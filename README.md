@@ -1,8 +1,15 @@
 # Agentic SDLC Harness
 
 Plantilla agnóstica (Claude Code first) para desarrollo agéntico disciplinado, con
-verificación/UAT como norte. Basada en el whitepaper de Google *"The New SDLC With Vibe
-Coding"* y en el concepto de *constitution* de Spec Kit.
+verificación/UAT como norte.
+
+> **Basado en el trabajo de Google.** Este harness es una implementación práctica de las
+> ideas del whitepaper de Google **_"The New SDLC With Vibe Coding — From ad-hoc prompting
+> to Agentic Engineering"_** (Addy Osmani, Shubham Saboo y Sokratis Kartakis, mayo 2026):
+> el *factory model*, el *context engineering* (static vs dynamic), la ecuación
+> `Agent = Model + Harness`, los evals de *output + trajectory*, y el *80% problem*. El
+> concepto de **constitution** proviene de **Spec Kit** (GitHub / Microsoft). Ver
+> [Créditos y referencias](#créditos-y-referencias).
 
 ## El loop de un vistazo
 `/constitution → brief → /distill → /plan → /contract → /tasks → implement → /verify → /uat`
@@ -104,6 +111,10 @@ feature "DONE"  ⟺  BUILD ✅  AND  TRAJECTORY ✅  AND  UAT ✅  AND  coverage
 2. `/distill` → `/plan` → `/contract` → `/tasks` → implementar → `/verify` → `/uat`.
 3. `coverage.md` es tu fuente de verdad del estado.
 
+> 📎 **Ejemplo poblado:** `specs/001-example/` muestra un feature real a mitad de camino
+> — con la matriz de `coverage.md` mezclando estados (🔴 / 🟢 / ✅ / 📋 / `[given]` /
+> `deferred`) para que se vea el Way of Work en acción.
+
 ## Heredar la constitution en otro proyecto
 `memory/constitution/base/` es un asset compartido **vendored**: copialo al proyecto
 nuevo. El `constitution.md` local declara `extends: base` y agrega sus deltas. Para
@@ -112,7 +123,20 @@ actualizar, seguí `memory/constitution/update-checklist.md` y re-copiá `base/`
 ## Verificar el harness
 `bash tests/run.sh` — el template se auto-verifica (estructura + hook). También corre en CI (advisory).
 
-## Referencias
+## Créditos y referencias
+
+Este harness no inventa la metodología: la operacionaliza. El crédito conceptual es de:
+
+- **Google — _"The New SDLC With Vibe Coding — From ad-hoc prompting to Agentic
+  Engineering"_** (Addy Osmani, Shubham Saboo, Sokratis Kartakis; mayo 2026). Fuente del
+  *factory model*, *context engineering* (static/dynamic), `Agent = Model + Harness`,
+  *harness engineering*, evals de *output + trajectory*, el *conductor/orchestrator* y el
+  *80% problem*. Todo el vocabulario del Way of Work proviene de aquí.
+- **Spec Kit — GitHub / Microsoft.** Concepto de **constitution** (principios
+  no-negociables que gobiernan el flujo) y del pipeline `specify → plan → tasks`.
+
+Documentos internos de este repo:
+
 - Diseño (rationale): `docs/superpowers/specs/2026-07-02-agentic-sdlc-harness-design.md`
 - Plan de implementación: `docs/superpowers/plans/2026-07-02-agentic-sdlc-harness.md`
 - Detalle del flujo: `docs/workflow.md` · Factory model: `docs/factory-model.md`
