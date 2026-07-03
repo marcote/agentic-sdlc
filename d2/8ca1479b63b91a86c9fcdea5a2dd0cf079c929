@@ -1,0 +1,33 @@
+.claude/commands/verify.md
+  s_9fca83243ad621::t_54022411dc4542 1-6
+tests/check_40_commands.sh
+  s_9fca83243ad621::t_7fd661a69bf82b 1-7
+.claude/commands/uat.md
+  s_9fca83243ad621::t_82a00e25010ad0 1-6
+.claude/commands/plan.md
+  s_9fca83243ad621::t_1acec00f54e025 1-7
+.claude/commands/contract.md
+  s_9fca83243ad621::t_ae7abe7d6b17b9 1-9
+.claude/commands/tasks.md
+  s_9fca83243ad621::t_9e438cc0bee0ff 1-8
+.claude/commands/constitution.md
+  s_9fca83243ad621::t_b7dea379c46e42 1-8
+.claude/commands/distill.md
+  s_9fca83243ad621::t_144d749bbae5e7 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "d28ca1479b63b91a86c9fcdea5a2dd0cf079c929",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
