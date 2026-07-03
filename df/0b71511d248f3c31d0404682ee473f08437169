@@ -1,0 +1,35 @@
+memory/constitution/base/README.md
+  s_9fca83243ad621::t_dd8ac2c7477fac 1-9
+memory/constitution/base/principles.md
+  s_9fca83243ad621::t_75c8a49ce8205b 1-15
+memory/constitution/update-checklist.md
+  s_9fca83243ad621::t_4339473211f9dd 1-9
+memory/constitution/constitution.md
+  s_9fca83243ad621::t_fb295d37ef2ca3 1-17
+memory/constitution/base/patterns/idempotency.md
+  s_9fca83243ad621::t_0089456f950f72 1-7
+tests/check_10_constitution.sh
+  s_9fca83243ad621::t_600b232a264e25 1-12
+memory/constitution/base/patterns/audit-logging.md
+  s_9fca83243ad621::t_9a03cbcc9ac79c 1-7
+memory/constitution/base/patterns/rate-limiting.md
+  s_9fca83243ad621::t_2fabd2f94fdcea 1-7
+CLAUDE.md
+  s_9fca83243ad621::t_688cf1e4f9e564 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "df0b71511d248f3c31d0404682ee473f08437169",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
