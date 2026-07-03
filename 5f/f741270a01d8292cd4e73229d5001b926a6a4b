@@ -1,0 +1,25 @@
+tests/run.sh
+  s_9fca83243ad621::t_b3aa5c3706222e 1-10
+tests/check_00_skeleton.sh
+  s_9fca83243ad621::t_fe3d41895bcf3c 1-9
+tests/lib.sh
+  s_9fca83243ad621::t_21b0a0840082a4 1-8
+.gitignore
+  s_9fca83243ad621::t_5bea842babd6d9 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "5ff741270a01d8292cd4e73229d5001b926a6a4b",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
