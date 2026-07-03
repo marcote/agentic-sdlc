@@ -1,0 +1,14 @@
+name: verify
+on: [pull_request]
+
+# Advisory por defecto: este check puede fallar (X roja) sin bloquear el merge.
+# Para volverlo bloqueante, hacelo "required" en Branch protection (decisión de gobernanza).
+jobs:
+  self-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Harness self-verification
+        run: bash tests/run.sh
+      # Placeholder (agent-driven /verify en CI): postear verification-report como comentario
+      # del PR queda a criterio del proyecto — depende del stack y del runner de evals.
