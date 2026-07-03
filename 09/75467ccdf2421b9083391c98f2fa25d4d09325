@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-07-02-agentic-sdlc-harness.md
+  s_9fca83243ad621::t_90229da45c699d 1-1147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "0975467ccdf2421b9083391c98f2fa25d4d09325",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
