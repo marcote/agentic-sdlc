@@ -13,6 +13,9 @@ if [ "${1:-}" = "--scan-text" ]; then
 fi
 
 # Hook mode: stdin is the tool-call JSON. Only act on git commit.
+# NOTE: the "git commit" match is intentionally a loose substring (advisory,
+# bash-only, no jq). It may over-match; that only costs one warning, never a
+# blocked commit. Tighten per-project if needed (constitution extends: base).
 INPUT="$(cat)"
 case "$INPUT" in
   *"git commit"*) : ;;
