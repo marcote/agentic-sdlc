@@ -1,0 +1,31 @@
+specs/_template/brief.md
+  s_9fca83243ad621::t_1a0d14a29d1839 1-15
+specs/_template/tasks.md
+  s_9fca83243ad621::t_deac4b911884ca 1-7
+specs/_template/coverage.md
+  s_9fca83243ad621::t_7a3fbd5d7ca18e 1-12
+specs/_template/spec.md
+  s_9fca83243ad621::t_ac6a57aaf30695 1-16
+tests/check_20_spec_templates.sh
+  s_9fca83243ad621::t_74ffb5197c28fc 1-9
+specs/_template/acceptance.md
+  s_9fca83243ad621::t_99e5a3b646e66e 1-14
+specs/_template/plan.md
+  s_9fca83243ad621::t_0f64d1397a4785 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "023194e1a8365569f07f09787b7b734cf1448505",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
