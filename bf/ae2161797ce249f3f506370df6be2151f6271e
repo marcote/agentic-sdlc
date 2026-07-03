@@ -1,0 +1,25 @@
+.claude/skills/uat/SKILL.md
+  s_9fca83243ad621::t_ecc619b148a362 1-14
+.claude/skills/distill/SKILL.md
+  s_9fca83243ad621::t_fd6eaac839f40d 1-22
+tests/check_50_skills.sh
+  s_9fca83243ad621::t_be448ed3dfa7cd 1-8
+.claude/skills/verify/SKILL.md
+  s_9fca83243ad621::t_9116379472ab3f 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "bfae2161797ce249f3f506370df6be2151f6271e",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
