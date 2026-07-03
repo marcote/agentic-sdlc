@@ -1,0 +1,27 @@
+tests/check_70_docs_ci.sh
+  s_9fca83243ad621::t_0b76f5255cf079 1-7
+docs/factory-model.md
+  s_9fca83243ad621::t_2f6b1d0475acbd 1-11
+docs/workflow.md
+  s_9fca83243ad621::t_45cd4ed4eb207a 1-26
+README.md
+  s_9fca83243ad621::t_8161b8e17e81c8 1-29
+.github/workflows/verify.yml
+  s_9fca83243ad621::t_05dd93bff086bd 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "c3a641b2d76a208ebddc301f046be30455464e17",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
