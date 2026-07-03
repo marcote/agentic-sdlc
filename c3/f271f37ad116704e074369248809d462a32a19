@@ -1,0 +1,23 @@
+.claude/hooks/secret-scan.sh
+  s_9fca83243ad621::t_b871f29d4a4193 1-26
+.claude/settings.json
+  s_9fca83243ad621::t_c1c43a423c1839 1-12
+tests/check_60_secret_scan.sh
+  s_9fca83243ad621::t_6daab046366971 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "c3f271f37ad116704e074369248809d462a32a19",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
