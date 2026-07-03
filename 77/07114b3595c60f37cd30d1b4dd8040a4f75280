@@ -1,0 +1,29 @@
+verification/code-review-checklist.md
+  s_9fca83243ad621::t_ca9c9a538a2989 1-10
+evals/README.md
+  s_9fca83243ad621::t_7807be36d3bb3d 1-11
+tests/check_30_verification.sh
+  s_9fca83243ad621::t_04a29a01bde700 1-11
+verification/verification-report.md
+  s_9fca83243ad621::t_7db8728c8fcc7a 1-20
+verification/uat-checklist.md
+  s_9fca83243ad621::t_13c29e6d89222c 1-10
+evals/rubric.md
+  s_9fca83243ad621::t_eaec803ad0c670 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "7707114b3595c60f37cd30d1b4dd8040a4f75280",
+  "prompts": {},
+  "sessions": {
+    "s_9fca83243ad621": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3932c23-db23-4ceb-8df9-c6d5c071efae",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
