@@ -232,8 +232,24 @@ limpio, el espacio para el teatro queda chico e incómodo.
   cierre** → para cuando `003-wow-self-validation` está cerrando, `/retro` **ya existe**.
   Por lo tanto `003` **se retro-ea a sí mismo**: la primera entrada real del ledger es
   este feature validándose con su propia capacidad.
-- Solo `002` (que precede a todo) cierra con `n/a: precede a /retro (bootstrap)`.
-  `001-example` es fixture, no un feature real.
+- **No hace falta bootstrap para `002`.** `check_90` detecta "cerrado" por *"tiene un
+  reporte con veredicto DONE"* (`BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%`).
+  `002` solo tiene `verification/reports/002-north-star-judge.md` (un resultado de eval,
+  no un verdict DONE) → el detector uniforme **no lo marca**; queda como "en vuelo" y se
+  saltea. Sin hardcode y sin `n/a` de relleno — más limpio que una excepción. El
+  veredicto `n/a` sigue siendo un estado válido para features reales futuros (refactor
+  puro, tooling), con su razón obligatoria. `001-example` es fixture, no un feature real.
+
+## Constraint: repo-plantilla vs repo-adoptante
+
+Este repo es la **plantilla** del harness: su `north-star.md` es un placeholder no
+schema-válido. `/align` es fail-closed → **no corre de verdad acá**. Por lo tanto la
+**Cara A (Misión)** del retro solo se cierra con datos reales en un **repo adoptante**
+(con North Star propio). En el repo-plantilla:
+- Cara A = `n/a` (+ razón: "North Star placeholder; align↔retro corre en adoptante").
+- Cara B (Método) = real y derivada (se dogfoodea de verdad al construir features acá).
+- La maquinaria completa (template, skills, `check_90`, `/wow-report`) se ejercita y
+  testea igual; lo único diferido al adoptante es la medición real del signal.
 
 ## Manifiesto de archivos
 
@@ -246,7 +262,7 @@ limpio, el espacio para el teatro queda chico e incómodo.
 | editar checks | `check_20` (+retro template), `check_40` (+retro, wow-report), `check_50` (+retro, wow-report) |
 | editar contrato DONE | `CLAUDE.md`, `docs/workflow.md`, `verification/verification-report.md` |
 | generado (commiteado) | `verification/wow-report.md` |
-| bootstrap | `specs/002-north-star-governance/retro.md` (`n/a`) |
+| bootstrap | — (ninguno: `002` no tiene reporte DONE → `check_90` lo saltea; sin hardcode ni `n/a`) |
 | dogfood | `specs/003-wow-self-validation/` completo (brief→align→…→retro propio) |
 
 ## No-objetivos (YAGNI)
