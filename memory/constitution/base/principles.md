@@ -14,7 +14,12 @@ verificación debe cumplirlos. Se heredan vía `extends: base`.
    darle el arco RED→GREEN.
 3. **Trazabilidad total.** Todo objetivo del brief llega a un criterio; todo criterio
    mapea a un eval o paso de UAT. Filas huérfanas = gap que bloquea el freeze del spec.
-4. **Productividad primero.** La verificación es on-demand; nada bloquea commit/push.
+4. **Productividad primero.** La verificación es on-demand: sin hooks bloqueantes por
+   commit, el inner loop —commit local y push a ramas de trabajo— nunca se frena y el
+   throughput de features no se gatea. Única excepción admitida: un **gate de governance
+   angosto** sobre la rama de integración protegida (proteger la gobernanza de producto),
+   siempre que **no** frene ese throughput; su instancia concreta se declara como delta en
+   el `constitution.md` del proyecto.
 5. **Rastro auditable.** Cada verificación produce un reporte versionado.
 6. **Seguridad por defecto.** Ningún secreto en el repo; los patterns heredados
    (abajo) aplican salvo override justificado en el `constitution.md` del proyecto.

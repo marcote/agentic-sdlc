@@ -28,8 +28,10 @@ El output primario del desarrollador **no es código: es el sistema que produce 
 (el *factory model*). Vos definís los specs y los guardrails; el agente implementa; la
 verificación valida. Cuatro reglas rigen todo:
 
-1. **Productividad primero** — la verificación la corre el agente *on-demand*; nada
-   bloquea un commit/push por defecto.
+1. **Productividad primero** — la verificación la corre el agente *on-demand*; el inner
+   loop (commit local, push a ramas de trabajo) nunca se frena. La única excepción es un
+   gate de governance angosto sobre `main` (el amendment-gate del North Star), que no frena
+   el throughput de features.
 2. **Intent > syntax** — el artefacto que importa es el *spec* + los *criterios de
    aceptación*, no el código.
 3. **La constitution es código** — versionada, revisada, heredable. Agregá una regla cada
