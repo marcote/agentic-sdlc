@@ -1,0 +1,49 @@
+verification/reports/002-north-star-judge.md
+  s_43f94d3c4675c1::t_0a1911d3d3b951 1-44
+memory/north-star/base/alignment-rubric.md
+  s_43f94d3c4675c1::t_06c378f011702c 1-53
+docs/workflow.md
+  s_43f94d3c4675c1::t_28fd926b002afa 4,11-12
+  s_43f94d3c4675c1::t_a6c0f37196407a 26-36
+specs/002-north-star-governance/coverage.md
+  s_43f94d3c4675c1::t_cd6a6ba8e8049a 28-29,31,33-38
+.claude/skills/align/SKILL.md
+  s_43f94d3c4675c1::t_d402e63796ca83 1-118
+README.md
+  s_43f94d3c4675c1::t_1de22e37ceccea 15-19
+  s_43f94d3c4675c1::t_aa851e8f903bb2 39-58
+  s_43f94d3c4675c1::t_7449f2a3a64063 79
+  s_43f94d3c4675c1::t_d18c89f821be8e 128-129
+memory/north-star/base/README.md
+  s_43f94d3c4675c1::t_da2a7b0f221157 1-29
+memory/north-star/base/amendment-protocol.md
+  s_43f94d3c4675c1::t_77374be8d3863c 1-57
+specs/_template/coverage.md
+  s_43f94d3c4675c1::t_72ea0c780eb5b5 5-7,12-15
+memory/north-star/base/adr-template.md
+  s_43f94d3c4675c1::t_99e4944e3b7470 1-30
+memory/north-star/north-star.md
+  s_43f94d3c4675c1::t_0e6f2328a2a387 1-72
+.claude/commands/align.md
+  s_43f94d3c4675c1::t_b3e0868a5e967f 1-7
+.claude/skills/distill/SKILL.md
+  s_43f94d3c4675c1::t_e593d18d6a78f3 11-23
+memory/north-star/base/schema.md
+  s_43f94d3c4675c1::t_7cfec20771bbcb 1-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "0d151cf83977eb9f910271eb34fc05868c8bc9b7",
+  "prompts": {},
+  "sessions": {
+    "s_43f94d3c4675c1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7674d511-5854-49dd-ae15-05ed0f23145f",
+        "model": "unknown"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
