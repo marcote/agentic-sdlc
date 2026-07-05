@@ -67,7 +67,7 @@ Fuente: `specs/<feature>/alignment.md` (mapping objetivo→pilar) + `north-star.
   - si `n/a` → **razón:** <por qué este feature no cierra contra ningún signal>
 
 ## Cara B — Método (valida el WoW) — DERIVADA de artefactos, no redactada
-Cada campo trae su `[deriv: <locator>]`. Sin locator = inválido.
+Cada campo trae su marcador `[deriv: …]` — el locator de dónde salió la cifra. Sin locator = inválido.
 
 - **Gaps cazados por /distill:** <N> `[deriv: <coverage.md / git log de distill>]` — <los jugosos>
 - **Disciplina RED→GREEN:** <sí / no + excepciones> `[deriv: <historial de estados coverage.md + git>]`
@@ -212,13 +212,13 @@ for report in verification/reports/*.md; do
   # Sin placeholders sin llenar
   if grep -qE '_\(…\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro tiene placeholders sin llenar"; else _pass "$retro sin placeholders"; fi
   # Veredicto de misión válido
-  if grep -qE 'Veredicto de misión:[[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
+  if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
     _pass "$retro veredicto de misión válido"
   else
     _fail "$retro sin veredicto de misión válido"
   fi
   # n/a exige razón (Capa: anti-escape)
-  if grep -qE 'Veredicto de misión:[[:space:]]*n/a' "$retro"; then
+  if grep -qE 'Veredicto de misión:[*[:space:]]*n/a' "$retro"; then
     if grep -qiE 'raz[oó]n' "$retro"; then _pass "$retro n/a con razón"; else _fail "$retro n/a sin razón"; fi
   fi
   # Cada campo de Cara B con [deriv:] (Capa 1)

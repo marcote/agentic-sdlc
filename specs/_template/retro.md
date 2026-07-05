@@ -20,7 +20,7 @@ Fuente: `specs/<feature>/alignment.md` (mapping objetivo→pilar) + `north-star.
   - si `n/a` → **razón:** <por qué este feature no cierra contra ningún signal>
 
 ## Cara B — Método (valida el WoW) — DERIVADA de artefactos, no redactada
-Cada campo trae su `[deriv: <locator>]`. Sin locator = inválido.
+Cada campo trae su marcador `[deriv: …]` — el locator de dónde salió la cifra. Sin locator = inválido.
 
 - **Gaps cazados por /distill:** <N> `[deriv: <coverage.md / git log de distill>]` — <los jugosos>
 - **Disciplina RED→GREEN:** <sí / no + excepciones> `[deriv: <historial de estados coverage.md + git>]`
