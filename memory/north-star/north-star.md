@@ -93,6 +93,11 @@ El bloque de abajo es la única fuente de verdad, leída por el validador determ
       "id": "impacto-medible",
       "statement": "La disciplina que el harness impone tiene que traducirse en mejor software: menos rework y gaps cazados antes de producción, no gates que disparan por disparar.",
       "signal": "Gaps cazados temprano (grilling/contract) y rework tardío evitado (post-verify/uat), agregados por feature en la sección Método del wow-report; alto = la disciplina previene, no solo burocratiza."
+    },
+    {
+      "id": "pilar-invalido-uat",
+      "statement": "Pilar de prueba para el UAT del amendment-gate.",
+      "signal": "no debería mergearse."
     }
   ],
   "scope": {
