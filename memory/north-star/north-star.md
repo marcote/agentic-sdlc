@@ -37,6 +37,12 @@ sin escribir código de producto.
   íntegro al vendorearlo sobre un repo/stack arbitrario.
 - **`adopcion-sin-friccion`** — Incorporar el harness a un repo nuevo cuesta poco. Su
   `signal`: pasos/tiempo para adoptar el harness en un proyecto (menor = mejor).
+- **`impacto-medible`** — La disciplina que el harness impone tiene que traducirse en
+  mejor software, no en gates que disparan por disparar. Su `signal`: gaps cazados
+  temprano (grilling/`/contract`) y rework tardío evitado (post-`/verify`/`/uat`),
+  agregados por feature en la sección "Método" del `wow-report`. Distingue *enforçar*
+  (`enforcement-real`) de *que enforçar sirva* — la misma línea anti-teatro del retro,
+  subida al nivel del harness.
 
 ## Scope
 
@@ -82,6 +88,11 @@ El bloque de abajo es la única fuente de verdad, leída por el validador determ
       "id": "adopcion-sin-friccion",
       "statement": "Incorporar el harness a un repo nuevo cuesta poco.",
       "signal": "Pasos/tiempo para adoptar el harness en un proyecto (menor = mejor)."
+    },
+    {
+      "id": "impacto-medible",
+      "statement": "La disciplina que el harness impone tiene que traducirse en mejor software: menos rework y gaps cazados antes de producción, no gates que disparan por disparar.",
+      "signal": "Gaps cazados temprano (grilling/contract) y rework tardío evitado (post-verify/uat), agregados por feature en la sección Método del wow-report; alto = la disciplina previene, no solo burocratiza."
     }
   ],
   "scope": {
