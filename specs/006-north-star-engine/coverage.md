@@ -1,15 +1,45 @@
-# Coverage — <feature>
+# Coverage — North Star engine
 
 > Traceability matrix = source of truth for the state of each criterion and gap detector.
-> Rule: every objective → one criterion; every criterion → one eval/UAT. Orphan row = gap.
-> Chain: **pillar → objective → criterion** — every objective traces to a North Star pillar
-> (`memory/north-star/north-star.md`) via the objective→pillar mapping in `specs/<feature>/alignment.md`.
-> A row with an empty **Pillar** cell is a drift signal (see the orphan check of `/align`).
+> Rule: every objective → a criterion; every criterion → an eval/UAT. Orphan row = gap.
+> Chain: **pillar → objective → criterion** via the mapping in `alignment.md` (`aligned`).
 
 **Status legend:** `no contract` → `🔴 red` → `🟢 green` → `✅ uat`  ·
 `📋 case` (non-deterministic) · `[given]` (inherited from constitution) · `deferred` (justified gap)
 
+No `base/pattern` applies as `[given]`: the engine is a stateless dev-time function library
+(no write endpoints, retries/webhooks/payments, or network surface) — audit-logging /
+idempotency / rate-limiting do not fire.
+
+All criteria are `no contract` (freshly distilled); `/contract` materialises them 🔴 RED next.
+
 | Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked test/eval | Status |
 |---|---|---|---|---|---|---|
-| _(e.g.)_ `pillar-a` | _(e.g.)_ ↑ conversion | Save card 1-tap | token < 300ms | project | `card_token.feature` | 🔴 red |
-| — | — | (all writes) | audit-log actor+ts | `[given] base/audit-logging` | `audit.feature` | 🔴 red |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | schema-valid: accepts a valid North Star | SCHEMA-VALID | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | schema-valid: rejects invalid with reason | SCHEMA-INVALID | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | schema-valid: malformed → exit 2, not exit 1 | SCHEMA-MALFORMED | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | sets-changed: detects governed-set change | SETS-CHANGED | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | sets-changed: prose/threshold → same | SETS-SAME-PROSE | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | sets-changed: set-based, order-agnostic | SETS-ORDER-AGNOSTIC | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | scope-reject: full-predicate substring hit | SCOPE-HIT | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | scope-reject: conservative — partial ≠ hit | SCOPE-MISS-PARTIAL | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | scope-reject: case/whitespace normalization | SCOPE-NORMALIZE | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | align-verdict: scopeHit → rejected | VERDICT-REJECTED | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | align-verdict: orphan → blocked | VERDICT-BLOCKED | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | align-verdict: all dims ≥ threshold → aligned | VERDICT-ALIGNED | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | align-verdict: a dim < threshold → needs-amendment | VERDICT-NEEDS-AMENDMENT | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | has-adr-for: matching ADR present | ADR-PRESENT | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` · `frictionless-adoption` | In-repo py3 reference engine | has-adr-for: no ADR / non-slug ≠ match | ADR-ABSENT | project | `check_82_north_star_engine.sh` | no contract |
+| `real-enforcement` | amendment-gate reuses the engine (no dup) | Gate calls engine.py; embedded heredoc removed | GATE-REUSE | project | `check_82_north_star_engine.sh` (grep gate) | no contract |
+| `real-enforcement` | amendment-gate reuses the engine (no dup) | Gate behavior identical after rewire | GATE-REGRESSION | project | `check_95_amendment_gate.sh` | no contract |
+| `agnostic-portability` | Dependency-free (py3 stdlib) | Engine imports only stdlib; no Node/pip | DEP-FREE | project | `check_82_north_star_engine.sh` | no contract |
+| `agnostic-portability` | Self-check green | Suite exercises the engine and stays green | SELF-CHECK | project | `tests/run.sh` + `check_82_north_star_engine.sh` | no contract |
+
+**No orphan rows:** every brief objective (O1 in-repo engine, O2 gate reuse, O3
+dependency-free, + self-check green) maps to ≥1 criterion with a pillar; every criterion
+has a deterministic test. Spec freezable.
+
+**Invariant tied to deliverable:** `DEP-FREE` is bound to the engine existing at
+`scripts/north-star/engine.py` and importing only stdlib (not a repo-wide
+green-by-construction guardrail) — so it has a genuine RED→GREEN arc (`/contract` proves it
+RED because the module does not exist yet).
