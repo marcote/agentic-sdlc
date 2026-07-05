@@ -1,0 +1,24 @@
+memory/north-star/base/schema.md
+  s_43f94d3c4675c1::t_0c9b4c4a34362d 43
+  s_43f94d3c4675c1::t_069378a8f8c91b 49
+specs/_template/coverage.md
+  s_43f94d3c4675c1::t_1e9c43adecc30f 14
+verification/reports/002-north-star-judge.md
+  s_43f94d3c4675c1::t_124c2d0c540667 42-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "bdb2353e7a64647d96e77b57c8e61bc76022ddb6",
+  "prompts": {},
+  "sessions": {
+    "s_43f94d3c4675c1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7674d511-5854-49dd-ae15-05ed0f23145f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
