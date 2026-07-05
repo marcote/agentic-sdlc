@@ -40,11 +40,28 @@ rows). No `base/pattern` applies as `[given]` (stateless dev-time function libra
   not invented behavior; `scope-reject`/`align-verdict` implement the documented `/align`
   contract (`align/SKILL.md`, `alignment-rubric.md`).
 
-## 4. UAT  — appended by /uat, against acceptance.md
-_(pending — run in `/uat`)_
+## 4. UAT  — against acceptance.md + the brief objective
+End-to-end walk on the **real** repo artifacts (not fixtures), validating the
+batteries-included objective — "the engine runs, the gate uses it":
+
+- **Engine on the real `memory/north-star/north-star.md`:** `schema-valid` → exit 0 (the
+  real North Star is valid); `scope-reject "…blocking commit hooks"` → hit, prints the
+  predicate; `scope-reject "improve the governance workflow commands"` (in-scope) → exit 1
+  (miss); `align-verdict` (all dims ≥ threshold) → `aligned`. ✅
+- **`amendment-gate.sh` gating through the engine (O2 live, not just structural):**
+  sets change without ADR → **BLOCK** ("…WITHOUT a new ADR", from `engine has-adr-for`);
+  prose-only → **PASS** ("not applicable", from `engine sets-changed` → same); sets change
+  with ADR + schema-valid + green suite → **PASS** ("amendment OK"). ✅
+- **Dependency-free:** no installable manifests present; `engine.py` imports only
+  `sys`/`json`/`re`/`argparse` (stdlib). ✅
+
+Does it move the success metric? **Yes** — `/align` and the amendment gate stop being
+"contract only, engine elsewhere"; an adopter inherits a *running* reference engine
+(frictionless-adoption) and the gate runs one deterministic engine (real-enforcement).
+**No product gap → no `/distill` return.**
 
 ## 5. Verdict
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: pending · coverage: 100% (18/18 + guard) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19) · retro: pending
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/006-north-star-engine/retro.md` (closes the measurable prediction from `/align`).
-Gaps routed: none (no BUILD/TRAJECTORY gap → no return to implement).
+Gaps routed: none (no BUILD/TRAJECTORY gap → no return to implement; no UAT gap → no `/distill`).
