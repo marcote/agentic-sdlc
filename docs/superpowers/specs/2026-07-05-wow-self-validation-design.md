@@ -1,283 +1,281 @@
-# Diseño — WoW Self-Validation (`003-wow-self-validation`)
+# Design — WoW Self-Validation (`003-wow-self-validation`)
 
-fecha: 2026-07-05 · estado: aprobado en brainstorming, pendiente de plan
+date: 2026-07-05 · status: approved in brainstorming, pending plan
 
-## Problema
+## Problem
 
-El harness propone una Way of Working (WoW): `distill → plan → contract → tasks →
-implement → verify → uat`, con gates deterministas, coverage como fuente de verdad, y
-`/align` como Measurability Gate. Pero **nada valida que esa WoW funcione**. Un SDLC
-que predica disciplina pero no se somete a sí mismo no está probado.
+The harness proposes a Way of Working (WoW): `distill → plan → contract → tasks →
+implement → verify → uat`, with deterministic gates, coverage as the source of truth, and
+`/align` as the Measurability Gate. But **nothing validates that this WoW works**. An SDLC
+that preaches discipline but does not submit itself to it is unproven.
 
-El pedido: que el SDLC sea **dogfooding** — que nos autovalidemos el WoW que
-proponemos. Elegido en brainstorming: **loop cerrado** (conformance + outcome +
-auto-mejora), con la evidencia producida por la **parte agéntica** del flujo (no por
-diligencia humana), para sacarle el error humano.
+The goal: for the SDLC to be **dogfooding** — that we self-validate the WoW we
+propose. Chosen in brainstorming: **closed loop** (conformance + outcome +
+self-improvement), with evidence produced by the **agentic part** of the flow (not by
+human diligence), to eliminate human error.
 
-### Restricción honesta: N=1
+### Honest Constraint: N=1
 
-Una metodología no se puede A/B-testear contra sí misma en un solo repo — no hay grupo
-de control. Por lo tanto "outcome" no se apoya en estadística cruzada entre features,
-sino en **una afirmación falsable por feature**: `/align` declara una predicción
-medible arriba de todo, y el retro dicta el veredicto sobre esa predicción. El WoW se
-auto-valida feature por feature.
+A methodology cannot be A/B-tested against itself in a single repo — there is no control
+group. Therefore "outcome" does not rely on cross-feature statistics, but on **a falsifiable
+claim per feature**: `/align` declares a measurable prediction up front, and the retro
+issues the verdict on that prediction. The WoW self-validates feature by feature.
 
-## Principio rector: la columna `align ↔ retro`
+## Guiding Principle: the `align ↔ retro` column
 
-Toda predicción medible que **abre** `/align` la **cierra** el retro. El retro no es un
-artefacto suelto de "cómo nos fue"; es la contraparte estructural de la Measurability
-Gate.
+Every measurable prediction that **opens** `/align` is **closed** by the retro. The retro
+is not a loose artifact about "how it went"; it is the structural counterpart of the
+Measurability Gate.
 
 ```
 brief.md
   │
-/align ──────────► alignment.md        PREDICCIÓN: "avanza pilar X vía signal Y;
-  │                 (verdict, scores,               scores ≥ umbral"
+/align ──────────► alignment.md        PREDICTION: "pillar X advances via signal Y;
+  │                 (verdict, scores,               scores ≥ threshold"
   │                  mapping, orphans)
   ▼
 distill → contract → tasks → implement
   │
-/verify + /uat ──► verification/reports/<feature>   el PRODUCTO funciona
+/verify + /uat ──► verification/reports/<feature>   the PRODUCT works
   │                 (BUILD ∧ TRAJECTORY ∧ UAT ∧ coverage 100%)
   ▼
-/retro ──────────► specs/<feature>/retro.md   VEREDICTO sobre la predicción de align
-                                              + señales del método (WoW)
+/retro ──────────► specs/<feature>/retro.md   VERDICT on the align prediction
+                                              + method signals (WoW)
 ```
 
-### Extensión del contrato DONE
+### Extension of the DONE contract
 
 ```
 feature DONE ⟺ BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100% ∧ retro ✅
 ```
 
-`retro ✅` = el retro cerró sus tres caras, **no** que "salió todo bien". Un retro que
-documenta que la predicción de align **falló** es un retro válido y cerrado — de hecho
-el más valioso, porque alimenta el loop de auto-mejora.
+`retro ✅` = the retro closed all three faces, **not** that "everything went well". A retro
+that documents that the align prediction **failed** is a valid and closed retro — in fact
+the most valuable, because it feeds the self-improvement loop.
 
-## Componentes
+## Components
 
-### 1. `specs/_template/retro.md` — el artefacto (tres caras)
+### 1. `specs/_template/retro.md` — the artifact (three faces)
 
-Vive co-locado con el feature (respeta "un feature = un folder"). Cada campo anclado a
-un artefacto existente para que el agente lo **derive**, no lo invente.
+Lives co-located with the feature (respects "one feature = one folder"). Each field anchored
+to an existing artifact so the agent can **derive** it, not invent it.
 
 ```markdown
 # Retro — <feature> @ <commit>
-cierra: alignment.md · verification/reports/<feature> · fecha: <YYYY-MM-DD>
+closes: alignment.md · verification/reports/<feature> · date: <YYYY-MM-DD>
 
-## Cara A — Misión (cierra la predicción de /align)
-Fuente: specs/<feature>/alignment.md
+## Face A — Mission (closes the /align prediction)
+Source: specs/<feature>/alignment.md
 
-| Pilar (mapping) | Signal predicho | Veredicto | Evidencia (locator OBLIGATORIO) |
+| Pillar (mapping) | Predicted signal | Verdict | Evidence (MANDATORY locator) |
 |---|---|---|---|
-| pilar-x | <signal del North Star> | ✅ movió / ❌ no movió / ⏳ aún no observable | <valor/SHA/fila-coverage/URL — no prosa> |
+| pillar-x | <North Star signal> | ✅ moved / ❌ did not move / ⏳ not yet observable | <value/SHA/coverage-row/URL — no prose> |
 
-- Calibración de align: los scores predichos (pillarFit/scope/mission) ¿acertaron?
-- Veredicto de misión: confirmed | refuted | pending-observation | n/a
-  - si confirmed | refuted → la celda Evidencia NO puede estar vacía (Capa 2)
-  - si pending-observation → trigger de re-chequeo: <cuándo/qué señal mirar>
-  - si n/a → razón obligatoria: <por qué no cierra contra un signal>
+- Align calibration: did the predicted scores (pillarFit/scope/mission) hold up?
+- Mission verdict: confirmed | refuted | pending-observation | n/a
+  - if confirmed | refuted → the Evidence cell CANNOT be empty (Layer 2)
+  - if pending-observation → re-check trigger: <when/what signal to look at>
+  - if n/a → mandatory reason: <why it does not close against a signal>
 
-## Cara B — Método (valida el WoW) — DERIVADA de artefactos, no redactada (Capa 1)
-Cada campo muestra su `[deriv: <locator>]` — de dónde salió la cifra. Sin locator = inválido.
+## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted (Layer 1)
+Each field shows its `[deriv: <locator>]` — where the figure came from. Without locator = invalid.
 
-- Gaps cazados por /distill: <N> `[deriv: coverage.md filas + git log de distill]`
-- Disciplina RED→GREEN: <sí/no + excepciones> `[deriv: historial de estados coverage.md + git]`
-- Rework post-/verify: <N> · post-/uat: <N> `[deriv: gaps ruteados en verification/reports/<feature>]`
-- Escalaciones al humano: <N> `[deriv: traza/git]` — <por qué>
-- Fricción del propio WoW: <qué estorbó o faltó> (cualitativo; el único campo de juicio libre)
+- Gaps caught by /distill: <N> `[deriv: coverage.md rows + git log from distill phase]`
+- RED→GREEN discipline: <yes/no + exceptions> `[deriv: coverage.md state history + git]`
+- Post-/verify rework: <N> · post-/uat: <N> `[deriv: gaps routed in verification/reports/<feature>]`
+- Human escalations: <N> `[deriv: trace/git]` — <why>
+- Friction from the WoW itself: <what got in the way or was missing> (qualitative; the only free-judgment field)
 
-## Cara C — Loop (auto-mejora) — puente, no subsistema
-- Reglas candidatas → constitution: <regla o "ninguna">
-- Amendments candidatos → North Star: <ADR propuesto o "ninguno">
+## Face C — Loop (self-improvement) — bridge, not subsystem
+- Candidate rules → constitution: <rule or "none">
+- Candidate amendments → North Star: <proposed ADR or "none">
 ```
 
-**Decisiones:**
-- `pending-observation` es de primera clase: muchos `signal` (ej. "↑ conversión") no
-  se pueden medir el día del cierre. En vez de fingir certeza, veredicto diferido con
-  trigger. No bloquea el cierre.
-- `n/a` es un veredicto de primera clase (no un hack): un refactor puro o tooling
-  legítimamente no mueve ningún signal. **Requiere razón obligatoria** (evita el escape
-  silencioso).
-- La Cara B es mayormente **auto-derivable** de artefactos (coverage, git, report), no
-  de memoria — ahí es donde la parte agéntica saca el error humano.
-- La Cara C solo **propone**; aplicar reglas/ADRs sigue los mecanismos existentes
+**Decisions:**
+- `pending-observation` is first-class: many `signal`s (e.g., "↑ conversion") cannot
+  be measured on the closing day. Instead of faking certainty, deferred verdict with
+  trigger. Does not block closure.
+- `n/a` is a first-class verdict (not a hack): a pure refactor or tooling legitimately
+  does not move any signal. **Requires mandatory reason** (avoids silent escape).
+- Face B is mostly **auto-derivable** from artifacts (coverage, git, report), not from
+  memory — that is where the agentic part eliminates human error.
+- Face C only **proposes**; applying rules/ADRs follows the existing mechanisms
   (`memory/constitution/update-checklist.md`, `memory/north-star/base/amendment-protocol.md`).
 
-### 2. `tests/check_90_retro.sh` — enforcement determinista
+### 2. `tests/check_90_retro.sh` — deterministic enforcement
 
-Respeta la regla "verificación on-demand, sin hooks bloqueantes por commit": el diente
-lo pone **CI** (`tests/` corre en `.github/workflows/verify.yml`), no un hook de git.
+Respects the rule "on-demand verification, no blocking git hooks per commit": the
+enforcement lives in **CI** (`tests/` runs in `.github/workflows/verify.yml`), not a git
+hook.
 
-Dos niveles:
-- **Template** (extiende `check_20`): `specs/_template/retro.md` existe con los headers
-  de las tres caras.
-- **Cierre por-feature** (`check_90`), lógica uniforme, **sin ramas por número de
-  feature**:
+Two levels:
+- **Template** (extends `check_20`): `specs/_template/retro.md` exists with the headers
+  for all three faces.
+- **Per-feature closure** (`check_90`), uniform logic, **no branches by feature number**:
 
 ```
-para cada specs/NNN-*/ cuyo verification/reports/NNN-* muestre el veredicto DONE:
-  assert retro.md existe
-  assert sin placeholders _(…)_ / <…> sin llenar
-  assert veredicto de misión ∈ {confirmed, refuted, pending-observation, n/a}
-  assert si veredicto == n/a  →  hay una razón no vacía
-  assert si veredicto ∈ {confirmed, refuted}  →  celda Evidencia no vacía          (Capa 2)
-          y "parece" locator (contiene path / SHA / número / URL, no solo prosa)
-  assert cada campo de Cara B trae su [deriv: <locator>]                            (Capa 1)
-si NO está DONE: skip (feature en vuelo)
+for each specs/NNN-*/ whose verification/reports/NNN-* shows the DONE verdict:
+  assert retro.md exists
+  assert no unfilled placeholders _(…)_ / <…>
+  assert mission verdict ∈ {confirmed, refuted, pending-observation, n/a}
+  assert if verdict == n/a  →  there is a non-empty reason
+  assert if verdict ∈ {confirmed, refuted}  →  Evidence cell not empty          (Layer 2)
+          and "looks like" a locator (contains path / SHA / number / URL, not just prose)
+  assert each Face B field carries its [deriv: <locator>]                            (Layer 1)
+if NOT DONE: skip (feature in-flight)
 ```
 
-Materializa `retro ✅` de forma determinista y en CI: no se puede mergear un feature
-declarado DONE sin retro completo. **Límite honesto:** el check verifica presencia +
-estructura + token de veredicto, **no la honestidad** del contenido — eso lo sostiene
-el agente que corre `/retro` (la apuesta agéntica).
+Materializes `retro ✅` deterministically in CI: a feature declared DONE cannot be merged
+without a complete retro. **Honest limit:** the check verifies presence + structure + verdict
+token, **not the honesty** of the content — that is upheld by the agent running `/retro`
+(the agentic bet).
 
-**Sin hardcodeo:** la exención de bootstrap (`002`) no vive en el test sino como dato
-(`retro.md` con `n/a` + razón). `grep -r "n/a" specs/*/retro.md` lista todas las
-exenciones con su razón. Cero housekeeping.
+**No hardcoding:** the bootstrap exemption (`002`) does not live in the test but as data
+(`retro.md` with `n/a` + reason). `grep -r "n/a" specs/*/retro.md` lists all exemptions
+with their reason. Zero housekeeping.
 
-### 3. `/wow-report` — agregación (observabilidad)
+### 3. `/wow-report` — aggregation (observability)
 
-Skill on-demand (patrón `/verify`, `/uat`) que lee todos los `retro.md` + `alignment.md`
-+ reportes de verificación y **regenera** `verification/wow-report.md` (snapshot
-commiteado). Estructura:
+On-demand skill (pattern `/verify`, `/uat`) that reads all `retro.md` + `alignment.md`
++ verification reports and **regenerates** `verification/wow-report.md` (committed
+snapshot). Structure:
 
 ```markdown
-# WoW Report — @ <fecha/commit>   (snapshot generado; no editar a mano)
+# WoW Report — @ <date/commit>   (generated snapshot; do not edit manually)
 
-## 1. Misión — ¿cada pilar del North Star está siendo servido de verdad?
-   mapping (align) × veredicto de signal (retro) por pilar.
-   pilar con features que dijeron servirlo pero ningún signal movido = DRIFT medible.
+## 1. Mission — is each North Star pillar actually being served?
+   mapping (align) × signal verdict (retro) per pillar.
+   pillar with features that promised to serve it but no signal moved = measurable DRIFT.
 
-## 2. Re-chequeos pendientes (worklist)
-   los pending-observation con su trigger; marca los vencidos.
+## 2. Pending re-checks (worklist)
+   the pending-observation items with their triggers; marks the overdue ones.
 
-## 3. Método — ¿el WoW agrega valor? (N=<n>, muestra chica, sin stats)
-   por-feature: gaps cazados, disciplina RED, rework, escalaciones; + temas de fricción.
+## 3. Method — does the WoW add value? (N=<n>, small sample, no stats)
+   per-feature: gaps caught, RED discipline, rework, escalations; + friction themes.
 
-## 4. Loop — ¿el WoW se mejora a sí mismo?
-   reglas candidatas propuestas vs aterrizadas en constitution;
-   amendments propuestos vs aprobados (ADR).
+## 4. Loop — does the WoW improve itself?
+   candidate rules proposed vs landed in constitution;
+   amendments proposed vs approved (ADR).
 
-## 5. Olores de teatro (spot-check humano)  (Capa 4)
-   marca retros sospechosos: celdas de Evidencia vacías · all-green
-   (cero gaps + cero rework + cero fricción) · pending-observation vencidos y
-   nunca re-chequeados. Un retro demasiado limpio ES una señal.
+## 5. Theater smells (human spot-check)  (Layer 4)
+   flags suspicious retros: empty Evidence cells · all-green
+   (zero gaps + zero rework + zero friction) · overdue pending-observation items
+   never re-checked. An overly clean retro IS a signal.
 ```
 
-**Decisiones:**
-- El centro de gravedad es el **rollup por pilar (§1)**: responde lo más profundo —
-  ¿cada pilar del North Star avanza de verdad, o solo se lo prometió? Drift medible.
-- `pending-observation` se vuelve **worklist accionable (§2)**; cobra la deuda de la
-  medición diferida. No se automatiza con scheduler ahora (YAGNI); solo se hace visible.
-- `/wow-report` **observa, nunca gatea**. `check_90` es el diente (CI); el report es
-  síntesis read-only para el humano.
-- Honestidad del N chico: el report dice explícito "N=n, sin estadística" y muestra
-  por-feature + totales, sin fingir tendencias.
+**Decisions:**
+- The center of gravity is the **rollup by pillar (§1)**: it answers the deepest question —
+  is each North Star pillar actually advancing, or was it just promised? Measurable drift.
+- `pending-observation` becomes an **actionable worklist (§2)**; it collects the debt of
+  deferred measurement. Not automated with a scheduler now (YAGNI); just made visible.
+- `/wow-report` **observes, never gates**. `check_90` is the enforcement mechanism (CI);
+  the report is read-only synthesis for the human.
+- Small N honesty: the report explicitly says "N=n, no statistics" and shows per-feature +
+  totals, without faking trends.
 
-### 4. La skill `/retro`
+### 4. The `/retro` skill
 
-Par comando+skill (mismo patrón que `/align`):
-- `.claude/commands/retro.md` (thin): invocá la skill `retro`; requiere el reporte de
-  verificación del feature en DONE; escribe `specs/<feature>/retro.md`.
-- `.claude/skills/retro/SKILL.md` (procedimiento — orden `derivar → auto-desafiar →
-  escribir`, no al revés):
-  1. **Derivá primero** (Capa 1): cada cifra de Cara B sale de un artefacto con su
-     `[deriv: <locator>]` (`coverage.md`, git, `verification/reports/<feature>`). No
-     tipees cifras de memoria.
-  2. leé `alignment.md` → para cada pilar del `mapping`, buscá su `signal` y dictá
-     veredicto **con evidencia locator obligatoria** (Cara A, Capa 2). Sin locator para
-     un `confirmed`/`refuted` → no lo escribas: es `pending-observation`.
-  3. **Auto-desafío adversarial** (Capa 3): antes de escribir, argumentá EN CONTRA de tu
-     propio borrador — "el report dice 0 rework: verificá contra `git log`; dice que el
-     pillar-fit de align fue exacto: sostené lo opuesto". Solo lo que sobrevive al
-     desafío se escribe. (Refuerzo futuro, YAGNI ahora: delegar el desafío a un subagente
-     sképtico separado, no al que redactó.)
-  4. proponé reglas/ADRs (Cara C);
-  5. si un signal no es medible al cierre → `pending-observation` + trigger, o `n/a` +
-     razón.
+Command+skill pair (same pattern as `/align`):
+- `.claude/commands/retro.md` (thin): invokes the `retro` skill; requires the feature's
+  verification report in DONE; writes `specs/<feature>/retro.md`.
+- `.claude/skills/retro/SKILL.md` (procedure — order `derive → self-challenge →
+  write`, not the other way around):
+  1. **Derive first** (Layer 1): every figure in Face B comes from an artifact with its
+     `[deriv: <locator>]` (`coverage.md`, git, `verification/reports/<feature>`). Do not
+     type figures from memory.
+  2. read `alignment.md` → for each pillar in the `mapping`, find its `signal` and issue
+     the verdict **with mandatory evidence locator** (Face A, Layer 2). Without locator for
+     a `confirmed`/`refuted` → do not write it: it is `pending-observation`.
+  3. **Adversarial self-challenge** (Layer 3): before writing, argue AGAINST your own
+     draft — "the report says 0 rework: verify against `git log`; says the pillar-fit of
+     align was exact: argue the opposite". Only what survives the challenge gets written.
+     (Future reinforcement, YAGNI now: delegate the challenge to a separate skeptic
+     subagent, not the one that drafted.)
+  4. propose rules/ADRs (Face C);
+  5. if a signal is not measurable at closure → `pending-observation` + trigger, or `n/a` +
+     reason.
 
-## Anti-teatro: defensa en profundidad (4 capas)
+## Anti-theater: defense in depth (4 layers)
 
-El mayor riesgo del diseño: que el agente llene el retro **por cumplir**. Un check
-determinista **no puede probar honestidad** (un grep pasa con relleno plausible —
-Goodhart). No lo resolvemos con una defensa sino achicando el lugar donde el teatro se
-esconde. Cuatro capas, de más barata a más potente:
+The greatest design risk: that the agent fills in the retro **just to comply**. A
+deterministic check **cannot prove honesty** (a grep passes with plausible filler —
+Goodhart). We do not solve this with a single defense but by shrinking the space where
+theater can hide. Four layers, from cheapest to most powerful:
 
-1. **Derivar, no redactar** (Cara B + skill paso 1). Cada campo del Método es una
-   consulta contra un artefacto (`coverage.md`, git, report) con su `[deriv: <locator>]`.
-   Si el campo es una cifra derivada, no hay nada que "inventar por cumplir": el número
-   es el que es. Deja un solo campo de juicio libre (fricción), a propósito.
-2. **Evidence-or-it-didn't-happen** (Cara A + `check_90`). Un veredicto
-   `confirmed`/`refuted` exige celda de Evidencia no vacía con forma de locator
-   (path/SHA/número/URL). Esto **sí es checkeable** en CI: la prosa infalsificable está
-   prohibida. Sin evidencia → el veredicto honesto es `pending-observation`.
-3. **Auto-desafío adversarial** (skill paso 3). El mismo agente que construyó tiene sesgo
-   de auto-calificarse; el procedimiento le exige argumentar en contra de su propio
-   borrador antes de escribir. Reusa el patrón "juez sobre la traza" que `/verify` ya
-   tiene (trajectory eval). Refuerzo futuro: subagente sképtico separado (YAGNI ahora).
-4. **El report huele lo demasiado-limpio** (`/wow-report` §5). Un retro all-green es en
-   sí una señal; el agregador marca evidencia vacía, all-green y `pending-observation`
-   vencidos para spot-check humano. El trigger de re-chequeo es lo que **cobra** un
-   `confirmed` que después no se sostiene.
+1. **Derive, don't write** (Face B + skill step 1). Each Method field is a query against
+   an artifact (`coverage.md`, git, report) with its `[deriv: <locator>]`.
+   If the field is a derived figure, there is nothing to "invent to comply": the number
+   is what it is. Leaves only one free-judgment field (friction), intentionally.
+2. **Evidence-or-it-didn't-happen** (Face A + `check_90`). A `confirmed`/`refuted`
+   verdict requires a non-empty Evidence cell in locator form (path/SHA/number/URL). This
+   **is checkable** in CI: unfalsifiable prose is forbidden. Without evidence → the honest
+   verdict is `pending-observation`.
+3. **Adversarial self-challenge** (skill step 3). The same agent that built has a bias
+   toward self-grading; the procedure requires it to argue against its own draft before
+   writing. Reuses the "judge over the trace" pattern that `/verify` already has (trajectory
+   eval). Future reinforcement: separate skeptic subagent (YAGNI now).
+4. **The report smells what is too clean** (`/wow-report` §5). An all-green retro is
+   itself a signal; the aggregator flags empty evidence, all-green, and expired
+   `pending-observation` for human spot-check. The re-check trigger is what **collects**
+   on a `confirmed` that later cannot be sustained.
 
-**Lo honesto:** es defensa en profundidad, no una prueba. El residuo — que el agente
-evalúe de verdad — sigue siendo la apuesta agéntica. Pero entre derivar en vez de
-redactar, evidencia obligatoria y checkeable, auto-desafío, y el report que huele lo
-limpio, el espacio para el teatro queda chico e incómodo.
+**The honest truth:** this is defense in depth, not a proof. The residual — that the agent
+genuinely evaluates — remains the agentic bet. But between deriving instead of writing,
+mandatory and checkable evidence, self-challenge, and the report that smells what is clean,
+the space for theater is left small and uncomfortable.
 
-## Bootstrap recursivo
+## Recursive Bootstrap
 
-- `/align` no pudo gatear `002` porque corre **al inicio** del flujo. `/retro` corre **al
-  cierre** → para cuando `003-wow-self-validation` está cerrando, `/retro` **ya existe**.
-  Por lo tanto `003` **se retro-ea a sí mismo**: la primera entrada real del ledger es
-  este feature validándose con su propia capacidad.
-- **No hace falta bootstrap para `002`.** `check_90` detecta "cerrado" por *"tiene un
-  reporte con veredicto DONE"* (`BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%`).
-  `002` solo tiene `verification/reports/002-north-star-judge.md` (un resultado de eval,
-  no un verdict DONE) → el detector uniforme **no lo marca**; queda como "en vuelo" y se
-  saltea. Sin hardcode y sin `n/a` de relleno — más limpio que una excepción. El
-  veredicto `n/a` sigue siendo un estado válido para features reales futuros (refactor
-  puro, tooling), con su razón obligatoria. `001-example` es fixture, no un feature real.
+- `/align` could not gate `002` because it runs **at the start** of the flow. `/retro`
+  runs **at the close** → by the time `003-wow-self-validation` is closing, `/retro`
+  **already exists**. Therefore `003` **retros itself**: the first real ledger entry is
+  this feature validating itself with its own capability.
+- **No bootstrap needed for `002`.** `check_90` detects "closed" by *"has a report with
+  DONE verdict"* (`BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%`).
+  `002` only has `verification/reports/002-north-star-judge.md` (an eval result,
+  not a DONE verdict) → the uniform detector **does not flag it**; it remains "in flight"
+  and is skipped. No hardcode and no filler `n/a` — cleaner than an exception. The
+  `n/a` verdict remains a valid state for future real features (pure refactor, tooling),
+  with its mandatory reason. `001-example` is a fixture, not a real feature.
 
-## Constraint: repo-plantilla vs repo-adoptante
+## Constraint: template repo vs adopter repo
 
-Este repo es la **plantilla** del harness: su `north-star.md` es un placeholder no
-schema-válido. `/align` es fail-closed → **no corre de verdad acá**. Por lo tanto la
-**Cara A (Misión)** del retro solo se cierra con datos reales en un **repo adoptante**
-(con North Star propio). En el repo-plantilla:
-- Cara A = `n/a` (+ razón: "North Star placeholder; align↔retro corre en adoptante").
-- Cara B (Método) = real y derivada (se dogfoodea de verdad al construir features acá).
-- La maquinaria completa (template, skills, `check_90`, `/wow-report`) se ejercita y
-  testea igual; lo único diferido al adoptante es la medición real del signal.
+This repo is the harness **template**: its `north-star.md` is a non-schema-valid
+placeholder. `/align` is fail-closed → **it does not truly run here**. Therefore the
+retro's **Face A (Mission)** can only be closed with real data in an **adopter repo**
+(with its own North Star). In the template repo:
+- Face A = `n/a` (+ reason: "North Star placeholder; align↔retro runs in adopter").
+- Face B (Method) = real and derived (truly dogfooded when building features here).
+- The full machinery (template, skills, `check_90`, `/wow-report`) is exercised and
+  tested all the same; the only thing deferred to the adopter is the actual signal
+  measurement.
 
-## Manifiesto de archivos
+## File Manifest
 
-| Acción | Archivo |
+| Action | File |
 |---|---|
-| nuevo template | `specs/_template/retro.md` |
-| nuevo comando | `.claude/commands/retro.md`, `.claude/commands/wow-report.md` |
-| nueva skill | `.claude/skills/retro/SKILL.md`, `.claude/skills/wow-report/SKILL.md` |
-| nuevo check | `tests/check_90_retro.sh` |
-| editar checks | `check_20` (+retro template), `check_40` (+retro, wow-report), `check_50` (+retro, wow-report) |
-| editar contrato DONE | `CLAUDE.md`, `docs/workflow.md`, `verification/verification-report.md` |
-| generado (commiteado) | `verification/wow-report.md` |
-| bootstrap | — (ninguno: `002` no tiene reporte DONE → `check_90` lo saltea; sin hardcode ni `n/a`) |
-| dogfood | `specs/003-wow-self-validation/` completo (brief→align→…→retro propio) |
+| new template | `specs/_template/retro.md` |
+| new command | `.claude/commands/retro.md`, `.claude/commands/wow-report.md` |
+| new skill | `.claude/skills/retro/SKILL.md`, `.claude/skills/wow-report/SKILL.md` |
+| new check | `tests/check_90_retro.sh` |
+| edit checks | `check_20` (+retro template), `check_40` (+retro, wow-report), `check_50` (+retro, wow-report) |
+| edit DONE contract | `CLAUDE.md`, `docs/workflow.md`, `verification/verification-report.md` |
+| generated (committed) | `verification/wow-report.md` |
+| bootstrap | — (none: `002` has no DONE report → `check_90` skips it; no hardcode or `n/a`) |
+| dogfood | `specs/003-wow-self-validation/` complete (brief→align→…→own retro) |
 
-## No-objetivos (YAGNI)
+## Non-goals (YAGNI)
 
-- **No** scheduler/automatización de re-chequeos de `pending-observation` (solo
-  visibilidad en el report).
-- **No** estadística cruzada entre features / dashboards de tendencia (N=1 lo prohíbe
-  honestamente).
-- **No** hook de git bloqueante (el enforcement es CI, on-demand).
-- **No** motor determinista nuevo: `check_90` es grep sobre artefactos, como el resto.
+- **No** scheduler/automation for `pending-observation` re-checks (visibility in report
+  only).
+- **No** cross-feature statistics / trend dashboards (N=1 honestly prohibits it).
+- **No** blocking git hook (enforcement is CI, on-demand).
+- **No** new deterministic engine: `check_90` is a grep over artifacts, like the rest.
 
-## Riesgos
+## Risks
 
-- **Retro de baja calidad** (el agente llena por cumplir): ver "Anti-teatro: defensa en
-  profundidad (4 capas)". El check no puede probar honestidad — es explícito.
-- **`n/a` abusado** como escape: mitiga la razón obligatoria + visibilidad por grep.
-- **`pending-observation` que nunca se re-chequea**: mitiga la worklist con "vencidos"
-  en `/wow-report`.
+- **Low-quality retro** (the agent fills in to comply): see "Anti-theater: defense in
+  depth (4 layers)". The check cannot prove honesty — this is explicit.
+- **`n/a` abused** as an escape: mitigated by the mandatory reason + grep visibility.
+- **`pending-observation` that never gets re-checked**: mitigated by the worklist with
+  "expired" items in `/wow-report`.

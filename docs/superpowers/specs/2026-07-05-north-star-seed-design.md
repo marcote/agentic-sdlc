@@ -1,114 +1,113 @@
-# Diseño — Seed del North Star del harness
+# Design — Harness North Star Seed
 
-fecha: 2026-07-05 · estado: aprobado en brainstorming, pendiente de ejecución
+date: 2026-07-05 · status: approved in brainstorming, pending execution
 
-## Problema
+## Problem
 
-`memory/north-star/north-star.md` es un **placeholder** (todo `_(completar por
-proyecto)_`) porque históricamente este repo se trató como "la plantilla, el adoptante
-la reemplaza". Pero el repo **es un producto real** — un harness reutilizable de SDLC
-agéntico — y merece su propia gobernanza de producto, igual que ya tiene una
-`constitution.md` real. El usuario quiere empezar a definir "hacia dónde vamos".
+`memory/north-star/north-star.md` is a **placeholder** (all `_(fill in per
+project)_`) because historically this repo was treated as "the template — the adopter
+replaces it." But the repo **is a real product** — a reusable agentic SDLC
+harness — and deserves its own product governance, just as it already has a
+real `constitution.md`. The user wants to start defining "where we are headed."
 
-**Bonus estructural:** llenar el North Star con un bloque schema-válido **destraba la
-Cara A (Misión) del retro** que hoy cierra `n/a` (ver
+**Structural bonus:** filling the North Star with a schema-valid block **unlocks
+Side A (Mission) of the retro** that currently closes as `n/a` (see
 `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`, "Constraint:
-repo-plantilla vs adoptante"). Completa el loop align↔retro que quedó a medias.
+repo-template vs adopter"). This completes the align↔retro loop that was left half-done.
 
-## Principio de clasificación (por qué esto ordena, no improvisa)
+## Classification Principle (why this organizes rather than improvises)
 
-El North Star tiene una forma precisa (`memory/north-star/base/schema.md`): `mission` +
-`pillars[]` (cada uno con un **`signal` medible**) + `scope.in/out` + `threshold`. No es
-una lista de features ni una guía de estilo. Los tres ejemplos iniciales del usuario son
-tres clases distintas de cosa:
+The North Star has a precise shape (`memory/north-star/base/schema.md`): `mission` +
+`pillars[]` (each with a measurable **`signal`**) + `scope.in/out` + `threshold`. It is not
+a feature list or a style guide. The user's three initial examples are three distinct
+classes of thing:
 
-| Ejemplo | Qué es | Dónde va |
+| Example | What it is | Where it goes |
 |---|---|---|
-| "armar un SDLC reutilizable" | la **Misión** (para qué existe) | `north-star.md` |
-| "install desde github" | un **feature/medio** (futuro `brief.md`) | backlog, bajo el pilar `adopcion-sin-friccion` |
-| "comandos en inglés" | una **convención del cómo** (sin signal medible) | `constitution`, fuera del North Star |
+| "build a reusable SDLC" | the **Mission** (why it exists) | `north-star.md` |
+| "install from github" | a **feature/means** (future `brief.md`) | backlog, under the `adopcion-sin-friccion` pillar |
+| "commands in English" | a **how convention** (no measurable signal) | `constitution`, outside the North Star |
 
-Regla para saber si algo es pilar: **¿tiene un `signal` medible de "¿estamos sirviendo
-la misión?"?**
+Rule for deciding whether something is a pillar: **Does it have a measurable `signal` for "are we serving the mission?"**
 
-## Framing: repo-como-producto
+## Framing: repo-as-product
 
-Este repo pasa a tener North Star **real** (retira el placeholder), análogo a que ya
-tiene `constitution.md` real. Los adoptantes lo reemplazan al vendorear el harness, igual
-que reemplazan la constitution (flujo ya documentado en README y
-`memory/north-star/base/README.md`). El `base/` (schema, rúbrica, amendment-protocol)
-sigue siendo el asset compartido; el delta del proyecto es misión/pilares/scope.
+This repo now has a **real** North Star (retiring the placeholder), analogous to already
+having a real `constitution.md`. Adopters replace it when they vendor the harness, just
+as they replace the constitution (flow already documented in README and
+`memory/north-star/base/README.md`). The `base/` (schema, rubric, amendment-protocol)
+remains the shared asset; the project delta is mission/pillars/scope.
 
-## "De a poco" reconciliado con el schema
+## "Incrementally" reconciled with the schema
 
-El schema exige un mínimo **completo** para ser válido (misión + ≥1 pilar con signal +
-scope in/out + threshold) — no existe medio-North-Star válido. Entonces "de a poco" =
-**seedear un mínimo válido ahora** y **crecer pilares/scope después vía el
-amendment-protocol** (ADR en `memory/north-star/decisions/`). El seed inicial se registra
-como **ADR fundacional 0001**.
+The schema requires a **complete** minimum to be valid (mission + ≥1 pillar with signal +
+scope in/out + threshold) — there is no such thing as a half-valid North Star. So "incrementally" =
+**seed a valid minimum now** and **grow pillars/scope later via the
+amendment-protocol** (ADR in `memory/north-star/decisions/`). The initial seed is recorded
+as **foundational ADR 0001**.
 
-## El North Star aprobado
+## The Approved North Star
 
-**Misión (paraguas — abarca los tres pilares):**
-> Un harness reutilizable y agnóstico de stack que hace cumplir un SDLC agéntico
-> disciplinado (spec-driven, test-first, verificado con evidencia) sobre cualquier
-> proyecto — gobierna *cómo* se construye, sin imponer stack ni runtime de ejecución, y
-> sin escribir código de producto.
+**Mission (umbrella — covers all three pillars):**
+> A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC
+> (spec-driven, test-first, verified with evidence) on any project — it governs *how*
+> things are built, without imposing a stack or execution runtime, and
+> without writing product code.
 
-**Pilares (3 — la auto-validación/dogfooding NO es pilar aparte: es el `signal` del
+**Pillars (3 — self-validation/dogfooding is NOT a separate pillar: it is the `signal` of
 `enforcement-real`):**
 
-| Pilar | Statement | Signal medible |
+| Pillar | Statement | Measurable signal |
 |---|---|---|
-| `enforcement-real` | La disciplina la hacen cumplir gates deterministas, no la buena voluntad | Los gates bloquean el cierre cuando falta una condición; violaciones cazadas antes del merge (el harness lo prueba dogfoodeándose: ledger de retros / wow-report) |
-| `portabilidad-agnostica` | Corre sobre cualquier stack/proyecto sin imponer tecnología ni runtime | El contrato (schema/gates/artefactos) se mantiene íntegro al vendorearlo sobre un repo/stack arbitrario |
-| `adopcion-sin-friccion` | Incorporar el harness a un repo nuevo cuesta poco | Pasos/tiempo para adoptar el harness (menor = mejor) |
+| `enforcement-real` | Discipline is enforced by deterministic gates, not goodwill | Gates block closure when a condition is missing; violations caught before merge (the harness proves this by dogfooding itself: retro ledger / wow-report) |
+| `portabilidad-agnostica` | Runs on any stack/project without imposing technology or runtime | The contract (schema/gates/artifacts) remains intact when vendored onto an arbitrary repo/stack |
+| `adopcion-sin-friccion` | Onboarding the harness to a new repo costs little | Steps/time to adopt the harness (lower = better) |
 
 **Scope:**
-- **in_scope:** comandos/gates/skills del workflow; constitution y North Star; plantillas
-  de feature, coverage y máquina de estados; evals/verificación/UAT; tooling de adopción
-  (install/vendoring/herencia); auto-validación del WoW (retro/wow-report) y docs del método.
-- **out_of_scope (rechazo duro de `/align`):** código de aplicación o features de producto
-  del adoptante; motor determinista específico de un stack; imponer/nombrar un runtime
-  obligatorio; hooks bloqueantes por commit; dependencias de runtime o frameworks.
+- **in_scope:** workflow commands/gates/skills; constitution and North Star; feature,
+  coverage, and criteria state-machine templates; evals/verification/UAT; adoption
+  tooling (install/vendoring/inheritance); WoW self-validation (retro/wow-report) and method docs.
+- **out_of_scope (hard rejection by `/align`):** application code or product features of
+  an adopter project; stack-specific deterministic engine; imposing or naming a mandatory
+  execution runtime; blocking commit hooks; runtime dependencies or frameworks.
 
-**Bloque canónico** (fuente de verdad, va en `north-star.md`):
+**Canonical block** (source of truth, goes in `north-star.md`):
 
 ```json
 {
-  "mission": "Un harness reutilizable y agnóstico de stack que hace cumplir un SDLC agéntico disciplinado (spec-driven, test-first, verificado con evidencia) sobre cualquier proyecto — gobierna cómo se construye, sin imponer stack ni runtime de ejecución, y sin escribir código de producto.",
+  "mission": "A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spec-driven, test-first, evidence-verified) on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.",
   "pillars": [
     {
       "id": "enforcement-real",
-      "statement": "La disciplina la hacen cumplir gates deterministas, no la buena voluntad.",
-      "signal": "Los gates bloquean el cierre cuando falta una condición; las violaciones se cazan antes del merge (y el harness lo prueba dogfoodeándose: ledger de retros / wow-report)."
+      "statement": "Discipline is enforced by deterministic gates, not good intentions.",
+      "signal": "Gates block closure when a condition is missing; violations are caught before merge (and the harness proves this by dogfooding itself: retro ledger / wow-report)."
     },
     {
-      "id": "portabilidad-agnostica",
-      "statement": "Corre sobre cualquier stack o proyecto sin imponer tecnología ni runtime.",
-      "signal": "El contrato (schema, gates, artefactos) se mantiene íntegro al vendorearlo sobre un repo/stack arbitrario."
+      "id": "agnostic-portability",
+      "statement": "Runs on any stack or project without imposing technology or runtime.",
+      "signal": "The contract (schema, gates, artifacts) remains intact when vendored onto an arbitrary repo/stack."
     },
     {
-      "id": "adopcion-sin-friccion",
-      "statement": "Incorporar el harness a un repo nuevo cuesta poco.",
-      "signal": "Pasos/tiempo para adoptar el harness en un proyecto (menor = mejor)."
+      "id": "frictionless-adoption",
+      "statement": "Incorporating the harness into a new repo costs little.",
+      "signal": "Steps/time to adopt the harness in a project (lower = better)."
     }
   ],
   "scope": {
     "in_scope": [
-      "comandos, gates y skills del workflow de governance",
-      "gobernanza de producto: constitution y North Star",
-      "plantillas de feature, coverage y máquina de estados de criterios",
-      "evals, verificación y UAT del método",
-      "tooling de adopción: install, vendoring y herencia del harness",
-      "auto-validación del WoW (retro, wow-report) y documentación del método"
+      "commands, gates, and skills of the governance workflow",
+      "product governance: constitution and North Star",
+      "feature templates, coverage, and criterion state machine",
+      "evals, verification, and UAT of the method",
+      "adoption tooling: install, vendoring, and harness inheritance",
+      "WoW self-validation (retro, wow-report) and method documentation"
     ],
     "out_of_scope": [
-      "código de aplicación o features de producto de un proyecto adoptante",
-      "motor determinista específico de un stack",
-      "imponer o nombrar un runtime de ejecución obligatorio",
-      "hooks bloqueantes por commit",
-      "dependencias de runtime o frameworks"
+      "application code or product features of an adopting project",
+      "stack-specific deterministic engine",
+      "imposing or naming a mandatory execution runtime",
+      "blocking commit hooks",
+      "runtime dependencies or frameworks"
     ]
   },
   "alignment": {
@@ -118,24 +117,24 @@ como **ADR fundacional 0001**.
 }
 ```
 
-## Archivos que toca
+## Files it touches
 
-| Acción | Archivo |
+| Action | File |
 |---|---|
-| reescribir | `memory/north-star/north-star.md` (bloque JSON real + prosa; retira el placeholder, mantiene `extends: base`) |
-| ajustar prosa | `README.md` (la línea `north-star.md (placeholder del proyecto)` → North Star real; aclarar que el adoptante lo reemplaza como la constitution) |
-| nuevo | `memory/north-star/decisions/0001-seed-north-star.md` (ADR fundacional con el rationale del seed) |
+| rewrite | `memory/north-star/north-star.md` (real JSON block + prose; retires the placeholder, keeps `extends: base`) |
+| adjust prose | `README.md` (the line `north-star.md (project placeholder)` → real North Star; clarify that the adopter replaces it just like the constitution) |
+| new | `memory/north-star/decisions/0001-seed-north-star.md` (foundational ADR with the seed rationale) |
 
-## Verificación
-- El bloque JSON pasa `memory/north-star/base/schema.md` (misión no vacía; 3 pilares con
-  `id`+`statement`+`signal`; scope in/out no vacíos; threshold presente).
-- `bash tests/run.sh` sigue verde — `check_80_north_star.sh` sólo exige `extends: base` +
-  existencia, ambos preservados.
+## Verification
+- The JSON block passes `memory/north-star/base/schema.md` (non-empty mission; 3 pillars with
+  `id`+`statement`+`signal`; non-empty scope in/out; threshold present).
+- `bash tests/run.sh` stays green — `check_80_north_star.sh` only requires `extends: base` +
+  existence, both preserved.
 
-## No-objetivos (YAGNI)
-- **No** agregar pilares más allá de 3 ahora (crecen vía amendment-protocol cuando haga falta).
-- **No** implementar el feature "install desde github" acá (es un futuro `brief.md` bajo
+## Non-goals (YAGNI)
+- **No** adding pillars beyond 3 now (they grow via amendment-protocol when needed).
+- **No** implementing the "install from github" feature here (it is a future `brief.md` under
   `adopcion-sin-friccion`).
-- **No** abordar "comandos en inglés" acá (es convención → constitution, ítem separado).
-- **No** construir el motor determinista per-stack de `/align` en este repo (contrato en
-  la plantilla, motor por-stack — sigue siendo del adoptante).
+- **No** addressing "commands in English" here (it is a convention → constitution, separate item).
+- **No** building the per-stack deterministic engine for `/align` in this repo (contract in
+  the template, per-stack engine — remains the adopter's responsibility).
