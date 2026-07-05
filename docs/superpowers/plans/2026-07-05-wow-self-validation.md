@@ -222,7 +222,7 @@ for report in verification/reports/*.md; do
     if grep -qiE 'raz[oó]n' "$retro"; then _pass "$retro n/a con razón"; else _fail "$retro n/a sin razón"; fi
   fi
   # Cada campo de Cara B con [deriv:] (Capa 1)
-  if grep -qE '\[deriv:' "$retro"; then _pass "$retro Cara B con deriv"; else _fail "$retro Cara B sin [deriv:]"; fi
+  if [ "$(grep -cE '\[deriv:' "$retro")" -ge 4 ]; then _pass "$retro Cara B con deriv (≥4)"; else _fail "$retro Cara B con <4 [deriv:] (campos derivables sin locator)"; fi
 done
 [ "$closed_seen" -eq 1 ] && _pass "loop de cierre ejercitado" || _pass "sin features cerrados aún (vacuo)"
 ```
