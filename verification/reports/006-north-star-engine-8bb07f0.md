@@ -61,7 +61,7 @@ Does it move the success metric? **Yes** — `/align` and the amendment gate sto
 **No product gap → no `/distill` return.**
 
 ## 5. Verdict
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19) · retro: ✅ (mission verdict: pending-observation, re-check @ feature 007)
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/006-north-star-engine/retro.md` (closes the measurable prediction from `/align`).
 Gaps routed: none (no BUILD/TRAJECTORY gap → no return to implement; no UAT gap → no `/distill`).
