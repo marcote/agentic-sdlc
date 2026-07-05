@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-07-04-north-star-governance-design.md
+  s_89e92a6ccd6c1a::t_982badd626703b 1-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7a8755f8f4d28aebfd6f7ca51338c4170de775c9",
+  "prompts": {},
+  "sessions": {
+    "s_89e92a6ccd6c1a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee71364e-c7ea-4d6a-880f-ac36227c144c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
