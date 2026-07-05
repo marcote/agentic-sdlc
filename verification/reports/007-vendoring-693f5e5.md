@@ -62,7 +62,7 @@ agnostic-portability (the contract — schema/gate/engine — stayed intact vend
 arbitrary repo) both moved, measured here. **No product gap.**
 
 ## 5. Verdict
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (12/12) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (12/12) · retro: ✅ (mission verdict: confirmed; also closes 006's pending re-check)
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/007-vendoring/retro.md` — also closes 006's pending re-check
 (frictionless-adoption + agnostic-portability, measured by this UAT).
