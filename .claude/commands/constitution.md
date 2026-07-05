@@ -1,8 +1,8 @@
 ---
-description: Crear o actualizar la constitution (base + proyecto). Semilla y filtro del workflow.
+description: Create or update the constitution (base + project). Seed and filter of the workflow.
 ---
 
-Leé `memory/constitution/base/principles.md` y `memory/constitution/constitution.md`.
-Para crear/actualizar reglas seguí `memory/constitution/update-checklist.md`:
-principios universales → `base/principles.md`; prácticas con criterios → `base/patterns/<x>.md`
-(con sección `**Criterios inyectados:**` y al menos un `[given]`); específicos del proyecto → `constitution.md`.
+Read `memory/constitution/base/principles.md` and `memory/constitution/constitution.md`.
+To create/update rules follow `memory/constitution/update-checklist.md`:
+universal principles → `base/principles.md`; practices with criteria → `base/patterns/<x>.md`
+(with a `**Injected criteria:**` section and at least one `[given]`); project-specific → `constitution.md`.

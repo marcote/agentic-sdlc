@@ -1,8 +1,8 @@
 ---
-description: Descomponer en tasks ejecutables. GATE test-first — rechaza si falta contrato RED.
+description: Decompose into executable tasks. GATE test-first — rejects if RED contract is missing.
 ---
 
-GATE (machine-checkable, no discrecional): recorré `coverage.md`. Para CADA fila
-determinista, exigí `test ligado != vacío AND estado == 🔴 RED`. Si alguna no cumple,
-NO emitas tasks de implementación: reportá las filas faltantes y frená.
-Solo si el gate pasa, escribí `specs/<feature>/tasks.md` (cada task liga sus filas de coverage).
+GATE (machine-checkable, not discretionary): walk through `coverage.md`. For EACH
+deterministic row, require `linked test != empty AND state == 🔴 RED`. If any does not comply,
+DO NOT emit implementation tasks: report the missing rows and stop.
+Only if the gate passes, write `specs/<feature>/tasks.md` (each task links its coverage rows).

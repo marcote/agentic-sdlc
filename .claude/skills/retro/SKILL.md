@@ -1,52 +1,52 @@
 ---
 name: retro
-description: Cierra la predicción de /align al cerrar un feature — dicta el veredicto sobre el signal del pilar y deriva las señales del WoW de artefactos. Escribe specs/<feature>/retro.md. Usar tras un /verify+/uat en verde, como paso final del cierre.
+description: Closes the /align prediction when a feature closes — dictates the verdict on the pillar signal and derives WoW signals from artifacts. Writes specs/<feature>/retro.md. Use after a green /verify+/uat, as the final closing step.
 ---
 
 # Retro
 
-Entrada: `specs/<feature>/alignment.md` + `coverage.md` + `verification/reports/<feature>` + git.
-Salida: `specs/<feature>/retro.md` (plantilla en `specs/_template/retro.md`). Es la
-**mitad trasera de la Measurability Gate**: `/align` abrió una predicción medible; el
-retro la cierra. El feature no está DONE hasta que este retro cierra sus tres caras.
+Input: `specs/<feature>/alignment.md` + `coverage.md` + `verification/reports/<feature>` + git.
+Output: `specs/<feature>/retro.md` (template at `specs/_template/retro.md`). This is the
+**back half of the Measurability Gate**: `/align` opened a measurable prediction; the
+retro closes it. The feature is not DONE until this retro closes its three faces.
 
-## Anti-teatro (por qué el orden importa)
-Un check no puede probar honestidad. El procedimiento achica el lugar donde el relleno
-"por cumplir" se esconde: **derivar → auto-desafiar → escribir**, nunca al revés.
+## Anti-theater (why order matters)
+A check cannot prove honesty. The procedure shrinks the place where filler-to-comply
+hides: **derive → self-challenge → write**, never the other way.
 
-## Procedimiento
+## Procedure
 
-1. **Derivá primero (Cara B, Capa 1).** No tipees cifras de memoria. Cada campo de
-   Método sale de un artefacto con su `[deriv: <locator>]`:
-   - Gaps cazados por /distill → filas de `coverage.md` + `git log` de la fase distill.
-   - Disciplina RED→GREEN → historial de estados de `coverage.md` (🔴 antes de 🟢) + git.
-   - Rework post-/verify y post-/uat → gaps ruteados en `verification/reports/<feature>`.
-   - Escalaciones → traza / git.
-   Solo "Fricción del propio WoW" es juicio libre; el resto es derivado.
+1. **Derive first (Face B, Layer 1).** Do not type numbers from memory. Each
+   Method field comes from an artifact with its `[deriv: <locator>]`:
+   - Gaps caught by /distill → rows of `coverage.md` + `git log` of the distill phase.
+   - RED→GREEN discipline → `coverage.md` state history (🔴 before 🟢) + git.
+   - Rework post-/verify and post-/uat → gaps routed in `verification/reports/<feature>`.
+   - Escalations → trace / git.
+   Only "Friction from the WoW itself" is free judgment; everything else is derived.
 
-2. **Dictá la Cara A con evidencia locator obligatoria (Capa 2).** Leé `alignment.md`:
-   para cada pilar del `mapping`, buscá su `signal` en `north-star.md` y dictá veredicto
-   (`✅ movió` / `❌ no movió` / `⏳ aún no observable`) con una celda de Evidencia que sea
-   un **locator** (valor, SHA, fila de coverage, URL) — no prosa. Sin locator para un
-   `confirmed`/`refuted`, el veredicto honesto es `pending-observation` con su trigger de
-   re-chequeo. Anotá la **calibración de align** (¿los scores pillarFit/scope/mission
-   acertaron?). Si el North Star del repo es placeholder (no schema-válido), la Cara A es
-   `n/a` con razón — no hay signal real que cerrar.
+2. **Dictate Face A with a mandatory evidence locator (Layer 2).** Read `alignment.md`:
+   for each pillar in the `mapping`, find its `signal` in `north-star.md` and dictate a verdict
+   (`✅ moved` / `❌ did not move` / `⏳ not yet observable`) with an Evidence cell that is
+   a **locator** (value, SHA, coverage row, URL) — not prose. Without a locator for a
+   `confirmed`/`refuted`, the honest verdict is `pending-observation` with its re-check trigger.
+   Note the **align calibration** (did the pillarFit/scope/mission scores hold up in retrospect?).
+   If the repo's North Star is a placeholder (not schema-valid), Face A is
+   `n/a` with reason — there is no real signal to close.
 
-3. **Auto-desafío adversarial (Capa 3).** Antes de escribir, argumentá EN CONTRA de tu
-   propio borrador: "el report dice 0 rework — verificá contra `git log`; dice que el
-   pillar-fit de align fue exacto — sostené lo opuesto". Solo lo que sobrevive al desafío
-   se escribe. (Refuerzo futuro, no ahora: delegar el desafío a un subagente sképtico
-   separado del que redactó.)
+3. **adversarial self-challenge (Layer 3).** Before writing, argue AGAINST your
+   own draft: "the report shows 0 rework — verify against `git log`; it says the
+   pillar-fit of align was exact — argue the opposite". Only what survives the challenge
+   is written. (Future reinforcement, not now: delegate the challenge to a separate skeptic
+   subagent from the one that drafted.)
 
-4. **Cara C (loop).** Proponé reglas candidatas → constitution y/o amendments → North
-   Star. Solo proponé; aplicarlos sigue `update-checklist.md` / `amendment-protocol.md`.
+4. **Face C (loop).** Propose candidate rules → constitution and/or amendments → North
+   Star. Only propose; applying them follows `update-checklist.md` / `amendment-protocol.md`.
 
-5. **Veredicto de misión.** `confirmed` | `refuted` | `pending-observation` (+trigger) |
-   `n/a` (+razón obligatoria). Escribí `specs/<feature>/retro.md` desde la plantilla.
+5. **Mission verdict.** `confirmed` | `refuted` | `pending-observation` (+trigger) |
+   `n/a` (+reason required). Write `specs/<feature>/retro.md` from the template.
 
 ## Gate
-`tests/check_90_retro.sh` exige, para todo feature con reporte DONE: retro presente, sin
-placeholders, veredicto de misión válido, evidencia no vacía para `confirmed`/`refuted`,
-`[deriv:]` en cada campo de Cara B, y razón para `n/a`. El feature no está DONE sin
+`tests/check_90_retro.sh` requires, for every feature with a DONE report: retro present, no
+placeholders, valid mission verdict, non-empty evidence for `confirmed`/`refuted`,
+`[deriv:]` on every Face B field, and reason for `n/a`. The feature is not DONE without
 `retro ✅`.

@@ -1,6 +1,6 @@
 ---
-description: Verificación on-demand — corre output + trajectory eval y emite el verification-report.
+description: On-demand verification — runs output + trajectory eval and emits the verification-report.
 ---
 
-Invocá la skill `verify`. Genera `verification/reports/<feature>-<ref>.md` a partir de
-`verification/verification-report.md`, puntuando contra `evals/rubric.md`.
+Invoke the `verify` skill. Generates `verification/reports/<feature>-<ref>.md` from
+`verification/verification-report.md`, scoring against `evals/rubric.md`.

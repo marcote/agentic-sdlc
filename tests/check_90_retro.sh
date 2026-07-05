@@ -7,7 +7,7 @@
 
 # --- Template: 3-face structure (Layer 1+2) ---
 assert_file specs/_template/retro.md
-for h in "Cara A" "Cara B" "Cara C" "Evidencia" "deriv"; do
+for h in "Face A" "Face B" "Face C" "Evidence" "deriv"; do
   assert_contains specs/_template/retro.md "$h"
 done
 

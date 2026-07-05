@@ -1,7 +1,7 @@
 # Tasks — <feature>
 
-> Descomposición ejecutable. Producido por `/tasks`. GATE: `/tasks` no emite tasks de
-> implementación mientras exista un criterio determinista sin test ligado en 🔴 RED.
+> Executable breakdown. Produced by `/tasks`. GATE: `/tasks` does not emit implementation
+> tasks while any deterministic criterion has no linked test in 🔴 RED.
 
 ## Tasks
-- [ ] T1: _(unidad testeable)_ — cubre criterios: _(filas de coverage.md)_
+- [ ] T1: _(testable unit)_ — covers criteria: _(coverage.md rows)_

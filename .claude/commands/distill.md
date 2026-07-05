@@ -1,6 +1,6 @@
 ---
-description: Destilar brief.md en spec + acceptance + coverage (loop estilo grilling, cubre gaps).
+description: Distill brief.md into spec + acceptance + coverage (grilling-style loop, covers gaps).
 ---
 
-Invocá la skill `distill`. Requiere `specs/<feature>/brief.md`. No avances con ambigüedades
-abiertas ni con filas huérfanas en `coverage.md`.
+Invoke the `distill` skill. Requires `specs/<feature>/brief.md`. Do not proceed with open
+ambiguities or orphan rows in `coverage.md`.

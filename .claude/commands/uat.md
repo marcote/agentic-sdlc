@@ -1,6 +1,6 @@
 ---
-description: UAT on-demand contra acceptance.md — valida contra el objetivo del brief.
+description: On-demand UAT against acceptance.md — validates against the brief's objective.
 ---
 
-Invocá la skill `uat`. Recorré `verification/uat-checklist.md`. Un fallo de UAT es un
-gap de PRODUCTO → routeá a `/distill`. Actualizá `coverage.md` (→ ✅ uat) y el reporte.
+Invoke the `uat` skill. Walk through `verification/uat-checklist.md`. A UAT failure is a
+PRODUCT gap → route to `/distill`. Update `coverage.md` (→ ✅ uat) and the report.

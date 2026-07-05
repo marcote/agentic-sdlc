@@ -1,35 +1,35 @@
 ---
 name: distill
-description: Destila brief.md en spec + acceptance (BDD) + coverage, cazando gaps estilo grilling. Usar tras escribir el brief de un feature.
+description: Distills brief.md into spec + acceptance (BDD) + coverage, hunting gaps grilling-style. Use after writing a feature's brief.
 ---
 
 # Distill
 
-Entrada: `specs/<feature>/brief.md`. Salidas: `spec.md`, `acceptance.md`, `coverage.md`.
+Input: `specs/<feature>/brief.md`. Outputs: `spec.md`, `acceptance.md`, `coverage.md`.
 
-## Procedimiento (loop hasta converger)
-0. **Measurability Gate (fail closed).** Leé `specs/<feature>/alignment.md` (lo produce `/align`).
-   - **Ausente** → negate a avanzar. Decile al humano que corra `/align` primero para producirlo
-     (criterio `MEAS-GATE`).
-   - **Presente** → mirá su `verdict`; el gate determinista (equivalente a `canDistill`, per-stack)
-     es `true` solo cuando el veredicto es exactamente `aligned`. Avanzá únicamente en ese caso.
-     - `needs-amendment` → frená; el protocolo de amendment del North Star
-       (`memory/north-star/base/amendment-protocol.md`: un ADR en
-       `memory/north-star/decisions/NNNN-*.md` + PR) es la única ruta hacia adelante, no un
-       continue silencioso.
-     - `rejected` → frená; la feature está fuera de alcance, sin ruta de amendment desde este skill.
-   - **Excepción bootstrap:** la feature que introduce `/align`
-     (`002-north-star-governance`) está exenta de este gate — es la única excepción. Toda otra
-     feature corre `/align` antes de `/distill`.
-1. **Sembrar desde la constitution.** Leé `memory/constitution/` (base + proyecto). Por cada
-   `base/patterns/*.md` aplicable, inyectá su/s criterio/s `[given]` como filas en `coverage.md`.
-2. **Extraer.** Del brief: objetivos, user stories, restricciones, métricas de éxito.
-3. **Interrogar (grilling).** Preguntá al humano de a una las ambigüedades. NO avances con
-   ambigüedades abiertas. (Inspirate en la skill `grilling` si está disponible.)
-4. **Expandir edge cases (80% problem).** Generá los casos que el brief no cubre; cada uno
-   entra como fila nueva de `coverage.md` y fuerza un criterio.
-5. **Trazar.** Cada objetivo → requerimiento → criterio de aceptación (BDD). Marcá deterministas
-   vs no-deterministas.
-6. **Chequear cobertura.** Si hay filas huérfanas (objetivo sin criterio, o criterio sin
-   eval/UAT), volvé al paso 3. Solo cuando no queden (o estén `deferred` con justificación),
-   congelá `spec.md` + `acceptance.md`.
+## Procedure (loop until convergence)
+0. **Measurability Gate (fail closed).** Read `specs/<feature>/alignment.md` (produced by `/align`).
+   - **Absent** → refuse to proceed. Tell the human to run `/align` first to produce it
+     (criterion `MEAS-GATE`).
+   - **Present** → check its `verdict`; the deterministic gate (equivalent to `canDistill`, per-stack)
+     is `true` only when the verdict is exactly `aligned`. Proceed only in that case.
+     - `needs-amendment` → stop; the North Star amendment protocol
+       (`memory/north-star/base/amendment-protocol.md`: an ADR in
+       `memory/north-star/decisions/NNNN-*.md` + PR) is the only path forward, not a
+       silent continue.
+     - `rejected` → stop; the feature is out of scope, no amendment route from this skill.
+   - **Bootstrap exception:** the feature that introduces `/align`
+     (`002-north-star-governance`) is exempt from this gate — it is the only exception. Every other
+     feature runs `/align` before `/distill`.
+1. **Seed from the constitution.** Read `memory/constitution/` (base + project). For each
+   applicable `base/patterns/*.md`, inject its `[given]` criterion/criteria as rows in `coverage.md`.
+2. **Extract.** From the brief: objectives, user stories, constraints, success metrics.
+3. **Interrogate (grilling).** Ask the human about ambiguities one at a time. Do NOT proceed with
+   open ambiguities. (Draw inspiration from the `grilling` skill if available.)
+4. **Expand edge cases (80% problem).** Generate the cases the brief does not cover; each one
+   enters as a new row in `coverage.md` and forces a criterion.
+5. **Trace.** Each objective → requirement → acceptance criterion (BDD). Mark deterministic
+   vs non-deterministic.
+6. **Check coverage.** If there are orphan rows (objective without criterion, or criterion without
+   eval/UAT), return to step 3. Only when none remain (or are `deferred` with justification),
+   freeze `spec.md` + `acceptance.md`.
