@@ -152,6 +152,25 @@ actualizar, seguí `memory/constitution/update-checklist.md` y re-copiá `base/`
 ## Verificar el harness
 `bash tests/run.sh` — el template se auto-verifica (estructura + hook). También corre en CI (advisory).
 
+## Gatear amendments del North Star (opcional pero recomendado)
+Cambiar los sets `pillars`/`scope` del North Star es un evento gobernado (ADR + PR, ver
+`memory/north-star/base/amendment-protocol.md`). El workflow `.github/workflows/amendment-gate.yml`
+lo hace cumplir en CI: si un commit/push cambia esos sets sin un ADR nuevo, sin dejar el
+bloque JSON schema-válido, o con la suite en rojo, el check `amendment-gate` falla. El
+desarrollo normal de features **no** se bloquea (bloqueo angosto — es la única excepción al
+principio 4, registrada en el delta D1 de la constitution).
+
+Para volverlo **realmente bloqueante** (no solo advisory), el owner corre una vez:
+
+```sh
+scripts/setup-branch-protection.sh            # repo actual, rama main
+scripts/setup-branch-protection.sh OWNER/REPO main
+```
+
+Eso hace `amendment-gate` un status-check *required* con `enforce_admins=true`: un PR con el
+gate en rojo no es mergeable y un push directo saltándolo es rechazado. Requiere `gh` con
+permisos de admin.
+
 ## Créditos y referencias
 
 Este harness no inventa la metodología: la operacionaliza. El crédito conceptual es de:

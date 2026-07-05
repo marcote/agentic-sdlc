@@ -1,0 +1,28 @@
+name: amendment-gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A diferencia de `verify` (advisory), este check está pensado para ser REQUIRED en
+# branch protection de `main` (ver scripts/setup-branch-protection.sh): hace cumplir el
+# protocolo de amendment del North Star. Bloqueo angosto — solo dispara cuando cambian los
+# sets pillars/scope del bloque JSON canónico sin ADR/schema/suite (ver el delta D1 de la
+# constitution). El trabajo normal de features pasa en verde (exit 0, no-aplica).
+jobs:
+  amendment-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historia completa: el gate compara base..head del North Star
+      - name: Derivar el rango base..head
+        id: range
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "range=${{ github.event.pull_request.base.sha }}..${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "range=${{ github.event.before }}..${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Amendment gate (North Star pillars/scope)
+        run: bash scripts/amendment-gate.sh --range "${{ steps.range.outputs.range }}"
