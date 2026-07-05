@@ -12,7 +12,11 @@ verificación/UAT como norte.
 > [Créditos y referencias](#créditos-y-referencias).
 
 ## El loop de un vistazo
-`/constitution → brief → /distill → /plan → /contract → /tasks → implement → /verify → /uat`
+`/constitution → brief → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat`
+
+`/align` es el **gate de intake** (Measurability Gate): puntúa el brief contra el
+North Star del proyecto (`memory/north-star/`) y `/distill` se niega a arrancar
+salvo que el veredicto sea `aligned`.
 
 ---
 
@@ -31,6 +35,26 @@ verificación valida. Cuatro reglas rigen todo:
 3. **La constitution es código** — versionada, revisada, heredable. Agregá una regla cada
    vez que el agente comete un error repetible.
 4. **Todo verificable deja rastro** — cada verificación emite un reporte versionado.
+
+### Dos capas: governance vs execution-runtime
+
+El Way of Work se separa en dos capas con dueños distintos:
+
+| Capa | Qué es | Dueño | Estabilidad |
+|---|---|---|---|
+| **Governance** (el harness) | los comandos (`/align`, `/distill`, `/plan`, `/contract`, `/tasks`, `/verify`, `/uat`), los gates deterministas, la **constitution** (cómo se construye) y el **North Star** (para qué existe el producto) | el harness — versionado, revisado, el mismo para todo adoptante | estable |
+| **Execution-runtime** (lo elige el adoptante) | los pasos que **no** son comandos: el intake que produce el `brief.md`, el trabajo de implementación entre `/tasks` y `/verify`, y el finish (merge/PR/cleanup) | cada repo adoptante | intercambiable |
+
+El harness **gobierna**; no impone un runtime de ejecución. Cualquier conjunto de
+asistentes puede cubrir intake→brief, implement y finish siempre que respete los
+artefactos y gates de la capa de governance. El harness **no nombra ningún runtime
+como obligatorio** — los asistentes de brainstorming/TDD/etc. de un proyecto son
+ayuda puntual **subordinada** a este flujo, no un proceso paralelo.
+
+Análogamente, la capa de governance trae el **contrato** (schema del North Star,
+rúbrica, protocolo de amendment, semántica del veredicto de `/align`) pero **no** el
+motor determinista ejecutable que lo evalúa: ese lo provee cada stack adoptante,
+igual que el eval-runner (`evals/README.md`). Ver `memory/north-star/base/README.md`.
 
 ### El enforcement no vive en hooks
 
@@ -52,6 +76,7 @@ Cada comando produce un artefacto y tiene su verificación. La columna vertebral
 |---|---|---|---|
 | 1 | `/constitution` | `memory/constitution/` | semilla + filtro de todo el flujo |
 | 2 | *(intake)* | `brief.md` | objetivo de producto + métricas de éxito (no la solución) |
+| — | `/align` | `alignment.md` | **Measurability Gate**: puntúa el brief contra el North Star; solo `aligned` avanza a `/distill` |
 | 3 | `/distill` | `spec.md` + `acceptance.md` + `coverage.md` | loop de grilling; no congela con filas huérfanas |
 | 4 | `/plan` | `plan.md` | grounded en la constitution (no puede violar un `[given]`) |
 | 5 | `/contract` | tests 🔴 + eval cases 📋 | corre el suite y **prueba que está RED** |
@@ -100,6 +125,8 @@ feature "DONE"  ⟺  BUILD ✅  AND  TRAJECTORY ✅  AND  UAT ✅  AND  coverage
 ## Estructura
 - `CLAUDE.md` — static context (stack, hard rules, workflow).
 - `memory/constitution/` — principios no-negociables (base heredable + proyecto).
+- `memory/north-star/` — gobernanza de producto (para qué existe): `base/` (schema,
+  rúbrica, protocolo de amendment) + `north-star.md` (placeholder del proyecto).
 - `specs/_template/` — plantilla de feature (brief/spec/acceptance/coverage/plan/tasks).
 - `evals/` — rubric de 5 dimensiones + cases no-deterministas.
 - `verification/` — report, UAT y code-review checklists + `reports/` (observability).
