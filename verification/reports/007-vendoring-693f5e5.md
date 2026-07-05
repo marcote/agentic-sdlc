@@ -39,12 +39,31 @@ eval cases.
   test-bug fix (the intent "vendor.sh needs no toolchain to run" holds), recorded in
   `coverage.md` and the impl commit.
 
-## 4. UAT  — appended by /uat, against acceptance.md
-_(pending — run in `/uat`)_
+## 4. UAT  — against acceptance.md + the brief objective
+Full vendoring walk onto a **fresh fake adopter repo** (`git init`, a `pyproject.toml`, a
+pre-existing `CLAUDE.md`), validating the batteries-included objective:
+
+- **Dry-run** printed the plan (detected `pytest`, provenance preview, KEEP list) and wrote
+  nothing. ✅
+- **`--apply`** landed governance (`.claude/commands/align.md`, `.claude/skills/distill`,
+  `scripts/north-star/engine.py`, `memory/constitution/base/principles.md`, `specs/_template`);
+  harness-self absent (`specs/001-example`, `verification/reports`, `README.md`, `tests/`). ✅
+- **Non-destructive:** the existing `CLAUDE.md` (`# my project`) was preserved and
+  `CLAUDE.md.harness-new` written; `scripts/test.sh` seeded with `pytest`;
+  `.harness-provenance` stamped (SHA + date). ✅
+- **Batteries-included (the hard proof):** the **vendored engine ran inside the target** —
+  `python3 <target>/scripts/north-star/engine.py schema-valid <target>/…/north-star.md` → exit 0,
+  and `align-verdict` → `aligned`. The harness runs in the adopter repo out of the box. ✅
+
+Does it move the success metric? **Yes** — adoption is one command
+(`vendor.sh --apply`) + merge `.harness-new` + `/constitution`. **This also closes 006's
+pending re-check**: frictionless-adoption (steps to adopt: measurably low) and
+agnostic-portability (the contract — schema/gate/engine — stayed intact vendored onto an
+arbitrary repo) both moved, measured here. **No product gap.**
 
 ## 5. Verdict
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: pending · coverage: 100% (12/12) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (12/12) · retro: pending
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/007-vendoring/retro.md` — also closes 006's pending re-check
-(frictionless-adoption + agnostic-portability, measured by vendoring).
-Gaps routed: none (no BUILD/TRAJECTORY gap → no return to implement).
+(frictionless-adoption + agnostic-portability, measured by this UAT).
+Gaps routed: none.
