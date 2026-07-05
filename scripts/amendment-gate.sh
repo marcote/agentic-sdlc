@@ -20,84 +20,11 @@ die(){ echo "amendment-gate: $*" >&2; exit 1; }
 # --- Fail-closed if no system python3 interpreter ---
 command -v python3 >/dev/null 2>&1 || die "requires python3 (stdlib json) — not found in environment"
 
-# --- python3 helper: extracts the canonical ```json block and operates on it ---
-# Usage: _py sets_changed OLD NEW  |  _py schema_valid FILE
-_py(){
-  python3 - "$@" <<'PYEOF'
-import sys, json, re
-
-def load(path):
-    with open(path, encoding="utf-8") as fh:
-        txt = fh.read()
-    m = re.search(r"```json\s*\n(.*?)\n```", txt, re.S)
-    if not m:
-        raise ValueError("no ```json block found in %s" % path)
-    return json.loads(m.group(1))
-
-def sig(ns):
-    """Semantic signature of the governed sets: pillars and scope, order-agnostic."""
-    pillars = frozenset(
-        (p.get("id"), p.get("statement"), p.get("signal"))
-        for p in ns.get("pillars", [])
-    )
-    sc = ns.get("scope", {}) or {}
-    scope = (frozenset(sc.get("in_scope", []) or []),
-             frozenset(sc.get("out_of_scope", []) or []))
-    return (pillars, scope)
-
-def nonempty_str(v): return isinstance(v, str) and v.strip() != ""
-
-def validate(ns):
-    if not nonempty_str(ns.get("mission")):
-        return "mission is empty or missing"
-    pillars = ns.get("pillars")
-    if not isinstance(pillars, list) or len(pillars) < 1:
-        return "pillars must be an array with >=1 entry"
-    for i, p in enumerate(pillars):
-        for k in ("id", "statement", "signal"):
-            if not nonempty_str(p.get(k)):
-                return "pillars[%d].%s is empty or missing" % (i, k)
-    sc = ns.get("scope")
-    if not isinstance(sc, dict):
-        return "scope is missing"
-    for k in ("in_scope", "out_of_scope"):
-        arr = sc.get(k)
-        if not isinstance(arr, list) or len(arr) < 1 or not all(nonempty_str(x) for x in arr):
-            return "scope.%s must be a non-empty array of strings" % k
-    al = ns.get("alignment")
-    if not isinstance(al, dict) or not isinstance(al.get("threshold"), (int, float)):
-        return "alignment.threshold must be a number"
-    return ""  # valid
-
-cmd = sys.argv[1]
-try:
-    if cmd == "sets_changed":
-        old, new = load(sys.argv[2]), load(sys.argv[3])
-        print("changed" if sig(old) != sig(new) else "same")
-        sys.exit(0)
-    elif cmd == "schema_valid":
-        reason = validate(load(sys.argv[2]))
-        if reason:
-            sys.stderr.write(reason + "\n"); sys.exit(1)
-        sys.exit(0)
-    else:
-        sys.stderr.write("unknown command: %s\n" % cmd); sys.exit(2)
-except Exception as e:  # broken JSON / missing block → treat as schema-invalid / error
-    sys.stderr.write(str(e) + "\n")
-    sys.exit(1 if cmd == "schema_valid" else 2)
-PYEOF
-}
-
-# --- has_new_adr ADDED… : is any added file a new ADR? ---
-has_new_adr(){
-  local f
-  for f in "$@"; do
-    case "$f" in
-      *memory/north-star/decisions/[0-9][0-9][0-9][0-9]-*.md) return 0 ;;
-    esac
-  done
-  return 1
-}
+# --- engine: the single source of North Star determinism ---
+# All JSON parsing / schema validation / governed-set comparison / ADR detection lives
+# in scripts/north-star/engine.py (feature 006). The gate orchestrates; the engine decides.
+ENGINE="$(dirname "$0")/north-star/engine.py"
+[ -f "$ENGINE" ] || die "missing engine: $ENGINE"
 
 # --- suite_green : the suite is green (injectable override in tests) ---
 suite_green(){
@@ -133,17 +60,16 @@ fi
 [ -n "$OLD" ] && [ -n "$NEW" ] || die "missing --files OLD NEW (or --range BASE..HEAD)"
 
 # --- Gate logic ---
-if [ "$(_py sets_changed "$OLD" "$NEW")" = "same" ]; then
+if [ "$(python3 "$ENGINE" sets-changed "$OLD" "$NEW")" = "same" ]; then
   echo "amendment-gate: no change to pillars/scope sets — not applicable (dev not blocked)"
   exit 0
 fi
 
 # The sets changed: it is a governed amendment. Require all three conditions.
-# shellcheck disable=SC2086
-if ! has_new_adr $ADDED; then
+if ! python3 "$ENGINE" has-adr-for --added "$ADDED"; then
   die "amendment of pillars/scope WITHOUT a new ADR (memory/north-star/decisions/NNNN-*.md)"
 fi
-if ! _py schema_valid "$NEW"; then
+if ! python3 "$ENGINE" schema-valid "$NEW"; then
   die "amendment leaves the North Star NOT schema-valid (see base/schema.md)"
 fi
 if ! suite_green; then
