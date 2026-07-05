@@ -58,14 +58,14 @@ Then pasa (exit 0, no-aplica) — no bloquea el desarrollo (preserva el principi
 ```gherkin
 Given memory/constitution/constitution.md tras el feature
 When se lo inspecciona
-Then declara el gate bloqueante de amendments como la única excepción al principio 4, acotada a pillars/scope del North Star
+Then registra que el gate bloqueante de amendments es consistente con la intención productividad-primero del principio 4 — el bloqueo es angosto (solo pillars/scope del North Star), el desarrollo de features no se bloquea
 ```
 
 ## Criterio: DEP-FREE  (determinista)
 ```gherkin
 Given el source tras el feature
 When se lo inspecciona
-Then no hay package.json ni deps de runtime nuevas — solo bash/coreutils + GitHub Actions
+Then no hay package.json/package-lock/node_modules ni toolchain instalable (uv/pip/npm); solo bash/coreutils + python3 stdlib + GitHub Actions
 ```
 
 ## Criterio: SELF-CHECK  (determinista)

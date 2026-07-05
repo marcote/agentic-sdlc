@@ -5,7 +5,8 @@
 
 ## Requerimientos funcionales
 
-1. **Script de amendment-gate** (bash, dependency-free). Dado un rango `base..head`,
+1. **Script de amendment-gate** (bash + `python3` stdlib, dependency-free — sin uv/pip/node).
+   Dado un rango `base..head`,
    detecta si cambiaron los **sets** `pillars`/`scope` del bloque JSON canónico de
    `memory/north-star/north-star.md` — comparación **semántica por sets**, no por texto
    (reordenar/reformatear sin alterar el contenido no cuenta). Si cambiaron, exige las
@@ -54,3 +55,12 @@
   GitHub, no unit test hermético**: los criterios `AMEND-BLOCK-REAL` y `AMEND-BLOCK-PUSH`
   se validan en **UAT** (walk: aplicar protection, intentar un amendment inválido,
   confirmar bloqueo), no con un test local.
+- **Runtime del gate:** `python3` stdlib (módulo `json`), no pure bash — pure bash para
+  parsear JSON es frágil. `python3` es un intérprete de sistema (presente en todos los
+  runners + máquinas de dev), no una dependencia instalable, así que **no** cruza el
+  `out_of_scope` "dependencias de runtime" ni exige amendment del North Star; sí afloja el
+  criterio `DEP-FREE` a "bash/coreutils + python3 stdlib" (re-congelado acá).
+- **Deferred a constitution (futuro):** afinar la redacción **literal** del principio 4
+  ("nada bloquea commit/push") hacia su **intención productividad-primero**, para que un
+  gate de governance angosto no lea como contradicción. Es un amendment de constitution
+  aparte; este feature solo registra la reconciliación (criterio `CONST-EXCEPTION`).

@@ -5,16 +5,18 @@
 
 ## Decisiones técnicas
 
-- **D1 — Pure bash/coreutils, sin python3/jq.** La detección de "cambió el set
-  pillars/scope" y la validación de schema se hacen con `grep`/`sed`/`sort`/`comm`, no con
-  un parser JSON. *Trade-off:* menos robusto que parsear JSON de verdad, pero honra el
-  criterio **DEP-FREE** (spec: "solo bash/coreutils + GitHub Actions") ya **congelado**, y
-  mantiene la consistencia con `tests/lib.sh` (todo grep, sin frameworks). *Supuesto que lo
-  hace viable:* el formato de `north-star.md` es **controlado por nosotros** y sus valores
-  JSON son **de una sola línea** (sin newlines embebidos), así que extraer las líneas
-  semánticas (`"id"`, `"statement"`, `"signal"`, predicados de scope) + normalizar
-  (trim + `sort`) da una comparación por-sets estable frente a reformateo/reorden.
-  Restringido por: North Star `out_of_scope` "dependencias de runtime o frameworks".
+- **D1 — `python3` stdlib para la lógica JSON (no pure bash).** La detección de "cambió el
+  set pillars/scope" y la validación de schema se hacen con un helper `python3` (módulo
+  `json` de la stdlib) que extrae el bloque canónico de ambas versiones y compara los sets
+  `pillars`/`scope` semánticamente. El resto del gate (I/O de git, orquestación, mensajes)
+  es bash. *Trade-off:* pure bash para parsear JSON es frágil; `python3` da robustez real.
+  *Costo:* afloja el criterio **DEP-FREE** de "solo bash/coreutils" a "bash/coreutils +
+  `python3` stdlib" (re-congelado en el spec). *Por qué no cruza el North Star:* `python3`
+  es un **intérprete de sistema** (como bash/grep), no una dependencia instalable
+  (sin uv/pip/npm, sin package-manifest) → no matchea `out_of_scope` "dependencias de
+  runtime o frameworks", no exige amendment. **node** está descartado por el brief
+  ("sin Node/npm"); **uv** sería un toolchain instalable → out_of_scope. Restringido por:
+  `portabilidad-agnostica` (mantener el baseline chico) y el `out_of_scope`.
 
 - **D2 — Núcleo lógico separado del I/O de git (testabilidad).** El script expone
   funciones puras que operan sobre **archivos**, no sobre un rango de git:
@@ -41,13 +43,14 @@
   Editar un ADR existente **no** cuenta (protocolo: "número secuencial nuevo"). Restringido
   por: `base/amendment-protocol.md`.
 
-- **D6 (override justificado) — Excepción al principio 4.** El principio 4 dice "nada
-  bloquea commit/push". Este feature introduce el **primer gate bloqueante** del harness.
-  El override se justifica y se **registra en `constitution.md`** (delta de proyecto): el
-  bloqueo está **acotado a cambios de `pillars`/`scope` del North Star** (governance), el
-  desarrollo de features sigue sin bloquear. Coherente con `base/amendment-protocol.md`, que
-  ya declara los amendments un evento gateado. Sin este registro, el feature contradiría un
-  no-negociable en silencio.
+- **D6 — Reconciliación con el principio 4 (no override literal).** El principio 4 dice,
+  literal, "nada bloquea commit/push", pero su **intención es productividad-primero**. Este
+  gate bloquea **solo** cambios de `pillars`/`scope` del North Star (governance rara), no el
+  throughput de features — así que es **consistente con la intención**, no un override de
+  ella. Se **registra en `constitution.md`** (delta de proyecto) esa reconciliación.
+  Coherente con `base/amendment-protocol.md`, que ya declara los amendments un evento
+  gateado. *Deferred (no en este feature):* afinar la **redacción literal** del principio 4
+  hacia "productividad-primero" es un amendment de constitution aparte.
 
 ## Componentes / módulos
 
@@ -77,9 +80,10 @@
 
 ## Riesgos
 
-- **Fragilidad del parseo bash (D1)** → mitigación: normalización por líneas semánticas +
-  `sort`; fixtures que cubren reformateo y reorden (AMEND-SET-SEMANTICS) para cazar falsos
-  positivos; supuesto de valores de una línea documentado y garantizado por nuestro formato.
+- **`python3` ausente en un entorno minimalista** → mitigación: el gate chequea `python3`
+  al inicio y falla-cerrado con un mensaje claro ("requiere python3 stdlib"); está presente
+  en todos los runners de GitHub y en la práctica en toda máquina de dev. Es el costo
+  aceptado de D1 sobre `portabilidad-agnostica` (baseline: bash/coreutils + python3).
 - **`github.event.before` en el primer push / force-push** puede ser inválido
   (`000000…`) → mitigación: si BASE no resuelve, el gate trata el rango como "revisar el
   estado actual" (schema-valid + si el HEAD tocó pillars/scope respecto del último commit
