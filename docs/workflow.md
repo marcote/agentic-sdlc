@@ -1,7 +1,7 @@
 # Workflow end-to-end
 
 ```
-/constitution → (brief.md) → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat
+/constitution → (brief.md) → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat → /retro
 ```
 
 | Comando | Entrada | Salida | Verificación |
@@ -16,6 +16,8 @@
 | implement | `tasks` | código | inner loop 🔴→🟢 (budget → ESCALA) |
 | `/verify` | código | `verification/reports/…` | output + trajectory eval |
 | `/uat` | reporte | reporte completo | contra objetivo; gap → `/distill` |
+| `/retro` | `alignment.md` + `verification/reports/…` | `retro.md` | cierra la predicción de `/align` (Cara Misión) + deriva señales del WoW (Cara Método) |
+| `/wow-report` | todos los `retro.md` | `verification/wow-report.md` | agrega el ledger: drift por pilar, re-chequeos, salud del método, olores de teatro (observa, no gatea) |
 
 ## Tres loops
 1. **Grilling** (en `/distill`): cierra gaps de especificación antes de codear.
@@ -35,4 +37,4 @@ El flujo tiene dos capas con dueños distintos:
   `memory/north-star/base/README.md` (contrato en la plantilla, motor por-stack).
 
 ## Cierre
-`feature DONE ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%`.
+`feature DONE ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅`.

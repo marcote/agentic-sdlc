@@ -1,4 +1,4 @@
-for s in distill verify uat; do
+for s in distill verify uat retro wow-report; do
   f=".claude/skills/$s/SKILL.md"
   assert_file "$f"
   assert_contains "$f" "^name:"
@@ -6,3 +6,7 @@ for s in distill verify uat; do
 done
 assert_contains .claude/skills/distill/SKILL.md "grilling"
 assert_contains .claude/skills/verify/SKILL.md "rubric"
+assert_contains .claude/skills/retro/SKILL.md "adversarial"
+assert_contains .claude/skills/retro/SKILL.md "deriv"
+assert_contains .claude/skills/wow-report/SKILL.md "pilar"
+assert_contains .claude/skills/wow-report/SKILL.md "olor"

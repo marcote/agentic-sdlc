@@ -15,6 +15,7 @@ _(tool use: score/umbral | pasos saltados: … | hallucination: N)_
 _(escenario BDD → walked → pass/fail → nota; los fallos de UAT son gaps de PRODUCTO → /distill)_
 
 ## 5. Verdicto
-BUILD: <✅/❌> · TRAJECTORY: <✅/❌> · UAT: <✅/❌> · coverage: <N%>
-Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.
+BUILD: <✅/❌> · TRAJECTORY: <✅/❌> · UAT: <✅/❌> · coverage: <N%> · retro: <✅/pendiente>
+Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
+Retro: `specs/<feature>/retro.md` (cierra la predicción medible de `/align`).
 Gaps ruteados: _(a /verify=implementación, a /distill=producto)_

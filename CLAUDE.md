@@ -13,12 +13,12 @@ Agnóstico. Se copia encima de cualquier proyecto.
 
 ## Hard rules (detalle en memory/constitution/)
 - Ningún criterio determinista avanza a implementación sin test en 🔴 RED (`/contract`).
-- Un feature cierra solo con: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.
+- Un feature cierra solo con: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅ (`/retro` cierra la predicción de `/align`).
 - La verificación es on-demand (`/verify`, `/uat`); no hay hooks bloqueantes por commit.
 - Agregá una regla a memory/constitution/ cada vez que cometas un error repetible.
 
 ## Workflow
-`/constitution` → (brief) → `/distill` → `/plan` → `/contract` → `/tasks` → implement → `/verify` → `/uat`
+`/constitution` → (brief.md) → `/align` → `/distill` → `/plan` → `/contract` → `/tasks` → implement → `/verify` → `/uat` → `/retro`
 Ver `docs/workflow.md`.
 
 ## Punteros
