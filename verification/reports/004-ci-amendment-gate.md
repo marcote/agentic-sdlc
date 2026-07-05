@@ -36,11 +36,24 @@ spec: spec.md (congelado) · fecha: 2026-07-05 · constitution: base + proyecto 
   ninguna dep instalable inventada). Smoke-test de `--range` real (no-aplica + base 000…).
 
 ## 4. UAT  — agregado por /uat, contra acceptance.md
-_Pendiente — `AMEND-BLOCK-REAL` / `AMEND-BLOCK-PUSH` se caminan en `/uat` (aplicar branch
-protection, intentar amendment inválido por PR y por push directo, confirmar bloqueo)._
+Walk real completo sobre `marcote/agentic-sdlc` (branch protection aplicada en `main`:
+`amendment-gate` required + strict + `enforce_admins=true`):
+
+- **AMEND-BLOCK-REAL** ✅ — PR #2 con un pilar agregado sin ADR → check `amendment-gate`
+  **fail** (log: "amendment de pillars/scope SIN ADR nuevo"); `mergeStateStatus: BLOCKED`;
+  `gh pr merge` rechazado ("the base branch policy prohibits the merge"). `self-verify`
+  quedó pass (advisory, no bloquea) — confirma que el bloqueo lo hace el gate, no la suite.
+- **AMEND-BLOCK-PUSH** ✅ — push directo del mismo commit a `main` rechazado:
+  `GH006: Protected branch update failed … Required status check "amendment-gate" is failing …
+  [remote rejected] (protected branch hook declined)`. `main` quedó intacto (`ade3c24`).
+- Artefactos de prueba limpiados (PR cerrado, rama `uat-invalid-amendment` borrada).
+
+¿Mueve la métrica del brief? Sí — el objetivo era enforcement *realmente* bloqueante
+(no advisory) que no dependa de un approval que un mantenedor solo no puede darse; el walk
+lo demuestra por PR y por push. Sin gap de producto.
 
 ## 5. Verdicto
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: pendiente · coverage: 100% (determinista) · retro: pendiente
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% · retro: ✅ → **DONE**
 Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
-Retro: `specs/004-ci-amendment-gate/retro.md` (cierra la predicción medible de `/align`).
-Gaps ruteados: _ninguno de implementación (BUILD+TRAJECTORY verdes); UAT pendiente._
+Retro: `specs/004-ci-amendment-gate/retro.md` (veredicto de misión: confirmed).
+Gaps ruteados: _ninguno (implementación y producto verdes)._

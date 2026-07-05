@@ -22,8 +22,8 @@ Ningún `base/pattern` aplica como `[given]` (no hay writes/API/rate-limit en un
 | `enforcement-real` | Bloqueo angosto (preserva principio 4) | Delta de constitution declara la excepción | CONST-EXCEPTION | proyecto | `check_95_amendment_gate.sh` (grep constitution) | 🟢 green |
 | `portabilidad-agnostica` | Dependency-free + self-check verde | Sin deps de runtime nuevas | DEP-FREE | proyecto | `check_95_amendment_gate.sh` (gate sin toolchain + no manifests) | 🟢 green |
 | `portabilidad-agnostica` | Dependency-free + self-check verde | Wiring cubierto (script + workflow existen) | SELF-CHECK | proyecto | `check_95_amendment_gate.sh` + `check_40/70` | 🟢 green |
-| `enforcement-real` | Realmente bloqueante (branch protection) | Action + branch protection exigen el status-check | AMEND-BLOCK-REAL | proyecto | UAT walk (PR rojo no mergeable) | UAT (config) |
-| `enforcement-real` | Realmente bloqueante (branch protection) | Branch protection prohíbe bypass en push directo | AMEND-BLOCK-PUSH | proyecto | UAT walk (push directo rechazado) | UAT (config) |
+| `enforcement-real` | Realmente bloqueante (branch protection) | Action + branch protection exigen el status-check | AMEND-BLOCK-REAL | proyecto | UAT walk (PR rojo no mergeable) | ✅ uat |
+| `enforcement-real` | Realmente bloqueante (branch protection) | Branch protection prohíbe bypass en push directo | AMEND-BLOCK-PUSH | proyecto | UAT walk (push directo rechazado) | ✅ uat |
 
 **Sin filas huérfanas:** cada objetivo del brief mapea a ≥1 criterio con pilar; cada
 criterio tiene test (`/contract`) o UAT walk. Spec congelable.
