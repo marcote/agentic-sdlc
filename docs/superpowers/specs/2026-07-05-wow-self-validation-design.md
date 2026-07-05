@@ -68,23 +68,24 @@ cierra: alignment.md · verification/reports/<feature> · fecha: <YYYY-MM-DD>
 ## Cara A — Misión (cierra la predicción de /align)
 Fuente: specs/<feature>/alignment.md
 
-| Pilar (mapping) | Signal predicho | Veredicto | Evidencia |
+| Pilar (mapping) | Signal predicho | Veredicto | Evidencia (locator OBLIGATORIO) |
 |---|---|---|---|
-| pilar-x | <signal del North Star> | ✅ movió / ❌ no movió / ⏳ aún no observable | <link/dato> |
+| pilar-x | <signal del North Star> | ✅ movió / ❌ no movió / ⏳ aún no observable | <valor/SHA/fila-coverage/URL — no prosa> |
 
 - Calibración de align: los scores predichos (pillarFit/scope/mission) ¿acertaron?
 - Veredicto de misión: confirmed | refuted | pending-observation | n/a
+  - si confirmed | refuted → la celda Evidencia NO puede estar vacía (Capa 2)
   - si pending-observation → trigger de re-chequeo: <cuándo/qué señal mirar>
   - si n/a → razón obligatoria: <por qué no cierra contra un signal>
 
-## Cara B — Método (valida el WoW)
-Fuente: coverage.md, git history, verification/reports/<feature>
+## Cara B — Método (valida el WoW) — DERIVADA de artefactos, no redactada (Capa 1)
+Cada campo muestra su `[deriv: <locator>]` — de dónde salió la cifra. Sin locator = inválido.
 
-- Gaps cazados por /distill: <N> — <los jugosos>
-- Disciplina RED→GREEN: <todos los criterios deterministas tuvieron 🔴 antes de 🟢?>
-- Rework post-/verify: <N> · Rework post-/uat (gaps de producto): <N>
-- Escalaciones al humano: <N> (budget del inner loop excedido) — <por qué>
-- Fricción del propio WoW: <qué del harness estorbó o faltó>
+- Gaps cazados por /distill: <N> `[deriv: coverage.md filas + git log de distill]`
+- Disciplina RED→GREEN: <sí/no + excepciones> `[deriv: historial de estados coverage.md + git]`
+- Rework post-/verify: <N> · post-/uat: <N> `[deriv: gaps ruteados en verification/reports/<feature>]`
+- Escalaciones al humano: <N> `[deriv: traza/git]` — <por qué>
+- Fricción del propio WoW: <qué estorbó o faltó> (cualitativo; el único campo de juicio libre)
 
 ## Cara C — Loop (auto-mejora) — puente, no subsistema
 - Reglas candidatas → constitution: <regla o "ninguna">
@@ -120,6 +121,9 @@ para cada specs/NNN-*/ cuyo verification/reports/NNN-* muestre el veredicto DONE
   assert sin placeholders _(…)_ / <…> sin llenar
   assert veredicto de misión ∈ {confirmed, refuted, pending-observation, n/a}
   assert si veredicto == n/a  →  hay una razón no vacía
+  assert si veredicto ∈ {confirmed, refuted}  →  celda Evidencia no vacía          (Capa 2)
+          y "parece" locator (contiene path / SHA / número / URL, no solo prosa)
+  assert cada campo de Cara B trae su [deriv: <locator>]                            (Capa 1)
 si NO está DONE: skip (feature en vuelo)
 ```
 
@@ -154,6 +158,11 @@ commiteado). Estructura:
 ## 4. Loop — ¿el WoW se mejora a sí mismo?
    reglas candidatas propuestas vs aterrizadas en constitution;
    amendments propuestos vs aprobados (ADR).
+
+## 5. Olores de teatro (spot-check humano)  (Capa 4)
+   marca retros sospechosos: celdas de Evidencia vacías · all-green
+   (cero gaps + cero rework + cero fricción) · pending-observation vencidos y
+   nunca re-chequeados. Un retro demasiado limpio ES una señal.
 ```
 
 **Decisiones:**
@@ -171,13 +180,51 @@ commiteado). Estructura:
 Par comando+skill (mismo patrón que `/align`):
 - `.claude/commands/retro.md` (thin): invocá la skill `retro`; requiere el reporte de
   verificación del feature en DONE; escribe `specs/<feature>/retro.md`.
-- `.claude/skills/retro/SKILL.md` (procedimiento):
-  1. leé `alignment.md` → para cada pilar del `mapping`, buscá su `signal` y dictá
-     veredicto con evidencia (Cara A);
-  2. derivá la Cara B de `coverage.md` + git + `verification/reports/<feature>`;
-  3. proponé reglas/ADRs (Cara C);
-  4. si un signal no es medible al cierre → `pending-observation` + trigger, o `n/a` +
+- `.claude/skills/retro/SKILL.md` (procedimiento — orden `derivar → auto-desafiar →
+  escribir`, no al revés):
+  1. **Derivá primero** (Capa 1): cada cifra de Cara B sale de un artefacto con su
+     `[deriv: <locator>]` (`coverage.md`, git, `verification/reports/<feature>`). No
+     tipees cifras de memoria.
+  2. leé `alignment.md` → para cada pilar del `mapping`, buscá su `signal` y dictá
+     veredicto **con evidencia locator obligatoria** (Cara A, Capa 2). Sin locator para
+     un `confirmed`/`refuted` → no lo escribas: es `pending-observation`.
+  3. **Auto-desafío adversarial** (Capa 3): antes de escribir, argumentá EN CONTRA de tu
+     propio borrador — "el report dice 0 rework: verificá contra `git log`; dice que el
+     pillar-fit de align fue exacto: sostené lo opuesto". Solo lo que sobrevive al
+     desafío se escribe. (Refuerzo futuro, YAGNI ahora: delegar el desafío a un subagente
+     sképtico separado, no al que redactó.)
+  4. proponé reglas/ADRs (Cara C);
+  5. si un signal no es medible al cierre → `pending-observation` + trigger, o `n/a` +
      razón.
+
+## Anti-teatro: defensa en profundidad (4 capas)
+
+El mayor riesgo del diseño: que el agente llene el retro **por cumplir**. Un check
+determinista **no puede probar honestidad** (un grep pasa con relleno plausible —
+Goodhart). No lo resolvemos con una defensa sino achicando el lugar donde el teatro se
+esconde. Cuatro capas, de más barata a más potente:
+
+1. **Derivar, no redactar** (Cara B + skill paso 1). Cada campo del Método es una
+   consulta contra un artefacto (`coverage.md`, git, report) con su `[deriv: <locator>]`.
+   Si el campo es una cifra derivada, no hay nada que "inventar por cumplir": el número
+   es el que es. Deja un solo campo de juicio libre (fricción), a propósito.
+2. **Evidence-or-it-didn't-happen** (Cara A + `check_90`). Un veredicto
+   `confirmed`/`refuted` exige celda de Evidencia no vacía con forma de locator
+   (path/SHA/número/URL). Esto **sí es checkeable** en CI: la prosa infalsificable está
+   prohibida. Sin evidencia → el veredicto honesto es `pending-observation`.
+3. **Auto-desafío adversarial** (skill paso 3). El mismo agente que construyó tiene sesgo
+   de auto-calificarse; el procedimiento le exige argumentar en contra de su propio
+   borrador antes de escribir. Reusa el patrón "juez sobre la traza" que `/verify` ya
+   tiene (trajectory eval). Refuerzo futuro: subagente sképtico separado (YAGNI ahora).
+4. **El report huele lo demasiado-limpio** (`/wow-report` §5). Un retro all-green es en
+   sí una señal; el agregador marca evidencia vacía, all-green y `pending-observation`
+   vencidos para spot-check humano. El trigger de re-chequeo es lo que **cobra** un
+   `confirmed` que después no se sostiene.
+
+**Lo honesto:** es defensa en profundidad, no una prueba. El residuo — que el agente
+evalúe de verdad — sigue siendo la apuesta agéntica. Pero entre derivar en vez de
+redactar, evidencia obligatoria y checkeable, auto-desafío, y el report que huele lo
+limpio, el espacio para el teatro queda chico e incómodo.
 
 ## Bootstrap recursivo
 
@@ -213,9 +260,8 @@ Par comando+skill (mismo patrón que `/align`):
 
 ## Riesgos
 
-- **Retro de baja calidad** (el agente llena por cumplir): mitiga la Cara B
-  auto-derivable + revisión humana del `/wow-report`. El check no puede probar
-  honestidad — es explícito.
+- **Retro de baja calidad** (el agente llena por cumplir): ver "Anti-teatro: defensa en
+  profundidad (4 capas)". El check no puede probar honestidad — es explícito.
 - **`n/a` abusado** como escape: mitiga la razón obligatoria + visibilidad por grep.
 - **`pending-observation` que nunca se re-chequea**: mitiga la worklist con "vencidos"
   en `/wow-report`.
