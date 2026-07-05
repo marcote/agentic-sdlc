@@ -4,112 +4,93 @@ extends: base
 
 # North Star — Agentic SDLC Harness
 
-> Este archivo gobierna **para qué existe** el producto; su par
-> `memory/constitution/constitution.md` gobierna **cómo** se construye. Extiende
-> `base` (ver `base/schema.md`, `base/alignment-rubric.md`,
+> This file governs **why** the product exists; its counterpart
+> `memory/constitution/constitution.md` governs **how** it is built. Extends
+> `base` (see `base/schema.md`, `base/alignment-rubric.md`,
 > `base/amendment-protocol.md`).
 >
-> **Adoptantes:** al vendorear el harness sobre otro repo, reemplazá este archivo con
-> el North Star de *tu* producto — igual que reemplazás/extendés `constitution.md`. El
-> `base/` compartido (schema, rúbrica, protocolo) queda; el delta de un proyecto es su
-> misión, pilares y scope solamente.
+> **Adopters:** when vendoring the harness onto another repo, replace this file with
+> the North Star of *your* product — just as you would replace/extend `constitution.md`. The
+> shared `base/` (schema, rubric, protocol) remains; a project's delta is its
+> mission, pillars, and scope only.
 >
-> Cambiar `pillars` o `scope` es un evento gobernado: requiere ADR + PR (ver
-> `base/amendment-protocol.md`). El seed inicial está registrado en
+> Changing `pillars` or `scope` is a governed event: it requires an ADR + PR (see
+> `base/amendment-protocol.md`). The initial seed is registered in
 > `decisions/0001-seed-north-star.md`.
 
-## Misión
+## Mission
 
-Un harness reutilizable y agnóstico de stack que hace cumplir un SDLC agéntico
-disciplinado (spec-driven, test-first, verificado con evidencia) sobre cualquier
-proyecto — gobierna *cómo* se construye, sin imponer stack ni runtime de ejecución, y
-sin escribir código de producto.
+A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spec-driven, test-first, evidence-verified) on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.
 
-## Pilares
+## Pillars
 
-- **`enforcement-real`** — La disciplina la hacen cumplir gates deterministas, no la
-  buena voluntad. Su `signal`: los gates bloquean el cierre cuando falta una condición y
-  las violaciones se cazan antes del merge; el harness lo prueba **dogfoodeándose** (el
-  ledger de retros y el `wow-report` son la evidencia). La auto-validación no es un pilar
-  aparte: es el proxy medible de *este*.
-- **`portabilidad-agnostica`** — Corre sobre cualquier stack o proyecto sin imponer
-  tecnología ni runtime. Su `signal`: el contrato (schema, gates, artefactos) se mantiene
-  íntegro al vendorearlo sobre un repo/stack arbitrario.
-- **`adopcion-sin-friccion`** — Incorporar el harness a un repo nuevo cuesta poco. Su
-  `signal`: pasos/tiempo para adoptar el harness en un proyecto (menor = mejor).
-- **`impacto-medible`** — La disciplina que el harness impone tiene que traducirse en
-  mejor software, no en gates que disparan por disparar. Su `signal`: gaps cazados
-  temprano (grilling/`/contract`) y rework tardío evitado (post-`/verify`/`/uat`),
-  agregados por feature en la sección "Método" del `wow-report`. Distingue *enforçar*
-  (`enforcement-real`) de *que enforçar sirva* — la misma línea anti-teatro del retro,
-  subida al nivel del harness.
+- **`real-enforcement`** — Discipline is enforced by deterministic gates, not good intentions.
+  Its `signal`: gates block closure when a condition is missing and violations are caught before merge; the harness proves this by **dogfooding itself** (the retro ledger and `wow-report` are the evidence). Self-validation is not a separate pillar: it is the measurable proxy of *this one*.
+- **`agnostic-portability`** — Runs on any stack or project without imposing technology or runtime.
+  Its `signal`: the contract (schema, gates, artifacts) remains intact when vendored onto an arbitrary repo/stack.
+- **`frictionless-adoption`** — Incorporating the harness into a new repo costs little.
+  Its `signal`: steps/time to adopt the harness in a project (lower = better).
+- **`measurable-impact`** — The discipline the harness imposes must translate into better software, not gates that fire for the sake of firing.
+  Its `signal`: gaps caught early (grilling/`/contract`) and late rework avoided (post-`/verify`/`/uat`), aggregated per feature in the "Method" section of the `wow-report`. Distinguishes *enforcing* (`real-enforcement`) from *enforcement that works* — the same anti-theater line from retro, elevated to the harness level.
 
 ## Scope
 
-**En alcance:** comandos, gates y skills del workflow de governance; la gobernanza de
-producto (constitution y North Star); plantillas de feature, `coverage` y la máquina de
-estados de criterios; evals, verificación y UAT del método; tooling de adopción
-(install, vendoring, herencia); auto-validación del WoW (retro, wow-report) y
-documentación del método.
+**In scope:** commands, gates, and skills of the governance workflow; product governance (constitution and North Star); feature templates, coverage, and criterion state machine; evals, verification, and UAT of the method; adoption tooling (install, vendoring, inheritance); WoW self-validation (retro, wow-report) and method documentation.
 
-**Fuera de alcance** (los predicados que `/align` usa como rechazo duro): código de
-aplicación o features de producto de un proyecto adoptante; el motor determinista
-específico de un stack (lo provee el adoptante — "contrato en la plantilla, motor
-por-stack"); imponer o nombrar un runtime de ejecución obligatorio; hooks bloqueantes por
-commit; dependencias de runtime o frameworks (el harness es dependency-free).
+**Out of scope** (the hard-rejection predicates that `/align` uses): application code or product features of an adopting project; the stack-specific deterministic engine (provided by the adopter — "contract in the template, engine per-stack"); imposing or naming a mandatory execution runtime; blocking commit hooks; runtime dependencies or frameworks (the harness is dependency-free).
 
 ## Alignment
 
-Los briefs nuevos se puntúan contra `base/alignment-rubric.md` por la skill `/align`.
-Umbral de pase: **3** de 5 en cada una de las tres dimensiones (pillar fit, scope
-compliance, mission advancement), con cualquier hit de `out_of_scope` como rechazo duro
-sin importar el score. Ver `base/alignment-rubric.md` para la regla de agregación completa.
+New briefs are scored against `base/alignment-rubric.md` by the `/align` skill.
+Pass threshold: **3** out of 5 in each of the three dimensions (pillar fit, scope
+compliance, mission advancement), with any `out_of_scope` hit as a hard rejection
+regardless of score. See `base/alignment-rubric.md` for the complete aggregation rule.
 
-## North Star canónico
+## Canonical North Star
 
-El bloque de abajo es la única fuente de verdad, leída por el validador determinista
-(per-stack). La prosa de arriba lo explica para humanos; si discrepan, este bloque gana.
+The block below is the single source of truth, read by the deterministic validator
+(per-stack). The prose above explains it for humans; if they conflict, this block wins.
 
 ```json
 {
-  "mission": "Un harness reutilizable y agnóstico de stack que hace cumplir un SDLC agéntico disciplinado (spec-driven, test-first, verificado con evidencia) sobre cualquier proyecto — gobierna cómo se construye, sin imponer stack ni runtime de ejecución, y sin escribir código de producto.",
+  "mission": "A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spec-driven, test-first, evidence-verified) on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.",
   "pillars": [
     {
-      "id": "enforcement-real",
-      "statement": "La disciplina la hacen cumplir gates deterministas, no la buena voluntad.",
-      "signal": "Los gates bloquean el cierre cuando falta una condición; las violaciones se cazan antes del merge (y el harness lo prueba dogfoodeándose: ledger de retros / wow-report)."
+      "id": "real-enforcement",
+      "statement": "Discipline is enforced by deterministic gates, not good intentions.",
+      "signal": "Gates block closure when a condition is missing; violations are caught before merge (and the harness proves this by dogfooding itself: retro ledger / wow-report)."
     },
     {
-      "id": "portabilidad-agnostica",
-      "statement": "Corre sobre cualquier stack o proyecto sin imponer tecnología ni runtime.",
-      "signal": "El contrato (schema, gates, artefactos) se mantiene íntegro al vendorearlo sobre un repo/stack arbitrario."
+      "id": "agnostic-portability",
+      "statement": "Runs on any stack or project without imposing technology or runtime.",
+      "signal": "The contract (schema, gates, artifacts) remains intact when vendored onto an arbitrary repo/stack."
     },
     {
-      "id": "adopcion-sin-friccion",
-      "statement": "Incorporar el harness a un repo nuevo cuesta poco.",
-      "signal": "Pasos/tiempo para adoptar el harness en un proyecto (menor = mejor)."
+      "id": "frictionless-adoption",
+      "statement": "Incorporating the harness into a new repo costs little.",
+      "signal": "Steps/time to adopt the harness in a project (lower = better)."
     },
     {
-      "id": "impacto-medible",
-      "statement": "La disciplina que el harness impone tiene que traducirse en mejor software: menos rework y gaps cazados antes de producción, no gates que disparan por disparar.",
-      "signal": "Gaps cazados temprano (grilling/contract) y rework tardío evitado (post-verify/uat), agregados por feature en la sección Método del wow-report; alto = la disciplina previene, no solo burocratiza."
+      "id": "measurable-impact",
+      "statement": "The discipline the harness imposes must translate into better software: less rework and gaps caught before production, not gates that fire for the sake of firing.",
+      "signal": "Gaps caught early (grilling/contract) and late rework avoided (post-verify/uat), aggregated per feature in the Method section of the wow-report; high = discipline prevents, not just bureaucratizes."
     }
   ],
   "scope": {
     "in_scope": [
-      "comandos, gates y skills del workflow de governance",
-      "gobernanza de producto: constitution y North Star",
-      "plantillas de feature, coverage y máquina de estados de criterios",
-      "evals, verificación y UAT del método",
-      "tooling de adopción: install, vendoring y herencia del harness",
-      "auto-validación del WoW (retro, wow-report) y documentación del método"
+      "commands, gates, and skills of the governance workflow",
+      "product governance: constitution and North Star",
+      "feature templates, coverage, and criterion state machine",
+      "evals, verification, and UAT of the method",
+      "adoption tooling: install, vendoring, and harness inheritance",
+      "WoW self-validation (retro, wow-report) and method documentation"
     ],
     "out_of_scope": [
-      "código de aplicación o features de producto de un proyecto adoptante",
-      "motor determinista específico de un stack",
-      "imponer o nombrar un runtime de ejecución obligatorio",
-      "hooks bloqueantes por commit",
-      "dependencias de runtime o frameworks"
+      "application code or product features of an adopting project",
+      "stack-specific deterministic engine (provided by the adopter)",
+      "imposing or naming a mandatory execution runtime",
+      "blocking commit hooks",
+      "runtime dependencies or frameworks"
     ]
   },
   "alignment": {
