@@ -15,7 +15,7 @@ Fuente: N/A — North Star de este repo es placeholder (no schema-válido); `/al
 
 - **Calibración de align:** N/A (no corrió `/align`; North Star sin completar).
 - Veredicto de misión: n/a
-  - **razón:** repo = plantilla del harness; `north-star.md` es placeholder, no hay signal real que cerrar. La columna align↔retro se dogfoodea de verdad en un repo adoptante. Evidencia: `memory/north-star/north-star.md` (todos los campos son `_(completar por proyecto)_`).
+  - **razón:** repo = plantilla del harness; `north-star.md` es placeholder, no hay signal real que cerrar. La columna align↔retro se dogfoodea de verdad en un repo adoptante. Evidencia: `memory/north-star/north-star.md` (todos los campos tienen el valor-template "completar por proyecto").
 
 ## Cara B — Método (valida el WoW) — DERIVADA de artefactos, no redactada
 Cada campo trae su `[deriv: locator]`. Sin locator = inválido.

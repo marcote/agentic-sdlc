@@ -33,7 +33,7 @@ for report in verification/reports/*.md; do
   if [ ! -f "$retro" ]; then _fail "feature $nnn DONE pero falta $retro"; continue; fi
   _pass "feature $nnn DONE tiene $retro"
   # Sin placeholders sin llenar
-  if grep -qE '_\(…\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro tiene placeholders sin llenar"; else _pass "$retro sin placeholders"; fi
+  if grep -qE '_\([^)]*\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro tiene placeholders sin llenar"; else _pass "$retro sin placeholders"; fi
   # Veredicto de misión válido
   if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
     _pass "$retro veredicto de misión válido"
@@ -44,7 +44,22 @@ for report in verification/reports/*.md; do
   if grep -qE 'Veredicto de misión:[*[:space:]]*n/a' "$retro"; then
     if grep -qiE 'raz[oó]n' "$retro"; then _pass "$retro n/a con razón"; else _fail "$retro n/a sin razón"; fi
   fi
-  # Cada campo de Cara B con [deriv:] (Capa 1)
-  if [ "$(grep -cE '\[deriv:' "$retro")" -ge 4 ]; then _pass "$retro Cara B con deriv (≥4)"; else _fail "$retro Cara B con <4 [deriv:] (campos derivables sin locator)"; fi
+  # Capa 2: confirmed/refuted exige evidencia locator en las filas de la tabla Cara A.
+  if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted)' "$retro"; then
+    ev_bad=0; ev_rows=0
+    while IFS= read -r row; do
+      case "$row" in *Pilar*|*Signal*|*---*) continue ;; esac   # saltear header/separador
+      ev=$(printf '%s' "$row" | awk -F'|' '{c=$(NF-1); gsub(/^[ \t]+|[ \t]+$/,"",c); print c}')
+      ev_rows=$((ev_rows+1))
+      printf '%s' "$ev" | grep -qE '[0-9]|/|https?://|\.md|#' || ev_bad=1
+    done < <(grep -E '^\|' "$retro")
+    if [ "$ev_rows" -ge 1 ] && [ "$ev_bad" -eq 0 ]; then
+      _pass "$retro Capa2: evidencia locator en Cara A (confirmed/refuted)"
+    else
+      _fail "$retro Capa2: confirmed/refuted con evidencia vacía o sin locator"
+    fi
+  fi
+  # Cada campo de Cara B con [deriv:] (Capa 1) — anclado a bullet lines para excluir la intro
+  if [ "$(grep -cE '^- .*\[deriv:' "$retro")" -ge 4 ]; then _pass "$retro Cara B con deriv (≥4)"; else _fail "$retro Cara B con <4 [deriv:] (campos derivables sin locator)"; fi
 done
 [ "$closed_seen" -eq 1 ] && _pass "loop de cierre ejercitado" || _pass "sin features cerrados aún (vacuo)"

@@ -18,7 +18,7 @@ Agnóstico. Se copia encima de cualquier proyecto.
 - Agregá una regla a memory/constitution/ cada vez que cometas un error repetible.
 
 ## Workflow
-`/constitution` → (brief) → `/distill` → `/plan` → `/contract` → `/tasks` → implement → `/verify` → `/uat`
+`/constitution` → (brief.md) → `/align` → `/distill` → `/plan` → `/contract` → `/tasks` → implement → `/verify` → `/uat` → `/retro`
 Ver `docs/workflow.md`.
 
 ## Punteros
