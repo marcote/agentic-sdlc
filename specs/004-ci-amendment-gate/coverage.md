@@ -20,7 +20,7 @@ Ningún `base/pattern` aplica como `[given]` (no hay writes/API/rate-limit en un
 | `enforcement-real` | Gatear amendments por CI determinista | Script gate: exige suite verde | AMEND-SUITE-GREEN | proyecto | `check_95_amendment_gate.sh` | 🔴 red |
 | `enforcement-real` | Bloqueo angosto (preserva principio 4) | Gate no bloquea trabajo que no toca pillars/scope | DEV-UNBLOCKED | proyecto | `check_95_amendment_gate.sh` | 🔴 red |
 | `enforcement-real` | Bloqueo angosto (preserva principio 4) | Delta de constitution declara la excepción | CONST-EXCEPTION | proyecto | `check_95_amendment_gate.sh` (grep constitution) | 🔴 red |
-| `portabilidad-agnostica` | Dependency-free + self-check verde | Sin deps de runtime nuevas | DEP-FREE | proyecto | `check_95_amendment_gate.sh` (no package.json) | 🟡 guard* |
+| `portabilidad-agnostica` | Dependency-free + self-check verde | Sin deps de runtime nuevas | DEP-FREE | proyecto | `check_95_amendment_gate.sh` (gate sin toolchain + no manifests) | 🔴 red |
 | `portabilidad-agnostica` | Dependency-free + self-check verde | Wiring cubierto (script + workflow existen) | SELF-CHECK | proyecto | `check_95_amendment_gate.sh` + `check_40/70` | 🔴 red |
 | `enforcement-real` | Realmente bloqueante (branch protection) | Action + branch protection exigen el status-check | AMEND-BLOCK-REAL | proyecto | UAT walk (PR rojo no mergeable) | UAT (config) |
 | `enforcement-real` | Realmente bloqueante (branch protection) | Branch protection prohíbe bypass en push directo | AMEND-BLOCK-PUSH | proyecto | UAT walk (push directo rechazado) | UAT (config) |
@@ -28,9 +28,8 @@ Ningún `base/pattern` aplica como `[given]` (no hay writes/API/rate-limit en un
 **Sin filas huérfanas:** cada objetivo del brief mapea a ≥1 criterio con pilar; cada
 criterio tiene test (`/contract`) o UAT walk. Spec congelable.
 
-**`*` `DEP-FREE` = guardarraíl invariante (green-by-construction):** su assert pasa hoy
-porque no hay deps que romper; es un test real que **fallará** si un task de impl agrega
-un `package.json`/`node_modules`/toolchain instalable. No tiene fase RED genuina (no hay
-nada que implementar para pasarlo), por eso `🟡 guard` en vez de `🔴 red`. Los otros 9
-deterministas están 🔴 RED verificados (`bash tests/run.sh` → 14 FAIL, todos por
-gate/workflow/delta ausentes) y avanzan a `🟢 green` recién cuando la impl los pone en verde.
+**Los 10 deterministas están 🔴 RED verificados** (`bash tests/run.sh` → todos FAIL por
+gate/workflow/delta de constitution ausentes) y avanzan a `🟢 green` recién cuando la impl
+los pone en verde. `DEP-FREE` se ató al deliverable (el gate debe existir y no invocar
+toolchains instalables) en vez de ser un mero guardarraíl de repo green-by-construction —
+así tiene fase RED genuina como el resto.

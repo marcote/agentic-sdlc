@@ -67,12 +67,22 @@ assert_contains memory/constitution/constitution.md "amendment-gate"
 assert_contains memory/constitution/constitution.md "[Pp]rincipio 4"
 assert_contains memory/constitution/constitution.md "pillars/scope"
 
-# --- DEP-FREE: ni package.json/lock/node_modules ni toolchain instalable (uv/pip) ---
+# --- DEP-FREE: el nuevo layer (gate) es dependency-free ---
+# (a) atado al deliverable: no se puede verificar la dep-freeness de un gate que
+#     no existe -> RED hasta que la impl cree el script. Y cuando exista, no debe
+#     invocar ningún toolchain instalable (solo bash/coreutils + python3 stdlib).
+assert_file "$GATE"
+if grep -qiE '(^|[^[:alnum:]-])(npm|npx|node|uv|pip3?|pnpm|yarn)([^[:alnum:]-]|$)' "$GATE" 2>/dev/null; then
+  _fail "DEP-FREE: $GATE invoca un toolchain instalable (npm/node/uv/pip…)"
+elif [ -f "$GATE" ]; then
+  _pass "DEP-FREE: $GATE sin toolchain instalable (bash/coreutils + python3)"
+fi
+# (b) guardarraíl de repo: el feature no incorpora manifests instalables
 dep_free=1
 for d in package.json package-lock.json pnpm-lock.yaml yarn.lock node_modules uv.lock requirements.txt; do
   [ -e "$d" ] && { _fail "DEP-FREE: apareció $d (dependencia instalable)"; dep_free=0; }
 done
-[ "$dep_free" -eq 1 ] && _pass "DEP-FREE: sin package manifests ni toolchain instalable"
+[ "$dep_free" -eq 1 ] && _pass "DEP-FREE: repo sin package manifests instalables"
 
 # --- SELF-CHECK: wiring — el script del gate y el workflow existen y están cableados ---
 assert_file "$GATE"
