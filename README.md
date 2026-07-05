@@ -126,7 +126,9 @@ feature "DONE"  ⟺  BUILD ✅  AND  TRAJECTORY ✅  AND  UAT ✅  AND  coverage
 - `CLAUDE.md` — static context (stack, hard rules, workflow).
 - `memory/constitution/` — principios no-negociables (base heredable + proyecto).
 - `memory/north-star/` — gobernanza de producto (para qué existe): `base/` (schema,
-  rúbrica, protocolo de amendment) + `north-star.md` (placeholder del proyecto).
+  rúbrica, protocolo de amendment) + `north-star.md` (North Star del harness; el
+  adoptante lo reemplaza con el suyo, igual que la constitution) + `decisions/` (ADRs
+  de amendment).
 - `specs/_template/` — plantilla de feature (brief/spec/acceptance/coverage/plan/tasks).
 - `evals/` — rubric de 5 dimensiones + cases no-deterministas.
 - `verification/` — report, UAT y code-review checklists + `reports/` (observability).
