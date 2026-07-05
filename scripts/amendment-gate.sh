@@ -134,7 +134,7 @@ fi
 
 # --- Gate logic ---
 if [ "$(_py sets_changed "$OLD" "$NEW")" = "same" ]; then
-  echo "amendment-gate: sin cambio de sets pillars/scope — no aplica (dev no bloqueado)"
+  echo "amendment-gate: no change to pillars/scope sets — not applicable (dev not blocked)"
   exit 0
 fi
 

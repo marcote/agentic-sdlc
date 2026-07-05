@@ -25,7 +25,7 @@ classes of thing:
 | Example | What it is | Where it goes |
 |---|---|---|
 | "build a reusable SDLC" | the **Mission** (why it exists) | `north-star.md` |
-| "install from github" | a **feature/means** (future `brief.md`) | backlog, under the `adopcion-sin-friccion` pillar |
+| "install from github" | a **feature/means** (future `brief.md`) | backlog, under the `frictionless-adoption` pillar |
 | "commands in English" | a **how convention** (no measurable signal) | `constitution`, outside the North Star |
 
 Rule for deciding whether something is a pillar: **Does it have a measurable `signal` for "are we serving the mission?"**
@@ -55,13 +55,13 @@ as **foundational ADR 0001**.
 > without writing product code.
 
 **Pillars (3 — self-validation/dogfooding is NOT a separate pillar: it is the `signal` of
-`enforcement-real`):**
+`real-enforcement`):**
 
 | Pillar | Statement | Measurable signal |
 |---|---|---|
-| `enforcement-real` | Discipline is enforced by deterministic gates, not goodwill | Gates block closure when a condition is missing; violations caught before merge (the harness proves this by dogfooding itself: retro ledger / wow-report) |
-| `portabilidad-agnostica` | Runs on any stack/project without imposing technology or runtime | The contract (schema/gates/artifacts) remains intact when vendored onto an arbitrary repo/stack |
-| `adopcion-sin-friccion` | Onboarding the harness to a new repo costs little | Steps/time to adopt the harness (lower = better) |
+| `real-enforcement` | Discipline is enforced by deterministic gates, not goodwill | Gates block closure when a condition is missing; violations caught before merge (the harness proves this by dogfooding itself: retro ledger / wow-report) |
+| `agnostic-portability` | Runs on any stack/project without imposing technology or runtime | The contract (schema/gates/artifacts) remains intact when vendored onto an arbitrary repo/stack |
+| `frictionless-adoption` | Onboarding the harness to a new repo costs little | Steps/time to adopt the harness (lower = better) |
 
 **Scope:**
 - **in_scope:** workflow commands/gates/skills; constitution and North Star; feature,
@@ -78,7 +78,7 @@ as **foundational ADR 0001**.
   "mission": "A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spec-driven, test-first, evidence-verified) on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.",
   "pillars": [
     {
-      "id": "enforcement-real",
+      "id": "real-enforcement",
       "statement": "Discipline is enforced by deterministic gates, not good intentions.",
       "signal": "Gates block closure when a condition is missing; violations are caught before merge (and the harness proves this by dogfooding itself: retro ledger / wow-report)."
     },
@@ -134,7 +134,7 @@ as **foundational ADR 0001**.
 ## Non-goals (YAGNI)
 - **No** adding pillars beyond 3 now (they grow via amendment-protocol when needed).
 - **No** implementing the "install from github" feature here (it is a future `brief.md` under
-  `adopcion-sin-friccion`).
+  `frictionless-adoption`).
 - **No** addressing "commands in English" here (it is a convention → constitution, separate item).
 - **No** building the per-stack deterministic engine for `/align` in this repo (contract in
   the template, per-stack engine — remains the adopter's responsibility).

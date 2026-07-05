@@ -50,11 +50,11 @@ gate_pass "reformat without sets change" \
   --files "$F/base.md" "$F/reformatted.md" --added "" --suite-cmd true
 
 # --- AMEND-SCHEMA-VALID: sets change, with ADR, but JSON schema-invalid -> blocks citing schema ---
-gate_block "sets change schema-invalid (even with ADR)" "schema|inv[aá]lid" \
+gate_block "sets change schema-invalid (even with ADR)" "schema|invalid" \
   --files "$F/base.md" "$F/set-added-invalid.md" --added "$ADR" --suite-cmd true
 
 # --- AMEND-SUITE-GREEN: sets change, ADR, schema ok, but RED suite -> blocks ---
-gate_block "sets change with red suite" "suite|verde|red|roj" \
+gate_block "sets change with red suite" "suite|red" \
   --files "$F/base.md" "$F/set-added-valid.md" --added "$ADR" --suite-cmd false
 
 # --- DEV-UNBLOCKED: diff does not touch sets (normal work) -> passes (preserves Principle 4) ---
