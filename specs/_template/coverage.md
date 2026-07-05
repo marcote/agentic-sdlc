@@ -11,5 +11,5 @@
 
 | Pillar | Objetivo (brief) | Requerimiento (spec) | Criterio (acceptance) | Origen | Test/Eval ligado | Estado |
 |---|---|---|---|---|---|---|
-| _(ej.)_ `inventory-topology` | _(ej.)_ ↑ conversión | Guardar tarjeta 1-tap | token < 300ms | proyecto | `card_token.feature` | 🔴 red |
+| _(ej.)_ `pilar-a` | _(ej.)_ ↑ conversión | Guardar tarjeta 1-tap | token < 300ms | proyecto | `card_token.feature` | 🔴 red |
 | — | — | (todas las escrituras) | audit-log actor+ts | `[given] base/audit-logging` | `audit.feature` | 🔴 red |

@@ -39,6 +39,12 @@ comportamiento esperado.
 ## Conclusión
 
 Ambos cases coinciden con su veredicto esperado (`aligned` / `rejected`); el Case 2
-muestra scope compliance `< 3` de forma específica. El eval **pasa**. El motor
-determinista de agregación (`alignVerdict`) es contrato per-stack — no unit-testeado
-aquí (criterio `ALIGN-VERDICT-CONTRACT`); reference: `poirot-fe scripts/north-star/`.
+muestra scope compliance `< 3` de forma específica. Este es el **resultado
+esperado (ilustrativo — cada proyecto adoptante corre este eval contra su North
+Star real)**: `north-star.md` en este repo es un placeholder sin predicados
+`out_of_scope` reales, así que no hay un eval "pasando" en sentido estricto
+todavía — lo que este documento registra es que el judge, puntuando contra los
+pilares ilustrativos `pilar-a`/`pilar-b`, produce el veredicto que la rúbrica
+predice. El motor determinista de agregación (`alignVerdict`) es contrato
+per-stack — no unit-testeado aquí (criterio `ALIGN-VERDICT-CONTRACT`);
+reference: `poirot-fe scripts/north-star/`.

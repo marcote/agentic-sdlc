@@ -40,12 +40,13 @@ gana**.
 |---|---|
 | `mission` | requerido, string no vacío |
 | `pillars` | requerido, array con **≥ 1** entrada |
-| `pillars[].id` | requerido, string no vacío — un slug corto (p. ej. `inventory-topology`) |
+| `pillars[].id` | requerido, string no vacío — un slug corto (p. ej. `pilar-a`) |
 | `pillars[].statement` | requerido, string no vacío — qué significa el pilar |
 | `pillars[].signal` | requerido, string no vacío — un indicador **medible** de que el pilar está siendo servido (esto es lo que hace al North Star chequeable, no solo aspiracional) |
 | `scope.in_scope` | requerido, array de strings **no vacío** |
 | `scope.out_of_scope` | requerido, array de strings **no vacío** — usado por el predicado de scope (`scopeReject`, per-stack) como predicados de rechazo duro |
 | `alignment.threshold` | requerido, número — score mínimo (0–5) que cada dimensión de la rúbrica debe superar para contar como alineado (ver `alignment-rubric.md`) |
+| `alignment.rubric` | **opcional** — puntero/ruta al archivo de rúbrica usado para puntuar (p. ej. `alignment-rubric.md`); solo `alignment.threshold` es requerido |
 
 Un North Star que falle cualquiera de estas reglas **no es schema-válido**, y por
 la Measurability Gate (`specs/002-north-star-governance/acceptance.md`, criterio
