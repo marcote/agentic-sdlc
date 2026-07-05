@@ -1,4 +1,4 @@
-for c in constitution distill plan contract tasks verify uat; do
+for c in constitution distill plan contract tasks verify uat retro; do
   f=".claude/commands/$c.md"
   assert_file "$f"
   assert_contains "$f" "^description:"
