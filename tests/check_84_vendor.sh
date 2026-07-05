@@ -120,12 +120,17 @@ fi
 rm -rf "$T"
 
 # --- DEPFREE: vendor.sh uses no installable toolchain (tied to deliverable) ---
+# Distinguish INVOCATION from string DATA: vendor.sh legitimately names test commands
+# ("npm test", "pytest", …) as the defaults it SEEDS into scripts/test.sh. Those are data,
+# not dependencies. So exclude comment and echo lines (data) before checking for a real
+# toolchain invocation.
 assert_file "$VENDOR"
 if have; then
-  if grep -qiE '(^|[^[:alnum:]-])(npm|npx|node|uv|pip3?|pnpm|yarn)([^[:alnum:]-]|$)' "$VENDOR"; then
+  if grep -vE '^[[:space:]]*#|echo' "$VENDOR" \
+     | grep -qiE '(^|[^[:alnum:]-])(npm|npx|node|uv|pip3?|pnpm|yarn)([^[:alnum:]-]|$)'; then
     _fail "DEPFREE: $VENDOR invokes an installable toolchain"
   else
-    _pass "DEPFREE: $VENDOR bash/coreutils + python3 only"
+    _pass "DEPFREE: $VENDOR bash/coreutils + git + python3 only (test commands are seeded data)"
   fi
 fi
 
