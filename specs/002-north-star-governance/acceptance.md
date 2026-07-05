@@ -1,106 +1,106 @@
-# Acceptance — Gobernanza North-Star + Measurability Gate
+# Acceptance — North-Star Governance + Measurability Gate
 
-> Criterios de aceptación medibles en BDD. CADA criterio ES simultáneamente el
-> eval y el paso de UAT. La porción determinista se materializa como test en
-> `/contract`. Los criterios marcados **contrato documentado — motor per-stack
-> (deferred)** describen comportamiento del motor determinista (schema
-> validation, scope predicates, verdict aggregation) que este repo especifica
-> pero NO implementa ni unit-testea — ver `plan.md` decisión 2 y
-> `poirot-fe scripts/north-star/*.mjs` como reference implementation.
+> Measurable acceptance criteria in BDD. EACH criterion IS simultaneously the
+> eval and the UAT step. The deterministic portion is materialized as a test in
+> `/contract`. Criteria marked **documented contract — per-stack engine
+> (deferred)** describe behavior of the deterministic engine (schema
+> validation, scope predicates, verdict aggregation) that this repo specifies
+> but does NOT implement or unit-test — see `plan.md` decision 2 and
+> `poirot-fe scripts/north-star/*.mjs` as reference implementation.
 
-## Criterio: NS-BASE — capa base North-Star presente  (determinista · estructural)
+## Criterion: NS-BASE — North-Star base layer present  (deterministic · structural)
 ```gherkin
-Given el repo tiene la capacidad north-star-governance instalada
-When se listan memory/north-star/base/{schema.md, alignment-rubric.md, amendment-protocol.md, adr-template.md, README.md}
-Then los 5 archivos existen
-And README.md documenta el mecanismo extends: base
+Given the repo has the north-star-governance capability installed
+When memory/north-star/base/{schema.md, alignment-rubric.md, amendment-protocol.md, adr-template.md, README.md} are listed
+Then all 5 files exist
+And README.md documents the extends: base mechanism
 ```
 
-## Criterio: NS-PLACEHOLDER — north-star.md es un placeholder válido  (determinista · estructural)
+## Criterion: NS-PLACEHOLDER — north-star.md is a valid placeholder  (deterministic · structural)
 ```gherkin
 Given memory/north-star/north-star.md
-When se lee su frontmatter
-Then contiene "extends: base"
-And trae un bloque ```json``` esqueleto marcado "_(completar por proyecto)_"
+When its frontmatter is read
+Then it contains "extends: base"
+And it carries a ```json``` skeleton block marked "_(completar por proyecto)_"
 ```
 
-## Criterio: NS-SCHEMA-CONTRACT — forma medible documentada  (contrato documentado — motor per-stack, deferred)
+## Criterion: NS-SCHEMA-CONTRACT — measurable form documented  (documented contract — per-stack engine, deferred)
 ```gherkin
-Given schema.md documenta mission, pillars[] (id+statement+signal),
-  scope.in_scope/out_of_scope, y alignment.threshold como campos requeridos
-When un repo adoptante implementa su propio validador (equivalente a validateNorthStar)
-Then un north-star.md al que le falta un campo requerido falla la validación con una razón clara
+Given schema.md documents mission, pillars[] (id+statement+signal),
+  scope.in_scope/out_of_scope, and alignment.threshold as required fields
+When an adopting repo implements its own validator (equivalent to validateNorthStar)
+Then a north-star.md missing a required field fails validation with a clear reason
 ```
-_(No unit-testeado en este repo — el validador concreto es per-stack;
-`poirot-fe scripts/north-star/schema.mjs` es la reference implementation ya
-unit-testeada allí.)_
+_(Not unit-tested in this repo — the concrete validator is per-stack;
+`poirot-fe scripts/north-star/schema.mjs` is the reference implementation already
+unit-tested there.)_
 
-## Criterio: ALIGN-CMD — comando+skill /align existen y documentan el modelo  (determinista · estructural)
+## Criterion: ALIGN-CMD — /align command+skill exist and document the model  (deterministic · structural)
 ```gherkin
-Given .claude/commands/align.md y .claude/skills/align/SKILL.md
-When se leen
-Then documentan: entrada brief.md + north-star.md, salida alignment.md, y el
-  modelo de 3 capas (scope predicates, orphan check, LLM-judge)
+Given .claude/commands/align.md and .claude/skills/align/SKILL.md
+When they are read
+Then they document: input brief.md + north-star.md, output alignment.md, and the
+  3-layer model (scope predicates, orphan check, LLM-judge)
 ```
 
-## Criterio: ALIGN-VERDICT-CONTRACT — semántica del veredicto  (contrato documentado — motor per-stack, deferred)
+## Criterion: ALIGN-VERDICT-CONTRACT — verdict semantics  (documented contract — per-stack engine, deferred)
 ```gherkin
-Given un objetivo de brief y un North Star schema-válido
-When se evalúan scopeReject + orphan-check + alignVerdict (per-stack)
-Then un hit de out_of_scope produce "rejected"; un huérfano produce bloqueo;
-  las 3 dimensiones ≥ threshold sin reject/huérfano producen "aligned"; y
-  estar in-scope sin huérfano pero bajo threshold produce "needs-amendment"
+Given a brief objective and a schema-valid North Star
+When scopeReject + orphan-check + alignVerdict are evaluated (per-stack)
+Then an out_of_scope hit produces "rejected"; an orphan produces a block;
+  all 3 dimensions ≥ threshold with no reject/orphan produce "aligned"; and
+  being in-scope without orphan but below threshold produces "needs-amendment"
 ```
-_(No unit-testeado en este repo — ver `poirot-fe scripts/north-star/align.mjs`
-(`scopeReject`, `alignVerdict`) + su suite
+_(Not unit-tested in this repo — see `poirot-fe scripts/north-star/align.mjs`
+(`scopeReject`, `alignVerdict`) + its suite
 `tests/unit/north-star/align.node.spec.js`.)_
 
-## Criterio: MEAS-GATE — /distill se niega sin intención medible y alineada  (determinista · estructural)
+## Criterion: MEAS-GATE — /distill refuses without a measurable and aligned intent  (deterministic · structural)
 ```gherkin
 Given .claude/skills/distill/SKILL.md
-When se lee su procedimiento
-Then contiene un Paso 0 que menciona "alignment.md" y "Measurability Gate"
-And especifica que solo el veredicto "aligned" permite avanzar
-And documenta la excepción de bootstrap para la feature que introduce /align
+When its procedure is read
+Then it contains a Step 0 that mentions "alignment.md" and "Measurability Gate"
+And specifies that only the "aligned" verdict allows proceeding
+And documents the bootstrap exception for the feature that introduces /align
 ```
 
-## Criterio: AMEND-ADR — cambios de scope son auditables  (determinista · estructural · [given] audit-logging)
+## Criterion: AMEND-ADR — scope changes are auditable  (deterministic · structural · [given] audit-logging)
 ```gherkin
-Given memory/north-star/base/amendment-protocol.md y adr-template.md
-When se leen
-Then documentan que un cambio a scope/pillars requiere un ADR en
-  memory/north-star/decisions/NNNN-*.md y aterriza vía PR
-And que un cambio sin ADR correspondiente es una violación de gobernanza señalizable
+Given memory/north-star/base/amendment-protocol.md and adr-template.md
+When they are read
+Then they document that a change to scope/pillars requires an ADR in
+  memory/north-star/decisions/NNNN-*.md and lands via PR
+And that a change without a corresponding ADR is a flaggable governance violation
 ```
 
-## Criterio: COVERAGE-PILLAR — trazabilidad hasta el north star  (determinista · estructural)
+## Criterion: COVERAGE-PILLAR — traceability up to the north star  (deterministic · structural)
 ```gherkin
 Given specs/_template/coverage.md
-When se lee su tabla de columnas
-Then incluye una columna Pillar que liga cada fila pillar → objetivo → criterio
+When its column layout is read
+Then it includes a Pillar column linking each row pillar → objective → criterion
 ```
 
-## Criterio: WOW-2LAYER — Way-of-Work de dos capas  (no-determinista → UAT)
-_(El README/docs distinguen harness=governance de execution-runtime=adoptante,
-de forma genérica, sin nombrar un runtime obligatorio como propio del harness.
-Se valida por lectura manual/UAT, no por grep — es contenido de prosa, no
-forma estructural.)_
+## Criterion: WOW-2LAYER — two-layer Way-of-Work  (non-deterministic → UAT)
+_(The README/docs distinguish harness=governance from execution-runtime=adopter,
+generically, without naming any specific runtime as required by the harness.
+Validated by manual reading/UAT, not by grep — it is prose content, not
+reliably grep-able structural form.)_
 
-## Criterio: SELFCHECK — la capacidad forma parte de la integridad del harness  (determinista · estructural)
+## Criterion: SELFCHECK — the capability is part of the harness integrity  (deterministic · structural)
 ```gherkin
-Given la capacidad north-star-governance está instalada completa
-When corre bash tests/run.sh
-Then tests/check_80_north_star.sh (auto-tomado por el glob) pasa
-And los checks 00–70 preexistentes siguen en verde
+Given the north-star-governance capability is fully installed
+When bash tests/run.sh runs
+Then tests/check_80_north_star.sh (auto-picked by the glob) passes
+And the pre-existing checks 00–70 remain green
 ```
 
-## Criterio: JUDGE-ALIGNMENT — el judge puntúa la alineación con sensatez  (no-determinista → eval case)
-_(Un brief in-scope puntúa ≥3 en las 3 dimensiones; un brief plausible-pero-
-fuera-de-alcance puntúa <3 específicamente en scope compliance, no como
-promedio. Cases en `evals/cases/north-star-judge.md`, puntuados contra
+## Criterion: JUDGE-ALIGNMENT — the judge scores alignment sensibly  (non-deterministic → eval case)
+_(An in-scope brief scores ≥3 on all 3 dimensions; a plausible-but-out-of-scope
+brief scores <3 specifically on scope compliance, not as a diluted average.
+Cases in `evals/cases/north-star-judge.md`, scored against
 `memory/north-star/base/alignment-rubric.md`.)_
 
-## Deferred (justificado)
-- `[given] base/idempotency` — deferred: sin reintentos/webhooks (esta capa es
-  markdown de gobernanza).
-- `[given] base/rate-limiting` — deferred: sin superficie de red.
+## Deferred (justified)
+- `[given] base/idempotency` — deferred: no retries/webhooks (this layer is
+  governance markdown).
+- `[given] base/rate-limiting` — deferred: no network surface.

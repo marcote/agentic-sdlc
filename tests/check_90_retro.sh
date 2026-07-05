@@ -35,20 +35,20 @@ for report in verification/reports/*.md; do
   # No unfilled placeholders
   if grep -qE '_\([^)]*\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro has unfilled placeholders"; else _pass "$retro no placeholders"; fi
   # Valid mission verdict
-  if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
+  if grep -qE '(Veredicto de misión|Mission verdict):[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
     _pass "$retro valid mission verdict"
   else
     _fail "$retro missing valid mission verdict"
   fi
   # n/a requires a reason (Layer: anti-escape)
-  if grep -qE 'Veredicto de misión:[*[:space:]]*n/a' "$retro"; then
-    if grep -qiE 'raz[oó]n' "$retro"; then _pass "$retro n/a with reason"; else _fail "$retro n/a without reason"; fi
+  if grep -qE '(Veredicto de misión|Mission verdict):[*[:space:]]*n/a' "$retro"; then
+    if grep -qiE '(raz[oó]n|reason)' "$retro"; then _pass "$retro n/a with reason"; else _fail "$retro n/a without reason"; fi
   fi
   # Layer 2: confirmed/refuted requires evidence locator in Face A table rows.
-  if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted)' "$retro"; then
+  if grep -qE '(Veredicto de misión|Mission verdict):[*[:space:]]*(confirmed|refuted)' "$retro"; then
     ev_bad=0; ev_rows=0
     while IFS= read -r row; do
-      case "$row" in *Pilar*|*Signal*|*---*) continue ;; esac   # skip header/separator
+      case "$row" in *Pilar*|*Pillar*|*Signal*|*---*) continue ;; esac   # skip header/separator
       ev=$(printf '%s' "$row" | awk -F'|' '{c=$(NF-1); gsub(/^[ \t]+|[ \t]+$/,"",c); print c}')
       ev_rows=$((ev_rows+1))
       printf '%s' "$ev" | grep -qE '[0-9]|/|https?://|\.md|#' || ev_bad=1

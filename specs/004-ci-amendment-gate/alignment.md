@@ -1,39 +1,39 @@
 # Alignment — 004-ci-amendment-gate
 
-Measurability Gate (`/align`) sobre `brief.md` × `memory/north-star/north-star.md`.
-North Star schema-válido (4 pilares) → el gate corre.
+Measurability Gate (`/align`) over `brief.md` × `memory/north-star/north-star.md`.
+North Star schema-valid (4 pillars) → gate runs.
 
-## Veredicto
+## Verdict
 
-**`aligned`** — las 3 dimensiones ≥ umbral (3), sin hit de `out_of_scope`, sin huérfano.
-`/distill` puede avanzar.
+**`aligned`** — all 3 dimensions ≥ threshold (3), no `out_of_scope` hit, no orphan.
+`/distill` may proceed.
 
-## Scores (mínimo a través de objetivos)
+## Scores (minimum across objectives)
 
-| Dimensión | Score | Nota |
+| Dimension | Score | Note |
 |---|---|---|
-| pillar fit | 4 | Mapea limpio a `enforcement-real` (su `signal` — "gates bloquean el cierre; violaciones cazadas antes del merge" — es *literalmente* este feature). El objetivo dependency-free mapea a `portabilidad-agnostica` de forma plausible pero indirecta. |
-| scope compliance | 4 | In-scope (gate de governance + auto-validación del WoW), pero **toca el borde** del predicado `out_of_scope` "motor determinista específico de un stack": construir un checker bash en el source. Resuelto como in-scope porque el harness implementa su **propia** gate en su **propio** stack (bash/coreutils + GitHub Actions, igual que `tests/check_*.sh` y `verify.yml`), no el motor del adoptante. Preferí 4 sobre 5 por el borde. |
-| mission advancement | 4 | Efecto medible sobre el `signal` de `enforcement-real`: convierte el enforcement del amendment de convención a gate determinista que bloquea el drift antes del merge. |
+| pillar fit | 4 | Maps cleanly to `real-enforcement` (its `signal` — "gates block the close; violations caught before the merge" — is *literally* this feature). The dependency-free objective maps to `agnostic-portability` plausibly but indirectly. |
+| scope compliance | 4 | In-scope (governance gate + WoW self-validation), but **touches the edge** of the `out_of_scope` predicate "deterministic engine specific to a stack": building a bash checker in the source. Resolved as in-scope because the harness implements its **own** gate in its **own** stack (bash/coreutils + GitHub Actions, just like `tests/check_*.sh` and `verify.yml`), not the adopter's engine. Preferred 4 over 5 for the edge. |
+| mission advancement | 4 | Measurable effect on the `signal` of `real-enforcement`: converts amendment enforcement from convention to a deterministic gate that blocks drift before the merge. |
 
-## Mapping objetivo→pilar
+## Objective→pillar mapping
 
-| Objetivo (brief) | Pilares |
+| Objective (brief) | Pillars |
 |---|---|
-| Gatear amendments de `pillars`/`scope` por CI determinista (no approval humano) | `enforcement-real`, `impacto-medible` |
-| Que la gate sea realmente bloqueante (branch protection exige el status-check) | `enforcement-real` |
-| Mantener la capa dependency-free y el self-check verde | `portabilidad-agnostica` |
+| Gate `pillars`/`scope` amendments by deterministic CI (not human approval) | `real-enforcement`, `measurable-impact` |
+| Make the gate truly blocking (branch protection requires the status-check) | `real-enforcement` |
+| Keep the layer dependency-free and self-check green | `agnostic-portability` |
 
 ## Orphans
 
-Ninguno. Todos los objetivos mapean a ≥1 pilar.
+None. All objectives map to ≥1 pillar.
 
-## Nota de gate
+## Gate note
 
-El único punto de fricción fue el borde de scope "motor determinista específico de un
-stack". El predicado conservador (`scopeReject`, match por frase contigua) **no** dio hit
-—el objetivo dice "CI determinista", no la frase literal— así que no hubo rechazo duro; la
-evaluación del borde fue trabajo del judge en la dimensión scope compliance (score 4). El
-distingo clave: el harness construyendo su **propia** gate de governance en su stack nativo
-(bash) es in-scope (`comandos, gates y skills del workflow de governance` +
-`auto-validación del WoW`); shippear el motor per-stack del **adoptante** sería out.
+The only friction point was the scope edge "deterministic engine specific to a
+stack". The conservative predicate (`scopeReject`, contiguous-phrase match) did **not**
+hit — the objective says "deterministic CI", not the literal phrase — so there was no
+hard rejection; the edge evaluation was the judge's work on the scope compliance dimension
+(score 4). The key distinction: the harness building its **own** governance gate in its
+native stack (bash) is in-scope (`commands, gates, and skills of the governance workflow` +
+`WoW self-validation`); shipping the **adopter**'s per-stack engine would be out.

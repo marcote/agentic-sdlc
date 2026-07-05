@@ -1,66 +1,66 @@
-# Spec — CI-gate del amendment del North Star
+# Spec — CI-gate for the North Star amendment
 
-> QUÉ se construye. Producido por `/distill` a partir de `brief.md` + `alignment.md`
-> (`aligned`). Se congela cuando `coverage.md` no tiene filas huérfanas.
+> WHAT is built. Produced by `/distill` from `brief.md` + `alignment.md`
+> (`aligned`). Frozen when `coverage.md` has no orphan rows.
 
-## Requerimientos funcionales
+## Functional requirements
 
-1. **Script de amendment-gate** (bash + `python3` stdlib, dependency-free — sin uv/pip/node).
-   Dado un rango `base..head`,
-   detecta si cambiaron los **sets** `pillars`/`scope` del bloque JSON canónico de
-   `memory/north-star/north-star.md` — comparación **semántica por sets**, no por texto
-   (reordenar/reformatear sin alterar el contenido no cuenta). Si cambiaron, exige las
-   tres condiciones y falla (exit ≠ 0) si falta alguna:
-   - (a) un archivo `memory/north-star/decisions/NNNN-*.md` **nuevo** en el rango
+1. **Amendment-gate script** (bash + `python3` stdlib, dependency-free — no uv/pip/node).
+   Given a `base..head` range,
+   detects whether the **sets** `pillars`/`scope` of the canonical JSON block in
+   `memory/north-star/north-star.md` changed — **semantic set comparison**, not text
+   (reordering/reformatting without altering content does not count). If they changed, requires
+   all three conditions and fails (exit ≠ 0) if any is missing:
+   - (a) a `memory/north-star/decisions/NNNN-*.md` file **new** in the range
      (`hasAdrFor`);
-   - (b) el bloque JSON resultante es **schema-válido** (`base/schema.md`);
-   - (c) `tests/run.sh` en verde.
-2. **GitHub Action** que corre el gate en `pull_request` y `push` hacia `main` y lo
-   expone como **status-check** requerible.
-3. **Branch protection** en `main` que exige ese status-check → bloquea tanto PRs como
-   pushes directos con un amendment inválido.
-4. **Delta de constitution**: la `constitution.md` del proyecto declara el gate
-   bloqueante de amendments como la **única excepción** al principio 4 ("nada bloquea
-   commit/push"), acotada a cambios de `pillars`/`scope` del North Star.
-5. **Self-check**: `tests/` cubre el script del gate (con fixtures base/head) y el wiring
-   (el script y el workflow existen); `tests/run.sh` sigue verde y dependency-free.
+   - (b) the resulting JSON block is **schema-valid** (`base/schema.md`);
+   - (c) `tests/run.sh` green.
+2. **GitHub Action** that runs the gate on `pull_request` and `push` to `main` and
+   exposes it as a requirable **status-check**.
+3. **Branch protection** on `main` requiring that status-check → blocks both PRs and
+   direct pushes with an invalid amendment.
+4. **Constitution delta**: the project `constitution.md` declares the blocking amendment
+   gate as the **only exception** to principle 4 ("nothing blocks commit/push"), bounded to
+   changes of `pillars`/`scope` in the North Star.
+5. **Self-check**: `tests/` covers the gate script (with base/head fixtures) and the wiring
+   (the script and the workflow exist); `tests/run.sh` stays green and dependency-free.
 
 ## User stories
 
-- Como **mantenedor del harness**, quiero que un cambio de `pillars`/`scope` sin ADR sea
-  bloqueado por CI, para que la gobernanza no dependa de un approval que un mantenedor
-  solo no puede darse.
-- Como **adoptante**, quiero un script + doc para activar la misma gate en mi repo, para
-  heredar el enforcement del amendment sin reinventarlo.
+- As a **harness maintainer**, I want a `pillars`/`scope` change without an ADR to be
+  blocked by CI, so that governance does not depend on an approval a solo maintainer cannot
+  give themselves.
+- As an **adopter**, I want a script + doc to activate the same gate in my repo, to
+  inherit amendment enforcement without reinventing it.
 
 ## Edge cases (80% problem)
 
-- Reformatear/reordenar el bloque JSON **sin** cambiar los sets → **no** exige ADR
-  (semántica por sets).
-- Agregar un ADR **sin** tocar el North Star → permitido (no bloquea).
-- Cambio de `pillars`/`scope` con ADR pero que deja el JSON **schema-inválido** →
-  bloqueado (condición b).
-- Cambio **solo** de `alignment.threshold`, prosa, o redacción de `mission` que no altera
-  los sets → **no** exige ADR.
-- "ADR nuevo" = archivo `decisions/NNNN-*.md` **agregado** en el rango; editar uno
-  existente no satisface `hasAdrFor`.
-- Trabajo normal de feature (no toca `pillars`/`scope`) → el gate **no bloquea**
-  (preserva "productividad primero").
+- Reformat/reorder the JSON block **without** changing the sets → does **not** require ADR
+  (semantic set comparison).
+- Add an ADR **without** touching the North Star → allowed (not blocked).
+- `pillars`/`scope` change with ADR but leaving the JSON **schema-invalid** →
+  blocked (condition b).
+- Change **only** `alignment.threshold`, prose, or wording of `mission` that does not alter
+  the sets → does **not** require ADR.
+- "New ADR" = a `decisions/NNNN-*.md` file **added** in the range; editing an existing one
+  does not satisfy `hasAdrFor`.
+- Normal feature work (does not touch `pillars`/`scope`) → the gate does **not block**
+  (preserves "productivity first").
 
-## Preguntas abiertas / deferred
+## Open questions / deferred
 
-- **Aplicar branch protection a este repo ahora** vs solo proveer el script → resuelto:
-  se aplica a este repo en el finish + se provee script/doc para adoptantes.
-- La verificación de "**realmente bloqueante**" (branch protection) es **config de
-  GitHub, no unit test hermético**: los criterios `AMEND-BLOCK-REAL` y `AMEND-BLOCK-PUSH`
-  se validan en **UAT** (walk: aplicar protection, intentar un amendment inválido,
-  confirmar bloqueo), no con un test local.
-- **Runtime del gate:** `python3` stdlib (módulo `json`), no pure bash — pure bash para
-  parsear JSON es frágil. `python3` es un intérprete de sistema (presente en todos los
-  runners + máquinas de dev), no una dependencia instalable, así que **no** cruza el
-  `out_of_scope` "dependencias de runtime" ni exige amendment del North Star; sí afloja el
-  criterio `DEP-FREE` a "bash/coreutils + python3 stdlib" (re-congelado acá).
-- **Deferred a constitution (futuro):** afinar la redacción **literal** del principio 4
-  ("nada bloquea commit/push") hacia su **intención productividad-primero**, para que un
-  gate de governance angosto no lea como contradicción. Es un amendment de constitution
-  aparte; este feature solo registra la reconciliación (criterio `CONST-EXCEPTION`).
+- **Applying branch protection to this repo now** vs just providing the script → resolved:
+  applied to this repo on finish + script/doc provided for adopters.
+- Verifying "**truly blocking**" (branch protection) is **GitHub config, not a hermetic
+  unit test**: the `AMEND-BLOCK-REAL` and `AMEND-BLOCK-PUSH` criteria are validated in
+  **UAT** (walk: apply protection, attempt an invalid amendment, confirm block), not with
+  a local test.
+- **Gate runtime:** `python3` stdlib (`json` module), not pure bash — pure bash JSON
+  parsing is fragile. `python3` is a system interpreter (present on all runners + dev
+  machines), not an installable dependency, so it does **not** cross the `out_of_scope`
+  "runtime dependencies" and does not require a North Star amendment; it does loosen the
+  `DEP-FREE` criterion to "bash/coreutils + python3 stdlib" (re-frozen here).
+- **Deferred to constitution (future):** refine the **literal wording** of principle 4
+  ("nothing blocks commit/push") toward its **productivity-first intent**, so that a narrow
+  governance gate does not read as a contradiction. That is a separate constitution
+  amendment; this feature only records the reconciliation (criterion `CONST-EXCEPTION`).

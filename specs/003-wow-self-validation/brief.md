@@ -1,12 +1,12 @@
 # Brief — 003 WoW self-validation
 
-**Objetivo:** el harness se autovalida sometiéndose a su propia Way of Working — un retro
-que cierra la predicción medible de `/align` (columna align↔retro), enforcement en CI, y
-un rollup agregado.
+**Objective:** the harness self-validates by going through its own Way of Working — a retro
+that closes the measurable prediction from `/align` (align↔retro column), enforcement in CI,
+and an aggregated rollup.
 
-**Métricas de éxito:** `tests/run.sh` verde con `check_90`; `/retro` y `/wow-report`
-presentes y wired; el propio `003` cerrado con un retro completo (Cara B real).
+**Success metrics:** `tests/run.sh` green with `check_90`; `/retro` and `/wow-report`
+present and wired; `003` itself closed with a complete retro (real Face B).
 
-**Nota de alcance:** repo-plantilla → North Star placeholder → `/align` no corre acá; la
-Cara A (Misión) cierra como `n/a`. Diseño completo:
+**Scope note:** repo-template → North Star placeholder → `/align` does not run here; the
+Face A (Mission) closes as `n/a`. Full design:
 `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`.

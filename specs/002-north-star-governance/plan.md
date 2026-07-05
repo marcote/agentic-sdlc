@@ -1,148 +1,146 @@
-# Plan técnico — Gobernanza North-Star + Measurability Gate
+# Technical plan — North-Star Governance + Measurability Gate
 
-> CÓMO se construye. Producido por `/plan`. Grounded en la constitution (no viola
-> ningún no-negociable ni un pattern `[given]` sin override). Diseño:
+> HOW it is built. Produced by `/plan`. Grounded in the constitution (violates
+> no non-negotiable nor a `[given]` pattern without override). Design:
 > `docs/superpowers/specs/2026-07-04-north-star-governance-design.md`
 
-## Decisiones técnicas
+## Technical decisions
 
-1. **North Star = markdown + un bloque JSON canónico machine-readable.**
-   `north-star.md` lleva frontmatter YAML `extends: base` (mismo mecanismo que
-   `constitution.md`) más **un** bloque ` ```json ` fenced que es el North Star
-   canónico, parseable (`mission`, `pillars[]`, `scope.in_scope`/`out_of_scope`,
-   `alignment.threshold`); la prosa alrededor lo explica para humanos pero nada
-   del flujo la lee para decidir. *Constrained by:* base principio #1
-   (Verificabilidad) — "lo que no se puede verificar, no se construye" extendido
-   de la técnica al producto.
+1. **North Star = markdown + a machine-readable canonical JSON block.**
+   `north-star.md` carries YAML frontmatter `extends: base` (same mechanism as
+   `constitution.md`) plus **one** fenced ` ```json ` block that is the canonical
+   North Star, parseable (`mission`, `pillars[]`, `scope.in_scope`/`out_of_scope`,
+   `alignment.threshold`); the surrounding prose explains it for humans but nothing
+   in the flow reads it to decide. *Constrained by:* base principle #1
+   (Verifiability) — "what cannot be verified, is not built" extended
+   from the technical to the product dimension.
 
-2. **Contrato en la plantilla, motor por-stack (la decisión central del port).**
-   El harness es una plantilla stack-agnóstica, dependency-free (self-check en
-   bash puro, sin Node/npm). Por eso este repo trae la **especificación completa**
-   (forma del schema, dimensiones+pass-rule de la rúbrica, semántica exacta del
-   veredicto, protocolo de amendment) pero **no** implementa el motor determinista
-   ejecutable (`parseNorthStar`/`validateNorthStar`/`scopeReject`/`alignVerdict`/
-   `requiresAdr`/`hasAdrFor`). Cada repo adoptante lo construye en su propio
-   stack — exactamente el mismo patrón que `evals/README.md` ya usa para el
-   eval-runner ("depende del stack del proyecto que adopte el harness"). Se cita
-   `poirot-fe scripts/north-star/{schema,align,amendment}.mjs` como **reference
-   implementation** (Node, ya construida y con su propia suite
-   `tests/unit/north-star/*.node.spec.js`, verde). *Trade-off:* un adoptante debe
-   escribir su propio checker antes de que `/align` sea ejecutable de verdad —
-   mitigado por la spec explícita + la reference impl citada. *Constrained by:*
-   el repo es dependency-free (`docs/factory-model.md`, `tests/run.sh` en bash
-   puro); no se introduce Node/npm en el source por esta feature.
+2. **Contract in the template, per-stack engine (the central port decision).**
+   The harness is a stack-agnostic, dependency-free template (self-check in
+   pure bash, without Node/npm). Therefore this repo brings the **complete
+   specification** (schema form, rubric dimensions+pass-rule, exact verdict
+   semantics, amendment protocol) but does **not** implement the executable
+   deterministic engine (`parseNorthStar`/`validateNorthStar`/`scopeReject`/`alignVerdict`/
+   `requiresAdr`/`hasAdrFor`). Each adopting repo builds it in its own
+   stack — exactly the same pattern that `evals/README.md` already uses for the
+   eval-runner ("depends on the stack of the project adopting the harness"). Cites
+   `poirot-fe scripts/north-star/{schema,align,amendment}.mjs` as **reference
+   implementation** (Node, already built and with its own suite
+   `tests/unit/north-star/*.node.spec.js`, green). *Trade-off:* an adopter must
+   write its own checker before `/align` is truly executable —
+   mitigated by the explicit spec + the cited reference impl. *Constrained by:*
+   the repo is dependency-free (`docs/factory-model.md`, `tests/run.sh` in pure
+   bash); Node/npm is not introduced in the source by this feature.
 
-3. **Agregación del veredicto: fija y determinista, documentada aquí, implementada
-   por-stack.** Dado scores + mapping + scope-check: un hit de `out_of_scope` →
-   `rejected` (dura, sin importar los otros dos scores); si no, cualquier huérfano
-   → bloqueado (no `aligned`); si no, las 3 dimensiones ≥ `threshold` (default 3)
-   → `aligned`; si no → `needs-amendment`. *Constrained by:* la regla de
-   threshold resuelta en `spec.md` (Preguntas abiertas).
+3. **Verdict aggregation: fixed and deterministic, documented here, implemented
+   per-stack.** Given scores + mapping + scope-check: an `out_of_scope` hit →
+   `rejected` (hard, regardless of the other two scores); otherwise, any orphan
+   → blocked (not `aligned`); otherwise, all 3 dimensions ≥ `threshold` (default 3)
+   → `aligned`; otherwise → `needs-amendment`. *Constrained by:* the threshold
+   rule resolved in `spec.md` (Open questions).
 
-4. **`/align` es harness-owned**, no delegado a ningún execution-runtime
-   específico (p. ej. `superpowers`) — la gobernanza vive en el harness, como
+4. **`/align` is harness-owned**, not delegated to any specific execution-runtime
+   (e.g. `superpowers`) — governance lives in the harness, like
    `/constitution`/`/distill`/`/plan`/`/contract`/`/tasks`/`/verify`/`/uat`.
-   Sigue el mismo patrón `.claude/commands/<c>.md` (thin, delega) +
-   `.claude/skills/<c>/SKILL.md` (procedimiento) que todo el resto del flujo.
-   Escribe `specs/<feature>/alignment.md`; `/distill` lo lee y se niega a
-   arrancar si el veredicto no es `aligned`. *Constrained by:* README.md, tabla
-   "El enforcement no vive en hooks" — los *workflow gates* (deterministas, en
-   transiciones de comando) son "el 90% del enforcement"; `/align` se suma como
-   gate #0, no como hook.
+   Follows the same `.claude/commands/<c>.md` (thin, delegates) +
+   `.claude/skills/<c>/SKILL.md` (procedure) pattern as the rest of the flow.
+   Writes `specs/<feature>/alignment.md`; `/distill` reads it and refuses to
+   start if the verdict is not `aligned`. *Constrained by:* README.md, table
+   "Enforcement does not live in hooks" — *workflow gates* (deterministic, at
+   command transitions) are "90% of enforcement"; `/align` is added as gate #0,
+   not as a hook.
 
-5. **El gate en `/distill` es un Paso 0 prepended, no una reescritura.**
-   `.claude/skills/distill/SKILL.md` gana un **Paso 0 — Measurability Gate**
-   antes de su "Paso 1 — Sembrar desde la constitution" actual (los pasos 1–6
-   existentes no se renumeran ni se alteran en su contenido). El texto del Paso
-   0 declara inline la excepción de bootstrap (para no depender solo de
-   `coverage.md` para documentarla). *Constrained by:* base principio #2
-   (test-first / gate determinista) y la regla existente "no avances con
-   ambigüedades abiertas" del propio skill.
+5. **The gate in `/distill` is a prepended Step 0, not a rewrite.**
+   `.claude/skills/distill/SKILL.md` gains a **Step 0 — Measurability Gate**
+   before its current "Step 1 — Seed from the constitution" (existing steps 1–6
+   are not renumbered or altered in content). The Step 0 text declares the
+   bootstrap exception inline (to not rely solely on `coverage.md` to document
+   it). *Constrained by:* base principle #2 (test-first / deterministic gate)
+   and the existing rule "do not proceed with open ambiguities" in the skill itself.
 
-6. **`coverage.md` template gana una columna: Pillar** (primera columna, antes
-   de "Objetivo"), consistente con la cadena `pillar → objetivo → criterio` del
-   diseño. `tests/check_80_north_star.sh` asserta que
-   `specs/_template/coverage.md` contiene la palabra `Pillar` — una decisión
-   tomada en este `/contract` (no explícitamente enumerada en el diseño, que solo
-   describe 4 grupos de asserts para `check_80`) para que exista un RED real hoy
-   que pruebe el gap, en vez de dejar la columna sin ningún check ligado. Extender
-   `tests/check_20_spec_templates.sh` con un assert de contenido más rico queda
-   como posible follow-up, no requerido por esta feature.
+6. **`coverage.md` template gains a column: Pillar** (first column, before
+   "Objective"), consistent with the `pillar → objective → criterion` chain in the
+   design. `tests/check_80_north_star.sh` asserts that
+   `specs/_template/coverage.md` contains the word `Pillar` — a decision
+   made in this `/contract` (not explicitly enumerated in the design, which only
+   describes 4 groups of asserts for `check_80`) so that a real RED exists today
+   proving the gap, rather than leaving the column with no linked check.
+   Extending `tests/check_20_spec_templates.sh` with a richer content assert
+   remains a possible follow-up, not required by this feature.
 
-7. **Self-check bash, dependency-free, auto-glob.**
-   `tests/check_80_north_star.sh` (nuevo) mirror-ea el estilo de
-   `tests/check_10_constitution.sh` (`assert_file`/`assert_contains` de
-   `tests/lib.sh`, sin frameworks). No requiere cambios en `tests/run.sh`: el glob
-   `for t in tests/check_*.sh` ya lo recoge por orden alfabético/numérico.
-   *Constrained by:* constitution base — el self-check es on-demand, nada
-   bloquea commit/push por defecto (regla 4).
+7. **Bash self-check, dependency-free, auto-glob.**
+   `tests/check_80_north_star.sh` (new) mirrors the style of
+   `tests/check_10_constitution.sh` (`assert_file`/`assert_contains` from
+   `tests/lib.sh`, without frameworks). No changes needed in `tests/run.sh`: the
+   `for t in tests/check_*.sh` glob already picks it up in alphanumeric order.
+   *Constrained by:* base constitution — the self-check is on-demand, nothing
+   blocks commit/push by default (rule 4).
 
-8. **Bootstrap.** `/align` no puede gatear la feature que lo introduce
-   (`002-north-star-governance`, esta misma) — se saltea solo para esta
-   feature, documentado en `coverage.md` y (una vez implementado, tarea T3 de
-   `tasks.md`) en el propio `.claude/skills/align/SKILL.md`. Desde la próxima
-   feature, `/align` corre antes de `/distill` sin excepción.
+8. **Bootstrap.** `/align` cannot gate the feature that introduces it
+   (`002-north-star-governance`, this one) — skipped only for this
+   feature, documented in `coverage.md` and (once implemented, task T3 of
+   `tasks.md`) in `.claude/skills/align/SKILL.md` itself. From the next
+   feature onward, `/align` runs before `/distill` without exception.
 
-9. **Way-of-Work de dos capas, genérico.** El README.md (sección "Way of Work")
-   y `docs/workflow.md` se enriquecen para distinguir explícitamente: el
-   **harness gobierna** (comandos, gates deterministas, constitution,
-   North-Star) — capa estable, versionada, la misma para todo adoptante; los
-   pasos que **no** son comandos (intake→brief, implement, finish) los
-   provee un **execution-runtime** que cada adoptante elige (el harness no
-   nombra ninguno como obligatorio — ni siquiera `superpowers`, aunque sea el
-   runtime que `poirot-fe` eligió de hecho). Es contenido de prosa: no hay un
-   check bash confiable para "explica bien la distinción de dos capas"; se
-   cierra por UAT (lectura humana), no por `check_80`.
+9. **Two-layer Way-of-Work, generic.** `README.md` (section "Way of Work")
+   and `docs/workflow.md` are enriched to explicitly distinguish: the
+   **harness governs** (commands, deterministic gates, constitution,
+   North-Star) — stable, versioned layer, the same for every adopter; the
+   steps that are **not** commands (intake→brief, implement, finish) are
+   provided by an **execution-runtime** that each adopter chooses (the harness
+   names none as mandatory — not even `superpowers`, even if it is the
+   runtime that `poirot-fe` chose in practice). It is prose content: there is
+   no reliable bash check for "clearly explains the two-layer distinction"; it is
+   closed by UAT (human reading), not by `check_80`.
 
-10. **Aditivo, sin código de motor, sin Node/npm.** Todo lo que aterriza en esta
-    feature vive bajo `memory/north-star/`, `.claude/`, `specs/_template/`,
-    `tests/`, `evals/`, y docs — nada de runtime app (no hay runtime app en este
-    repo: es la plantilla). *Constrained by:* el repo es stack-agnóstico /
-    dependency-free por diseño (ver `docs/factory-model.md`); introducir un
-    motor Node aquí violaría esa propiedad para todo adoptante no-Node.
+10. **Additive, no engine code, no Node/npm.** Everything landing in this
+    feature lives under `memory/north-star/`, `.claude/`, `specs/_template/`,
+    `tests/`, `evals/`, and docs — no runtime app code (there is no runtime app in
+    this repo: it is the template). *Constrained by:* the repo is stack-agnostic /
+    dependency-free by design (see `docs/factory-model.md`); introducing a
+    Node engine here would violate that property for every non-Node adopter.
 
-## Componentes / módulos
+## Components / modules
 
-- **`memory/north-star/base/`** — `schema.md` (forma requerida + reglas de
-  validez), `alignment-rubric.md` (3 dims × 0–5 + pass rule), `amendment-protocol.md`
+- **`memory/north-star/base/`** — `schema.md` (required form + validity rules),
+  `alignment-rubric.md` (3 dims × 0–5 + pass rule), `amendment-protocol.md`
   (ADR + PR), `adr-template.md`, `README.md` (`extends: base`), `decisions/.gitkeep`.
 - **`memory/north-star/north-star.md`** — placeholder: frontmatter `extends: base`
-  + bloque JSON esqueleto `_(completar por proyecto)_`.
-- **`.claude/commands/align.md` + `.claude/skills/align/SKILL.md`** — orquestan el
-  gate; documentan el modelo de 3 capas y producen `alignment.md`; citan la
-  reference impl de poirot para el motor concreto.
-- **`.claude/skills/distill/SKILL.md`** — edición: Paso 0 — Measurability Gate.
-- **`specs/_template/coverage.md`** — columna **Pillar** agregada.
-- **`tests/check_80_north_star.sh`** — self-check de integridad (presencia +
-  grep de wiring), auto-tomado por `tests/run.sh`.
-- **`evals/cases/north-star-judge.md`** — el eval case no-determinista
-  (JUDGE-ALIGNMENT), genérico (pilares ilustrativos — el harness no tiene North
-  Star propio con contenido real).
-- **Docs:** `README.md` (Way of Work, dos capas), `docs/workflow.md` (`/align`
-  como primer gate + nota de Measurability Gate).
-- **Fuera de este repo (per-stack, deferred):** el motor determinista
-  equivalente a `poirot-fe scripts/north-star/{schema,align,amendment}.mjs` —
-  cada adoptante lo escribe en su stack; no hay tarea de `tasks.md` para
-  construirlo aquí.
+  + JSON skeleton block `_(completar por proyecto)_`.
+- **`.claude/commands/align.md` + `.claude/skills/align/SKILL.md`** — orchestrate
+  the gate; document the 3-layer model and produce `alignment.md`; cite the
+  poirot reference impl for the concrete engine.
+- **`.claude/skills/distill/SKILL.md`** — edit: Step 0 — Measurability Gate.
+- **`specs/_template/coverage.md`** — **Pillar** column added.
+- **`tests/check_80_north_star.sh`** — integrity self-check (presence +
+  wiring grep), auto-picked by `tests/run.sh`.
+- **`evals/cases/north-star-judge.md`** — the non-deterministic eval case
+  (JUDGE-ALIGNMENT), generic (illustrative pillars — the harness has no North
+  Star of its own with real content).
+- **Docs:** `README.md` (Way of Work, two layers), `docs/workflow.md` (`/align`
+  as first gate + Measurability Gate note).
+- **Outside this repo (per-stack, deferred):** the deterministic engine
+  equivalent to `poirot-fe scripts/north-star/{schema,align,amendment}.mjs` —
+  each adopter writes it in their own stack; there is no `tasks.md` task to
+  build it here.
 
-## Riesgos
+## Risks
 
-- **Frontera semántica vs determinista.** Los scope predicates por keyword no
-  capturan drift semántico → la dimensión "scope compliance" del judge es el
-  backstop; documentado explícitamente para que un adoptante no confunda el
-  predicado determinista con la única defensa.
-- **Contrato sin motor en la plantilla.** Un repo adoptante debe implementar el
-  checker determinista antes de que `/align` sea ejecutable de verdad →
-  mitigado con la spec explícita (`schema.md`, rúbrica, semántica del veredicto)
-  + la reference impl de `poirot-fe` ya verde y citada por ruta exacta.
-- **Confusión de bootstrap.** Que se entienda que `/align` se saltea *solo* para
-  la feature que lo introduce, no en general → documentado en tres lugares:
-  `coverage.md`, el propio `.claude/skills/align/SKILL.md` (tarea T3), y el
-  Paso 0 de `.claude/skills/distill/SKILL.md` (tarea T4).
-- **Columna Pillar sin check dedicado en el diseño original.** Se resolvió
-  sumando un assert de `Pillar` a `check_80_north_star.sh` (decisión 6) para
-  que el criterio COVERAGE-PILLAR tenga un RED real, no una promesa sin
-  verificación.
-- **Deriva prosa↔bloque JSON** (para cuando exista contenido real): el bloque
-  JSON es la única fuente de verdad; la prosa es solo explicativa — el
-  validador (per-stack) nunca lee la prosa.
+- **Semantic vs deterministic boundary.** Keyword-based scope predicates do not
+  capture semantic drift → the "scope compliance" judge dimension is the
+  backstop; documented explicitly so an adopter does not confuse the deterministic
+  predicate with the sole defense.
+- **Contract without engine in the template.** An adopting repo must implement the
+  deterministic checker before `/align` is truly executable →
+  mitigated with the explicit spec (`schema.md`, rubric, verdict semantics)
+  + the `poirot-fe` reference impl already green and cited by exact path.
+- **Bootstrap confusion.** It must be clear that `/align` is skipped *only* for
+  the feature that introduces it, not in general → documented in three places:
+  `coverage.md`, `.claude/skills/align/SKILL.md` itself (task T3), and the
+  Step 0 of `.claude/skills/distill/SKILL.md` (task T4).
+- **Pillar column without a dedicated check in the original design.** Resolved by
+  adding a `Pillar` assert to `check_80_north_star.sh` (decision 6) so that
+  criterion COVERAGE-PILLAR has a real RED, not an unverified promise.
+- **Prose↔JSON block drift** (for when real content exists): the JSON block is
+  the sole source of truth; the prose is only explanatory — the validator
+  (per-stack) never reads the prose.

@@ -1,52 +1,52 @@
-# Tasks — CI-gate del amendment del North Star
+# Tasks — CI-gate for the North Star amendment
 
-> Descomposición ejecutable. Producido por `/tasks`. GATE: `/tasks` no emite tasks de
-> implementación mientras exista un criterio determinista sin test ligado en 🔴 RED.
-> **GATE verificado:** las 10 filas deterministas de `coverage.md` tienen
-> `check_95_amendment_gate.sh` ligado y estado 🔴 RED (`bash tests/run.sh` → FAIL). ✅
+> Executable breakdown. Produced by `/tasks`. GATE: `/tasks` does not issue
+> implementation tasks while a deterministic criterion exists without a linked test in 🔴 RED.
+> **GATE verified:** the 10 deterministic rows of `coverage.md` have
+> `check_95_amendment_gate.sh` linked and status 🔴 RED (`bash tests/run.sh` → FAIL). ✅
 
-## Orden
-T1 → T2 → T3 en paralelo con T4 → T5. Cada task de impl se cierra cuando sus asserts de
-`check_95` pasan a 🟢 (test-first: el contrato ya está RED; implementar hasta verde, sin
-tocar el test salvo bug del propio contrato).
+## Order
+T1 → T2 → T3 in parallel with T4 → T5. Each impl task closes when its `check_95` asserts
+turn 🟢 (test-first: the contract is already RED; implement to green, without touching the
+test unless there is a bug in the contract itself).
 
 ## Tasks
 
-- [ ] **T1 — Núcleo del gate (funciones puras).** `scripts/amendment-gate.sh`: helpers
-  `python3`-stdlib que extraen el bloque ```json canónico de un `.md` y exponen
-  `sets_changed OLD NEW` (compara sets pillars/scope semánticamente, no por texto),
-  `schema_valid FILE` (reglas de `base/schema.md`), `has_new_adr ADDED…`
-  (`decisions/NNNN-*.md`). CLI test-mode `--files OLD NEW --added "…" --suite-cmd CMD`:
-  si los sets no cambian → exit 0; si cambian → exige ADR ∧ schema-válido ∧ suite verde,
-  exit ≠0 citando la condición faltante. Falla-cerrado si falta `python3`.
-  **Cubre:** AMEND-BLOCK-NO-ADR · AMEND-PASS-WITH-ADR · AMEND-NO-ADR-FOR-PROSE ·
+- [ ] **T1 — Gate core (pure functions).** `scripts/amendment-gate.sh`: `python3`-stdlib
+  helpers that extract the ```json canonical block from a `.md` and expose
+  `sets_changed OLD NEW` (compares pillars/scope sets semantically, not by text),
+  `schema_valid FILE` (rules from `base/schema.md`), `has_new_adr ADDED…`
+  (`decisions/NNNN-*.md`). Test-mode CLI `--files OLD NEW --added "…" --suite-cmd CMD`:
+  if sets do not change → exit 0; if they change → requires ADR ∧ schema-valid ∧ green suite,
+  exit ≠0 citing the missing condition. Fails-closed if `python3` is absent.
+  **Covers:** AMEND-BLOCK-NO-ADR · AMEND-PASS-WITH-ADR · AMEND-NO-ADR-FOR-PROSE ·
   AMEND-SET-SEMANTICS · AMEND-SCHEMA-VALID · AMEND-SUITE-GREEN · DEV-UNBLOCKED · DEP-FREE.
 
-- [ ] **T2 — Wrapper CLI `--range BASE..HEAD` (I/O de git).** Sobre T1: deriva old/new de
-  `north-star.md` (`git show BASE:… ` vs HEAD) y los added-files
-  (`git diff --name-status --diff-filter=A BASE HEAD`), maneja `github.event.before`
-  inválido (`000…`/force-push) fallando-cerrado. Es el entrypoint que corre CI.
-  **Cubre:** habilita AMEND-BLOCK-REAL / AMEND-BLOCK-PUSH (validados en `/uat`); sin
-  assert determinista propio (I/O de git no es hermético — ver plan D2).
+- [ ] **T2 — CLI wrapper `--range BASE..HEAD` (git I/O).** On top of T1: derives old/new of
+  `north-star.md` (`git show BASE:… ` vs HEAD) and the added-files
+  (`git diff --name-status --diff-filter=A BASE HEAD`), handles invalid `github.event.before`
+  (`000…`/force-push) by failing-closed. This is the entrypoint run by CI.
+  **Covers:** enables AMEND-BLOCK-REAL / AMEND-BLOCK-PUSH (validated in `/uat`); no
+  dedicated deterministic assert (git I/O is not hermetic — see plan D2).
 
-- [ ] **T3 — Workflow `amendment-gate.yml`.** `.github/workflows/amendment-gate.yml`: corre
-  `scripts/amendment-gate.sh --range …` en `pull_request` y `push` a `main`; expone el
-  status-check requerible "amendment-gate".
-  **Cubre:** SELF-CHECK (workflow existe + referencia al script).
+- [ ] **T3 — Workflow `amendment-gate.yml`.** `.github/workflows/amendment-gate.yml`: runs
+  `scripts/amendment-gate.sh --range …` on `pull_request` and `push` to `main`; exposes
+  the requirable "amendment-gate" status-check.
+  **Covers:** SELF-CHECK (workflow exists + references the script).
 
-- [ ] **T4 — Delta de constitution.** `memory/constitution/constitution.md`: registra que
-  el amendment-gate bloqueante es la única excepción angosta al principio 4
-  ("nada bloquea commit/push"), acotada a cambios de `pillars`/`scope` del North Star,
-  consistente con su intención productividad-primero (reconciliación D6 del plan).
-  **Cubre:** CONST-EXCEPTION (grep `amendment-gate` ∧ `principio 4` ∧ `pillars/scope`).
+- [ ] **T4 — Constitution delta.** `memory/constitution/constitution.md`: records that the
+  blocking amendment gate is the only narrow exception to principle 4
+  ("nothing blocks commit/push"), bounded to changes of `pillars`/`scope` in the North Star,
+  consistent with its productivity-first intent (plan reconciliation D6).
+  **Covers:** CONST-EXCEPTION (grep `amendment-gate` ∧ `principio 4` ∧ `pillars/scope`).
 
-- [ ] **T5 — Branch protection + doc de adopción.** `scripts/setup-branch-protection.sh`
-  (aplica vía `gh api` el required status-check "amendment-gate" en `main` + prohíbe
-  bypass; lo corre el owner una vez) + sección corta en `README.md` para adoptantes.
-  **Cubre:** AMEND-BLOCK-REAL · AMEND-BLOCK-PUSH — no unit-testeables (config de GitHub);
-  se caminan en `/uat` (aplicar protection, intentar amendment inválido por PR y por push,
-  confirmar bloqueo).
+- [ ] **T5 — Branch protection + adoption doc.** `scripts/setup-branch-protection.sh`
+  (applies via `gh api` the required "amendment-gate" status-check on `main` + prohibits
+  bypass; run once by the owner) + short section in `README.md` for adopters.
+  **Covers:** AMEND-BLOCK-REAL · AMEND-BLOCK-PUSH — not unit-testable (GitHub config);
+  walked in `/uat` (apply protection, attempt invalid amendment by PR and by push,
+  confirm block).
 
-## Fuera de estas tasks (deferred, registrado en spec)
-- Afinar la redacción **literal** del principio 4 hacia "productividad-primero" → amendment
-  de constitution aparte (este feature solo registra la reconciliación en T4).
+## Outside these tasks (deferred, recorded in spec)
+- Refining the **literal wording** of principle 4 toward "productivity-first" → separate
+  constitution amendment (this feature only records the reconciliation in T4).

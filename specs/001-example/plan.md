@@ -1,21 +1,21 @@
-# Plan técnico — Guardar tarjeta con 1-tap
+# Technical plan — Save card with 1-tap
 
-> CÓMO se construye. Producido por `/plan`. Grounded en la constitution: no puede violar
-> un no-negociable ni un pattern `[given]` sin override justificado.
+> HOW it is built. Produced by `/plan`. Grounded in the constitution: cannot violate
+> a non-negotiable or a `[given]` pattern without a justified override.
 
-## Decisiones técnicas
-- **Tokenización vía vault externo** (no almacenamos PAN). Trade-off: dependencia de red
-  → se mitiga con timeout y degradación a "no guardada" (nunca bloquea una compra
-  aprobada). Restringido por el principio *seguridad por defecto* + objetivo PCI.
-- **Idempotencia por `idempotency-key`** en el endpoint de guardado. Requerido por el
-  pattern `[given] base/idempotency`.
-- **Audit-log vía middleware** en toda escritura. Requerido por `[given] base/audit-logging`.
+## Technical decisions
+- **Tokenization via external vault** (we don't store the PAN). Trade-off: network dependency
+  → mitigated with timeout and degradation to "not saved" (never blocks an approved purchase).
+  Constrained by the *security by default* principle + PCI objective.
+- **Idempotency by `idempotency-key`** on the save endpoint. Required by the
+  `[given] base/idempotency` pattern.
+- **Audit-log via middleware** on every write. Required by `[given] base/audit-logging`.
 
-## Componentes / módulos
-- `TokenizationClient` — habla con el vault; timeout 300ms; una responsabilidad.
-- `SaveCardHandler` — orquesta guardado + idempotencia + audit; interfaz `save(card, key)`.
-- `OneTapPayHandler` — recupera token y ejecuta el pago de la 2da compra.
+## Components / modules
+- `TokenizationClient` — talks to the vault; 300ms timeout; single responsibility.
+- `SaveCardHandler` — orchestrates save + idempotency + audit; interface `save(card, key)`.
+- `OneTapPayHandler` — retrieves token and executes the 2nd purchase payment.
 
-## Riesgos
-- Vault lento degrada UX → timeout + fallback "no guardada" (no bloquear compra).
-- Colisión de `idempotency-key` entre usuarios → key namespaced por usuario.
+## Risks
+- Slow vault degrades UX → timeout + fallback "not saved" (don't block purchase).
+- `idempotency-key` collision between users → key namespaced by user.

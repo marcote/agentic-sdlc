@@ -1,38 +1,38 @@
-# Acceptance — Guardar tarjeta con 1-tap
+# Acceptance — Save card with 1-tap
 
-> Criterios de aceptación en BDD. CADA criterio ES simultáneamente el eval y el paso de
-> UAT. La porción determinista se materializa como test en `/contract`.
+> Acceptance criteria in BDD. EACH criterion IS simultaneously the eval and the
+> UAT step. The deterministic portion is materialized as a test in `/contract`.
 
-## Criterio: tokenización < 300ms  (determinista)
+## Criterion: tokenization < 300ms  (deterministic)
 ```gherkin
-Given una tarjeta válida y una compra aprobada
-When el usuario acepta "guardar con 1 tap"
-Then el token se retorna en < 300ms
-And la respuesta nunca contiene el PAN en claro
+Given a valid card and an approved purchase
+When the user accepts "save with 1 tap"
+Then the token is returned in < 300ms
+And the response never contains the PAN in the clear
 ```
 
-## Criterio: idempotencia del guardado  (determinista · [given] base/idempotency)
+## Criterion: save idempotency  (deterministic · [given] base/idempotency)
 ```gherkin
-Given un guardado ya realizado con un idempotency-key
-When se reenvía la misma request con igual idempotency-key
-Then no se crea un token duplicado
-And se retorna el token existente
+Given a save already performed with an idempotency-key
+When the same request is resent with the same idempotency-key
+Then no duplicate token is created
+And the existing token is returned
 ```
 
-## Criterio: audit-log del guardado  (determinista · [given] base/audit-logging)
+## Criterion: save audit-log  (deterministic · [given] base/audit-logging)
 ```gherkin
-Given un guardado de tarjeta
-When se persiste el token
-Then se emite un audit-log con actor + timestamp + entidad
+Given a card save
+When the token is persisted
+Then an audit-log is emitted with actor + timestamp + entity
 ```
 
-## Criterio: pago con tarjeta guardada en la 2da compra  (determinista)
+## Criterion: payment with saved card on 2nd purchase  (deterministic)
 ```gherkin
-Given un usuario con una tarjeta guardada
-When inicia una nueva compra
-Then puede pagar con la tarjeta guardada sin reingresar datos
+Given a user with a saved card
+When they start a new purchase
+Then they can pay with the saved card without re-entering data
 ```
 
-## Criterio: mensaje claro ante rechazo  (no-determinista → eval case)
-_(La calidad/claridad del mensaje de error cuando la tokenización falla o la tarjeta es
-rechazada se evalúa con un eval case en `evals/cases/`, no con un unit test.)_
+## Criterion: clear message on rejection  (non-deterministic → eval case)
+_(The quality/clarity of the error message when tokenization fails or the card is
+rejected is evaluated with an eval case in `evals/cases/`, not with a unit test.)_
