@@ -1,13 +1,13 @@
 # Eval Rubric
 
-> "An eval without a clear rubric measures nothing." Cinco dimensiones, cada una con
-> escala y umbral explícito. Trajectory pesa igual que Task success: un build verde que
-> saltó verificación es un FAIL.
+> "An eval without a clear rubric measures nothing." Five dimensions, each with
+> explicit scale and threshold. Trajectory weighs as much as Task success: a green build that
+> skipped verification is a FAIL.
 
-| Dimensión | Qué mide | Tipo | Puntuación | Umbral |
+| Dimension | What it measures | Type | Scoring | Threshold |
 |---|---|---|---|---|
-| **Task success** | ¿el artefacto cumple los criterios? | determinista | tests green / total criterios determ. | **100%** (no-negociable) |
-| **Tool use** quality | ¿usó las tools correctas, bien? | trajectory | LM judge + checks vs `tasks.md` | ≥ umbral |
-| **Trajectory** compliance | ¿siguió el flujo? ¿saltó verificación? | trajectory | LM judge sobre la traza | sin pasos saltados |
-| **Hallucination** | ¿deps/APIs inventadas? | mixto | check de imports reales + judge | **0** |
-| **Response quality** | criterios no-deterministas | no-determ. | eval cases + LM judge vs `acceptance` | ≥ umbral |
+| **Task success** | does the artifact meet the criteria? | deterministic | tests green / total deterministic criteria | **100%** (non-negotiable) |
+| **Tool use** quality | did it use the right tools, correctly? | trajectory | LM judge + checks vs `tasks.md` | ≥ threshold |
+| **Trajectory** compliance | did it follow the flow? did it skip verification? | trajectory | LM judge over the trace | no steps skipped |
+| **Hallucination** | hallucinated deps/APIs? | mixed | real imports check + judge | **0** |
+| **Response quality** | non-deterministic criteria | non-determ. | eval cases + LM judge vs `acceptance` | ≥ threshold |

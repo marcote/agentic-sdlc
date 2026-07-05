@@ -1,90 +1,90 @@
-# Sourced by tests/run.sh (lib.sh ya cargado). Contrato del amendment-gate:
-# gatea cambios de los sets pillars/scope del bloque JSON canónico del North Star.
-# Ejercita las funciones puras del gate vía su CLI de test contra fixtures
-# (pares old/new + lista de added-files + stub de suite) — sin construir estados
-# de git. Cubre los 10 criterios deterministas de acceptance.md. Los 2 criterios
-# de bloqueo real (AMEND-BLOCK-REAL/PUSH) son config de GitHub → UAT, no acá.
+# Sourced by tests/run.sh (lib.sh already loaded). Contract of the amendment-gate:
+# gates changes to the pillars/scope sets of the North Star's canonical JSON block.
+# Exercises the gate's pure functions via its test CLI against fixtures
+# (old/new pairs + added-files list + suite stub) — no git state construction.
+# Covers the 10 deterministic criteria from acceptance.md. The 2 real-blocking
+# criteria (AMEND-BLOCK-REAL/PUSH) are GitHub config → UAT, not here.
 #
-# Contrato de la CLI que la implementación debe satisfacer (modo test):
+# CLI contract that the implementation must satisfy (test mode):
 #   scripts/amendment-gate.sh --files OLD NEW --added "f1 f2 …" --suite-cmd CMD
-#     --files OLD NEW : dos archivos markdown con bloque ```json (old vs new)
-#     --added "…"     : lista space-separated de archivos AGREGADOS en el rango
-#     --suite-cmd CMD : comando cuyo exit 0 = suite verde (stub inyectable)
-#   exit 0 = pasa (no bloquea) · exit ≠0 = bloquea, citando la condición faltante.
+#     --files OLD NEW : two markdown files with a ```json block (old vs new)
+#     --added "…"     : space-separated list of ADDED files in the range
+#     --suite-cmd CMD : command whose exit 0 = green suite (injectable stub)
+#   exit 0 = passes (does not block) · exit ≠0 = blocks, citing the missing condition.
 
 F=tests/fixtures/amendment-gate
 GATE=scripts/amendment-gate.sh
-ADR="memory/north-star/decisions/0003-nuevo.md"   # un ADR nuevo válido (added)
+ADR="memory/north-star/decisions/0003-nuevo.md"   # a valid new ADR (added)
 
-# --- helpers de gate (usan _pass/_fail de lib.sh) ---
+# --- gate helpers (use _pass/_fail from lib.sh) ---
 gate_pass(){ # desc, args...
   local desc="$1"; shift
-  if bash "$GATE" "$@" >/tmp/ag_out 2>&1; then _pass "gate PASA: $desc"
-  else _fail "gate debería PASAR: $desc (exit $?, out: $(head -1 /tmp/ag_out))"; fi
+  if bash "$GATE" "$@" >/tmp/ag_out 2>&1; then _pass "gate PASSES: $desc"
+  else _fail "gate should PASS: $desc (exit $?, out: $(head -1 /tmp/ag_out))"; fi
 }
 gate_block(){ # desc, regex, args...
   local desc="$1" re="$2"; shift 2
   if bash "$GATE" "$@" >/tmp/ag_out 2>&1; then
-    _fail "gate debería BLOQUEAR: $desc (pasó con exit 0)"
-  elif grep -qiE "$re" /tmp/ag_out; then _pass "gate BLOQUEA: $desc (cita /$re/)"
-  else _fail "gate bloqueó pero sin mensaje /$re/: $desc (out: $(head -1 /tmp/ag_out))"; fi
+    _fail "gate should BLOCK: $desc (passed with exit 0)"
+  elif grep -qiE "$re" /tmp/ag_out; then _pass "gate BLOCKS: $desc (cites /$re/)"
+  else _fail "gate blocked but without /$re/ message: $desc (out: $(head -1 /tmp/ag_out))"; fi
 }
 
-# --- AMEND-BLOCK-NO-ADR: cambia sets, sin ADR nuevo -> bloquea citando ADR ---
-gate_block "cambio de sets sin ADR" "adr" \
+# --- AMEND-BLOCK-NO-ADR: sets change, no new ADR -> blocks citing ADR ---
+gate_block "sets change without ADR" "adr" \
   --files "$F/base.md" "$F/set-added-valid.md" --added "" --suite-cmd true
 
-# --- AMEND-PASS-WITH-ADR: cambia sets + ADR + schema-válido + suite verde -> pasa ---
-gate_pass "cambio de sets con ADR + schema ok + suite verde" \
+# --- AMEND-PASS-WITH-ADR: sets change + ADR + schema-valid + green suite -> passes ---
+gate_pass "sets change with ADR + schema ok + green suite" \
   --files "$F/base.md" "$F/set-added-valid.md" --added "$ADR" --suite-cmd true
 
-# --- AMEND-NO-ADR-FOR-PROSE: solo prosa (mismo bloque) -> pasa sin ADR ---
-gate_pass "solo prosa, sin ADR" \
+# --- AMEND-NO-ADR-FOR-PROSE: prose only (same block) -> passes without ADR ---
+gate_pass "prose only, no ADR" \
   --files "$F/base.md" "$F/prose-only.md" --added "" --suite-cmd true
-# refuerzo: solo alignment.threshold cambió -> tampoco exige ADR
-gate_pass "solo threshold, sin ADR" \
+# reinforcement: only alignment.threshold changed -> also does not require ADR
+gate_pass "threshold only, no ADR" \
   --files "$F/base.md" "$F/threshold.md" --added "" --suite-cmd true
 
-# --- AMEND-SET-SEMANTICS: reordenado/reformateado, mismos sets -> pasa (sin falso positivo) ---
-gate_pass "reformateo sin cambio de sets" \
+# --- AMEND-SET-SEMANTICS: reordered/reformatted, same sets -> passes (no false positive) ---
+gate_pass "reformat without sets change" \
   --files "$F/base.md" "$F/reformatted.md" --added "" --suite-cmd true
 
-# --- AMEND-SCHEMA-VALID: cambia sets, con ADR, pero JSON schema-inválido -> bloquea citando schema ---
-gate_block "cambio de sets schema-inválido (aun con ADR)" "schema|inv[aá]lid" \
+# --- AMEND-SCHEMA-VALID: sets change, with ADR, but JSON schema-invalid -> blocks citing schema ---
+gate_block "sets change schema-invalid (even with ADR)" "schema|inv[aá]lid" \
   --files "$F/base.md" "$F/set-added-invalid.md" --added "$ADR" --suite-cmd true
 
-# --- AMEND-SUITE-GREEN: cambia sets, ADR, schema ok, pero suite ROJA -> bloquea ---
-gate_block "cambio de sets con suite roja" "suite|verde|red|roj" \
+# --- AMEND-SUITE-GREEN: sets change, ADR, schema ok, but RED suite -> blocks ---
+gate_block "sets change with red suite" "suite|verde|red|roj" \
   --files "$F/base.md" "$F/set-added-valid.md" --added "$ADR" --suite-cmd false
 
-# --- DEV-UNBLOCKED: diff no toca sets (trabajo normal) -> pasa (preserva principio 4) ---
-gate_pass "trabajo normal, no toca sets (base==base)" \
+# --- DEV-UNBLOCKED: diff does not touch sets (normal work) -> passes (preserves Principle 4) ---
+gate_pass "normal work, does not touch sets (base==base)" \
   --files "$F/base.md" "$F/base.md" --added "src/algo.ts" --suite-cmd true
 
-# --- CONST-EXCEPTION: la constitution del proyecto registra la excepción angosta al principio 4 ---
+# --- CONST-EXCEPTION: the project constitution records the narrow Principle 4 exception ---
 assert_file memory/constitution/constitution.md
 assert_contains memory/constitution/constitution.md "amendment-gate"
-assert_contains memory/constitution/constitution.md "[Pp]rincipio 4"
+assert_contains memory/constitution/constitution.md "[Pp]rinciple 4"
 assert_contains memory/constitution/constitution.md "pillars/scope"
 
-# --- DEP-FREE: el nuevo layer (gate) es dependency-free ---
-# (a) atado al deliverable: no se puede verificar la dep-freeness de un gate que
-#     no existe -> RED hasta que la impl cree el script. Y cuando exista, no debe
-#     invocar ningún toolchain instalable (solo bash/coreutils + python3 stdlib).
+# --- DEP-FREE: the new layer (gate) is dependency-free ---
+# (a) tied to the deliverable: cannot verify dep-freeness of a gate that
+#     does not exist -> RED until the impl creates the script. And when it exists, it must
+#     not invoke any installable toolchain (only bash/coreutils + python3 stdlib).
 assert_file "$GATE"
 if grep -qiE '(^|[^[:alnum:]-])(npm|npx|node|uv|pip3?|pnpm|yarn)([^[:alnum:]-]|$)' "$GATE" 2>/dev/null; then
-  _fail "DEP-FREE: $GATE invoca un toolchain instalable (npm/node/uv/pip…)"
+  _fail "DEP-FREE: $GATE invokes an installable toolchain (npm/node/uv/pip…)"
 elif [ -f "$GATE" ]; then
-  _pass "DEP-FREE: $GATE sin toolchain instalable (bash/coreutils + python3)"
+  _pass "DEP-FREE: $GATE no installable toolchain (bash/coreutils + python3)"
 fi
-# (b) guardarraíl de repo: el feature no incorpora manifests instalables
+# (b) repo guardrail: the feature does not introduce installable manifests
 dep_free=1
 for d in package.json package-lock.json pnpm-lock.yaml yarn.lock node_modules uv.lock requirements.txt; do
-  [ -e "$d" ] && { _fail "DEP-FREE: apareció $d (dependencia instalable)"; dep_free=0; }
+  [ -e "$d" ] && { _fail "DEP-FREE: $d appeared (installable dependency)"; dep_free=0; }
 done
-[ "$dep_free" -eq 1 ] && _pass "DEP-FREE: repo sin package manifests instalables"
+[ "$dep_free" -eq 1 ] && _pass "DEP-FREE: repo without installable package manifests"
 
-# --- SELF-CHECK: wiring — el script del gate y el workflow existen y están cableados ---
+# --- SELF-CHECK: wiring — the gate script and workflow exist and are wired ---
 assert_file "$GATE"
 assert_file .github/workflows/amendment-gate.yml
 assert_contains .github/workflows/amendment-gate.yml "amendment-gate.sh"

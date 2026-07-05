@@ -1,9 +1,9 @@
-# Checklist para actualizar la constitution
+# Checklist for updating the constitution
 
-Cuando el agente comete un error repetible o cambia una regla:
+When the agent commits a repeatable mistake or a rule changes:
 
-- [ ] ¿Es un principio universal? → `base/principles.md`. ¿O una práctica con criterios? → nuevo `base/patterns/<x>.md`.
-- [ ] Si es un pattern: incluí la sección `**Criterios inyectados:**` con al menos un `[given]`.
-- [ ] ¿Es específico del proyecto? → `constitution.md` (deltas/overrides).
-- [ ] Actualizá la fecha/razón en el commit.
-- [ ] Re-copiá `base/` a los proyectos que la heredan (vendored).
+- [ ] Is it a universal principle? → `base/principles.md`. Or a practice with criteria? → new `base/patterns/<x>.md`.
+- [ ] If it is a pattern: include the `**Injected criteria:**` section with at least one `[given]`.
+- [ ] Is it project-specific? → `constitution.md` (deltas/overrides).
+- [ ] Update the date/reason in the commit.
+- [ ] Re-copy `base/` to the projects that inherit it (vendored).

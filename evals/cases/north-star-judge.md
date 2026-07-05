@@ -1,66 +1,65 @@
 # Eval case — north-star-judge
 
-> Criterio no-determinista: **JUDGE-ALIGNMENT**
-> (`specs/002-north-star-governance/acceptance.md`). Puntuado manualmente (o por
-> un LLM judge) contra `memory/north-star/base/alignment-rubric.md`, según
-> `evals/README.md`. Estado: 📋 case.
+> Non-deterministic criterion: **JUDGE-ALIGNMENT**
+> (`specs/002-north-star-governance/acceptance.md`). Scored manually (or by
+> an LLM judge) against `memory/north-star/base/alignment-rubric.md`, per
+> `evals/README.md`. State: 📋 case.
 >
-> Este repo es la plantilla del harness: `memory/north-star/north-star.md` es un
-> **placeholder** sin pilares reales. Los pilares usados abajo (`pilar-a`,
-> `pilar-b`) son **ilustrativos** — un repo adoptante corre estos mismos dos
-> cases contra su propio North Star, con sus propios pilares reales (ver
-> `poirot-fe evals/cases/north-star-judge.md` para un ejemplo con contenido
-> concreto de un proyecto).
+> This repo is the harness template: `memory/north-star/north-star.md` is a
+> **placeholder** without real pillars. The pillars used below (`pillar-a`,
+> `pillar-b`) are **illustrative** — an adopting repo runs these same two
+> cases against its own North Star, with its own real pillars (see
+> `poirot-fe evals/cases/north-star-judge.md` for an example with concrete
+> project content).
 
-## Qué se está juzgando
+## What is being judged
 
-El juicio semántico de la skill `/align`: dado los objetivos de un brief y el
-North Star del proyecto, el judge (a) propone un mapping objetivo→pilar y (b)
-puntúa 3 dimensiones de la rúbrica (0–5 cada una, umbral de pase 3 — ver
-`alignment-rubric.md`). Este eval chequea que el puntaje sea *sensato*, no solo
-que la agregación determinista corra — esa parte es contrato documentado,
-per-stack (criterio `ALIGN-VERDICT-CONTRACT`), no unit-testeada en este repo.
+The semantic judgment of the `/align` skill: given the objectives of a brief and the
+project's North Star, the judge (a) proposes an objective→pillar mapping and (b)
+scores 3 rubric dimensions (0–5 each, pass threshold 3 — see
+`alignment-rubric.md`). This eval checks that the score is *sensible*, not just
+that the deterministic aggregation runs — that part is a documented contract,
+per-stack (criterion `ALIGN-VERDICT-CONTRACT`), not unit-tested in this repo.
 
-## Case 1 — brief in-scope puntúa bien en las 3 dimensiones
+## Case 1 — in-scope brief scores well on all 3 dimensions
 
-**Objetivo del brief (input, ilustrativo):**
-> "Agregar un filtro de solo-lectura que permita ver qué elementos avanzan una
-> señal del pilar `pilar-a`, sin modificar ningún dato existente."
+**Brief objective (input, illustrative):**
+> "Add a read-only filter that lets users see which elements advance a
+> signal of pillar `pillar-a`, without modifying any existing data."
 
-**Comportamiento esperado del judge:**
-- Mapea limpiamente a `pilar-a` (sin huérfano).
-- Ningún predicado `out_of_scope` se dispara (es de solo lectura/visualización).
-- Las 3 dimensiones puntúan **≥ 3**:
-  - pillar fit — mapea a un `signal` explícito del pilar.
-  - scope compliance — claramente dentro de `scope.in_scope`.
-  - mission advancement — el objetivo tiene un efecto observable sobre el
-    `signal` nombrado.
-- Veredicto resultante (agregación per-stack): `aligned`.
+**Expected judge behavior:**
+- Maps cleanly to `pillar-a` (no orphan).
+- No `out_of_scope` predicate fires (it is read-only/visualization).
+- All 3 dimensions score **≥ 3**:
+  - pillar fit — maps to an explicit `signal` of the pillar.
+  - scope compliance — clearly within `scope.in_scope`.
+  - mission advancement — the objective has an observable effect on the
+    named `signal`.
+- Resulting verdict (per-stack aggregation): `aligned`.
 
-## Case 2 — brief plausible-pero-fuera-de-alcance puntúa bajo en scope compliance
+## Case 2 — plausible-but-out-of-scope brief scores low on scope compliance
 
-**Objetivo del brief (input, ilustrativo):**
-> "Agregar un botón que permita a los usuarios modificar directamente el
-> `north-star.md` del proyecto (sus pilares o su scope) desde la UI, sin pasar
-> por PR ni revisión."
+**Brief objective (input, illustrative):**
+> "Add a button that lets users directly modify the project's
+> `north-star.md` (its pillars or scope) from the UI, bypassing PR
+> review."
 
-**Comportamiento esperado del judge:**
-- Superficialmente plausible (menciona el North Star, un pilar real) — esta es
-  la trampa: un judge superficial podría puntuarlo alto por relevancia sola.
-- Al inspeccionarlo, requiere **mutar el scope/pillars sin ADR ni PR**, lo cual
-  es explícitamente `out_of_scope` (viola `amendment-protocol.md`: todo cambio
-  de scope/pillars es ADR + PR, nunca una escritura directa/silenciosa).
-- La dimensión **scope compliance** debe puntuar **< 3** aunque las otras dos
-  dimensiones (pillar fit, mission advancement) puntúen razonable — un judge
-  que promedia y diluye la violación de scope es un FAIL para este case.
-- Veredicto resultante: `rejected`, sin importar los otros dos scores (el
-  rechazo de scope corta la agregación — ver `plan.md` decisión 3).
+**Expected judge behavior:**
+- Superficially plausible (mentions the North Star, a real pillar) — this is
+  the trap: a superficial judge might score it high on relevance alone.
+- On inspection, it requires **mutating scope/pillars without ADR or PR**, which
+  is explicitly `out_of_scope` (violates `amendment-protocol.md`: every scope/pillars
+  change is ADR + PR, never a direct/silent write).
+- The **scope compliance** dimension must score **< 3** even if the other two
+  dimensions (pillar fit, mission advancement) score reasonably — a judge that
+  averages and dilutes the scope violation is a FAIL for this case.
+- Resulting verdict: `rejected`, regardless of the other two scores (the
+  scope rejection cuts the aggregation — see `plan.md` decision 3).
 
-## Puntuación
+## Scoring
 
-Registrar, por case, los 3 scores de dimensión que asignó el judge y si el
-veredicto derivado coincide con el "Comportamiento esperado" de arriba. Umbral
-de pase de este eval case: ambos cases deben coincidir con su veredicto
-esperado (`aligned` / `rejected`) y el Case 2 debe mostrar específicamente
-scope compliance `< 3` (no solo un promedio bajo). Registrar el resultado en
-`verification/reports/` de la feature, según `evals/README.md`.
+Record, per case, the 3 dimension scores assigned by the judge and whether the
+derived verdict matches the "Expected judge behavior" above. Pass threshold for this
+eval case: both cases must match their expected verdict (`aligned` / `rejected`) and
+Case 2 must specifically show scope compliance `< 3` (not just a low average). Record
+the result in `verification/reports/` for the feature, per `evals/README.md`.

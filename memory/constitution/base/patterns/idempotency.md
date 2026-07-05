@@ -1,7 +1,7 @@
 # Pattern: Idempotency (given practice)
 
-**Principio:** las operaciones de escritura repetibles son idempotentes.
-**Aplica a:** cualquier feature con reintentos, webhooks o pagos.
-**Criterios inyectados:**
-- `[given]` reenviar la misma request con igual `idempotency-key` no duplica el efecto.
-  → mapea a `eval: idempotency`.
+**Principle:** repeatable write operations are idempotent.
+**Applies to:** any feature with retries, webhooks, or payments.
+**Injected criteria:**
+- `[given]` resending the same request with the same `idempotency-key` does not duplicate the effect.
+  → maps to `eval: idempotency`.

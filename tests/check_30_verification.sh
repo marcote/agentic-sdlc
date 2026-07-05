@@ -4,7 +4,7 @@ for d in "Task success" "Tool use" "Trajectory" "Hallucination" "Response qualit
 done
 assert_file evals/README.md
 assert_file verification/verification-report.md
-for s in "Coverage snapshot" "Output eval" "Trajectory eval" "UAT" "Verdicto"; do
+for s in "Coverage snapshot" "Output eval" "Trajectory eval" "UAT" "Verdict"; do
   assert_contains verification/verification-report.md "$s"
 done
 assert_file verification/uat-checklist.md

@@ -1,61 +1,61 @@
-# 0002 — Agregar pilar `impacto-medible`
+# 0002 — Add `measurable-impact` pillar
 
-> Amendment de `pillars`: suma un 4º pilar. Aterriza junto al diff de `north-star.md`
-> en el mismo PR (ver `base/amendment-protocol.md`). Un humano revisa y aprueba.
+> `pillars` amendment: adds a 4th pillar. Lands together with the `north-star.md`
+> diff in the same PR (see `base/amendment-protocol.md`). A human reviews and approves.
 
-## Contexto
+## Context
 
-Los 3 pilares del seed (`0001`) — `enforcement-real`, `portabilidad-agnostica`,
-`adopcion-sin-friccion` — describen **propiedades del harness**, pero ninguno mide el
-**outcome para el desarrollador**. La misión es "hacer cumplir un SDLC disciplinado", y el
-valor real de esa disciplina es *mejor software*: menos rework, gaps cazados antes de
-codear, el humano liberado para el 20% conceptual (el *80% problem* del whitepaper que cita
-el README).
+The 3 pillars from the seed (`0001`) — `real-enforcement`, `agnostic-portability`,
+`frictionless-adoption` — describe **properties of the harness**, but none measures the
+**outcome for the developer**. The mission is "to enforce a disciplined SDLC", and the
+real value of that discipline is *better software*: less rework, gaps caught before coding,
+the human freed for the 20% conceptual (the *80% problem* from the whitepaper cited in the
+README).
 
-La presión que lo motiva: sin un pilar de outcome, el harness corre el riesgo de premiar
-**enforcement sin impacto** — gates que disparan por disparar. Es el mismo riesgo
-anti-teatro que atacamos a nivel del retro (`003`), ahora a nivel del harness entero:
-medíamos que *enforçáramos*, no que *enforçar sirviera*. Un review adversarial del propio
-seed lo destapó como el hueco más grande.
+The pressure that motivates it: without an outcome pillar, the harness risks rewarding
+**enforcement without impact** — gates that fire for the sake of firing. This is the same
+anti-theater risk attacked at the retro level (`003`), now at the harness level as a whole:
+we were measuring that we *enforced*, not that *enforcing was useful*. An adversarial review
+of the seed itself surfaced it as the biggest gap.
 
-## Decisión
+## Decision
 
-Agregar un pilar al array `pillars` del bloque canónico de `north-star.md`.
+Add a pillar to the `pillars` array of the canonical block in `north-star.md`.
 
-**Before** (3 pilares): `enforcement-real`, `portabilidad-agnostica`,
-`adopcion-sin-friccion`.
+**Before** (3 pillars): `real-enforcement`, `agnostic-portability`,
+`frictionless-adoption`.
 
-**After** (4 pilares): los 3 anteriores **+**
+**After** (4 pillars): the previous 3 **+**
 
 ```json
 {
-  "id": "impacto-medible",
-  "statement": "La disciplina que el harness impone tiene que traducirse en mejor software: menos rework y gaps cazados antes de producción, no gates que disparan por disparar.",
-  "signal": "Gaps cazados temprano (grilling/contract) y rework tardío evitado (post-verify/uat), agregados por feature en la sección Método del wow-report; alto = la disciplina previene, no solo burocratiza."
+  "id": "measurable-impact",
+  "statement": "The discipline the harness imposes must translate into better software: less rework and gaps caught before production, not gates that fire for the sake of firing.",
+  "signal": "Gaps caught early (grilling/contract) and late rework avoided (post-verify/uat), aggregated per feature in the Method section of the wow-report; high = discipline prevents, not just bureaucratizes."
 }
 ```
 
-Sin cambios en `mission`, `scope`, ni `alignment.threshold`.
+No changes to `mission`, `scope`, or `alignment.threshold`.
 
 ## Scope-delta
 
-Ninguno. Este amendment **no** mueve predicados entre `in_scope`/`out_of_scope`; solo
-agrega una dimensión de pilar. El radio de impacto es acotado: los briefs futuros ganan un
-pilar más contra el cual `/align` puede mapear objetivos.
+None. This amendment **does not** move predicates between `in_scope`/`out_of_scope`; it only
+adds a pillar dimension. The impact radius is bounded: future briefs gain one more pillar
+against which `/align` can map objectives.
 
-**Delta de solapamiento (declarado explícito para no confundir con `enforcement-real`):**
-`enforcement-real` mide que la gate **dispare** (la disciplina se hace cumplir);
-`impacto-medible` mide que **disparar reduzca rework / cace gaps** (la disciplina agrega
-valor). Uno es "enforçamos", el otro es "enforçar sirvió". Son dimensiones distintas y
-deliberadamente no colapsadas.
+**Overlap delta (declared explicitly to avoid confusion with `real-enforcement`):**
+`real-enforcement` measures that the gate **fires** (discipline is enforced);
+`measurable-impact` measures that **firing reduces rework / catches gaps** (discipline adds
+value). One is "we enforced", the other is "enforcing was useful". They are distinct
+dimensions deliberately not collapsed.
 
-## Consecuencias
+## Consequences
 
-- **Habilita** que un brief avance la misión por vía de *impacto demostrable* (no solo de
-  rigor procesal). Su `signal` se apoya en instrumentación **ya existente**: la sección
-  "Método" del `wow-report` (gaps cazados, rework post-verify/uat).
-- Ningún brief previo cambia de veredicto (no hay reclasificación `rejected`↔`aligned`; el
-  scope no se tocó).
-- **Follow-up:** cuando haya ≥2 features cerrados con retro real, el `wow-report §Método`
-  debería empezar a poblar la evidencia de este pilar; hasta entonces es un pilar
-  declarado pero aún sin serie de datos (honestidad N=1).
+- **Enables** a brief to advance the mission via *demonstrable impact* (not just procedural
+  rigor). Its `signal` relies on **already-existing** instrumentation: the "Method"
+  section of the `wow-report` (gaps caught, post-verify/uat rework).
+- No previous brief changes verdict (no `rejected`↔`aligned` reclassification; scope was
+  not touched).
+- **Follow-up:** when ≥2 features have closed with a real retro, the `wow-report §Method`
+  should start populating the evidence for this pillar; until then it is a declared but
+  still data-free pillar (honesty N=1).

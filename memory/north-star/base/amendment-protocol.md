@@ -1,57 +1,55 @@
-# Protocolo de amendment (base)
+# Amendment Protocol (base)
 
-> Un North Star que se puede editar en silencio no es gobernanza, es decoración.
-> Todo cambio al `scope` o a los `pillars` de un proyecto es un evento **gobernado
-> y auditable**: requiere un ADR y aterriza solo vía un PR aprobado por humano.
-> Nunca un commit directo a `north-star.md`.
+> A North Star that can be silently edited is not governance, it is decoration.
+> Every change to the `scope` or `pillars` of a project is a **governed and auditable
+> event**: it requires an ADR and lands only via a human-approved PR.
+> Never a direct commit to `north-star.md`.
 
-## Cuándo se requiere un amendment
+## When an amendment is required
 
-Cualquier cambio al bloque JSON canónico de `north-star.md` que toque:
+Any change to the canonical JSON block of `north-star.md` that touches:
 
-- `pillars` — agregar, quitar, o cambiar materialmente el `id`, `statement` o
-  `signal` de un pilar.
-- `scope.in_scope` o `scope.out_of_scope` — agregar, quitar, o angostar/ensanchar
-  un predicado.
+- `pillars` — adding, removing, or materially changing the `id`, `statement`, or
+  `signal` of a pillar.
+- `scope.in_scope` or `scope.out_of_scope` — adding, removing, or narrowing/widening
+  a predicate.
 
-La regla es determinista (equivalente a `requiresAdr(oldNs, newNs)`, per-stack): un
-diff limitado a la prosa, a la redacción de la `mission` que no cambia los conjuntos
-de `pillars`/`scope`, o al ajuste de `alignment.threshold` **no** requiere un ADR; un
-diff de `pillars`/`scope` **siempre** lo requiere.
+The rule is deterministic (equivalent to `requiresAdr(oldNs, newNs)`, per-stack): a
+diff limited to surrounding prose, to the wording of `mission` that does not change the
+`pillars`/`scope` sets, or to adjusting `alignment.threshold` **does not** require an ADR; a
+diff of `pillars`/`scope` **always** does.
 
-## Qué significa "amendment = ADR + PR"
+## What "amendment = ADR + PR" means
 
-1. **Un ADR** aterriza en `memory/north-star/decisions/NNNN-*.md` (número
-   secuencial, slug kebab-case), usando `adr-template.md`. Debe contener:
-   - **Contexto** — por qué el North Star actual ya no encaja (qué presión o drift
-     observado motivó el cambio).
-   - **Decisión** — el before/after exacto de los campos `pillars`/`scope`.
-   - **Scope-delta** — una declaración explícita de qué se mueve de `out_of_scope`
-     a `in_scope` (o viceversa), para que el radio de impacto sea visible de un
-     vistazo, no enterrado en un diff de JSON.
-   - **Consecuencias** — qué habilita o prohíbe de nuevo, y cualquier follow-up
-     (p. ej. features antes rechazadas que ahora son elegibles).
-2. **Un PR** lleva el ADR + el diff de `north-star.md` juntos. Un humano lo revisa y
-   aprueba — la aprobación del amendment explícitamente **no** está automatizada. El
-   PR es el rastro auditable: reviewer, timestamp y diff son todos git-nativos.
+1. **An ADR** lands in `memory/north-star/decisions/NNNN-*.md` (sequential number,
+   kebab-case slug), using `adr-template.md`. It must contain:
+   - **Context** — why the current North Star no longer fits (what pressure or observed
+     drift motivated the change).
+   - **Decision** — the exact before/after of the affected `pillars`/`scope` fields.
+   - **Scope-delta** — an explicit statement of what moves from `out_of_scope`
+     to `in_scope` (or vice versa), so the impact radius is visible at a glance,
+     not buried in a JSON diff.
+   - **Consequences** — what is newly enabled or prohibited, and any follow-ups
+     (e.g. previously rejected features that are now eligible).
+2. **A PR** carries the ADR + the `north-star.md` diff together. A human reviews and
+   approves — the amendment approval is explicitly **not automated**. The PR is the
+   auditable trail: reviewer, timestamp, and diff are all git-native.
 
 ## Enforcement
 
-Un checker (equivalente a `hasAdrFor(decisionsDir)`, per-stack) verifica que exista
-al menos un ADR para una ventana de cambio dada. Un cambio de `pillars`/`scope` a
-`north-star.md` que aterriza **sin** un ADR correspondiente es una **violación de
-gobernanza** — señalizala igual que se señalaría un test faltante, por el criterio
-`AMEND-ADR` de `specs/002-north-star-governance/acceptance.md`. Este es el patrón
-`[given] audit-logging` (`memory/constitution/base/patterns/audit-logging.md`)
-aplicado a la gobernanza de producto en vez de a endpoints de escritura: la
-"escritura" acá es un cambio a la misión/scope en sí, y el par ADR + PR es su rastro
-auditable.
+A checker (equivalent to `hasAdrFor(decisionsDir)`, per-stack) verifies that at least
+one ADR exists for a given change window. A `pillars`/`scope` change to
+`north-star.md` that lands **without** a corresponding ADR is a **governance violation**
+— signal it the same way you would signal a missing test, by criterion
+`AMEND-ADR` of `specs/002-north-star-governance/acceptance.md`. This is the
+`[given] audit-logging` pattern (`memory/constitution/base/patterns/audit-logging.md`)
+applied to product governance instead of write endpoints: the "write" here is a change
+to the mission/scope itself, and the ADR + PR pair is its auditable trail.
 
-## Qué NO requiere un amendment
+## What does NOT require an amendment
 
-- Corregir un typo en la prosa que rodea al bloque JSON.
-- Ajustar `alignment.threshold` (tuneable, pero igual amerita una descripción de PR
-  liviana de por qué).
-- Cualquier cosa bajo `base/` (schema, rúbrica, este protocolo) — esos son
-  vendored/compartidos; ver `README.md` para cómo se propagan las actualizaciones a
-  `base/`.
+- Correcting a typo in the prose surrounding the JSON block.
+- Adjusting `alignment.threshold` (tuneable, though a lightweight PR description of
+  why is still worth writing).
+- Anything under `base/` (schema, rubric, this protocol) — those are
+  vendored/shared; see `README.md` for how `base/` updates propagate.

@@ -1,4 +1,4 @@
-# fixture: solo cambió alignment.threshold (3 -> 4); sets pillars/scope intactos
+# fixture: only alignment.threshold changed (3 -> 4); pillars/scope sets untouched
 
 ```json
 {

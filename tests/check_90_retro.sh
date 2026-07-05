@@ -1,24 +1,24 @@
-# Sourced by tests/run.sh (lib.sh already loaded). Enforcea el retro gate: la
-# mitad trasera de la Measurability Gate. Template + wiring del contrato DONE +
-# cierre por-feature. "Cerrado" = su verification/reports/<NNN>-*.md muestra el
-# veredicto DONE (BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%). Feature
-# cerrado ⟹ specs/<NNN>-*/retro.md completo. Sin hardcode: un feature sin
-# reporte DONE está "en vuelo" y se saltea (regla uniforme).
+# Sourced by tests/run.sh (lib.sh already loaded). Enforces the retro gate: the
+# back half of the Measurability Gate. Template + wiring of the DONE contract +
+# per-feature close. "Closed" = its verification/reports/<NNN>-*.md shows the
+# DONE verdict (BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%). Feature
+# closed ⟹ specs/<NNN>-*/retro.md complete. No hardcode: a feature without a
+# DONE report is "in-flight" and is skipped (uniform rule).
 
-# --- Template: estructura de 3 caras (Capa 1+2) ---
+# --- Template: 3-face structure (Layer 1+2) ---
 assert_file specs/_template/retro.md
 for h in "Cara A" "Cara B" "Cara C" "Evidencia" "deriv"; do
   assert_contains specs/_template/retro.md "$h"
 done
 
-# --- Wiring del contrato DONE ---
+# --- DONE contract wiring ---
 assert_contains CLAUDE.md "retro ✅"
 assert_contains docs/workflow.md "retro ✅"
 assert_contains verification/verification-report.md "retro ✅"
 
-# --- Cierre por-feature (regla uniforme) ---
-# "Cerrado" = el report tiene BUILD ✅ y UAT ✅ y coverage 100% (tres greps
-# independientes: robusto al layout de línea y evita precedencia ||/&& frágil).
+# --- Per-feature close (uniform rule) ---
+# "Closed" = the report has BUILD ✅ and UAT ✅ and coverage 100% (three independent
+# greps: robust to line layout and avoids fragile ||/&& precedence).
 closed_seen=0
 for report in verification/reports/*.md; do
   [ -f "$report" ] || continue
@@ -28,38 +28,38 @@ for report in verification/reports/*.md; do
   closed_seen=1
   nnn=$(basename "$report" | grep -oE '^[0-9]+')
   featdir=$(ls -d specs/${nnn}-*/ 2>/dev/null | head -1)
-  if [ -z "$featdir" ]; then _fail "report $report DONE pero no hay specs/${nnn}-*"; continue; fi
+  if [ -z "$featdir" ]; then _fail "report $report DONE but no specs/${nnn}-*"; continue; fi
   retro="${featdir}retro.md"
-  if [ ! -f "$retro" ]; then _fail "feature $nnn DONE pero falta $retro"; continue; fi
-  _pass "feature $nnn DONE tiene $retro"
-  # Sin placeholders sin llenar
-  if grep -qE '_\([^)]*\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro tiene placeholders sin llenar"; else _pass "$retro sin placeholders"; fi
-  # Veredicto de misión válido
+  if [ ! -f "$retro" ]; then _fail "feature $nnn DONE but $retro is missing"; continue; fi
+  _pass "feature $nnn DONE has $retro"
+  # No unfilled placeholders
+  if grep -qE '_\([^)]*\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro has unfilled placeholders"; else _pass "$retro no placeholders"; fi
+  # Valid mission verdict
   if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
-    _pass "$retro veredicto de misión válido"
+    _pass "$retro valid mission verdict"
   else
-    _fail "$retro sin veredicto de misión válido"
+    _fail "$retro missing valid mission verdict"
   fi
-  # n/a exige razón (Capa: anti-escape)
+  # n/a requires a reason (Layer: anti-escape)
   if grep -qE 'Veredicto de misión:[*[:space:]]*n/a' "$retro"; then
-    if grep -qiE 'raz[oó]n' "$retro"; then _pass "$retro n/a con razón"; else _fail "$retro n/a sin razón"; fi
+    if grep -qiE 'raz[oó]n' "$retro"; then _pass "$retro n/a with reason"; else _fail "$retro n/a without reason"; fi
   fi
-  # Capa 2: confirmed/refuted exige evidencia locator en las filas de la tabla Cara A.
+  # Layer 2: confirmed/refuted requires evidence locator in Face A table rows.
   if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted)' "$retro"; then
     ev_bad=0; ev_rows=0
     while IFS= read -r row; do
-      case "$row" in *Pilar*|*Signal*|*---*) continue ;; esac   # saltear header/separador
+      case "$row" in *Pilar*|*Signal*|*---*) continue ;; esac   # skip header/separator
       ev=$(printf '%s' "$row" | awk -F'|' '{c=$(NF-1); gsub(/^[ \t]+|[ \t]+$/,"",c); print c}')
       ev_rows=$((ev_rows+1))
       printf '%s' "$ev" | grep -qE '[0-9]|/|https?://|\.md|#' || ev_bad=1
     done < <(grep -E '^\|' "$retro")
     if [ "$ev_rows" -ge 1 ] && [ "$ev_bad" -eq 0 ]; then
-      _pass "$retro Capa2: evidencia locator en Cara A (confirmed/refuted)"
+      _pass "$retro Layer2: evidence locator in Face A (confirmed/refuted)"
     else
-      _fail "$retro Capa2: confirmed/refuted con evidencia vacía o sin locator"
+      _fail "$retro Layer2: confirmed/refuted with empty or locator-free evidence"
     fi
   fi
-  # Cada campo de Cara B con [deriv:] (Capa 1) — anclado a bullet lines para excluir la intro
-  if [ "$(grep -cE '^- .*\[deriv:' "$retro")" -ge 4 ]; then _pass "$retro Cara B con deriv (≥4)"; else _fail "$retro Cara B con <4 [deriv:] (campos derivables sin locator)"; fi
+  # Each Face B field with [deriv:] (Layer 1) — anchored to bullet lines to exclude intro
+  if [ "$(grep -cE '^- .*\[deriv:' "$retro")" -ge 4 ]; then _pass "$retro Face B with deriv (≥4)"; else _fail "$retro Face B with <4 [deriv:] (derivable fields without locator)"; fi
 done
-[ "$closed_seen" -eq 1 ] && _pass "loop de cierre ejercitado" || _pass "sin features cerrados aún (vacuo)"
+[ "$closed_seen" -eq 1 ] && _pass "close loop exercised" || _pass "no closed features yet (vacuous)"

@@ -1,28 +1,27 @@
 #!/usr/bin/env bash
-# amendment-gate — gatea cambios de los sets pillars/scope del bloque JSON canónico
-# del North Star. Si cambiaron, exige: (a) un ADR nuevo (decisions/NNNN-*.md), (b) el
-# bloque resultante schema-válido (base/schema.md), (c) la suite (tests/run.sh) verde.
-# Bloqueo angosto: si los sets no cambian, no bloquea nada (preserva "productividad
-# primero"). Dependency-free: bash/coreutils + python3 stdlib (json). Sin toolchains
-# instalables.
+# amendment-gate — gates changes to the pillars/scope sets of the North Star's canonical
+# JSON block. If they changed, requires: (a) a new ADR (decisions/NNNN-*.md), (b) the
+# resulting block to be schema-valid (base/schema.md), (c) the suite (tests/run.sh) green.
+# Narrow block: if the sets did not change, nothing is blocked (preserves "productivity
+# first"). Dependency-free: bash/coreutils + python3 stdlib (json). No installable toolchains.
 #
-# Modos:
-#   --range BASE..HEAD                       (CI: deriva old/new/added de git)
-#   --files OLD NEW --added "f1 f2 …" [--suite-cmd CMD]   (test: fixtures herméticos)
-# Exit 0 = pasa (no bloquea) · exit ≠0 = bloquea, citando la condición faltante.
+# Modes:
+#   --range BASE..HEAD                       (CI: derives old/new/added from git)
+#   --files OLD NEW --added "f1 f2 …" [--suite-cmd CMD]   (test: hermetic fixtures)
+# Exit 0 = passes (does not block) · exit ≠0 = blocks, citing the missing condition.
 set -u
 
 NS_PATH="memory/north-star/north-star.md"
-SUITE_CMD=""              # override inyectable del estado de la suite (test)
+SUITE_CMD=""              # injectable override of suite state (test)
 OLD=""; NEW=""; ADDED=""; RANGE=""
 
 die(){ echo "amendment-gate: $*" >&2; exit 1; }
 
-# --- Falla-cerrado si no hay intérprete de sistema python3 ---
+# --- Fail-closed if no system python3 interpreter ---
 command -v python3 >/dev/null 2>&1 || die "requiere python3 (stdlib json) — ausente en el entorno"
 
-# --- Helper python3: extrae el bloque ```json canónico y opera sobre él ---
-# Uso: _py sets_changed OLD NEW  |  _py schema_valid FILE
+# --- python3 helper: extracts the canonical ```json block and operates on it ---
+# Usage: _py sets_changed OLD NEW  |  _py schema_valid FILE
 _py(){
   python3 - "$@" <<'PYEOF'
 import sys, json, re
@@ -36,7 +35,7 @@ def load(path):
     return json.loads(m.group(1))
 
 def sig(ns):
-    """Firma semántica de los sets gobernados: pillars y scope, orden-agnóstica."""
+    """Semantic signature of the governed sets: pillars and scope, order-agnostic."""
     pillars = frozenset(
         (p.get("id"), p.get("statement"), p.get("signal"))
         for p in ns.get("pillars", [])
@@ -68,7 +67,7 @@ def validate(ns):
     al = ns.get("alignment")
     if not isinstance(al, dict) or not isinstance(al.get("threshold"), (int, float)):
         return "alignment.threshold debe ser número"
-    return ""  # válido
+    return ""  # valid
 
 cmd = sys.argv[1]
 try:
@@ -83,13 +82,13 @@ try:
         sys.exit(0)
     else:
         sys.stderr.write("comando desconocido: %s\n" % cmd); sys.exit(2)
-except Exception as e:  # JSON roto / bloque ausente → tratar como schema-inválido / error
+except Exception as e:  # broken JSON / missing block → treat as schema-invalid / error
     sys.stderr.write(str(e) + "\n")
     sys.exit(1 if cmd == "schema_valid" else 2)
 PYEOF
 }
 
-# --- has_new_adr ADDED… : ¿algún archivo agregado es un ADR nuevo? ---
+# --- has_new_adr ADDED… : is any added file a new ADR? ---
 has_new_adr(){
   local f
   for f in "$@"; do
@@ -100,12 +99,12 @@ has_new_adr(){
   return 1
 }
 
-# --- suite_green : la suite está verde (override inyectable en test) ---
+# --- suite_green : the suite is green (injectable override in tests) ---
 suite_green(){
   if [ -n "$SUITE_CMD" ]; then eval "$SUITE_CMD"; else bash tests/run.sh >/dev/null 2>&1; fi
 }
 
-# --- parse de argumentos ---
+# --- argument parsing ---
 while [ $# -gt 0 ]; do
   case "$1" in
     --range)     RANGE="$2"; shift 2 ;;
@@ -116,10 +115,10 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# --- Modo --range: derivar OLD/NEW/ADDED desde git ---
+# --- --range mode: derive OLD/NEW/ADDED from git ---
 if [ -n "$RANGE" ]; then
   BASE="${RANGE%%..*}"; HEAD="${RANGE##*..}"; [ -n "$HEAD" ] || HEAD="HEAD"
-  # BASE inválido (primer push / force-push: 000…) → caer al padre de HEAD; si no, fail-closed
+  # Invalid BASE (first push / force-push: 000…) → fall back to HEAD's parent; if not, fail-closed
   if ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
     BASE="$(git rev-parse "${HEAD}~1" 2>/dev/null)" || die "rango base inválido y sin padre — revisión manual requerida"
   fi
@@ -133,13 +132,13 @@ fi
 
 [ -n "$OLD" ] && [ -n "$NEW" ] || die "faltan --files OLD NEW (o --range BASE..HEAD)"
 
-# --- Lógica del gate ---
+# --- Gate logic ---
 if [ "$(_py sets_changed "$OLD" "$NEW")" = "same" ]; then
   echo "amendment-gate: sin cambio de sets pillars/scope — no aplica (dev no bloqueado)"
   exit 0
 fi
 
-# Los sets cambiaron: es un amendment gobernado. Exigir las tres condiciones.
+# The sets changed: it is a governed amendment. Require all three conditions.
 # shellcheck disable=SC2086
 if ! has_new_adr $ADDED; then
   die "amendment de pillars/scope SIN ADR nuevo (memory/north-star/decisions/NNNN-*.md)"

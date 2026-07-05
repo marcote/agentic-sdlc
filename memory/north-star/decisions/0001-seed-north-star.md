@@ -1,55 +1,54 @@
-# 0001 — Seed del North Star del harness
+# 0001 — Seed of the harness North Star
 
-> ADR fundacional: el primer poblado del North Star de este repo (de placeholder a
-> real). Registra el rationale del seed y sienta el precedente de que todo cambio
-> posterior a `pillars`/`scope` va por `base/amendment-protocol.md`.
+> Foundational ADR: the first population of this repo's North Star (from placeholder to
+> real). Records the seed rationale and sets the precedent that all subsequent changes
+> to `pillars`/`scope` go through `base/amendment-protocol.md`.
 
-## Contexto
+## Context
 
-`memory/north-star/north-star.md` era un **placeholder** (`_(completar por proyecto)_`)
-porque el repo se trataba como "la plantilla, el adoptante la completa". Pero el repo es
-un **producto real** — un harness reutilizable de SDLC agéntico — y venía operando sin
-declarar *para qué existe*. Dos presiones lo motivaron:
+`memory/north-star/north-star.md` was a **placeholder** (`_(fill in per project)_`)
+because the repo was treated as "the template; the adopter fills it in". But the repo is
+a **real product** — a reusable agentic SDLC harness — and it had been operating without
+declaring *why it exists*. Two pressures motivated the change:
 
-1. Sin North Star schema-válido, `/align` es fail-closed: no se puede gatear ningún brief
-   contra la misión, y la **Cara A (Misión) del retro** cierra siempre `n/a` (ver
-   `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`). El loop align↔retro
-   quedaba estructuralmente incompleto.
-2. Falta de un norte explícito para decidir qué features pertenecen al harness y cuáles
-   no (p. ej. "install desde github" pertenece; "código de app del adoptante" no).
+1. Without a schema-valid North Star, `/align` is fail-closed: no brief can be gated
+   against the mission, and the **Face A (Mission) of the retro** always closes `n/a` (see
+   `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`). The align↔retro
+   loop was structurally incomplete.
+2. Lack of an explicit north to decide which features belong to the harness and which
+   do not (e.g. "install from github" belongs; "adopter's app code" does not).
 
-## Decisión
+## Decision
 
-Poblar el bloque JSON canónico de `north-star.md`. **Before:** todos los campos en
-`_(completar por proyecto)_` (no schema-válido). **After:**
+Populate the canonical JSON block of `north-star.md`. **Before:** all fields in
+`_(fill in per project)_` (not schema-valid). **After:**
 
-- `mission`: "Un harness reutilizable y agnóstico de stack que hace cumplir un SDLC
-  agéntico disciplinado … sin escribir código de producto." (ver el JSON en
-  `north-star.md`).
-- `pillars`: tres — `enforcement-real`, `portabilidad-agnostica`, `adopcion-sin-friccion`,
-  cada uno con `statement` + `signal` medible. La auto-validación/dogfooding **no** es un
-  pilar aparte: es el `signal` de `enforcement-real`.
-- `scope.in_scope` / `scope.out_of_scope`: poblados (ver el JSON).
+- `mission`: "A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC
+  … without writing product code." (see the JSON in `north-star.md`).
+- `pillars`: three — `real-enforcement`, `agnostic-portability`, `frictionless-adoption`,
+  each with `statement` + measurable `signal`. Self-validation/dogfooding is **not** a
+  separate pillar: it is the `signal` of `real-enforcement`.
+- `scope.in_scope` / `scope.out_of_scope`: populated (see the JSON).
 - `alignment.threshold`: 3.
 
 ## Scope-delta
 
-Todo el `scope` entra por primera vez (before: vacío/placeholder). Predicados
-`out_of_scope` que ahora son rechazo duro de `/align`: código de aplicación del adoptante;
-motor determinista per-stack; imponer un runtime obligatorio; hooks bloqueantes por
-commit; dependencias de runtime/frameworks. `in_scope`: el workflow de governance, la
-gobernanza (constitution/North Star), plantillas/coverage, evals/verificación/UAT, tooling
-de adopción, y la auto-validación del WoW.
+The entire `scope` enters for the first time (before: empty/placeholder). `out_of_scope`
+predicates that are now hard `/align` rejections: adopter's application code; per-stack
+deterministic engine; imposing a mandatory runtime; blocking per-commit hooks; runtime/framework
+dependencies. `in_scope`: the governance workflow, governance (constitution/North Star),
+feature/coverage templates and state machine, evals/verification/UAT, adoption tooling,
+and WoW self-validation.
 
-## Consecuencias
+## Consequences
 
-- **Habilita** `/align` de verdad en este repo → destraba la **Cara A del retro** (deja de
-  ser `n/a`; los features futuros del harness cierran su predicción de misión con datos
-  reales). Completa el loop align↔retro.
-- Los futuros briefs del harness ahora se puntúan contra estos 3 pilares. Ejemplos:
-  "install desde github" → `adopcion-sin-friccion` (elegible); "escribir código de app del
-  adoptante" → `out_of_scope` (rechazo duro).
-- Pilares/scope quedan bajo control de cambios: crecer o reformular va por ADR + PR
-  (`base/amendment-protocol.md`). Este ADR es el punto de partida (0001).
-- **Follow-ups** (no en este cambio): el feature "install desde github"; la convención
-  "comandos en inglés" (va a `constitution`, no al North Star).
+- **Enables** real `/align` in this repo → unlocks **Face A of the retro** (no longer
+  `n/a`; future harness features close their mission prediction with real data). Completes
+  the align↔retro loop.
+- Future harness briefs are now scored against these 3 pillars. Examples:
+  "install from github" → `frictionless-adoption` (eligible); "write adopter's app code"
+  → `out_of_scope` (hard rejection).
+- Pillars/scope are now under change control: growing or reformulating goes through ADR + PR
+  (`base/amendment-protocol.md`). This ADR is the starting point (0001).
+- **Follow-ups** (not in this change): the "install from github" feature; the "commands
+  in English" convention (goes in `constitution`, not the North Star).

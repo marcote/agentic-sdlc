@@ -1,12 +1,11 @@
-# Sourced by tests/run.sh (lib.sh already loaded). Verifica que la capacidad de
-# gobernanza North-Star + Measurability Gate está presente y conectada al
-# harness: capa base, el placeholder north-star.md (extends: base), el
-# comando+skill /align, el wiring del gate en /distill, y la columna Pillar en
-# el template de coverage. Estructural/presencia únicamente — el motor
-# determinista concreto (schema validation, scope predicates, verdict
-# aggregation) es per-stack y no se unit-testea aquí (ver
-# specs/002-north-star-governance/plan.md decisión 2;
-# poirot-fe scripts/north-star/*.mjs es la reference implementation).
+# Sourced by tests/run.sh (lib.sh already loaded). Verifies that the North-Star +
+# Measurability Gate governance capability is present and wired into the
+# harness: base layer, the placeholder north-star.md (extends: base), the
+# /align command+skill, the gate wiring in /distill, and the Pillar column in
+# the coverage template. Structural/presence only — the concrete deterministic
+# engine (schema validation, scope predicates, verdict aggregation) is per-stack
+# and is not unit-tested here (see specs/002-north-star-governance/plan.md decision 2;
+# poirot-fe scripts/north-star/*.mjs is the reference implementation).
 for f in schema.md alignment-rubric.md amendment-protocol.md adr-template.md README.md; do
   assert_file "memory/north-star/base/$f"
 done
@@ -15,11 +14,11 @@ assert_contains memory/north-star/north-star.md "extends: base"
 assert_file .claude/commands/align.md
 assert_file .claude/skills/align/SKILL.md
 
-# MEAS-GATE: /distill debe imponer el gate, no solo describirlo en otro doc.
+# MEAS-GATE: /distill must enforce the gate, not just describe it in another doc.
 assert_file .claude/skills/distill/SKILL.md
 assert_contains .claude/skills/distill/SKILL.md "alignment.md"
 assert_contains .claude/skills/distill/SKILL.md "Measurability Gate"
 assert_contains .claude/skills/distill/SKILL.md "aligned"
 
-# COVERAGE-PILLAR: trazabilidad hasta el north star.
+# COVERAGE-PILLAR: traceability up to the north star.
 assert_contains specs/_template/coverage.md "Pillar"

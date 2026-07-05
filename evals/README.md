@@ -1,11 +1,11 @@
 # Evals
 
-- `rubric.md` — cómo se puntúa (5 dimensiones).
-- `cases/` — un case por criterio NO-determinista (formato libre: `.yaml`/`.md`).
-  Los cases se crean en `/contract`, ANTES de implementar.
+- `rubric.md` — how to score (5 dimensions).
+- `cases/` — one case per non-deterministic criterion (free format: `.yaml`/`.md`).
+  Cases are created in `/contract`, BEFORE implementing.
 
 ## Runner
-El runner ejecutable concreto depende del stack del proyecto que adopte el harness
-(fuera de alcance del template). El contrato: un case debe poder puntuarse contra el
-`rubric.md` y su resultado alimenta la sección "Trajectory eval" / "Response quality"
-del `verification-report.md`.
+The concrete executable runner depends on the stack of the project adopting the harness
+(out of scope for the template). The contract: a case must be scoreable against
+`rubric.md` and its result feeds the "Trajectory eval" / "Response quality"
+section of `verification-report.md`.

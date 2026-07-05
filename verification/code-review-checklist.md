@@ -1,10 +1,10 @@
-# Code Review Checklist — código generado por IA
+# Code Review Checklist — AI-generated code
 
 > "AI-generated code requires the same or greater scrutiny than human-written code."
 
-- [ ] Imports/dependencias existen y son las correctas (sin paquetes alucinados).
-- [ ] Error handling cubre modos de falla realistas, no solo el happy path.
-- [ ] No hay secretos hardcodeados.
-- [ ] El código cumple los patterns `[given]` aplicables (audit-log, rate-limit, idempotency…).
-- [ ] La lógica "que parece correcta" fue verificada contra el criterio, no asumida.
-- [ ] Cambios trazables a filas de `coverage.md`.
+- [ ] Imports/dependencies exist and are correct (no hallucinated packages).
+- [ ] Error handling covers realistic failure modes, not just the happy path.
+- [ ] No hardcoded secrets.
+- [ ] The code complies with applicable `[given]` patterns (audit-log, rate-limit, idempotency…).
+- [ ] Logic that "looks correct" was verified against the criterion, not assumed.
+- [ ] Changes are traceable to rows in `coverage.md`.

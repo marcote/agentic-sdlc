@@ -1,29 +1,29 @@
 # Agentic SDLC Harness
 
-Plantilla agnóstica para desarrollo agéntico disciplinado (Claude Code first).
-No contiene código de app: provee el harness que rodea al modelo.
+Agnostic template for disciplined agentic development (Claude Code first).
+Contains no app code: provides the harness that surrounds the model.
 
 ## Stack
-Agnóstico. Se copia encima de cualquier proyecto.
+Agnostic. Copied on top of any project.
 
-## Convenciones
-- Un feature = un folder `specs/<NNN-feature>/` (kebab-case, NNN zero-padded).
-- Los criterios de aceptación se escriben en BDD (Given/When/Then).
-- `coverage.md` es la fuente de verdad del estado de cada criterio.
+## Conventions
+- One feature = one folder `specs/<NNN-feature>/` (kebab-case, NNN zero-padded).
+- Acceptance criteria are written in BDD (Given/When/Then).
+- `coverage.md` is the source of truth for the state of each criterion.
 
-## Hard rules (detalle en memory/constitution/)
-- Ningún criterio determinista avanza a implementación sin test en 🔴 RED (`/contract`).
-- Un feature cierra solo con: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅ (`/retro` cierra la predicción de `/align`).
-- La verificación es on-demand (`/verify`, `/uat`); no hay hooks bloqueantes por commit.
-- Agregá una regla a memory/constitution/ cada vez que cometas un error repetible.
+## Hard rules (details in memory/constitution/)
+- No deterministic criterion advances to implementation without a test in 🔴 RED (`/contract`).
+- A feature closes only with: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅ (`/retro` closes the prediction from `/align`).
+- Verification is on-demand (`/verify`, `/uat`); no blocking commit hooks.
+- Add a rule to memory/constitution/ every time you commit a repeatable mistake.
 
 ## Workflow
 `/constitution` → (brief.md) → `/align` → `/distill` → `/plan` → `/contract` → `/tasks` → implement → `/verify` → `/uat` → `/retro`
-Ver `docs/workflow.md`.
+See `docs/workflow.md`.
 
-## Punteros
-- Principios no-negociables: `memory/constitution/`
+## Pointers
+- Non-negotiable principles: `memory/constitution/`
 - Skills (dynamic context): `.claude/skills/` (distill, verify, uat)
-- Plantillas de feature: `specs/_template/`
-- Rubric de evaluación: `evals/rubric.md`
-- Reportes de verificación (observability): `verification/reports/`
+- Feature templates: `specs/_template/`
+- Evaluation rubric: `evals/rubric.md`
+- Verification reports (observability): `verification/reports/`

@@ -2,38 +2,37 @@
 extends: base
 ---
 
-# Constitution — Proyecto
+# Constitution — Project
 
-Extiende `base` (ver `base/principles.md`). Agregá aquí principios y overrides
-específicos del proyecto. Overridear un `base/pattern` requiere justificación explícita.
+Extends `base` (see `base/principles.md`). Add project-specific principles and overrides
+here. Overriding a `base/pattern` requires explicit justification.
 
-## Deltas del proyecto
+## Project deltas
 
-### D1 — El `amendment-gate`: instancia de la excepción de governance angosta (principio 4)
+### D1 — The `amendment-gate`: instance of the narrow governance exception (Principle 4)
 
-El principio 4 (base) admite **una** excepción a "nada frena el push": un *gate de
-governance angosto sobre la rama de integración protegida*. El **`amendment-gate`**
-(CI + branch protection, feature 004) es la **instancia concreta** de esa excepción en
-este proyecto, y es **angosta por diseño**: bloquea *solo* cuando un commit/push cambia los
-sets **`pillars`/`scope`** del bloque JSON canónico del North Star sin cumplir el protocolo
-(ADR nuevo + schema-válido + suite verde). El desarrollo normal de features — que no toca
-los sets pillars/scope — **no se bloquea**: el gate sale `exit 0` (no-aplica).
+Principle 4 (base) allows **one** exception to "nothing blocks a push": a *narrow
+governance gate on the protected integration branch*. The **`amendment-gate`**
+(CI + branch protection, feature 004) is the **concrete instance** of that exception in
+this project, and it is **narrow by design**: it blocks *only* when a commit/push changes the
+**`pillars`/`scope`** sets of the North Star's canonical JSON block without meeting the protocol
+(new ADR + schema-valid + green suite). Normal feature development — which does not touch
+the pillars/scope sets — **is not blocked**: the gate exits `exit 0` (not-applicable).
 
-**Por qué encaja con el principio 4:** su intención es **productividad primero** (no frenar
-el throughput de features). Un amendment del North Star no es throughput de features: es un
-evento de gobernanza que `base/amendment-protocol.md` ya declara gateado (ADR + PR).
-Gatearlo en CI hace cumplir ese protocolo cuando un mantenedor solo no puede darse el
-approval — usa exactamente la excepción que el principio 4 ahora carve-outea, sin frenar el
-throughput.
+**Why this fits Principle 4:** its intent is **productivity first** (not blocking feature
+throughput). A North Star amendment is not feature throughput: it is a governance event
+that `base/amendment-protocol.md` already declares gated (ADR + PR).
+Gating it in CI enforces that protocol when a sole maintainer cannot give the approval —
+it uses exactly the exception that Principle 4 now carves out, without blocking throughput.
 
-*Nota de branch protection:* al hacer el status-check `amendment-gate` *required* en `main`,
-GitHub gatea **todo** push directo a `main` (deben pasar por PR + CI), no solo los
-amendments. Eso preserva el principio 4 —commit local y push a ramas de trabajo siguen
-libres— pero conviene tenerlo explícito: `main` es un punto de integración protegido para
-todo, no solo para cambios de `pillars`/`scope`.
+*Branch protection note:* by making the `amendment-gate` status-check *required* on `main`,
+GitHub gates **all** direct pushes to `main` (they must go through PR + CI), not just
+amendments. That preserves Principle 4 — local commits and pushes to work branches remain
+free — but it is worth being explicit: `main` is a protected integration point for
+everything, not only for `pillars`/`scope` changes.
 
-## Overrides de patterns heredados
-_(ninguno — para desactivar un pattern, listalo aquí con su justificación)_
+## Inherited pattern overrides
+_(none — to deactivate a pattern, list it here with its justification)_
 
-## Presupuesto del inner loop (tuneable)
-- Escalar al humano tras **2 fallas idénticas** o **3 intentos totales** por task.
+## Inner loop budget (tuneable)
+- Escalate to human after **2 identical failures** or **3 total attempts** per task.

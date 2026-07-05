@@ -1,7 +1,7 @@
-# fixture: mismos sets, reordenado y reformateado (no cambia sets)
+# fixture: same sets, reordered and reformatted (sets do not change)
 
-Keys y elementos reordenados, whitespace distinto — el CONTENIDO de los sets
-pillars/scope es idéntico a base.md.
+Keys and elements reordered, different whitespace — the CONTENT of the
+pillars/scope sets is identical to base.md.
 
 ```json
 {

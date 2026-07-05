@@ -1,30 +1,30 @@
-# NNNN — <título corto>
+# NNNN — <short title>
 
-> Copiá este archivo a `memory/north-star/decisions/NNNN-<slug-kebab-case>.md`
-> (siguiente número secuencial) cada vez que se proponga un cambio al `scope` o a
-> los `pillars` de `north-star.md` — ver `amendment-protocol.md`. Aterriza junto al
-> diff de `north-star.md` en el mismo PR; un humano revisa y aprueba ambos.
-> Cualquier archivo `NNNN-*.md` acá (distinto de `.gitkeep`) satisface el requisito
-> de ADR — completá cada sección de abajo; un placeholder vacío no es un ADR real.
+> Copy this file to `memory/north-star/decisions/NNNN-<kebab-case-slug>.md`
+> (next sequential number) each time a change to the `scope` or
+> `pillars` of `north-star.md` is proposed — see `amendment-protocol.md`. It lands together
+> with the `north-star.md` diff in the same PR; a human reviews and approves both.
+> Any `NNNN-*.md` file here (other than `.gitkeep`) satisfies the ADR requirement —
+> fill out each section below; an empty placeholder is not a real ADR.
 
-## Contexto
+## Context
 
-¿Por qué el North Star actual ya no encaja? ¿Qué presión, drift, o información nueva
-motivó este cambio (p. ej. un brief repetidamente `needs-amendment` o `rejected` que
-resultó ser legítimo)?
+Why does the current North Star no longer fit? What pressure, drift, or new information
+motivated this change (e.g. a brief repeatedly getting `needs-amendment` or `rejected`
+that turned out to be legitimate)?
 
-## Decisión
+## Decision
 
-El before/after exacto de los campos `pillars` y/o `scope` afectados. Citá el JSON
-relevante para que el diff sea inequívoco, no solo prosa.
+The exact before/after of the affected `pillars` and/or `scope` fields. Quote the
+relevant JSON so the diff is unambiguous, not just prose.
 
 ## Scope-delta
 
-¿Qué se mueve de `out_of_scope` a `in_scope` (o viceversa)? ¿Qué pilar se agrega,
-quita, o reformula materialmente? Declaralo explícitamente para que el radio de
-impacto sea visible de un vistazo.
+What moves from `out_of_scope` to `in_scope` (or vice versa)? What pillar is added,
+removed, or materially reformulated? State it explicitly so the impact radius is visible
+at a glance.
 
-## Consecuencias
+## Consequences
 
-¿Qué habilita o prohíbe de nuevo? ¿Hay briefs antes `rejected`/`needs-amendment` que
-ahora son elegibles (o viceversa)? Cualquier follow-up que esto implique.
+What is newly enabled or prohibited? Are there previously `rejected`/`needs-amendment`
+briefs that are now eligible (or vice versa)? Any follow-ups this implies.

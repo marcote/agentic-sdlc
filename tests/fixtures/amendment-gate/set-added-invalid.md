@@ -1,6 +1,6 @@
-# fixture: agrega un pilar nuevo (set CAMBIÓ) pero deja el JSON schema-INVÁLIDO
+# fixture: adds a new pillar (set CHANGED) but leaves the JSON schema-INVALID
 
-El pilar `c` tiene `signal` vacío → viola `base/schema.md` (signal string no vacío).
+Pillar `c` has an empty `signal` → violates `base/schema.md` (signal must be non-empty string).
 
 ```json
 {
