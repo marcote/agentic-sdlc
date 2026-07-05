@@ -8,6 +8,19 @@ description: Destila brief.md en spec + acceptance (BDD) + coverage, cazando gap
 Entrada: `specs/<feature>/brief.md`. Salidas: `spec.md`, `acceptance.md`, `coverage.md`.
 
 ## Procedimiento (loop hasta converger)
+0. **Measurability Gate (fail closed).** Leé `specs/<feature>/alignment.md` (lo produce `/align`).
+   - **Ausente** → negate a avanzar. Decile al humano que corra `/align` primero para producirlo
+     (criterio `MEAS-GATE`).
+   - **Presente** → mirá su `verdict`; el gate determinista (equivalente a `canDistill`, per-stack)
+     es `true` solo cuando el veredicto es exactamente `aligned`. Avanzá únicamente en ese caso.
+     - `needs-amendment` → frená; el protocolo de amendment del North Star
+       (`memory/north-star/base/amendment-protocol.md`: un ADR en
+       `memory/north-star/decisions/NNNN-*.md` + PR) es la única ruta hacia adelante, no un
+       continue silencioso.
+     - `rejected` → frená; la feature está fuera de alcance, sin ruta de amendment desde este skill.
+   - **Excepción bootstrap:** la feature que introduce `/align`
+     (`002-north-star-governance`) está exenta de este gate — es la única excepción. Toda otra
+     feature corre `/align` antes de `/distill`.
 1. **Sembrar desde la constitution.** Leé `memory/constitution/` (base + proyecto). Por cada
    `base/patterns/*.md` aplicable, inyectá su/s criterio/s `[given]` como filas en `coverage.md`.
 2. **Extraer.** Del brief: objetivos, user stories, restricciones, métricas de éxito.

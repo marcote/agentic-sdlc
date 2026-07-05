@@ -25,17 +25,17 @@ capa nueva, plantilla stack-agnóstica/dependency-free.
 
 | Pilar | Objetivo (brief) | Requerimiento (spec) | Criterio (acceptance) | Origen | Test/Eval ligado | Estado |
 |---|---|---|---|---|---|---|
-| — (bootstrap) | O3 | Capa base North-Star (schema, rúbrica, protocolo, ADR template, README) | NS-BASE | proyecto | `tests/check_80_north_star.sh` | 🔴 red |
-| — (bootstrap) | O3 | `north-star.md` placeholder, `extends: base` | NS-PLACEHOLDER | proyecto | `tests/check_80_north_star.sh` | 🔴 red |
+| — (bootstrap) | O3 | Capa base North-Star (schema, rúbrica, protocolo, ADR template, README) | NS-BASE | proyecto | `tests/check_80_north_star.sh` | 🟢 green |
+| — (bootstrap) | O3 | `north-star.md` placeholder, `extends: base` | NS-PLACEHOLDER | proyecto | `tests/check_80_north_star.sh` | 🟢 green |
 | — (bootstrap) | O3 / O4 | Forma medible del schema (mission/pillars/scope/alignment) | NS-SCHEMA-CONTRACT | proyecto | contrato documentado — motor per-stack (`poirot-fe scripts/north-star/schema.mjs`, ref.) | contrato documentado (deferred) |
-| — (bootstrap) | O1 / O2 | Comando+skill `/align` (modelo de 3 capas) | ALIGN-CMD | proyecto | `tests/check_80_north_star.sh` | 🔴 red |
+| — (bootstrap) | O1 / O2 | Comando+skill `/align` (modelo de 3 capas) | ALIGN-CMD | proyecto | `tests/check_80_north_star.sh` | 🟢 green |
 | — (bootstrap) | O1 / O2 / O4 | Semántica del veredicto (scopeReject/orphan-check/alignVerdict) | ALIGN-VERDICT-CONTRACT | proyecto | contrato documentado — motor per-stack (`poirot-fe scripts/north-star/align.mjs`, ref.) | contrato documentado (deferred) |
-| — (bootstrap) | O3 | Paso 0 — Measurability Gate en `/distill` | MEAS-GATE | proyecto | `tests/check_80_north_star.sh` (grep `alignment.md` + `Measurability Gate` + `aligned`) | 🔴 red |
-| — (bootstrap) | O5 | `amendment-protocol.md` + `adr-template.md` (ADR + PR) | AMEND-ADR | `[given] base/audit-logging` | `tests/check_80_north_star.sh` | 🔴 red |
-| — (bootstrap) | O6 | Columna Pillar en `specs/_template/coverage.md` | COVERAGE-PILLAR | proyecto | `tests/check_80_north_star.sh` (grep `Pillar`) | 🔴 red |
-| — (bootstrap) | O6 | Way-of-Work de dos capas (governance vs execution-runtime) | WOW-2LAYER | proyecto | UAT (lectura manual `README.md` / `docs/workflow.md`) | sin contrato (UAT-only) |
-| — (bootstrap) | O6 | Self-check bash cubre la capa nueva | SELFCHECK | proyecto | `tests/check_80_north_star.sh` (vía `tests/run.sh`) | 🔴 red |
-| — (bootstrap) | O1 / O4 | El judge puntúa alineación con sensatez | JUDGE-ALIGNMENT | proyecto | `evals/cases/north-star-judge.md` | 📋 case |
+| — (bootstrap) | O3 | Paso 0 — Measurability Gate en `/distill` | MEAS-GATE | proyecto | `tests/check_80_north_star.sh` (grep `alignment.md` + `Measurability Gate` + `aligned`) | 🟢 green |
+| — (bootstrap) | O5 | `amendment-protocol.md` + `adr-template.md` (ADR + PR) | AMEND-ADR | `[given] base/audit-logging` | `tests/check_80_north_star.sh` | 🟢 green |
+| — (bootstrap) | O6 | Columna Pillar en `specs/_template/coverage.md` | COVERAGE-PILLAR | proyecto | `tests/check_80_north_star.sh` (grep `Pillar`) | 🟢 green |
+| — (bootstrap) | O6 | Way-of-Work de dos capas (governance vs execution-runtime) | WOW-2LAYER | proyecto | UAT (lectura manual `README.md` / `docs/workflow.md`) | ✅ uat |
+| — (bootstrap) | O6 | Self-check bash cubre la capa nueva | SELFCHECK | proyecto | `tests/check_80_north_star.sh` (vía `tests/run.sh`) | 🟢 green |
+| — (bootstrap) | O1 / O4 | El judge puntúa alineación con sensatez | JUDGE-ALIGNMENT | proyecto | `evals/cases/north-star-judge.md` (resultado: `verification/reports/002-north-star-judge.md`) | 📋 case |
 | — | (sin escrituras/reintentos: capa de gobernanza en markdown) | — | `[given] base/idempotency` | heredado | — | deferred (sin escrituras/reintentos) |
 | — | (sin superficie de red) | — | `[given] base/rate-limiting` | heredado | — | deferred (sin endpoints/red) |
 
