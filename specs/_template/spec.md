@@ -1,16 +1,16 @@
 # Spec — <feature>
 
-> QUÉ se construye. Producido por `/distill` a partir de `brief.md`. Se congela
-> cuando `coverage.md` no tiene filas huérfanas.
+> WHAT is built. Produced by `/distill` from `brief.md`. Frozen
+> when `coverage.md` has no orphan rows.
 
-## Requerimientos funcionales
-1. _(requerimiento)_
+## Functional requirements
+1. _(requirement)_
 
 ## User stories
-- Como _<rol>_ quiero _<capacidad>_ para _<beneficio>_.
+- As _<role>_ I want _<capability>_ so that _<benefit>_.
 
 ## Edge cases (80% problem)
-- _(casos que el brief no cubre — expandidos en el loop de distilación)_
+- _(cases the brief does not cover — expanded in the distillation loop)_
 
-## Preguntas abiertas / deferred
-- _(ambigüedades resueltas o diferidas con justificación)_
+## Open questions / deferred
+- _(ambiguities resolved or deferred with justification)_

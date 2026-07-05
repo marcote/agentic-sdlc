@@ -1,14 +1,14 @@
 ---
 name: uat
-description: UAT guiado de un feature contra acceptance.md y el objetivo del brief. Usar tras un /verify en verde.
+description: Guided UAT of a feature against acceptance.md and the brief's objective. Use after a green /verify.
 ---
 
 # UAT
 
-## Procedimiento
-1. Recorré `verification/uat-checklist.md` criterio por criterio contra `acceptance.md`.
-2. Preguntá para cada criterio: cumplido, ¿mueve la métrica de éxito del brief?
-   Si NO → gap de PRODUCTO → routeá a `/distill` (el spec estaba incompleto).
-3. Actualizá `coverage.md` (→ ✅ uat) y la sección UAT + Verdicto del reporte en
+## Procedure
+1. Walk through `verification/uat-checklist.md` criterion by criterion against `acceptance.md`.
+2. Ask for each criterion: fulfilled, does it move the success metric from the brief?
+   If NO → PRODUCT gap → route to `/distill` (the spec was incomplete).
+3. Update `coverage.md` (→ ✅ uat) and the UAT + Verdict section of the report in
    `verification/reports/`.
-4. El feature cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.
+4. The feature closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.

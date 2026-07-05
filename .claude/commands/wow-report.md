@@ -1,7 +1,7 @@
 ---
-description: Regenera verification/wow-report.md — el rollup del ledger de retros. Responde "¿está funcionando el WoW?" con drift por pilar, re-chequeos pendientes, salud del método y olores de teatro.
+description: Regenerates verification/wow-report.md — the retro ledger rollup. Answers "is the WoW working?" with drift by pillar, pending re-checks, method health, and theater smells.
 ---
 
-Invocá la skill `wow-report`. Lee todos los `specs/*/retro.md` + `alignment.md` +
-`verification/reports/*` y regenera `verification/wow-report.md` (snapshot commiteado,
-read-only, no gatea).
+Invoke the `wow-report` skill. Reads all `specs/*/retro.md` + `alignment.md` +
+`verification/reports/*` and regenerates `verification/wow-report.md` (committed snapshot,
+read-only, does not gate).

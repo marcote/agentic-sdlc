@@ -1,22 +1,22 @@
-# Brief — Guardar tarjeta con 1-tap
+# Brief — Save card with 1-tap
 
-> ORIGEN del desarrollo. Describe el OBJETIVO y el POR QUÉ, no la solución.
-> (Ejemplo ilustrativo del Way of Work — no es código real.)
+> ORIGIN of development. Describes the OBJECTIVE and the WHY, not the solution.
+> (Illustrative example of the Way of Work — not real code.)
 
-## Objetivo de producto
-Permitir que, tras una compra exitosa, el usuario guarde su tarjeta con un solo tap para
-que la próxima compra no requiera reingresar los datos.
+## Product objective
+Allow users, after a successful purchase, to save their card with a single tap so
+that the next purchase does not require re-entering data.
 
-## Por qué / motivación
-Cada campo extra en el checkout móvil cae la conversión. Los competidores ya ofrecen
-1-tap. Reducir la fricción de la segunda compra es la palanca de retención más barata que
-tenemos este trimestre.
+## Why / motivation
+Every extra field in mobile checkout drops conversion. Competitors already offer
+1-tap. Reducing friction on the second purchase is the cheapest retention lever
+we have this quarter.
 
-## Métricas de éxito
-- ↑ conversión móvil en la 2da compra **+5%** (medido a 30 días).
-- Tokenización de tarjeta **p95 < 300ms**.
-- **0 incidentes PCI** en el período.
+## Success metrics
+- ↑ mobile conversion on 2nd purchase **+5%** (measured at 30 days).
+- Card tokenization **p95 < 300ms**.
+- **0 PCI incidents** in the period.
 
-## Fuera de alcance
-- Gestión de múltiples tarjetas guardadas (ver *deferred* en `coverage.md`).
-- Edición/borrado de tarjeta desde el perfil.
+## Out of scope
+- Management of multiple saved cards (see *deferred* in `coverage.md`).
+- Edit/delete card from profile.

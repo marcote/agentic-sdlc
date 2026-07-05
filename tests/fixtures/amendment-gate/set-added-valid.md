@@ -1,4 +1,4 @@
-# fixture: agrega un pilar nuevo (set de pillars CAMBIÓ); schema-válido
+# fixture: adds a new pillar (pillars set CHANGED); schema-valid
 
 ```json
 {

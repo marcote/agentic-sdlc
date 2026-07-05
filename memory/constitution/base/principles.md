@@ -1,25 +1,25 @@
-# Constitution — Base Principles (heredado, no-negociable)
+# Constitution — Base Principles (inherited, non-negotiable)
 
-Estos principios son la capa más estable del static context. Todo spec, plan y
-verificación debe cumplirlos. Se heredan vía `extends: base`.
+These principles are the most stable layer of the static context. Every spec, plan, and
+verification must comply with them. They are inherited via `extends: base`.
 
-1. **Verificabilidad.** Todo requerimiento se expresa como criterio de aceptación
-   medible (BDD). Lo que no se puede verificar, no se construye.
-2. **Test-first.** La porción determinista de cada criterio existe como test en 🔴 RED
-   antes de escribir implementación (gate de `/contract`). Un criterio **invariante**
-   (*must-not-regress*: "que nunca aparezca X", "que siga sin deps") se **ata a un
-   deliverable observable** para tener una fase RED genuina — su test debe fallar hasta que
-   exista lo que verifica. `green-by-construction` (verde sin nada implementado) **no cuenta
-   como 🔴** y el gate de `/tasks` lo rechaza; atarlo al deliverable es la forma correcta de
-   darle el arco RED→GREEN.
-3. **Trazabilidad total.** Todo objetivo del brief llega a un criterio; todo criterio
-   mapea a un eval o paso de UAT. Filas huérfanas = gap que bloquea el freeze del spec.
-4. **Productividad primero.** La verificación es on-demand: sin hooks bloqueantes por
-   commit, el inner loop —commit local y push a ramas de trabajo— nunca se frena y el
-   throughput de features no se gatea. Única excepción admitida: un **gate de governance
-   angosto** sobre la rama de integración protegida (proteger la gobernanza de producto),
-   siempre que **no** frene ese throughput; su instancia concreta se declara como delta en
-   el `constitution.md` del proyecto.
-5. **Rastro auditable.** Cada verificación produce un reporte versionado.
-6. **Seguridad por defecto.** Ningún secreto en el repo; los patterns heredados
-   (abajo) aplican salvo override justificado en el `constitution.md` del proyecto.
+1. **Verifiability.** Every requirement is expressed as a measurable acceptance criterion
+   (BDD). What cannot be verified is not built.
+2. **Test-first.** The deterministic portion of each criterion exists as a test in 🔴 RED
+   before writing implementation (gate of `/contract`). An **invariant** criterion
+   (*must-not-regress*: "X must never appear", "must stay dep-free") is **tied to an
+   observable deliverable** to have a genuine RED phase — its test must fail until what it
+   verifies exists. `green-by-construction` (green with nothing implemented) **does not count
+   as 🔴** and the `/tasks` gate rejects it; tying it to the deliverable is the correct way
+   to give it the RED→GREEN arc.
+3. **Full traceability.** Every objective in the brief reaches a criterion; every criterion
+   maps to an eval or UAT step. Orphan rows = gap that blocks the spec freeze.
+4. **Productivity first.** Verification is on-demand: no blocking per-commit hooks,
+   the inner loop — local commit and push to work branches — never stops, and feature
+   throughput is not gated. Only exception allowed: a **narrow governance gate** on the
+   protected integration branch (protecting product governance), as long as it does **not**
+   block that throughput; its concrete instance is declared as a delta in the project's
+   `constitution.md`.
+5. **Auditable trail.** Each verification produces a versioned report.
+6. **Security by default.** No secrets in the repo; inherited patterns
+   (below) apply unless overridden with justification in the project's `constitution.md`.

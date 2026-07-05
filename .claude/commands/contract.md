@@ -1,9 +1,9 @@
 ---
-description: Generar el contrato de tests (determinista) y eval cases (no-determinista) y probar que está RED.
+description: Generate the test contract (deterministic) and eval cases (non-deterministic) and prove it is RED.
 ---
 
-Para cada criterio de `acceptance.md`:
-- Determinista → generá el test (BDD) y ligalo en `coverage.md`. CORRÉ el suite: debe estar 🔴 RED
-  (prueba que el test es real y el feature no existe). Registrá el test ligado por criterio.
-- No-determinista → creá un case en `evals/cases/` (estado 📋).
-No marques ninguna fila como lista hasta confirmar el estado RED (deterministas) o case presente.
+For each criterion in `acceptance.md`:
+- Deterministic → generate the test (BDD) and link it in `coverage.md`. RUN the suite: it must be 🔴 RED
+  (proves the test is real and the feature does not exist yet). Record the linked test per criterion.
+- Non-deterministic → create a case in `evals/cases/` (state 📋).
+Do not mark any row as ready until you confirm RED status (deterministic) or case present.

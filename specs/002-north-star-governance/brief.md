@@ -1,50 +1,49 @@
-# Brief — Gobernanza North-Star + Measurability Gate (capacidad base)
+# Brief — North-Star Governance + Measurability Gate (base capability)
 
-> ORIGEN del desarrollo. Describe el OBJETIVO y el PORQUÉ, no la solución.
+> ORIGIN of development. Describes the OBJECTIVE and the WHY, not the solution.
 >
-> Diseño completo (referencia): `docs/superpowers/specs/2026-07-04-north-star-governance-design.md`
+> Full design (reference): `docs/superpowers/specs/2026-07-04-north-star-governance-design.md`
 
-## Objetivo de producto
+## Product objective
 
-Dar al harness `agentic-sdlc` una capacidad **transversal** para **prevenir el drift
-de producto**: features perfectamente construidas pero fuera de la misión del
-proyecto. Sumar una capa **North Star** (gobernanza de producto, **par** de la
-constitution técnica) y un **gate de intake `/align`** chequeable, de modo que antes
-de destilar una feature se verifique que pertenece a la misión. Hacer cumplir la ley
-**Measurability Gate**: si el North Star no se puede definir, gobernar y cuantificar,
-el flujo no ejecuta contra él. La capacidad es **stack-agnóstica** (contrato en la
-plantilla; el motor determinista lo provee cada repo adoptante).
+Give the `agentic-sdlc` harness a **cross-cutting** capability to **prevent product
+drift**: perfectly built features that fall outside the project's mission. Add a
+**North Star** layer (product governance, **peer** of the technical constitution) and
+a checkable **intake gate `/align`**, so that before distilling a feature its
+belonging to the mission is verified. Enforce the **Measurability Gate** law: if the
+North Star cannot be defined, governed, and quantified, the flow does not execute
+against it. The capability is **stack-agnostic** (contract in the template; the
+deterministic engine is provided by each adopting repo).
 
-## Por qué / motivación
+## Why / motivation
 
-Un SDLC agéntico amplifica el drift: el agente no tiene el instinto "¿esto debería
-existir?" y produce features rápido, así que el scope creep se acelera con el
-throughput. El harness hoy gobierna el drift de intención (bien) y el arquitectónico
-(parcial) pero es **ciego al drift de producto** — una feature fuera de alcance pasa
-todos los gates. La gobernanza que no está codificada y gateada no sobrevive al
-throughput agéntico. Ya piloteado en `poirot-fe` (PR #24); esto lo lleva al harness
-base para todo repo adoptante.
+An agentic SDLC amplifies drift: the agent lacks the instinct "should this exist?"
+and produces features fast, so scope creep accelerates with throughput. The harness
+today governs intent drift (well) and architectural drift (partially) but is **blind
+to product drift** — an out-of-scope feature passes all gates. Governance that is
+not codified and gated does not survive agentic throughput. Already piloted in
+`poirot-fe` (PR #24); this brings it to the base harness for every adopting repo.
 
-## Métricas de éxito
+## Success metrics
 
-- Un brief cuyo objetivo matchea un predicado `out_of_scope` es **bloqueado**
-  (rechazo duro) por el gate — medible, determinista.
-- Todo brief aceptado tiene sus objetivos mapeados a ≥1 **pilar** del North Star
-  (cero objetivos huérfanos).
-- El flujo **se niega a correr** si el North Star del proyecto no es schema-válido /
-  medible, o si el score de alineación está por debajo del umbral sin amendment
-  aprobado (la Measurability Gate se cumple).
-- La alineación se **cuantifica** (score contra rúbrica), no es un sí/no de opinión.
-- Los cambios de alcance ocurren **solo** por el protocolo de amendment versionado y
-  aprobado por humano (**ADR + PR**), nunca en silencio.
-- El self-check del harness cubre la capa nueva (`tests/run.sh` verde); la plantilla
-  sigue **stack-agnóstica y dependency-free** (sin Node/npm en el source).
+- A brief whose objective matches an `out_of_scope` predicate is **blocked**
+  (hard rejection) by the gate — measurable, deterministic.
+- Every accepted brief has its objectives mapped to ≥1 **pillar** of the North Star
+  (zero orphan objectives).
+- The flow **refuses to run** if the project's North Star is not schema-valid /
+  measurable, or if the alignment score is below the threshold without an approved
+  amendment (the Measurability Gate is enforced).
+- Alignment is **quantified** (score against rubric), not a yes/no opinion.
+- Scope changes occur **only** via the versioned amendment protocol approved by
+  a human (**ADR + PR**), never silently.
+- The harness self-check covers the new layer (`tests/run.sh` green); the template
+  stays **stack-agnostic and dependency-free** (no Node/npm in the source).
 
-## Fuera de alcance
+## Out of scope
 
-- El **motor determinista ejecutable** en el source (queda por-stack; `poirot-fe
-  scripts/north-star/*.mjs` es la reference implementation citada).
-- Contenido específico de un proyecto: `north-star.md` en el source es un
-  **placeholder** a completar por proyecto.
-- Reescribir `specs/001-example` para pasar por `/align` (predata el gate).
-- Cambiar el idioma del source (se mantiene español).
+- The **executable deterministic engine** in the source (stays per-stack;
+  `poirot-fe scripts/north-star/*.mjs` is the cited reference implementation).
+- Project-specific content: `north-star.md` in the source is a
+  **placeholder** to be completed per project.
+- Rewriting `specs/001-example` to pass through `/align` (predates the gate).
+- Changing the language of the source (kept in Spanish).

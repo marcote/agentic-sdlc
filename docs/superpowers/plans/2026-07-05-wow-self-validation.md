@@ -2,85 +2,85 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Dar al harness la capacidad de autovalidar su propia Way of Working: un retro que cierra la predicción medible de `/align` (columna align↔retro), enforcement determinista en CI, y un rollup agregado — todo dogfooded construyéndolo con la propia disciplina test-first del harness.
+**Goal:** Give the harness the ability to self-validate its own Way of Working: a retro that closes the measurable prediction of `/align` (align↔retro column), deterministic enforcement in CI, and an aggregated rollup — all dogfooded by building it with the harness's own test-first discipline.
 
-**Architecture:** Un artefacto `retro.md` por feature (dos caras: Misión cierra `alignment.md`, Método deriva señales del WoW de artefactos). El contrato DONE se extiende con `∧ retro ✅`. `tests/check_90_retro.sh` lo enforcea en CI (detecta "cerrado" por veredicto DONE en `verification/reports/`, regla uniforme sin hardcode). `/retro` (skill+comando) produce el retro con orden anti-teatro `derivar→auto-desafiar→escribir`; `/wow-report` (skill+comando) agrega el ledger en `verification/wow-report.md`.
+**Architecture:** One `retro.md` artifact per feature (two faces: Mission closes `alignment.md`, Method derives WoW signals from artifacts). The DONE contract is extended with `∧ retro ✅`. `tests/check_90_retro.sh` enforces it in CI (detects "closed" by DONE verdict in `verification/reports/`, uniform rule without hardcoding). `/retro` (skill+command) produces the retro with anti-theater order `derive→self-challenge→write`; `/wow-report` (skill+command) aggregates the ledger in `verification/wow-report.md`.
 
-**Tech Stack:** Markdown (skills/comandos/templates/docs) + Bash POSIX (checks, estilo `tests/lib.sh`, dependency-free, sin frameworks). El "test" de cada cambio es una aserción en `tests/check_*.sh` corrida vía `tests/run.sh` — esto ES la disciplina RED→GREEN del harness aplicada a sí mismo.
+**Tech Stack:** Markdown (skills/commands/templates/docs) + POSIX Bash (checks, `tests/lib.sh` style, dependency-free, no frameworks). The "test" for each change is an assertion in `tests/check_*.sh` run via `tests/run.sh` — this IS the harness's RED→GREEN discipline applied to itself.
 
 ## Global Constraints
 
-- **Dependency-free:** los checks usan solo `tests/lib.sh` (`assert_file`, `assert_dir`, `assert_contains` con `grep -qE`) + Bash/coreutils. Sin frameworks, sin instalar nada.
-- **Verificación on-demand, sin hooks bloqueantes por commit:** el diente es CI (`.github/workflows/verify.yml` corre `tests/run.sh`). No agregar hooks de git.
-- **Un feature = un folder `specs/<NNN-feature>/`** (kebab-case, NNN zero-padded).
-- **Repo-plantilla:** `north-star.md` es placeholder → `/align` es fail-closed y **no corre acá**. La Cara A (Misión) del retro de `003` cierra como `n/a` + razón; la Cara B (Método) es real. Ver el design doc, sección "Constraint: repo-plantilla vs repo-adoptante".
-- **Idioma:** todo el contenido nuevo en español rioplatense, consistente con el harness existente.
-- **Cada task corre `bash tests/run.sh` y termina en verde antes de commitear.**
-- Design doc de referencia: `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`.
+- **Dependency-free:** checks use only `tests/lib.sh` (`assert_file`, `assert_dir`, `assert_contains` with `grep -qE`) + Bash/coreutils. No frameworks, nothing to install.
+- **On-demand verification, no blocking commit hooks:** the enforcement is CI (`.github/workflows/verify.yml` runs `tests/run.sh`). Do not add git hooks.
+- **One feature = one folder `specs/<NNN-feature>/`** (kebab-case, NNN zero-padded).
+- **Template repo:** `north-star.md` is a placeholder → `/align` is fail-closed and **does not run here**. Face A (Mission) of the `003` retro closes as `n/a` + reason; Face B (Method) is real. See the design doc, section "Constraint: template-repo vs adopter-repo".
+- **Language:** all new content in English, consistent with the existing harness.
+- **Each task runs `bash tests/run.sh` and ends in green before committing.**
+- Reference design doc: `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`.
 
 ---
 
-## Fase 1 — Fundación: template de retro + contrato DONE
+## Phase 1 — Foundation: retro template + DONE contract
 
-### Task 1: Template `specs/_template/retro.md` (RED vía check_20)
+### Task 1: Template `specs/_template/retro.md` (RED via check_20)
 
 **Files:**
 - Modify: `tests/check_20_spec_templates.sh:1`
 - Create: `specs/_template/retro.md`
 
 **Interfaces:**
-- Produces: el archivo `specs/_template/retro.md` con los headers `Cara A` / `Cara B` / `Cara C`, la columna `Evidencia`, y el marcador `deriv` — que las Tasks 3 y 5 asumen presentes.
+- Produces: the `specs/_template/retro.md` file with headers `Face A` / `Face B` / `Face C`, the `Evidence` column, and the `deriv` marker — which Tasks 3 and 5 assume are present.
 
-- [ ] **Step 1: Escribir la aserción que falla** — agregar `retro` al loop de templates en `tests/check_20_spec_templates.sh`. Cambiar la línea 1:
+- [ ] **Step 1: Write the failing assertion** — add `retro` to the templates loop in `tests/check_20_spec_templates.sh`. Change line 1:
 
 ```bash
 for f in brief spec acceptance coverage plan tasks retro; do
 ```
 
-- [ ] **Step 2: Correr el suite para verlo fallar**
+- [ ] **Step 2: Run the suite to see it fail**
 
 Run: `bash tests/run.sh 2>&1 | grep -E "check_20|retro"`
-Expected: FAIL con `missing file specs/_template/retro.md`
+Expected: FAIL with `missing file specs/_template/retro.md`
 
-- [ ] **Step 3: Crear `specs/_template/retro.md`** con este contenido exacto:
+- [ ] **Step 3: Create `specs/_template/retro.md`** with this exact content:
 
 ```markdown
 # Retro — <feature> @ <commit>
 
-cierra: `specs/<feature>/alignment.md` · `verification/reports/<feature>` · fecha: <YYYY-MM-DD>
+closes: `specs/<feature>/alignment.md` · `verification/reports/<feature>` · date: <YYYY-MM-DD>
 
-> Cierra la predicción medible que abrió `/align` (columna align↔retro). Un feature no
-> está DONE hasta que este retro cierra sus tres caras. Diseño:
+> Closes the measurable prediction that opened `/align` (the align↔retro column). A feature is not
+> DONE until this retro closes all three faces. Design:
 > `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`.
 
-## Cara A — Misión (cierra la predicción de /align)
-Fuente: `specs/<feature>/alignment.md` (mapping objetivo→pilar) + `north-star.md` (signal por pilar).
+## Face A — Mission (closes the /align prediction)
+Source: `specs/<feature>/alignment.md` (objective→pillar mapping) + `north-star.md` (signal per pillar).
 
-| Pilar (mapping) | Signal predicho | Veredicto | Evidencia (locator OBLIGATORIO) |
+| Pillar (mapping) | Predicted signal | Verdict | Evidence (MANDATORY locator) |
 |---|---|---|---|
-| <pilar-id> | <signal del North Star> | ✅ movió / ❌ no movió / ⏳ aún no observable | <valor/SHA/fila-coverage/URL — no prosa> |
+| <pillar-id> | <North Star signal> | ✅ moved / ❌ did not move / ⏳ not yet observable | <value/SHA/coverage-row/URL — no prose> |
 
-- **Calibración de align:** <los scores pillarFit/scope/mission de alignment.md, ¿acertaron en retrospectiva?>
-- **Veredicto de misión:** <confirmed | refuted | pending-observation | n/a>
-  - si `confirmed`/`refuted` → la(s) celda(s) Evidencia arriba NO pueden estar vacías.
-  - si `pending-observation` → **trigger de re-chequeo:** <cuándo / qué señal mirar>
-  - si `n/a` → **razón:** <por qué este feature no cierra contra ningún signal>
+- **Align calibration:** <did the pillarFit/scope/mission scores from alignment.md hold up in retrospect?>
+- **Mission verdict:** <confirmed | refuted | pending-observation | n/a>
+  - if `confirmed`/`refuted` → the Evidence cell(s) above CANNOT be empty.
+  - if `pending-observation` → **re-check trigger:** <when / what signal to look at>
+  - if `n/a` → **reason:** <why this feature does not close against any signal>
 
-## Cara B — Método (valida el WoW) — DERIVADA de artefactos, no redactada
-Cada campo trae su marcador `[deriv: …]` — el locator de dónde salió la cifra. Sin locator = inválido.
+## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
+Each field carries its `[deriv: …]` marker — the locator showing where the figure came from. Without locator = invalid.
 
-- **Gaps cazados por /distill:** <N> `[deriv: <coverage.md / git log de distill>]` — <los jugosos>
-- **Disciplina RED→GREEN:** <sí / no + excepciones> `[deriv: <historial de estados coverage.md + git>]`
-- **Rework post-/verify:** <N> · **post-/uat:** <N> `[deriv: <gaps ruteados en verification/reports/<feature>>]`
-- **Escalaciones al humano:** <N> `[deriv: <traza / git>]` — <por qué>
-- **Fricción del propio WoW:** <qué del harness estorbó o faltó> (único campo de juicio libre)
+- **Gaps caught by /distill:** <N> `[deriv: <coverage.md / git log from distill>]` — <the notable ones>
+- **RED→GREEN discipline:** <yes / no + exceptions> `[deriv: <coverage.md state history + git>]`
+- **Post-/verify rework:** <N> · **post-/uat:** <N> `[deriv: <gaps routed in verification/reports/<feature>>]`
+- **Human escalations:** <N> `[deriv: <trace / git>]` — <why>
+- **Friction from the WoW itself:** <what got in the way or was missing> (the only free-judgment field)
 
-## Cara C — Loop (auto-mejora)
-- **Reglas candidatas → constitution:** <regla o "ninguna"> (aplicar vía `memory/constitution/update-checklist.md`)
-- **Amendments candidatos → North Star:** <ADR propuesto o "ninguno"> (vía `memory/north-star/base/amendment-protocol.md`)
+## Face C — Loop (self-improvement)
+- **Candidate rules → constitution:** <rule or "none"> (apply via `memory/constitution/update-checklist.md`)
+- **Candidate amendments → North Star:** <proposed ADR or "none"> (via `memory/north-star/base/amendment-protocol.md`)
 ```
 
-- [ ] **Step 4: Correr el suite para verlo pasar**
+- [ ] **Step 4: Run the suite to see it pass**
 
 Run: `bash tests/run.sh 2>&1 | tail -3`
 Expected: `TOTAL PASS=… FAIL=0`
@@ -89,113 +89,113 @@ Expected: `TOTAL PASS=… FAIL=0`
 
 ```bash
 git add tests/check_20_spec_templates.sh specs/_template/retro.md
-git commit -m "feat(003): template retro.md (3 caras) + check_20"
+git commit -m "feat(003): retro.md template (3 faces) + check_20"
 ```
 
 ---
 
-### Task 2: Extender el contrato DONE con `∧ retro ✅`
+### Task 2: Extend the DONE contract with `∧ retro ✅`
 
 **Files:**
-- Modify: `CLAUDE.md` (hard rule de cierre)
-- Modify: `docs/workflow.md` (flujo, tabla, línea de cierre)
-- Modify: `verification/verification-report.md` (§5 verdicto)
+- Modify: `CLAUDE.md` (closing hard rule)
+- Modify: `docs/workflow.md` (flow, table, closing line)
+- Modify: `verification/verification-report.md` (§5 verdict)
 
 **Interfaces:**
-- Produces: los tres docs mencionan `retro` en el contexto del cierre — que la Task 3 (`check_90`) verifica con `assert_contains`.
+- Produces: the three docs mention `retro` in the closing context — which Task 3 (`check_90`) verifies with `assert_contains`.
 
-- [ ] **Step 1: Editar `CLAUDE.md`** — en la sección "Hard rules", reemplazar la línea de cierre:
+- [ ] **Step 1: Edit `CLAUDE.md`** — in the "Hard rules" section, replace the closing line:
 
-De:
+From:
 ```
-- Un feature cierra solo con: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.
+- A feature is done only when: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.
 ```
-A:
+To:
 ```
-- Un feature cierra solo con: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅ (`/retro` cierra la predicción de `/align`).
+- A feature is done only when: BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅ (`/retro` closes the `/align` prediction).
 ```
 
-- [ ] **Step 2: Editar `docs/workflow.md`** — tres cambios.
+- [ ] **Step 2: Edit `docs/workflow.md`** — three changes.
 
-(a) Línea 4, el flujo, agregar `/retro` al final:
+(a) Line 4, the flow, add `/retro` at the end:
 ```
 /constitution → (brief.md) → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat → /retro
 ```
 
-(b) En la tabla de comandos, agregar dos filas después de la de `/uat`:
+(b) In the commands table, add two rows after the `/uat` row:
 ```
-| `/retro` | `alignment.md` + `verification/reports/…` | `retro.md` | cierra la predicción de `/align` (Cara Misión) + deriva señales del WoW (Cara Método) |
-| `/wow-report` | todos los `retro.md` | `verification/wow-report.md` | agrega el ledger: drift por pilar, re-chequeos, salud del método, olores de teatro (observa, no gatea) |
+| `/retro` | `alignment.md` + `verification/reports/…` | `retro.md` | closes the `/align` prediction (Face Mission) + derives WoW signals (Face Method) |
+| `/wow-report` | all `retro.md` | `verification/wow-report.md` | aggregates the ledger: drift per pillar, re-checks, method health, theater smells (observes, never gates) |
 ```
 
-(c) Línea de cierre (§ Cierre), reemplazar:
+(c) Closing line (§ Closing), replace:
 ```
 `feature DONE ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅`.
 ```
 
-- [ ] **Step 3: Editar `verification/verification-report.md`** — en la sección `## 5. Verdicto`, reemplazar las dos líneas del verdicto:
+- [ ] **Step 3: Edit `verification/verification-report.md`** — in the `## 5. Verdict` section, replace the two verdict lines:
 
-De:
+From:
 ```
 BUILD: <✅/❌> · TRAJECTORY: <✅/❌> · UAT: <✅/❌> · coverage: <N%>
-Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.
+Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%.
 ```
-A:
+To:
 ```
-BUILD: <✅/❌> · TRAJECTORY: <✅/❌> · UAT: <✅/❌> · coverage: <N%> · retro: <✅/pendiente>
-Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
-Retro: `specs/<feature>/retro.md` (cierra la predicción medible de `/align`).
+BUILD: <✅/❌> · TRAJECTORY: <✅/❌> · UAT: <✅/❌> · coverage: <N%> · retro: <✅/pending>
+Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
+Retro: `specs/<feature>/retro.md` (closes the measurable `/align` prediction).
 ```
 
-- [ ] **Step 4: Correr el suite (no debe romper check_30, que verifica las secciones del report)**
+- [ ] **Step 4: Run the suite (must not break check_30, which verifies the report sections)**
 
 Run: `bash tests/run.sh 2>&1 | tail -3`
-Expected: `TOTAL PASS=… FAIL=0` (check_30 sigue verde: las secciones "Verdicto"/"UAT"/etc. siguen presentes)
+Expected: `TOTAL PASS=… FAIL=0` (check_30 stays green: the "Verdict"/"UAT"/etc. sections remain present)
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add CLAUDE.md docs/workflow.md verification/verification-report.md
-git commit -m "feat(003): extender contrato DONE con retro ✅ (CLAUDE.md, workflow, report)"
+git commit -m "feat(003): extend DONE contract with retro ✅ (CLAUDE.md, workflow, report)"
 ```
 
 ---
 
-## Fase 2 — Enforcement determinista: `check_90`
+## Phase 2 — Deterministic Enforcement: `check_90`
 
-### Task 3: `tests/check_90_retro.sh` — presencia, wiring y cierre por-feature
+### Task 3: `tests/check_90_retro.sh` — presence, wiring, and per-feature closure
 
 **Files:**
 - Create: `tests/check_90_retro.sh`
 
 **Interfaces:**
-- Consumes: `specs/_template/retro.md` (Task 1), el wiring de contrato DONE en docs (Task 2), `tests/lib.sh` (`_pass`/`_fail`/`assert_*`).
-- Produces: la gate `retro ✅`. Detecta "cerrado" por reporte con veredicto DONE; regla uniforme sin excepciones hardcodeadas.
+- Consumes: `specs/_template/retro.md` (Task 1), the DONE contract wiring in docs (Task 2), `tests/lib.sh` (`_pass`/`_fail`/`assert_*`).
+- Produces: the `retro ✅` gate. Detects "closed" by report with DONE verdict; uniform rule without hardcoded exceptions.
 
-- [ ] **Step 1: Crear el check.** `tests/run.sh` lo sourcea automáticamente (glob `check_*.sh`). Contenido exacto de `tests/check_90_retro.sh`:
+- [ ] **Step 1: Create the check.** `tests/run.sh` sources it automatically (glob `check_*.sh`). Exact content of `tests/check_90_retro.sh`:
 
 ```bash
-# Sourced by tests/run.sh (lib.sh already loaded). Enforcea el retro gate: la
-# mitad trasera de la Measurability Gate. Template + wiring del contrato DONE +
-# cierre por-feature. "Cerrado" = su verification/reports/<NNN>-*.md muestra el
-# veredicto DONE (BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%). Feature
-# cerrado ⟹ specs/<NNN>-*/retro.md completo. Sin hardcode: un feature sin
-# reporte DONE está "en vuelo" y se saltea (regla uniforme).
+# Sourced by tests/run.sh (lib.sh already loaded). Enforces the retro gate: the
+# back half of the Measurability Gate. Template + wiring of the DONE contract +
+# per-feature close. "Closed" = its verification/reports/<NNN>-*.md shows the
+# DONE verdict (BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%). Feature
+# closed ⟹ specs/<NNN>-*/retro.md complete. No hardcode: a feature without a
+# DONE report is "in-flight" and is skipped (uniform rule).
 
-# --- Template: estructura de 3 caras (Capa 1+2) ---
+# --- Template: 3-face structure (Layer 1+2) ---
 assert_file specs/_template/retro.md
-for h in "Cara A" "Cara B" "Cara C" "Evidencia" "deriv"; do
+for h in "Face A" "Face B" "Face C" "Evidence" "deriv"; do
   assert_contains specs/_template/retro.md "$h"
 done
 
-# --- Wiring del contrato DONE ---
+# --- DONE contract wiring ---
 assert_contains CLAUDE.md "retro ✅"
 assert_contains docs/workflow.md "retro ✅"
 assert_contains verification/verification-report.md "retro ✅"
 
-# --- Cierre por-feature (regla uniforme) ---
-# "Cerrado" = el report tiene BUILD ✅ y UAT ✅ y coverage 100% (tres greps
-# independientes: robusto al layout de línea y evita precedencia ||/&& frágil).
+# --- Per-feature close (uniform rule) ---
+# "Closed" = the report has BUILD ✅ and UAT ✅ and coverage 100% (three independent
+# greps: robust to line layout and avoids fragile ||/&& precedence).
 closed_seen=0
 for report in verification/reports/*.md; do
   [ -f "$report" ] || continue
@@ -205,57 +205,57 @@ for report in verification/reports/*.md; do
   closed_seen=1
   nnn=$(basename "$report" | grep -oE '^[0-9]+')
   featdir=$(ls -d specs/${nnn}-*/ 2>/dev/null | head -1)
-  if [ -z "$featdir" ]; then _fail "report $report DONE pero no hay specs/${nnn}-*"; continue; fi
+  if [ -z "$featdir" ]; then _fail "report $report DONE but no specs/${nnn}-*"; continue; fi
   retro="${featdir}retro.md"
-  if [ ! -f "$retro" ]; then _fail "feature $nnn DONE pero falta $retro"; continue; fi
-  _pass "feature $nnn DONE tiene $retro"
-  # Sin placeholders sin llenar
-  if grep -qE '_\(…\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro tiene placeholders sin llenar"; else _pass "$retro sin placeholders"; fi
-  # Veredicto de misión válido
-  if grep -qE 'Veredicto de misión:[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
-    _pass "$retro veredicto de misión válido"
+  if [ ! -f "$retro" ]; then _fail "feature $nnn DONE but $retro is missing"; continue; fi
+  _pass "feature $nnn DONE has $retro"
+  # No unfilled placeholders
+  if grep -qE '_\(…\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro has unfilled placeholders"; else _pass "$retro no placeholders"; fi
+  # Valid mission verdict
+  if grep -qE 'Mission verdict:[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
+    _pass "$retro valid mission verdict"
   else
-    _fail "$retro sin veredicto de misión válido"
+    _fail "$retro missing valid mission verdict"
   fi
-  # n/a exige razón (Capa: anti-escape)
-  if grep -qE 'Veredicto de misión:[*[:space:]]*n/a' "$retro"; then
-    if grep -qiE 'raz[oó]n' "$retro"; then _pass "$retro n/a con razón"; else _fail "$retro n/a sin razón"; fi
+  # n/a requires a reason (Layer: anti-escape)
+  if grep -qE 'Mission verdict:[*[:space:]]*n/a' "$retro"; then
+    if grep -qiE 'reason' "$retro"; then _pass "$retro n/a with reason"; else _fail "$retro n/a without reason"; fi
   fi
-  # Cada campo de Cara B con [deriv:] (Capa 1)
-  if [ "$(grep -cE '\[deriv:' "$retro")" -ge 4 ]; then _pass "$retro Cara B con deriv (≥4)"; else _fail "$retro Cara B con <4 [deriv:] (campos derivables sin locator)"; fi
+  # Each Face B field with [deriv:] (Layer 1)
+  if [ "$(grep -cE '\[deriv:' "$retro")" -ge 4 ]; then _pass "$retro Face B with deriv (≥4)"; else _fail "$retro Face B with <4 [deriv:] (derivable fields without locator)"; fi
 done
-[ "$closed_seen" -eq 1 ] && _pass "loop de cierre ejercitado" || _pass "sin features cerrados aún (vacuo)"
+[ "$closed_seen" -eq 1 ] && _pass "close loop exercised" || _pass "no closed features yet (vacuous)"
 ```
 
-- [ ] **Step 2: Correr el suite y verificar verde en el repo actual**
+- [ ] **Step 2: Run the suite and verify green on the current repo**
 
 Run: `bash tests/run.sh 2>&1 | grep -E "check_90|retro|FAIL" ; echo "---"; bash tests/run.sh 2>&1 | tail -2`
-Expected: aserciones de template + wiring PASS; `sin features cerrados aún (vacuo)` PASS (el único report, `002-north-star-judge.md`, no tiene veredicto DONE); `FAIL=0`.
+Expected: template + wiring assertions PASS; `no closed features yet (vacuous)` PASS (the only report, `002-north-star-judge.md`, has no DONE verdict); `FAIL=0`.
 
-- [ ] **Step 3: Probar la lógica de cierre con un fixture temporal (RED forzado).** Crear un report DONE falso SIN retro y confirmar que el check falla:
+- [ ] **Step 3: Test the closure logic with a temporary fixture (forced RED).** Create a fake DONE report WITHOUT retro and confirm the check fails:
 
 ```bash
 mkdir -p specs/900-fixture
-printf 'BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% · retro: pendiente\n' > verification/reports/900-fixture-report.md
+printf 'BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% · retro: pending\n' > verification/reports/900-fixture-report.md
 bash tests/run.sh 2>&1 | grep -E "900|FAIL"
 ```
-Expected: `FAIL: feature 900 DONE pero falta specs/900-fixture/retro.md`
+Expected: `FAIL: feature 900 DONE but specs/900-fixture/retro.md is missing`
 
-- [ ] **Step 4: Agregar el retro al fixture y confirmar GREEN** (prueba que la gate pasa cuando el retro existe y está completo):
+- [ ] **Step 4: Add the retro to the fixture and confirm GREEN** (verifies the gate passes when the retro exists and is complete):
 
 ```bash
 cat > specs/900-fixture/retro.md <<'EOF'
-## Cara A
-- Veredicto de misión: n/a
-  - razón: fixture de test
-## Cara B
+## Face A
+- Mission verdict: n/a
+  - reason: test fixture
+## Face B
 - Gaps: 0 [deriv: n/a]
 EOF
 bash tests/run.sh 2>&1 | grep -E "900"
 ```
-Expected: `PASS: feature 900 DONE tiene …`, `PASS: … n/a con razón`, `PASS: … Cara B con deriv`.
+Expected: `PASS: feature 900 DONE has …`, `PASS: … n/a with reason`, `PASS: … Face B with deriv`.
 
-- [ ] **Step 5: Limpiar el fixture y confirmar verde final**
+- [ ] **Step 5: Clean up the fixture and confirm final green**
 
 ```bash
 rm -rf specs/900-fixture verification/reports/900-fixture-report.md
@@ -267,14 +267,14 @@ Expected: `TOTAL PASS=… FAIL=0`
 
 ```bash
 git add tests/check_90_retro.sh
-git commit -m "feat(003): check_90_retro — gate determinista del retro (cierre uniforme, sin hardcode)"
+git commit -m "feat(003): check_90_retro — deterministic retro gate (uniform close, no hardcode)"
 ```
 
 ---
 
-## Fase 3 — Skills y comandos
+## Phase 3 — Skills and Commands
 
-### Task 4: Skill + comando `/retro`
+### Task 4: Skill + command `/retro`
 
 **Files:**
 - Create: `.claude/commands/retro.md`
@@ -283,101 +283,101 @@ git commit -m "feat(003): check_90_retro — gate determinista del retro (cierre
 - Modify: `tests/check_50_skills.sh:1`
 
 **Interfaces:**
-- Consumes: `specs/_template/retro.md` (formato de salida), `alignment.md` + `coverage.md` + `verification/reports/<feature>` (insumos).
-- Produces: el comando `/retro` y la skill `retro` que la Task 6 (dogfood) invoca sobre `003`.
+- Consumes: `specs/_template/retro.md` (output format), `alignment.md` + `coverage.md` + `verification/reports/<feature>` (inputs).
+- Produces: the `/retro` command and the `retro` skill that Task 6 (dogfood) invokes on `003`.
 
-- [ ] **Step 1: Escribir las aserciones que fallan.** En `tests/check_40_commands.sh` línea 1, agregar `retro` al loop:
+- [ ] **Step 1: Write the failing assertions.** In `tests/check_40_commands.sh` line 1, add `retro` to the loop:
 
 ```bash
 for c in constitution distill plan contract tasks verify uat retro; do
 ```
 
-En `tests/check_50_skills.sh` línea 1, agregar `retro` al loop y dos aserciones de contenido al final del archivo:
+In `tests/check_50_skills.sh` line 1, add `retro` to the loop and two content assertions at the end of the file:
 
 ```bash
 for s in distill verify uat retro; do
 ```
-Y agregar tras las líneas existentes:
+And add after the existing lines:
 ```bash
 assert_contains .claude/skills/retro/SKILL.md "adversarial"
 assert_contains .claude/skills/retro/SKILL.md "deriv"
 ```
 
-- [ ] **Step 2: Correr el suite para verlo fallar**
+- [ ] **Step 2: Run the suite to see it fail**
 
 Run: `bash tests/run.sh 2>&1 | grep -E "retro|FAIL"`
-Expected: FAIL con `missing file .claude/commands/retro.md` y `.claude/skills/retro/SKILL.md`
+Expected: FAIL with `missing file .claude/commands/retro.md` and `.claude/skills/retro/SKILL.md`
 
-- [ ] **Step 3: Crear `.claude/commands/retro.md`:**
+- [ ] **Step 3: Create `.claude/commands/retro.md`:**
 
 ```markdown
 ---
-description: Cierra la predicción medible de /align al cerrar un feature. Escribe specs/<feature>/retro.md (Cara Misión + Cara Método). Requerido para el veredicto DONE.
+description: Closes the measurable /align prediction when closing a feature. Writes specs/<feature>/retro.md (Face Mission + Face Method). Required for the DONE verdict.
 ---
 
-Invocá la skill `retro`. Requiere el feature cerrado en `verification/reports/<feature>`
-(BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%) y `specs/<feature>/alignment.md`.
-Escribe `specs/<feature>/retro.md`. Sin retro completo el feature no está DONE.
+Invoke the `retro` skill. Requires the feature closed in `verification/reports/<feature>`
+(BUILD ✅ ∧ TRAJECTORY ✅ ∧ UAT ✅ ∧ coverage 100%) and `specs/<feature>/alignment.md`.
+Writes `specs/<feature>/retro.md`. Without a complete retro the feature is not DONE.
 ```
 
-- [ ] **Step 4: Crear `.claude/skills/retro/SKILL.md`:**
+- [ ] **Step 4: Create `.claude/skills/retro/SKILL.md`:**
 
 ```markdown
 ---
 name: retro
-description: Cierra la predicción de /align al cerrar un feature — dicta el veredicto sobre el signal del pilar y deriva las señales del WoW de artefactos. Escribe specs/<feature>/retro.md. Usar tras un /verify+/uat en verde, como paso final del cierre.
+description: Closes the /align prediction when closing a feature — issues the verdict on the pillar signal and derives WoW signals from artifacts. Writes specs/<feature>/retro.md. Use after a green /verify+/uat, as the final step of closing.
 ---
 
 # Retro
 
-Entrada: `specs/<feature>/alignment.md` + `coverage.md` + `verification/reports/<feature>` + git.
-Salida: `specs/<feature>/retro.md` (plantilla en `specs/_template/retro.md`). Es la
-**mitad trasera de la Measurability Gate**: `/align` abrió una predicción medible; el
-retro la cierra. El feature no está DONE hasta que este retro cierra sus tres caras.
+Input: `specs/<feature>/alignment.md` + `coverage.md` + `verification/reports/<feature>` + git.
+Output: `specs/<feature>/retro.md` (template in `specs/_template/retro.md`). This is the
+**back half of the Measurability Gate**: `/align` opened a measurable prediction; the
+retro closes it. The feature is not DONE until this retro closes all three faces.
 
-## Anti-teatro (por qué el orden importa)
-Un check no puede probar honestidad. El procedimiento achica el lugar donde el relleno
-"por cumplir" se esconde: **derivar → auto-desafiar → escribir**, nunca al revés.
+## Anti-theater (why order matters)
+A check cannot prove honesty. The procedure shrinks the space where fill-in
+"just to comply" can hide: **derive → self-challenge → write**, never the other way around.
 
-## Procedimiento
+## Procedure
 
-1. **Derivá primero (Cara B, Capa 1).** No tipees cifras de memoria. Cada campo de
-   Método sale de un artefacto con su `[deriv: <locator>]`:
-   - Gaps cazados por /distill → filas de `coverage.md` + `git log` de la fase distill.
-   - Disciplina RED→GREEN → historial de estados de `coverage.md` (🔴 antes de 🟢) + git.
-   - Rework post-/verify y post-/uat → gaps ruteados en `verification/reports/<feature>`.
-   - Escalaciones → traza / git.
-   Solo "Fricción del propio WoW" es juicio libre; el resto es derivado.
+1. **Derive first (Face B, Layer 1).** Do not type figures from memory. Each Method
+   field comes from an artifact with its `[deriv: <locator>]`:
+   - Gaps caught by /distill → rows in `coverage.md` + `git log` from the distill phase.
+   - RED→GREEN discipline → `coverage.md` state history (🔴 before 🟢) + git.
+   - Post-/verify and post-/uat rework → gaps routed in `verification/reports/<feature>`.
+   - Escalations → trace / git.
+   Only "Friction from the WoW itself" is free judgment; the rest is derived.
 
-2. **Dictá la Cara A con evidencia locator obligatoria (Capa 2).** Leé `alignment.md`:
-   para cada pilar del `mapping`, buscá su `signal` en `north-star.md` y dictá veredicto
-   (`✅ movió` / `❌ no movió` / `⏳ aún no observable`) con una celda de Evidencia que sea
-   un **locator** (valor, SHA, fila de coverage, URL) — no prosa. Sin locator para un
-   `confirmed`/`refuted`, el veredicto honesto es `pending-observation` con su trigger de
-   re-chequeo. Anotá la **calibración de align** (¿los scores pillarFit/scope/mission
-   acertaron?). Si el North Star del repo es placeholder (no schema-válido), la Cara A es
-   `n/a` con razón — no hay signal real que cerrar.
+2. **Issue Face A with mandatory evidence locator (Layer 2).** Read `alignment.md`:
+   for each pillar in the `mapping`, find its `signal` in `north-star.md` and issue
+   the verdict (`✅ moved` / `❌ did not move` / `⏳ not yet observable`) with an Evidence
+   cell that is a **locator** (value, SHA, coverage row, URL) — not prose. Without a locator
+   for a `confirmed`/`refuted`, the honest verdict is `pending-observation` with its
+   re-check trigger. Note the **align calibration** (did the pillarFit/scope/mission scores
+   hold up?). If the repo's North Star is a placeholder (not schema-valid), Face A is
+   `n/a` with reason — there is no real signal to close against.
 
-3. **Auto-desafío adversarial (Capa 3).** Antes de escribir, argumentá EN CONTRA de tu
-   propio borrador: "el report dice 0 rework — verificá contra `git log`; dice que el
-   pillar-fit de align fue exacto — sostené lo opuesto". Solo lo que sobrevive al desafío
-   se escribe. (Refuerzo futuro, no ahora: delegar el desafío a un subagente sképtico
-   separado del que redactó.)
+3. **Adversarial self-challenge (Layer 3).** Before writing, argue AGAINST your own
+   draft: "the report says 0 rework — verify against `git log`; says the pillar-fit of
+   align was exact — argue the opposite". Only what survives the challenge gets written.
+   (Future reinforcement, not now: delegate the challenge to a separate skeptic subagent
+   distinct from the one that drafted.)
 
-4. **Cara C (loop).** Proponé reglas candidatas → constitution y/o amendments → North
-   Star. Solo proponé; aplicarlos sigue `update-checklist.md` / `amendment-protocol.md`.
+4. **Face C (loop).** Propose candidate rules → constitution and/or amendments → North
+   Star. Only propose; applying them follows `update-checklist.md` / `amendment-protocol.md`.
 
-5. **Veredicto de misión.** `confirmed` | `refuted` | `pending-observation` (+trigger) |
-   `n/a` (+razón obligatoria). Escribí `specs/<feature>/retro.md` desde la plantilla.
+5. **Mission verdict.** `confirmed` | `refuted` | `pending-observation` (+trigger) |
+   `n/a` (+mandatory reason). Write `specs/<feature>/retro.md` from the template.
 
 ## Gate
-`tests/check_90_retro.sh` exige, para todo feature con reporte DONE: retro presente, sin
-placeholders, veredicto de misión válido, evidencia no vacía para `confirmed`/`refuted`,
-`[deriv:]` en cada campo de Cara B, y razón para `n/a`. El feature no está DONE sin
+`tests/check_90_retro.sh` requires, for every feature with a DONE report: retro present,
+no unfilled placeholders, valid mission verdict, non-empty evidence for `confirmed`/`refuted`,
+`[deriv:]` on each Face B field, and a reason for `n/a`. The feature is not DONE without
 `retro ✅`.
 ```
 
-- [ ] **Step 5: Correr el suite para verlo pasar**
+- [ ] **Step 5: Run the suite to see it pass**
 
 Run: `bash tests/run.sh 2>&1 | tail -2`
 Expected: `TOTAL PASS=… FAIL=0`
@@ -386,12 +386,12 @@ Expected: `TOTAL PASS=… FAIL=0`
 
 ```bash
 git add .claude/commands/retro.md .claude/skills/retro/SKILL.md tests/check_40_commands.sh tests/check_50_skills.sh
-git commit -m "feat(003): skill+comando /retro (anti-teatro derivar→desafiar→escribir)"
+git commit -m "feat(003): skill+command /retro (anti-theater derive→challenge→write)"
 ```
 
 ---
 
-### Task 5: Skill + comando `/wow-report`
+### Task 5: Skill + command `/wow-report`
 
 **Files:**
 - Create: `.claude/commands/wow-report.md`
@@ -400,86 +400,86 @@ git commit -m "feat(003): skill+comando /retro (anti-teatro derivar→desafiar�
 - Modify: `tests/check_50_skills.sh:1`
 
 **Interfaces:**
-- Consumes: todos los `specs/*/retro.md` + `alignment.md` + `verification/reports/*`.
-- Produces: el comando `/wow-report` y la skill `wow-report` que la Task 7 invoca para generar `verification/wow-report.md`.
+- Consumes: all `specs/*/retro.md` + `alignment.md` + `verification/reports/*`.
+- Produces: the `/wow-report` command and the `wow-report` skill that Task 7 invokes to generate `verification/wow-report.md`.
 
-- [ ] **Step 1: Escribir las aserciones que fallan.** En `tests/check_40_commands.sh` línea 1, agregar `wow-report`:
+- [ ] **Step 1: Write the failing assertions.** In `tests/check_40_commands.sh` line 1, add `wow-report`:
 
 ```bash
 for c in constitution distill plan contract tasks verify uat retro wow-report; do
 ```
 
-En `tests/check_50_skills.sh` línea 1, agregar `wow-report`, y dos aserciones de contenido:
+In `tests/check_50_skills.sh` line 1, add `wow-report`, and two content assertions:
 
 ```bash
 for s in distill verify uat retro wow-report; do
 ```
-Y al final:
+And at the end:
 ```bash
-assert_contains .claude/skills/wow-report/SKILL.md "pilar"
-assert_contains .claude/skills/wow-report/SKILL.md "olor"
+assert_contains .claude/skills/wow-report/SKILL.md "pillar"
+assert_contains .claude/skills/wow-report/SKILL.md "smell"
 ```
 
-- [ ] **Step 2: Correr el suite para verlo fallar**
+- [ ] **Step 2: Run the suite to see it fail**
 
 Run: `bash tests/run.sh 2>&1 | grep -E "wow-report|FAIL"`
-Expected: FAIL con `missing file .claude/commands/wow-report.md` y `.claude/skills/wow-report/SKILL.md`
+Expected: FAIL with `missing file .claude/commands/wow-report.md` and `.claude/skills/wow-report/SKILL.md`
 
-- [ ] **Step 3: Crear `.claude/commands/wow-report.md`:**
+- [ ] **Step 3: Create `.claude/commands/wow-report.md`:**
 
 ```markdown
 ---
-description: Regenera verification/wow-report.md — el rollup del ledger de retros. Responde "¿está funcionando el WoW?" con drift por pilar, re-chequeos pendientes, salud del método y olores de teatro.
+description: Regenerates verification/wow-report.md — the retro ledger rollup. Answers "is the WoW working?" with drift per pillar, pending re-checks, method health, and theater smells.
 ---
 
-Invocá la skill `wow-report`. Lee todos los `specs/*/retro.md` + `alignment.md` +
-`verification/reports/*` y regenera `verification/wow-report.md` (snapshot commiteado,
-read-only, no gatea).
+Invoke the `wow-report` skill. Reads all `specs/*/retro.md` + `alignment.md` +
+`verification/reports/*` and regenerates `verification/wow-report.md` (committed snapshot,
+read-only, never gates).
 ```
 
-- [ ] **Step 4: Crear `.claude/skills/wow-report/SKILL.md`:**
+- [ ] **Step 4: Create `.claude/skills/wow-report/SKILL.md`:**
 
 ```markdown
 ---
 name: wow-report
-description: Agrega el ledger de retros en verification/wow-report.md — drift por pilar (mapping × veredicto de signal), re-chequeos pendientes, salud del método y olores de teatro. Observabilidad on-demand, nunca gatea. Usar para responder "¿está funcionando el WoW?".
+description: Aggregates the retro ledger in verification/wow-report.md — drift per pillar (mapping × signal verdict), pending re-checks, method health, and theater smells. On-demand observability, never gates. Use to answer "is the WoW working?".
 ---
 
 # WoW Report
 
-Entrada: todos los `specs/*/retro.md`, sus `alignment.md`, y `verification/reports/*`.
-Salida: `verification/wow-report.md` (snapshot generado y commiteado). **Observa, nunca
-gatea** — el diente determinista es `tests/check_90_retro.sh`; esto es síntesis para el
-humano.
+Input: all `specs/*/retro.md`, their `alignment.md`, and `verification/reports/*`.
+Output: `verification/wow-report.md` (generated and committed snapshot). **Observes, never
+gates** — the deterministic enforcement is `tests/check_90_retro.sh`; this is synthesis for
+the human.
 
-## Procedimiento
-Regenerá `verification/wow-report.md` con cinco secciones:
+## Procedure
+Regenerate `verification/wow-report.md` with five sections:
 
-1. **Misión — ¿cada pilar del North Star está siendo servido?** Cruzá el `mapping`
-   objetivo→pilar de cada `alignment.md` con el veredicto de signal del `retro.md`. Tabla
-   por pilar: features que dijeron servirlo × si el signal se movió. **Un pilar con
-   features que lo prometieron pero ningún signal movido = drift medible** (destacalo).
+1. **Mission — is each North Star pillar actually being served?** Cross-reference the
+   objective→pillar `mapping` of each `alignment.md` with the signal verdict of `retro.md`.
+   Table per pillar: features that promised to serve it × whether the signal moved. **A pillar
+   with features that promised to serve it but no signal moved = measurable drift** (highlight it).
 
-2. **Re-chequeos pendientes (worklist).** Juntá los `pending-observation` con su trigger;
-   marcá los vencidos.
+2. **Pending re-checks (worklist).** Collect `pending-observation` items with their trigger;
+   mark the overdue ones.
 
-3. **Método — ¿el WoW agrega valor?** (N=<n>, muestra chica, sin estadística). Tabla
-   por-feature: gaps cazados, disciplina RED, rework verify/uat, escalaciones. Agrupá
-   temas de fricción recurrentes.
+3. **Method — does the WoW add value?** (N=<n>, small sample, no statistics). Per-feature
+   table: gaps caught, RED discipline, rework verify/uat, escalations. Group recurring
+   friction themes.
 
-4. **Loop — ¿el WoW se mejora a sí mismo?** Reglas candidatas propuestas vs aterrizadas
-   en constitution; amendments propuestos vs aprobados (ADR).
+4. **Loop — does the WoW improve itself?** Candidate rules proposed vs landed in
+   constitution; amendments proposed vs approved (ADR).
 
-5. **Olores de teatro (spot-check humano, Capa 4).** Marcá retros sospechosos: celdas de
-   Evidencia vacías, all-green (cero gaps + cero rework + cero fricción),
-   `pending-observation` vencidos. Un retro demasiado limpio ES una señal.
+5. **Theater smells (human spot-check, Layer 4).** Flag suspicious retros: empty Evidence
+   cells, all-green (zero gaps + zero rework + zero friction), overdue `pending-observation`
+   items. An overly clean retro IS a signal.
 
-## Honestidad del N=1
-El reporte declara explícito "N=<n>, muestra chica, sin estadística". No finge
-tendencias; muestra por-feature + totales + temas.
+## N=1 Honesty
+The report explicitly states "N=<n>, small sample, no statistics". It does not fake
+trends; it shows per-feature + totals + themes.
 ```
 
-- [ ] **Step 5: Correr el suite para verlo pasar**
+- [ ] **Step 5: Run the suite to see it pass**
 
 Run: `bash tests/run.sh 2>&1 | tail -2`
 Expected: `TOTAL PASS=… FAIL=0`
@@ -488,16 +488,16 @@ Expected: `TOTAL PASS=… FAIL=0`
 
 ```bash
 git add .claude/commands/wow-report.md .claude/skills/wow-report/SKILL.md tests/check_40_commands.sh tests/check_50_skills.sh
-git commit -m "feat(003): skill+comando /wow-report (rollup del ledger, observa no gatea)"
+git commit -m "feat(003): skill+command /wow-report (ledger rollup, observes never gates)"
 ```
 
 ---
 
-## Fase 4 — Dogfood: `003` se valida a sí mismo
+## Phase 4 — Dogfood: `003` self-validates
 
-> Esta fase es el capstone reflexivo: usar la capacidad recién construida sobre el propio feature que la construyó. En el repo-plantilla la Cara A cierra como `n/a` (North Star placeholder); la Cara B es real. No son steps TDD clásicos sino invocaciones de la propia WoW con deliverables verificables por `check_90`.
+> This phase is the reflexive capstone: using the newly built capability on the very feature that built it. In the template repo Face A closes as `n/a` (North Star placeholder); Face B is real. These are not classic TDD steps but invocations of the WoW itself with deliverables verifiable by `check_90`.
 
-### Task 6: Cerrar `003` con su propio `/retro` (bootstrap recursivo)
+### Task 6: Close `003` with its own `/retro` (recursive bootstrap)
 
 **Files:**
 - Create: `specs/003-wow-self-validation/brief.md`
@@ -505,136 +505,136 @@ git commit -m "feat(003): skill+comando /wow-report (rollup del ledger, observa 
 - Create: `specs/003-wow-self-validation/retro.md`
 
 **Interfaces:**
-- Consumes: la skill `retro` (Task 4), `check_90` (Task 3), el diff completo de las Fases 1-3 (git log).
-- Produces: la primera entrada real del ledger — que la Task 7 (`/wow-report`) agrega.
+- Consumes: the `retro` skill (Task 4), `check_90` (Task 3), the full diff from Phases 1-3 (git log).
+- Produces: the first real ledger entry — which Task 7 (`/wow-report`) aggregates.
 
-- [ ] **Step 1: Crear `specs/003-wow-self-validation/brief.md`** — el brief mínimo que ancla el feature al workflow del harness:
+- [ ] **Step 1: Create `specs/003-wow-self-validation/brief.md`** — the minimal brief that anchors the feature to the harness workflow:
 
 ```markdown
 # Brief — 003 WoW self-validation
 
-**Objetivo:** el harness se autovalida sometiéndose a su propia Way of Working — un retro
-que cierra la predicción medible de `/align` (columna align↔retro), enforcement en CI, y
-un rollup agregado.
+**Objective:** the harness self-validates by submitting to its own Way of Working — a retro
+that closes the measurable prediction of `/align` (the align↔retro column), enforcement in CI,
+and an aggregated rollup.
 
-**Métricas de éxito:** `tests/run.sh` verde con `check_90`; `/retro` y `/wow-report`
-presentes y wired; el propio `003` cerrado con un retro completo (Cara B real).
+**Success metrics:** `tests/run.sh` green with `check_90`; `/retro` and `/wow-report`
+present and wired; `003` itself closed with a complete retro (real Face B).
 
-**Nota de alcance:** repo-plantilla → North Star placeholder → `/align` no corre acá; la
-Cara A (Misión) cierra como `n/a`. Diseño completo:
+**Scope note:** template repo → North Star placeholder → `/align` does not truly run here; the
+Face A (Mission) closes as `n/a`. Full design:
 `docs/superpowers/specs/2026-07-05-wow-self-validation-design.md`.
 ```
 
-- [ ] **Step 2: Crear el reporte de verificación DONE de `003`** en `verification/reports/003-wow-self-validation-report.md`. El BUILD del harness es `tests/run.sh` en verde:
+- [ ] **Step 2: Create the DONE verification report for `003`** in `verification/reports/003-wow-self-validation-report.md`. The harness BUILD is `tests/run.sh` in green:
 
 ```markdown
 # Verification Report — 003-wow-self-validation @ <commit>
 
-spec: design 2026-07-05 · fecha: 2026-07-05 · constitution: base + proyecto
+spec: design 2026-07-05 · date: 2026-07-05 · constitution: base + project
 
 ## 1. Coverage snapshot
-Criterios estructurales cubiertos por `tests/check_*.sh` (template, wiring, gate, skills/comandos).
+Structural criteria covered by `tests/check_*.sh` (template, wiring, gate, skills/commands).
 
 ## 2. Output eval (BUILD)
-`bash tests/run.sh` → TOTAL FAIL=0. Task success: checks estructurales 100%.
+`bash tests/run.sh` → TOTAL FAIL=0. Task success: structural checks 100%.
 
 ## 3. Trajectory eval
-Construido test-first: cada archivo nuevo tuvo su aserción en RED antes de crearse
-(git log Fases 1-3). Sin pasos saltados.
+Built test-first: every new file had its assertion in RED before being created
+(git log Phases 1-3). No steps skipped.
 
 ## 4. UAT
-Capacidad ejercitada end-to-end: fixture DONE sin retro → `check_90` FAIL; con retro →
-PASS (Task 3 steps 3-4). `/retro` produce este mismo retro.
+Capability exercised end-to-end: DONE fixture without retro → `check_90` FAIL; with retro →
+PASS (Task 3 steps 3-4). `/retro` produces this very retro.
 
-## 5. Verdicto
+## 5. Verdict
 BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% · retro: ✅
-Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
+Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/003-wow-self-validation/retro.md`.
 ```
 
-- [ ] **Step 3: Correr `/retro` sobre `003`** (invocar la skill `retro`; orden derivar→auto-desafiar→escribir). Derivar la Cara B del `git log` real de las Fases 1-3. Escribir `specs/003-wow-self-validation/retro.md`. Contenido esperado (ajustar cifras a lo que muestre `git log`):
+- [ ] **Step 3: Run `/retro` on `003`** (invoke the `retro` skill; order derive→self-challenge→write). Derive Face B from the real `git log` of Phases 1-3. Write `specs/003-wow-self-validation/retro.md`. Expected content (adjust figures to what `git log` shows):
 
 ```markdown
 # Retro — 003-wow-self-validation @ <commit>
 
-cierra: `specs/003-wow-self-validation/alignment.md` (n/a) · `verification/reports/003-wow-self-validation-report.md` · fecha: 2026-07-05
+closes: `specs/003-wow-self-validation/alignment.md` (n/a) · `verification/reports/003-wow-self-validation-report.md` · date: 2026-07-05
 
-## Cara A — Misión (cierra la predicción de /align)
-Fuente: N/A — North Star de este repo es placeholder (no schema-válido); `/align` es fail-closed.
+## Face A — Mission (closes the /align prediction)
+Source: N/A — this repo's North Star is a placeholder (not schema-valid); `/align` is fail-closed.
 
-| Pilar (mapping) | Signal predicho | Veredicto | Evidencia (locator OBLIGATORIO) |
+| Pillar (mapping) | Predicted signal | Verdict | Evidence (MANDATORY locator) |
 |---|---|---|---|
 | — | — | n/a | verification/reports/002-north-star-judge.md (NS placeholder) |
 
-- **Calibración de align:** N/A (no corrió `/align`).
-- **Veredicto de misión:** n/a
-  - **razón:** repo = plantilla del harness; `north-star.md` es placeholder, no hay signal real que cerrar. La columna align↔retro se dogfoodea de verdad en un repo adoptante.
+- **Align calibration:** N/A (`/align` did not run).
+- **Mission verdict:** n/a
+  - **reason:** repo = harness template; `north-star.md` is a placeholder, no real signal to close against. The align↔retro column is truly dogfooded in an adopter repo.
 
-## Cara B — Método (valida el WoW) — DERIVADA de artefactos, no redactada
-- **Gaps cazados por /distill:** 0 `[deriv: no hubo /distill; feature vino de brainstorming→design→plan]` — el grilling ocurrió en brainstorming (2 forks + N=1 + placeholder NS).
-- **Disciplina RED→GREEN:** sí `[deriv: git log Fases 1-3 — cada check en RED antes del archivo]` — Tasks 1,3,4,5 con step "verlo fallar" antes de crear.
-- **Rework post-/verify:** 0 · **post-/uat:** 0 `[deriv: verification/reports/003-wow-self-validation-report.md]`
-- **Escalaciones al humano:** varias por diseño `[deriv: transcript brainstorming]` — todas decisiones de diseño, no fallas de inner loop.
-- **Fricción del propio WoW:** el North Star placeholder impide dogfoodear la Cara A acá; se descubrió que `check_90` no necesita bootstrap para `002` (regla uniforme).
+## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
+- **Gaps caught by /distill:** 0 `[deriv: no /distill ran; feature came from brainstorming→design→plan]` — the grilling happened in brainstorming (2 forks + N=1 + NS placeholder).
+- **RED→GREEN discipline:** yes `[deriv: git log Phases 1-3 — each check in RED before the file]` — Tasks 1,3,4,5 with "see it fail" step before creating.
+- **Post-/verify rework:** 0 · **post-/uat:** 0 `[deriv: verification/reports/003-wow-self-validation-report.md]`
+- **Human escalations:** several by design `[deriv: brainstorming transcript]` — all design decisions, not inner-loop failures.
+- **Friction from the WoW itself:** the North Star placeholder prevents dogfooding Face A here; discovered that `check_90` needs no bootstrap for `002` (uniform rule).
 
-## Cara C — Loop (auto-mejora)
-- **Reglas candidatas → constitution:** "en repo-plantilla, la Cara A del retro cierra `n/a`; solo un adoptante la valida real" — candidata a nota en la constitution/README.
-- **Amendments candidatos → North Star:** ninguno.
+## Face C — Loop (self-improvement)
+- **Candidate rules → constitution:** "in the template repo, Face A of the retro closes as `n/a`; only an adopter validates it for real" — candidate note for the constitution/README.
+- **Candidate amendments → North Star:** none.
 ```
 
-- [ ] **Step 4: Correr el suite — ahora `003` es un feature cerrado y `check_90` lo exige**
+- [ ] **Step 4: Run the suite — now `003` is a closed feature and `check_90` requires it**
 
 Run: `bash tests/run.sh 2>&1 | grep -E "003|FAIL" ; bash tests/run.sh 2>&1 | tail -2`
-Expected: `PASS: feature 003 DONE tiene specs/003-wow-self-validation/retro.md`, `PASS: … n/a con razón`, `PASS: … Cara B con deriv`; `FAIL=0`.
+Expected: `PASS: feature 003 DONE has specs/003-wow-self-validation/retro.md`, `PASS: … n/a with reason`, `PASS: … Face B with deriv`; `FAIL=0`.
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add specs/003-wow-self-validation/ verification/reports/003-wow-self-validation-report.md
-git commit -m "feat(003): dogfood — 003 se cierra con su propio /retro (bootstrap recursivo)"
+git commit -m "feat(003): dogfood — 003 closes with its own /retro (recursive bootstrap)"
 ```
 
 ---
 
-### Task 7: Generar `verification/wow-report.md` con `/wow-report`
+### Task 7: Generate `verification/wow-report.md` with `/wow-report`
 
 **Files:**
 - Create: `verification/wow-report.md`
 
 **Interfaces:**
-- Consumes: la skill `wow-report` (Task 5), `specs/003-wow-self-validation/retro.md` (Task 6).
-- Produces: el snapshot del ledger — la vista "¿está funcionando el WoW?" con N=1.
+- Consumes: the `wow-report` skill (Task 5), `specs/003-wow-self-validation/retro.md` (Task 6).
+- Produces: the ledger snapshot — the "Is the WoW working?" view with N=1.
 
-- [ ] **Step 1: Correr `/wow-report`** (invocar la skill `wow-report`). Genera `verification/wow-report.md`. Contenido esperado:
+- [ ] **Step 1: Run `/wow-report`** (invoke the `wow-report` skill). Generates `verification/wow-report.md`. Expected content:
 
 ```markdown
-# WoW Report — @ <commit>  (snapshot generado; no editar a mano)
+# WoW Report — @ <commit>  (generated snapshot; do not edit manually)
 
-> N=1, muestra chica, sin estadística. Repo-plantilla: la Cara Misión aún no se mide real
-> (North Star placeholder). Este report prueba la maquinaria + la Cara Método.
+> N=1, small sample, no statistics. Template repo: the Mission Face is not yet measured for real
+> (North Star placeholder). This report tests the machinery + the Method Face.
 
-## 1. Misión — ¿cada pilar del North Star está siendo servido?
-North Star placeholder → sin pilares reales. 003: Misión `n/a` (razón: repo-plantilla).
-Drift medible: N/A hasta un repo adoptante.
+## 1. Mission — is each North Star pillar being served?
+North Star placeholder → no real pillars. 003: Mission `n/a` (reason: template repo).
+Measurable drift: N/A until an adopter repo.
 
-## 2. Re-chequeos pendientes
-Ninguno (003 cerró `n/a`, sin `pending-observation`).
+## 2. Pending re-checks
+None (003 closed as `n/a`, no `pending-observation`).
 
-## 3. Método — ¿el WoW agrega valor? (N=1)
-| Feature | Gaps /distill | RED disciplina | Rework verify/uat | Escalaciones |
+## 3. Method — does the WoW add value? (N=1)
+| Feature | Gaps /distill | RED discipline | Rework verify/uat | Escalations |
 |---|---|---|---|---|
-| 003 | 0 (grilling en brainstorming) | ✅ sí | 0 / 0 | diseño, no inner-loop |
-Temas de fricción: North Star placeholder bloquea Cara A; simplificación de bootstrap descubierta al construir.
+| 003 | 0 (grilling in brainstorming) | ✅ yes | 0 / 0 | design, not inner-loop |
+Friction themes: North Star placeholder blocks Face A; bootstrap simplification discovered during build.
 
-## 4. Loop — ¿el WoW se mejora a sí mismo?
-Reglas candidatas: 1 propuesta (nota repo-plantilla Cara A), 0 aterrizadas aún.
-Amendments North Star: 0 / 0.
+## 4. Loop — does the WoW improve itself?
+Candidate rules: 1 proposed (template repo Face A note), 0 landed yet.
+North Star amendments: 0 / 0.
 
-## 5. Olores de teatro
-003 no es all-green (declara fricción real y 0 gaps justificado por venir de brainstorming, no de /distill). Evidencia presente. Sin olores.
+## 5. Theater smells
+003 is not all-green (declares real friction and 0 gaps justified by coming from brainstorming, not /distill). Evidence present. No smells.
 ```
 
-- [ ] **Step 2: Correr el suite (no debe romper nada; `/wow-report` no gatea)**
+- [ ] **Step 2: Run the suite (must not break anything; `/wow-report` does not gate)**
 
 Run: `bash tests/run.sh 2>&1 | tail -2`
 Expected: `TOTAL PASS=… FAIL=0`
@@ -643,48 +643,48 @@ Expected: `TOTAL PASS=… FAIL=0`
 
 ```bash
 git add verification/wow-report.md
-git commit -m "feat(003): generar wow-report.md (ledger N=1, cara Método real)"
+git commit -m "feat(003): generate wow-report.md (ledger N=1, real Method Face)"
 ```
 
 ---
 
-### Task 8: Verde final + readiness de merge
+### Task 8: Final green + merge readiness
 
-**Files:** ninguno (verificación)
+**Files:** none (verification)
 
-- [ ] **Step 1: Suite completo verde**
+- [ ] **Step 1: Full suite green**
 
 Run: `bash tests/run.sh 2>&1 | tail -3`
 Expected: `TOTAL PASS=… FAIL=0`
 
-- [ ] **Step 2: Secret scan limpio** (si aplica al repo)
+- [ ] **Step 2: Clean secret scan** (if applicable to the repo)
 
 Run: `bash tests/run.sh 2>&1 | grep -iE "secret|check_60"`
-Expected: sin FAIL
+Expected: no FAIL
 
-- [ ] **Step 3: Revisar el diff completo de la rama**
+- [ ] **Step 3: Review the full branch diff**
 
 Run: `git log --oneline main..HEAD && git diff --stat main..HEAD`
-Expected: los commits de Fases 1-4; archivos del manifiesto presentes.
+Expected: commits from Phases 1-4; manifest files present.
 
-- [ ] **Step 4:** Reportar al humano que la rama `003-wow-self-validation` está lista para merge a `main`. No mergear sin OK explícito.
+- [ ] **Step 4:** Report to the human that branch `003-wow-self-validation` is ready to merge to `main`. Do not merge without explicit approval.
 
 ---
 
-## Self-Review (hecho por el autor del plan)
+## Self-Review (done by the plan author)
 
-**1. Cobertura del spec:**
-- Template retro 3 caras → Task 1 ✅
-- Contrato DONE `∧ retro ✅` → Task 2 ✅
-- `check_90` (template + wiring + cierre uniforme, sin hardcode) → Task 3 ✅
-- Anti-teatro 4 capas → Cara B `[deriv]` (Task 1/3), evidencia obligatoria + `check_90` (Task 3), auto-desafío en skill (Task 4), olores en `/wow-report` §5 (Task 5) ✅
-- Skill+comando `/retro` → Task 4 ✅ · `/wow-report` → Task 5 ✅
-- Bootstrap: sin hardcode, `002` no-DONE se saltea → Task 3 (loop vacuo) ✅
-- Dogfood recursivo `003` (Cara A `n/a` por NS placeholder, Cara B real) → Tasks 6-7 ✅
-- `/wow-report` genera snapshot commiteado → Task 7 ✅
+**1. Spec coverage:**
+- 3-face retro template → Task 1 ✅
+- DONE contract `∧ retro ✅` → Task 2 ✅
+- `check_90` (template + wiring + uniform closure, no hardcoding) → Task 3 ✅
+- 4-layer anti-theater → Face B `[deriv]` (Task 1/3), mandatory evidence + `check_90` (Task 3), self-challenge in skill (Task 4), smells in `/wow-report` §5 (Task 5) ✅
+- Skill+command `/retro` → Task 4 ✅ · `/wow-report` → Task 5 ✅
+- Bootstrap: no hardcoding, `002` non-DONE is skipped → Task 3 (vacuous loop) ✅
+- Recursive dogfood `003` (Face A `n/a` due to NS placeholder, Face B real) → Tasks 6-7 ✅
+- `/wow-report` generates committed snapshot → Task 7 ✅
 
-**2. Placeholder scan:** los `<…>` dentro de bloques son sintaxis de template/retro (contenido real a llenar por el ejecutor con git data), no placeholders del plan. Sin TBD/TODO.
+**2. Placeholder scan:** the `<…>` inside blocks are template/retro syntax (real content to be filled by the executor with git data), not plan placeholders. No TBD/TODO.
 
-**3. Type consistency:** nombres de archivo/comando/skill (`retro`, `wow-report`, `check_90_retro.sh`, `verification/wow-report.md`) consistentes entre tasks; los loops de `check_40`/`check_50` referencian exactamente esos nombres.
+**3. Type consistency:** file/command/skill names (`retro`, `wow-report`, `check_90_retro.sh`, `verification/wow-report.md`) are consistent across tasks; the `check_40`/`check_50` loops reference exactly those names.
 
-**Nota de fragilidad conocida (para el ejecutor):** el `done_re`/detección de DONE en `check_90` usa `grep` sobre emojis UTF-8; si el entorno tiene problemas de locale, verificar con `LC_ALL=C.UTF-8`. El fixture de Task 3 (steps 3-5) existe justo para cazar esto antes de confiar en la gate.
+**Known fragility note (for the executor):** the `done_re`/DONE detection in `check_90` uses `grep` over UTF-8 emojis; if the environment has locale issues, verify with `LC_ALL=C.UTF-8`. The Task 3 fixture (steps 3-5) exists precisely to catch this before trusting the gate.

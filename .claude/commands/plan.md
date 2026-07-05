@@ -1,7 +1,7 @@
 ---
-description: Producir el plan técnico (plan.md) grounded en la constitution.
+description: Produce the technical plan (plan.md) grounded in the constitution.
 ---
 
-Con `spec.md` congelado, escribí `specs/<feature>/plan.md`. Cada decisión técnica debe
-respetar los no-negociables y los patterns `[given]`; cualquier override requiere
-justificación explícita en `memory/constitution/constitution.md`.
+With `spec.md` frozen, write `specs/<feature>/plan.md`. Every technical decision must
+respect the non-negotiables and `[given]` patterns; any override requires explicit
+justification in `memory/constitution/constitution.md`.

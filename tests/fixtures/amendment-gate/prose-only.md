@@ -1,8 +1,8 @@
-# fixture: SOLO cambió la prosa; el bloque JSON es idéntico a base.md
+# fixture: ONLY prose changed; the JSON block is identical to base.md
 
-Esta introducción fue reescrita por completo, se agregaron párrafos, se cambió
-la redacción de la misión humana — pero el bloque canónico no se tocó. Los sets
-pillars/scope no cambian.
+This introduction was completely rewritten, paragraphs were added, the wording
+of the human mission was changed — but the canonical block was not touched. The
+pillars/scope sets do not change.
 
 ```json
 {

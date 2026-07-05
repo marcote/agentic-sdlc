@@ -1,15 +1,15 @@
 # Brief — <feature>
 
-> ORIGEN del desarrollo. Describe el OBJETIVO y el POR QUÉ, no la solución.
+> ORIGIN of the development. Describes the OBJECTIVE and the WHY, not the solution.
 
-## Objetivo de producto
-_(qué problema de negocio/usuario resolvemos)_
+## Product objective
+_(what business/user problem we are solving)_
 
-## Por qué / motivación
-_(por qué ahora, qué pasa si no lo hacemos)_
+## Why / motivation
+_(why now, what happens if we do not do it)_
 
-## Métricas de éxito
-_(medibles: p.ej. "↑ conversión móvil 5%", "latencia p95 < 300ms")_
+## Success metrics
+_(measurable: e.g. "↑ mobile conversion 5%", "p95 latency < 300ms")_
 
-## Fuera de alcance
-_(qué explícitamente NO hace)_
+## Out of scope
+_(what it explicitly does NOT do)_

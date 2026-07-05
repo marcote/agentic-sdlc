@@ -1,11 +1,11 @@
-# El Factory Model
+# The Factory Model
 
-El output primario del desarrollador no es código: es el SISTEMA que produce código.
-El dev define specs y guardrails (constitution); el agente produce; la verificación valida.
+The developer's primary output is not code: it is the SYSTEM that produces code.
+The dev defines specs and guardrails (constitution); the agent produces; the verification validates.
 
-- **Zona del developer:** define specs → diseña guardrails (constitution) → revisa/aprueba.
-- **Piso de fábrica (agente):** planning → coding → tests & verification → output verificado.
-- **Guardrails transversales:** la constitution (declarativa) + gates de workflow.
+- **Developer zone:** defines specs → designs guardrails (constitution) → reviews/approves.
+- **Factory floor (agent):** planning → coding → tests & verification → verified output.
+- **Cross-cutting guardrails:** the constitution (declarative) + workflow gates.
 
-`Agent = Model + Harness`. Este repo ES el harness: instrucciones, tools, skills,
-guardrails, feedback loops y observability alrededor del modelo.
+`Agent = Model + Harness`. This repo IS the harness: instructions, tools, skills,
+guardrails, feedback loops, and observability around the model.

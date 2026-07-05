@@ -1,16 +1,16 @@
-# Tasks — Guardar tarjeta con 1-tap
+# Tasks — Save card with 1-tap
 
-> Descomposición ejecutable. Producido por `/tasks`. GATE: no se emiten tasks de
-> implementación mientras exista un criterio determinista sin test ligado en 🔴 RED.
-> (El gate ya pasó: cada criterio determinista tiene su `.feature` ligado en `coverage.md`.)
+> Executable breakdown. Produced by `/tasks`. GATE: implementation tasks are not issued
+> while a deterministic criterion exists without a linked test in 🔴 RED.
+> (Gate already passed: every deterministic criterion has its `.feature` linked in `coverage.md`.)
 
 ## Tasks
-- [x] T1: `TokenizationClient` con timeout 300ms — cubre: *token < 300ms*, *sin PAN* (🟢, en UAT ✅ el primero)
-- [x] T2: Middleware de audit-log en escrituras — cubre: *audit-log* `[given]` (🟢)
-- [x] T3: `OneTapPayHandler` (pago con tarjeta guardada) — cubre: *paga sin reingresar* (🟢)
-- [ ] T4: Idempotencia por `idempotency-key` en `SaveCardHandler` — cubre: *idempotencia* `[given]` (🔴 → en curso)
-- [ ] T5: Eval case de claridad del mensaje de rechazo — cubre: *mensaje claro* (📋 case a completar)
+- [x] T1: `TokenizationClient` with 300ms timeout — covers: *token < 300ms*, *no PAN* (🟢, UAT ✅ first one)
+- [x] T2: audit-log middleware on writes — covers: *audit-log* `[given]` (🟢)
+- [x] T3: `OneTapPayHandler` (payment with saved card) — covers: *pays without re-entering* (🟢)
+- [ ] T4: Idempotency by `idempotency-key` in `SaveCardHandler` — covers: *idempotency* `[given]` (🔴 → in progress)
+- [ ] T5: Eval case for rejection message clarity — covers: *clear message* (📋 case to complete)
 
-## Siguiente paso
-Cerrar T4 (🔴→🟢), luego `/verify` sobre el feature y `/uat` contra `acceptance.md`.
-El feature no cierra hasta BUILD ✅ + TRAJECTORY ✅ + UAT ✅ + coverage 100%.
+## Next step
+Close T4 (🔴→🟢), then `/verify` on the feature and `/uat` against `acceptance.md`.
+The feature does not close until BUILD ✅ + TRAJECTORY ✅ + UAT ✅ + coverage 100%.

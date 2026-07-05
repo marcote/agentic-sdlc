@@ -1,7 +1,7 @@
 ---
-description: Valida los objetivos de specs/<feature>/brief.md contra el North Star y escribe alignment.md (Measurability Gate). Requerido antes de /distill.
+description: Validates the objectives in specs/<feature>/brief.md against the North Star and writes alignment.md (Measurability Gate). Required before /distill.
 ---
 
-Invocá la skill `align`. Requiere `specs/<feature>/brief.md` y un
-`memory/north-star/north-star.md` schema-válido. Escribe `specs/<feature>/alignment.md`.
-`/distill` se niega a arrancar salvo que el veredicto sea `aligned`.
+Invoke the `align` skill. Requires `specs/<feature>/brief.md` and a schema-valid
+`memory/north-star/north-star.md`. Writes `specs/<feature>/alignment.md`.
+`/distill` refuses to start unless the verdict is `aligned`.

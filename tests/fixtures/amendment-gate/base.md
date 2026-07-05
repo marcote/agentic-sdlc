@@ -1,6 +1,6 @@
-# fixture: north-star baseline (canónico)
+# fixture: north-star baseline (canonical)
 
-Prosa humana de referencia. El bloque de abajo es el canónico.
+Human reference prose. The block below is the canonical one.
 
 ```json
 {

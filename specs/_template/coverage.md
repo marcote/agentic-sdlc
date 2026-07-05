@@ -1,15 +1,15 @@
 # Coverage — <feature>
 
-> Matriz de trazabilidad = fuente de verdad del estado de cada criterio y detector de
-> gaps. Regla: todo objetivo → un criterio; todo criterio → un eval/UAT. Fila huérfana = gap.
-> Cadena: **pilar → objetivo → criterio** — todo objetivo traza hasta un pilar del North Star
-> (`memory/north-star/north-star.md`) vía el mapping objetivo→pilar de `specs/<feature>/alignment.md`.
-> Una fila con la celda **Pillar** vacía es una señal de drift (ver el orphan check de `/align`).
+> Traceability matrix = source of truth for the state of each criterion and gap detector.
+> Rule: every objective → one criterion; every criterion → one eval/UAT. Orphan row = gap.
+> Chain: **pillar → objective → criterion** — every objective traces to a North Star pillar
+> (`memory/north-star/north-star.md`) via the objective→pillar mapping in `specs/<feature>/alignment.md`.
+> A row with an empty **Pillar** cell is a drift signal (see the orphan check of `/align`).
 
-**Leyenda de estado:** `sin contrato` → `🔴 red` → `🟢 green` → `✅ uat`  ·
-`📋 case` (no-determinista) · `[given]` (heredado de constitution) · `deferred` (gap justificado)
+**Status legend:** `no contract` → `🔴 red` → `🟢 green` → `✅ uat`  ·
+`📋 case` (non-deterministic) · `[given]` (inherited from constitution) · `deferred` (justified gap)
 
-| Pillar | Objetivo (brief) | Requerimiento (spec) | Criterio (acceptance) | Origen | Test/Eval ligado | Estado |
+| Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked test/eval | Status |
 |---|---|---|---|---|---|---|
-| _(ej.)_ `pilar-a` | _(ej.)_ ↑ conversión | Guardar tarjeta 1-tap | token < 300ms | proyecto | `card_token.feature` | 🔴 red |
-| — | — | (todas las escrituras) | audit-log actor+ts | `[given] base/audit-logging` | `audit.feature` | 🔴 red |
+| _(e.g.)_ `pillar-a` | _(e.g.)_ ↑ conversion | Save card 1-tap | token < 300ms | project | `card_token.feature` | 🔴 red |
+| — | — | (all writes) | audit-log actor+ts | `[given] base/audit-logging` | `audit.feature` | 🔴 red |

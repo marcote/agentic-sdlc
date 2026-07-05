@@ -1,7 +1,7 @@
 # Pattern: Audit Logging (given practice)
 
-**Principio:** toda operación que escribe estado deja rastro auditable.
-**Aplica a:** cualquier feature con endpoints/acciones de escritura.
-**Criterios inyectados:**
-- `[given]` cada operación de escritura emite audit-log con `actor` + `timestamp` + `entidad`.
-  → mapea a `eval: audit-trail`.
+**Principle:** every operation that writes state leaves an auditable trail.
+**Applies to:** any feature with write endpoints/actions.
+**Injected criteria:**
+- `[given]` each write operation emits an audit-log with `actor` + `timestamp` + `entity`.
+  → maps to `eval: audit-trail`.

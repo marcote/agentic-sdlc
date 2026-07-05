@@ -1,24 +1,24 @@
-# Coverage — Guardar tarjeta con 1-tap
+# Coverage — Save card with 1-tap
 
-> Matriz de trazabilidad = fuente de verdad del estado de cada criterio y detector de
-> gaps. Regla: todo objetivo → un criterio; todo criterio → un eval/UAT. Fila huérfana = gap.
+> Traceability matrix = source of truth for the status of each criterion and gap detector.
+> Rule: every objective → a criterion; every criterion → an eval/UAT. Orphan row = gap.
 >
-> **Estado de este feature: a mitad de camino** — sirve para ver la matriz con estados
-> mezclados. Todavía NO cierra (falta idempotencia en 🟢 y el UAT del pago). Recordá:
+> **Status of this feature: halfway there** — used to show the matrix with mixed statuses.
+> Does NOT close yet (idempotency missing at 🟢 and the UAT of the payment). Remember:
 > `feature DONE ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100%`.
 
-**Leyenda de estado:** `sin contrato` → `🔴 red` → `🟢 green` → `✅ uat`  ·
-`📋 case` (no-determinista) · `[given]` (heredado de constitution) · `deferred` (gap justificado)
+**Status legend:** `no contract` → `🔴 red` → `🟢 green` → `✅ uat`  ·
+`📋 case` (non-deterministic) · `[given]` (inherited from constitution) · `deferred` (justified gap)
 
-| Objetivo (brief) | Requerimiento (spec) | Criterio (acceptance) | Origen | Test/Eval ligado | Estado |
+| Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked Test/Eval | Status |
 |---|---|---|---|---|---|
-| Tokenización p95 < 300ms | Tokenizar y persistir token | token < 300ms, sin PAN | proyecto | `card_token.feature` | ✅ uat |
-| 0 incidentes PCI | Nunca almacenar PAN | respuesta sin PAN en claro | proyecto | `card_token.feature` | 🟢 green |
-| — (toda escritura) | Persistir token | audit-log actor+ts+entidad | `[given] base/audit-logging` | `audit.feature` | 🟢 green |
-| — (reintentos) | Guardado repetible | idempotencia por key | `[given] base/idempotency` | `idempotency.feature` | 🔴 red |
-| ↑ conversión 2da compra | Pago con tarjeta guardada | paga sin reingresar datos | proyecto | `one_tap_pay.feature` | 🟢 green |
-| Calidad de UX ante error | Mensaje claro de rechazo | claridad del mensaje | proyecto | `evals/cases/reject-msg.yaml` | 📋 case |
-| (fuera de alcance) | Multi-tarjeta | selección entre varias | proyecto | — | deferred |
+| Tokenization p95 < 300ms | Tokenize and persist token | token < 300ms, no PAN | project | `card_token.feature` | ✅ uat |
+| 0 PCI incidents | Never store PAN | response without PAN in the clear | project | `card_token.feature` | 🟢 green |
+| — (every write) | Persist token | audit-log actor+ts+entity | `[given] base/audit-logging` | `audit.feature` | 🟢 green |
+| — (retries) | Repeatable save | idempotency by key | `[given] base/idempotency` | `idempotency.feature` | 🔴 red |
+| ↑ conversion 2nd purchase | Payment with saved card | pays without re-entering data | project | `one_tap_pay.feature` | 🟢 green |
+| UX quality on error | Clear rejection message | message clarity | project | `evals/cases/reject-msg.yaml` | 📋 case |
+| (out of scope) | Multi-card | selection among several | project | — | deferred |
 
-**Gaps abiertos:** ninguno huérfano. Pendientes para cerrar: `idempotency.feature` a 🟢
-(implementación en curso, ver `tasks.md` T4) y el pase de UAT sobre los criterios en 🟢.
+**Open gaps:** none orphaned. Pending to close: `idempotency.feature` to 🟢
+(implementation in progress, see `tasks.md` T4) and the UAT pass on criteria at 🟢.

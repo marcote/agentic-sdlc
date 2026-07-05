@@ -1,14 +1,14 @@
 # Acceptance — <feature>
 
-> Criterios de aceptación medibles en BDD. CADA criterio ES simultáneamente el
-> eval y el paso de UAT. La porción determinista se materializa como test en `/contract`.
+> Measurable acceptance criteria in BDD. EACH criterion IS simultaneously the
+> eval and the UAT step. The deterministic portion materialises as a test in `/contract`.
 
-## Criterio: <nombre>  (determinista)
+## Criterion: <name>  (deterministic)
 ```gherkin
-Given <precondición>
-When <acción>
-Then <resultado observable y medible>
+Given <precondition>
+When <action>
+Then <observable and measurable result>
 ```
 
-## Criterio: <nombre>  (no-determinista → eval case)
-_(comportamiento/calidad que no se unit-testea; genera un case en `evals/cases/`)_
+## Criterion: <name>  (non-deterministic → eval case)
+_(behaviour/quality that is not unit-tested; generates a case in `evals/cases/`)_

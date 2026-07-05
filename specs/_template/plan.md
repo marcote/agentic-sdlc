@@ -1,13 +1,13 @@
-# Plan técnico — <feature>
+# Technical plan — <feature>
 
-> CÓMO se construye. Producido por `/plan`. Debe estar grounded en la constitution
-> (no puede proponer nada que viole un no-negociable o un pattern `[given]` sin override).
+> HOW it is built. Produced by `/plan`. Must be grounded in the constitution
+> (cannot propose anything that violates a non-negotiable or a `[given]` pattern without an override).
 
-## Decisiones técnicas
-- _(decisión + trade-off + qué principio/pattern de la constitution la restringe)_
+## Technical decisions
+- _(decision + trade-off + which constitution principle/pattern constrains it)_
 
-## Componentes / módulos
-- _(unidad → responsabilidad → interfaz)_
+## Components / modules
+- _(unit → responsibility → interface)_
 
-## Riesgos
-- _(riesgo → mitigación)_
+## Risks
+- _(risk → mitigation)_

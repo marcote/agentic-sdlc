@@ -1,22 +1,22 @@
 # Verification Report — 003-wow-self-validation @ a0d42e8
 
-spec: design 2026-07-05 · fecha: 2026-07-05 · constitution: base + proyecto
+spec: design 2026-07-05 · date: 2026-07-05 · constitution: base + project
 
 ## 1. Coverage snapshot
-Criterios estructurales cubiertos por `tests/check_*.sh` (template, wiring, gate, skills/comandos).
+Structural criteria covered by `tests/check_*.sh` (template, wiring, gate, skills/commands).
 
 ## 2. Output eval (BUILD)
-`bash tests/run.sh` → TOTAL FAIL=0. Task success: checks estructurales 100%.
+`bash tests/run.sh` → TOTAL FAIL=0. Task success: structural checks 100%.
 
 ## 3. Trajectory eval
-Construido test-first: cada archivo nuevo tuvo su aserción en RED antes de crearse
-(git log Fases 1-3). Sin pasos saltados.
+Built test-first: every new file had its assertion in RED before being created
+(git log Phases 1-3). No steps skipped.
 
 ## 4. UAT
-Capacidad ejercitada end-to-end: fixture DONE sin retro → `check_90` FAIL; con retro →
-PASS (Task 3 steps 3-4). `/retro` produce este mismo retro.
+Capability exercised end-to-end: DONE fixture without retro → `check_90` FAIL; with retro →
+PASS (Task 3 steps 3-4). `/retro` produces this very retro.
 
-## 5. Veredicto
+## 5. Verdict
 BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% · retro: ✅
-Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
+Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/003-wow-self-validation/retro.md`.

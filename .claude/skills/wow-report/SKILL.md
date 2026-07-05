@@ -1,37 +1,37 @@
 ---
 name: wow-report
-description: Agrega el ledger de retros en verification/wow-report.md — drift por pilar (mapping × veredicto de signal), re-chequeos pendientes, salud del método y olores de teatro. Observabilidad on-demand, nunca gatea. Usar para responder "¿está funcionando el WoW?".
+description: Aggregates the retro ledger in verification/wow-report.md — drift by pillar (mapping x signal verdict), pending re-checks, method health, and theater smells. On-demand observability, never gates. Use to answer "is the WoW working?".
 ---
 
 # WoW Report
 
-Entrada: todos los `specs/*/retro.md`, sus `alignment.md`, y `verification/reports/*`.
-Salida: `verification/wow-report.md` (snapshot generado y commiteado). **Observa, nunca
-gatea** — el diente determinista es `tests/check_90_retro.sh`; esto es síntesis para el
-humano.
+Input: all `specs/*/retro.md`, their `alignment.md`, and `verification/reports/*`.
+Output: `verification/wow-report.md` (generated and committed snapshot). **Observes, never
+gates** — the deterministic teeth are `tests/check_90_retro.sh`; this is synthesis for the
+human.
 
-## Procedimiento
-Regenerá `verification/wow-report.md` con cinco secciones:
+## Procedure
+Regenerate `verification/wow-report.md` with five sections:
 
-1. **Misión — ¿cada pilar del North Star está siendo servido?** Cruzá el `mapping`
-   objetivo→pilar de cada `alignment.md` con el veredicto de signal del `retro.md`. Tabla
-   por pilar: features que dijeron servirlo × si el signal se movió. **Un pilar con
-   features que lo prometieron pero ningún signal movido = drift medible** (destacalo).
+1. **Mission — is each North Star pillar being served?** Cross the objective→pillar `mapping`
+   from each `alignment.md` with the signal verdict from `retro.md`. Table per pillar:
+   features that claimed to serve it x whether the signal moved. **A pillar with
+   features that promised it but no signal moved = measurable drift** (highlight it).
 
-2. **Re-chequeos pendientes (worklist).** Juntá los `pending-observation` con su trigger;
-   marcá los vencidos.
+2. **Pending re-checks (worklist).** Gather the `pending-observation` entries with their
+   trigger; mark the overdue ones.
 
-3. **Método — ¿el WoW agrega valor?** (N=<n>, muestra chica, sin estadística). Tabla
-   por-feature: gaps cazados, disciplina RED, rework verify/uat, escalaciones. Agrupá
-   temas de fricción recurrentes.
+3. **Method — does the WoW add value?** (N=<n>, small sample, no statistics). Per-feature
+   table: gaps caught, RED discipline, rework verify/uat, escalations. Group recurring
+   friction themes.
 
-4. **Loop — ¿el WoW se mejora a sí mismo?** Reglas candidatas propuestas vs aterrizadas
-   en constitution; amendments propuestos vs aprobados (ADR).
+4. **Loop — does the WoW improve itself?** Candidate rules proposed vs landed in
+   constitution; amendments proposed vs approved (ADR).
 
-5. **Olores de teatro (spot-check humano, Capa 4).** Marcá retros sospechosos: celdas de
-   Evidencia vacías, all-green (cero gaps + cero rework + cero fricción),
-   `pending-observation` vencidos. Un retro demasiado limpio ES una señal.
+5. **Theater smells (human spot-check, Layer 4).** Flag suspicious retros: empty
+   Evidence cells, all-green (zero gaps + zero rework + zero friction),
+   overdue `pending-observation`. A retro that is too clean IS a signal.
 
-## Honestidad del N=1
-El reporte declara explícito "N=<n>, muestra chica, sin estadística". No finge
-tendencias; muestra por-feature + totales + temas.
+## Honesty of N=1
+The report explicitly declares "N=<n>, small sample, no statistics". It does not fake
+trends; it shows per-feature + totals + themes.

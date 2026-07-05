@@ -1,50 +1,49 @@
-# Resultado del eval — north-star-judge (feature 002)
+# Eval result — north-star-judge (feature 002)
 
-> Criterio no-determinista **JUDGE-ALIGNMENT**. Cases en
-> `evals/cases/north-star-judge.md`, puntuados contra
-> `memory/north-star/base/alignment-rubric.md`. Los pilares son **ilustrativos**
-> (`pilar-a`, `pilar-b`) — este repo es la plantilla, `north-star.md` es un
-> placeholder. Estado: 📋 case.
+> Non-deterministic criterion **JUDGE-ALIGNMENT**. Cases in
+> `evals/cases/north-star-judge.md`, scored against
+> `memory/north-star/base/alignment-rubric.md`. Pillars are **illustrative**
+> (`pilar-a`, `pilar-b`) — this repo is the template, `north-star.md` is a
+> placeholder. Status: 📋 case.
 
-## Case 1 — brief in-scope
+## Case 1 — in-scope brief
 
-Objetivo: filtro de solo-lectura que muestra qué elementos avanzan un `signal` de
-`pilar-a`, sin modificar datos.
+Objective: read-only filter that shows which elements advance a `signal` of
+`pilar-a`, without modifying data.
 
-| Dimensión | Score | Nota |
+| Dimension | Score | Note |
 |---|---|---|
-| pillar fit | 4 | mapea a `pilar-a` vía un `signal` explícito, sin huérfano |
-| scope compliance | 5 | de lleno en `in_scope` (solo-lectura/visualización) |
-| mission advancement | 4 | efecto observable sobre el `signal` nombrado |
+| pillar fit | 4 | maps to `pilar-a` via an explicit `signal`, no orphan |
+| scope compliance | 5 | squarely in `in_scope` (read-only/visualization) |
+| mission advancement | 4 | observable effect on the named `signal` |
 
-Veredicto derivado: **`aligned`** (las 3 dimensiones ≥ 3, sin hit de scope, sin
-huérfano). **Coincide** con el comportamiento esperado.
+Derived verdict: **`aligned`** (all 3 dimensions ≥ 3, no scope hit, no
+orphan). **Matches** the expected behavior.
 
-## Case 2 — brief plausible-pero-fuera-de-alcance
+## Case 2 — plausible-but-out-of-scope brief
 
-Objetivo: botón que deja a los usuarios mutar `north-star.md` (pilares/scope) desde
-la UI, sin PR ni revisión.
+Objective: button that lets users mutate `north-star.md` (pillars/scope) from
+the UI, without PR or review.
 
-| Dimensión | Score | Nota |
+| Dimension | Score | Note |
 |---|---|---|
-| pillar fit | 3 | menciona el North Star; superficialmente relevante |
-| **scope compliance** | **1** | muta scope/pillars sin ADR ni PR → viola `amendment-protocol.md`, hit de `out_of_scope` |
-| mission advancement | 2 | no avanza ningún `signal` |
+| pillar fit | 3 | mentions the North Star; superficially relevant |
+| **scope compliance** | **1** | mutates scope/pillars without ADR or PR → violates `amendment-protocol.md`, hits `out_of_scope` |
+| mission advancement | 2 | does not advance any `signal` |
 
-Veredicto derivado: **`rejected`** — el hit de scope corta la agregación sin importar
-las otras dimensiones (`plan.md` decisión 3). Scope compliance puntúa
-específicamente **< 3** (no un promedio bajo diluido). **Coincide** con el
-comportamiento esperado.
+Derived verdict: **`rejected`** — the scope hit cuts the aggregation regardless
+of the other dimensions (`plan.md` decision 3). Scope compliance scores
+specifically **< 3** (not a diluted average). **Matches** the expected behavior.
 
-## Conclusión
+## Conclusion
 
-Ambos cases coinciden con su veredicto esperado (`aligned` / `rejected`); el Case 2
-muestra scope compliance `< 3` de forma específica. Este es el **resultado
-esperado (ilustrativo — cada proyecto adoptante corre este eval contra su North
-Star real)**: `north-star.md` en este repo es un placeholder sin predicados
-`out_of_scope` reales, así que no hay un eval "pasando" en sentido estricto
-todavía — lo que este documento registra es que el judge, puntuando contra los
-pilares ilustrativos `pilar-a`/`pilar-b`, produce el veredicto que la rúbrica
-predice. El motor determinista de agregación (`alignVerdict`) es contrato
-per-stack — no unit-testeado aquí (criterio `ALIGN-VERDICT-CONTRACT`);
+Both cases match their expected verdict (`aligned` / `rejected`); Case 2
+shows scope compliance `< 3` specifically. This is the **expected result
+(illustrative — each adopting project runs this eval against its own real North
+Star)**: `north-star.md` in this repo is a placeholder without real
+`out_of_scope` predicates, so there is no "passing" eval in the strict sense
+yet — what this document records is that the judge, scoring against the
+illustrative pillars `pilar-a`/`pilar-b`, produces the verdict that the rubric
+predicts. The deterministic aggregation engine (`alignVerdict`) is a per-stack
+contract — not unit-tested here (criterion `ALIGN-VERDICT-CONTRACT`);
 reference: `poirot-fe scripts/north-star/`.

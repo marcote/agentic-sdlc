@@ -1,35 +1,35 @@
-# Coverage — CI-gate del amendment del North Star
+# Coverage — CI-gate for the North Star amendment
 
-> Matriz de trazabilidad = fuente de verdad del estado de cada criterio y detector de
-> gaps. Regla: todo objetivo → un criterio; todo criterio → un eval/UAT. Fila huérfana = gap.
-> Cadena: **pilar → objetivo → criterio** vía el mapping de `alignment.md` (`aligned`).
+> Traceability matrix = source of truth for the status of each criterion and gap detector.
+> Rule: every objective → a criterion; every criterion → an eval/UAT. Orphan row = gap.
+> Chain: **pillar → objective → criterion** via the mapping in `alignment.md` (`aligned`).
 
-**Leyenda de estado:** `sin contrato` → `🔴 red` → `🟢 green` → `✅ uat`  ·
-`📋 case` (no-determinista) · `[given]` (heredado de constitution) · `deferred` (gap justificado)
-· `UAT (config)` = config de GitHub, no unit-testeable — validado en `/uat`, no en `/contract`.
+**Status legend:** `no contract` → `🔴 red` → `🟢 green` → `✅ uat`  ·
+`📋 case` (non-deterministic) · `[given]` (inherited from constitution) · `deferred` (justified gap)
+· `UAT (config)` = GitHub config, not unit-testable — validated in `/uat`, not in `/contract`.
 
-Ningún `base/pattern` aplica como `[given]` (no hay writes/API/rate-limit en un checker bash).
+No `base/pattern` applies as `[given]` (no writes/API/rate-limit in a bash checker).
 
-| Pillar | Objetivo (brief) | Requerimiento (spec) | Criterio (acceptance) | Origen | Test/Eval ligado | Estado |
+| Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked Test/Eval | Status |
 |---|---|---|---|---|---|---|
-| `enforcement-real` · `impacto-medible` | Gatear amendments por CI determinista | Script gate: detecta cambio de sets pillars/scope, exige ADR | AMEND-BLOCK-NO-ADR | proyecto | `check_95_amendment_gate.sh` | 🟢 green |
-| `enforcement-real` · `impacto-medible` | Gatear amendments por CI determinista | Script gate: pasa con ADR + schema + suite | AMEND-PASS-WITH-ADR | proyecto | `check_95_amendment_gate.sh` | 🟢 green |
-| `enforcement-real` | Gatear amendments por CI determinista | Script gate: no exige ADR para prosa/threshold | AMEND-NO-ADR-FOR-PROSE | proyecto | `check_95_amendment_gate.sh` | 🟢 green |
-| `enforcement-real` | Gatear amendments por CI determinista | Script gate: detección por sets, no por texto | AMEND-SET-SEMANTICS | proyecto | `check_95_amendment_gate.sh` | 🟢 green |
-| `enforcement-real` · `impacto-medible` | Gatear amendments por CI determinista | Script gate: exige North Star schema-válido | AMEND-SCHEMA-VALID | proyecto | `check_95_amendment_gate.sh` | 🟢 green |
-| `enforcement-real` | Gatear amendments por CI determinista | Script gate: exige suite verde | AMEND-SUITE-GREEN | proyecto | `check_95_amendment_gate.sh` | 🟢 green |
-| `enforcement-real` | Bloqueo angosto (preserva principio 4) | Gate no bloquea trabajo que no toca pillars/scope | DEV-UNBLOCKED | proyecto | `check_95_amendment_gate.sh` | 🟢 green |
-| `enforcement-real` | Bloqueo angosto (preserva principio 4) | Delta de constitution declara la excepción | CONST-EXCEPTION | proyecto | `check_95_amendment_gate.sh` (grep constitution) | 🟢 green |
-| `portabilidad-agnostica` | Dependency-free + self-check verde | Sin deps de runtime nuevas | DEP-FREE | proyecto | `check_95_amendment_gate.sh` (gate sin toolchain + no manifests) | 🟢 green |
-| `portabilidad-agnostica` | Dependency-free + self-check verde | Wiring cubierto (script + workflow existen) | SELF-CHECK | proyecto | `check_95_amendment_gate.sh` + `check_40/70` | 🟢 green |
-| `enforcement-real` | Realmente bloqueante (branch protection) | Action + branch protection exigen el status-check | AMEND-BLOCK-REAL | proyecto | UAT walk (PR rojo no mergeable) | ✅ uat |
-| `enforcement-real` | Realmente bloqueante (branch protection) | Branch protection prohíbe bypass en push directo | AMEND-BLOCK-PUSH | proyecto | UAT walk (push directo rechazado) | ✅ uat |
+| `real-enforcement` · `measurable-impact` | Gate amendments by deterministic CI | Gate script: detects change of pillars/scope sets, requires ADR | AMEND-BLOCK-NO-ADR | project | `check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement` · `measurable-impact` | Gate amendments by deterministic CI | Gate script: passes with ADR + schema + suite | AMEND-PASS-WITH-ADR | project | `check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement` | Gate amendments by deterministic CI | Gate script: does not require ADR for prose/threshold | AMEND-NO-ADR-FOR-PROSE | project | `check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement` | Gate amendments by deterministic CI | Gate script: detection by sets, not by text | AMEND-SET-SEMANTICS | project | `check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement` · `measurable-impact` | Gate amendments by deterministic CI | Gate script: requires schema-valid North Star | AMEND-SCHEMA-VALID | project | `check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement` | Gate amendments by deterministic CI | Gate script: requires green suite | AMEND-SUITE-GREEN | project | `check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement` | Narrow block (preserves principle 4) | Gate does not block work that does not touch pillars/scope | DEV-UNBLOCKED | project | `check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement` | Narrow block (preserves principle 4) | Constitution delta declares the exception | CONST-EXCEPTION | project | `check_95_amendment_gate.sh` (grep constitution) | 🟢 green |
+| `agnostic-portability` | Dependency-free + self-check green | No new runtime deps | DEP-FREE | project | `check_95_amendment_gate.sh` (gate without toolchain + no manifests) | 🟢 green |
+| `agnostic-portability` | Dependency-free + self-check green | Wiring covered (script + workflow exist) | SELF-CHECK | project | `check_95_amendment_gate.sh` + `check_40/70` | 🟢 green |
+| `real-enforcement` | Truly blocking (branch protection) | Action + branch protection require the status-check | AMEND-BLOCK-REAL | project | UAT walk (red PR not mergeable) | ✅ uat |
+| `real-enforcement` | Truly blocking (branch protection) | Branch protection prohibits bypass on direct push | AMEND-BLOCK-PUSH | project | UAT walk (direct push rejected) | ✅ uat |
 
-**Sin filas huérfanas:** cada objetivo del brief mapea a ≥1 criterio con pilar; cada
-criterio tiene test (`/contract`) o UAT walk. Spec congelable.
+**No orphan rows:** every brief objective maps to ≥1 criterion with a pillar; every
+criterion has a test (`/contract`) or UAT walk. Spec freezable.
 
-**Los 10 deterministas están 🔴 RED verificados** (`bash tests/run.sh` → todos FAIL por
-gate/workflow/delta de constitution ausentes) y avanzan a `🟢 green` recién cuando la impl
-los pone en verde. `DEP-FREE` se ató al deliverable (el gate debe existir y no invocar
-toolchains instalables) en vez de ser un mero guardarraíl de repo green-by-construction —
-así tiene fase RED genuina como el resto.
+**All 10 deterministic criteria are 🔴 RED verified** (`bash tests/run.sh` → all FAIL due to
+gate/workflow/constitution delta absent) and advance to `🟢 green` only when the impl
+puts them green. `DEP-FREE` was tied to the deliverable (the gate must exist and not invoke
+installable toolchains) instead of being a mere repo green-by-construction guardrail —
+so it has a genuine RED phase like the rest.

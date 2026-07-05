@@ -1,21 +1,21 @@
 # Verification Report — <feature> @ <commit/ref>
 
-spec: <spec.md vN> · fecha: <YYYY-MM-DD> · constitution: base v<X> + proyecto v<Y>
+spec: <spec.md vN> · date: <YYYY-MM-DD> · constitution: base v<X> + project v<Y>
 
 ## 1. Coverage snapshot
-_(copiado de coverage.md: criterio → estado → test/eval ligado)_
+_(copied from coverage.md: criterion → state → linked test/eval)_
 
-## 2. Output eval (BUILD)  — determinista, corre en /verify
-_(por criterio: test → pass/fail | Task success: N/N = %)_
+## 2. Output eval (BUILD)  — deterministic, runs in /verify
+_(per criterion: test → pass/fail | Task success: N/N = %)_
 
-## 3. Trajectory eval  — no-determinista, LM judge sobre la traza
-_(tool use: score/umbral | pasos saltados: … | hallucination: N)_
+## 3. Trajectory eval  — non-deterministic, LM judge over the trace
+_(tool use: score/threshold | skipped steps: … | hallucination: N)_
 
-## 4. UAT  — agregado por /uat, contra acceptance.md
-_(escenario BDD → walked → pass/fail → nota; los fallos de UAT son gaps de PRODUCTO → /distill)_
+## 4. UAT  — appended by /uat, against acceptance.md
+_(BDD scenario → walked → pass/fail → note; UAT failures are PRODUCT gaps → /distill)_
 
-## 5. Verdicto
-BUILD: <✅/❌> · TRAJECTORY: <✅/❌> · UAT: <✅/❌> · coverage: <N%> · retro: <✅/pendiente>
-Cierra ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
-Retro: `specs/<feature>/retro.md` (cierra la predicción medible de `/align`).
-Gaps ruteados: _(a /verify=implementación, a /distill=producto)_
+## 5. Verdict
+BUILD: <✅/❌> · TRAJECTORY: <✅/❌> · UAT: <✅/❌> · coverage: <N%> · retro: <✅/pending>
+Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
+Retro: `specs/<feature>/retro.md` (closes the measurable prediction from `/align`).
+Gaps routed: _(to /verify=implementation, to /distill=product)_

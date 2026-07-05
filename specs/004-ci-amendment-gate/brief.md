@@ -1,45 +1,46 @@
-# Brief — CI-gate del amendment del North Star
+# Brief — CI-gate for the North Star amendment
 
-> ORIGEN del desarrollo. Describe el OBJETIVO y el PORQUÉ, no la solución.
+> ORIGIN of development. Describes the OBJECTIVE and the WHY, not the solution.
 
-## Objetivo de producto
+## Product objective
 
-Que los amendments del North Star (cambios de `pillars`/`scope` de `north-star.md`)
-estén gateados por **CI determinista y bloqueante**, no por un approval humano. Un cambio
-que toca `pillars`/`scope` **sin** el ADR correspondiente, o con la suite del harness en
-rojo, **no puede mergearse a `main`**. El enforcement del amendment deja de depender de la
-buena voluntad (o de un review que un mantenedor solo no puede darse) y pasa a ser una
-gate determinista, coherente con el pilar `enforcement-real`.
+Have North Star amendments (changes to `pillars`/`scope` of `north-star.md`)
+gated by **deterministic and blocking CI**, not by human approval. A change
+that touches `pillars`/`scope` **without** the corresponding ADR, or with the
+harness suite red, **cannot be merged to `main`**. Amendment enforcement stops
+depending on goodwill (or a review that a solo maintainer cannot give themselves)
+and becomes a deterministic gate, consistent with the `real-enforcement` pillar.
 
-## Por qué / motivación
+## Why / motivation
 
-El `amendment-protocol` exige "ADR + PR aprobado por humano", pero GitHub no deja al autor
-aprobar su propio PR: un mantenedor solo queda trabado, y el enforcement real del amendment
-hoy es **por convención**, no por gate. Eso contradice al propio harness, que predica
-disciplina hecha cumplir por gates deterministas (`enforcement-real`) y no por gatekeeping
-manual. Sin una gate real, un cambio de `pillars`/`scope` puede aterrizar sin ADR y sin
-suite verde — el mismo drift de gobernanza que el `amendment-protocol` dice prevenir.
+The `amendment-protocol` requires "ADR + PR approved by a human", but GitHub does
+not let the author approve their own PR: a solo maintainer gets stuck, and the real
+enforcement of the amendment today is **by convention**, not by gate. That contradicts
+the harness itself, which preaches discipline enforced by deterministic gates
+(`real-enforcement`) and not by manual gatekeeping. Without a real gate, a change
+to `pillars`/`scope` can land without an ADR and without a green suite — the same
+governance drift that the `amendment-protocol` says it prevents.
 
-## Métricas de éxito
+## Success metrics
 
-- Un cambio a `pillars`/`scope` de `north-star.md` **sin** un ADR nuevo en
-  `memory/north-star/decisions/` en el mismo PR es **bloqueado** por CI (rojo, no
-  mergeable) — determinista.
-- El mismo cambio **con** su ADR y la suite verde **pasa** la gate.
-- Un cambio que NO toca `pillars`/`scope` (typo en prosa, ajuste de `threshold`) **no**
-  exige ADR y no es bloqueado.
-- La gate es **realmente bloqueante**: `main` no se puede mergear salvo que el status-check
-  esté verde (branch protection activa exigiéndolo).
-- El self-check del harness sigue verde (`tests/run.sh`) y cubre la capa nueva.
-- La capa se mantiene **dependency-free** (bash/coreutils + GitHub Actions; sin Node/npm en
-  el source).
+- A change to `pillars`/`scope` of `north-star.md` **without** a new ADR in
+  `memory/north-star/decisions/` in the same PR is **blocked** by CI (red, not
+  mergeable) — deterministic.
+- The same change **with** its ADR and the green suite **passes** the gate.
+- A change that does NOT touch `pillars`/`scope` (typo in prose, `threshold` adjustment) **does
+  not** require an ADR and is not blocked.
+- The gate is **truly blocking**: `main` cannot be merged to unless the status-check
+  is green (branch protection active and required).
+- The harness self-check stays green (`tests/run.sh`) and covers the new layer.
+- The layer stays **dependency-free** (bash/coreutils + GitHub Actions; no Node/npm
+  in the source).
 
-## Fuera de alcance
+## Out of scope
 
-- Gatear cambios que no son de gobernanza de producto (features de app del adoptante) — la
-  gate es específica de `north-star.md` `pillars`/`scope`.
-- Reimplementar el motor `/align` completo; esto cubre solo la mitad `requiresAdr`/
-  `hasAdrFor` del `amendment-protocol`.
-- Portar la gate a otros forges (GitLab/Bitbucket); el objetivo es GitHub Actions +
-  branch protection, consistente con el `.github/workflows/verify.yml` ya existente.
-- Cambiar el idioma del source (se mantiene español).
+- Gating changes that are not product governance (adopter's app features) — the
+  gate is specific to `north-star.md` `pillars`/`scope`.
+- Reimplementing the full `/align` engine; this covers only the `requiresAdr`/
+  `hasAdrFor` half of the `amendment-protocol`.
+- Porting the gate to other forges (GitLab/Bitbucket); the target is GitHub Actions +
+  branch protection, consistent with the existing `.github/workflows/verify.yml`.
+- Changing the language of the source (kept in Spanish).

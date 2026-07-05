@@ -1,118 +1,117 @@
-# Gobernanza North-Star + Measurability Gate — Diseño
+# North-Star Governance + Measurability Gate — Design
 
-**Fecha:** 2026-07-04
-**Estado:** Diseño — pendiente de revisión, luego pasa por el flujo del harness
-**Rama:** feature/north-star-governance
-**Origen:** capacidad piloteada en `poirot-fe` (rama `feature/north-star-governance`,
-PR #24); esto la **upstrea** al harness base como capacidad transversal.
+**Date:** 2026-07-04
+**Status:** Design — pending review, then goes through the harness workflow
+**Branch:** feature/north-star-governance
+**Origin:** capability piloted in `poirot-fe` (branch `feature/north-star-governance`,
+PR #24); this **upstreams** it to the base harness as a cross-cutting capability.
 
-## Resumen
+## Summary
 
-Sumar al harness `agentic-sdlc` una **capa de gobernanza de producto** — el **North
-Star** — como **par** de la constitution (que es técnica), más un **gate de intake
-`/align`** con un modelo chequeable de 3 capas, y la ley **Measurability Gate**: *si
-el North Star no se puede definir, gobernar y cuantificar, el flujo no ejecuta contra
-él*. Previene el **drift de producto**: features perfectamente construidas pero fuera
-de la misión — algo que un SDLC agéntico amplifica (el agente no tiene el instinto
-"¿esto debería existir?").
+Add to the `agentic-sdlc` harness a **product governance layer** — the **North
+Star** — as a **peer** of the constitution (which is technical), plus an **`/align`
+intake gate** with a 3-layer checkable model, and the **Measurability Gate** law: *if
+the North Star cannot be defined, governed, and quantified, the workflow does not
+execute against it*. This prevents **product drift**: perfectly built features that are
+outside the mission — something an agentic SDLC amplifies (the agent lacks the instinct
+"should this even exist?").
 
-## Principio rector del port: contrato en la plantilla, motor por-stack
+## Guiding principle of the port: contract in the template, per-stack engine
 
-El harness es una **plantilla stack-agnóstica y dependency-free** (su self-check es
-bash puro; no asume Node/npm). Por eso portamos el **contrato**, no el motor Node de
-poirot:
+The harness is a **stack-agnostic, dependency-free template** (its self-check is
+pure bash; it does not assume Node/npm). Therefore we port the **contract**, not the
+Node engine from poirot:
 
-- La plantilla trae la **especificación** del North-Star: `base/` (schema, rúbrica,
-  protocolo de amendment, ADR), el comando+skill `/align` (describiendo el modelo de
-  3 capas), el gate en `/distill`, la columna Pillar en el template de coverage, y un
-  self-check bash de **presencia/estructura**.
-- El **motor determinista ejecutable** (validar schema, `scopeReject`,
-  `alignVerdict`, `amendment`) queda **a cargo de cada repo adoptante**, igual que el
-  harness ya deja el *eval-runner* al adoptante (`evals/README`). Se cita
-  `poirot-fe scripts/north-star/*.mjs` como **reference implementation** (Node).
+- The template brings the **specification** of the North-Star: `base/` (schema, rubric,
+  amendment protocol, ADR), the `/align` command+skill (describing the 3-layer model),
+  the gate in `/distill`, the Pillar column in the coverage template, and a bash
+  **presence/structure** self-check.
+- The **runnable deterministic engine** (validate schema, `scopeReject`,
+  `alignVerdict`, `amendment`) is **the responsibility of each adopting repo**, just as
+  the harness already leaves the *eval-runner* to the adopter (`evals/README`). The
+  `poirot-fe scripts/north-star/*.mjs` is cited as the **reference implementation** (Node).
 
-Idioma: **español**, como el resto del source.
+Language: **Spanish**, like the rest of the source.
 
-## Alcance
+## Scope
 
-**Incluye:**
-1. **North-Star governance** (base + `/align` + gate en `/distill` + columna Pillar +
-   self-check), como contrato stack-agnóstico.
-2. **Refinar el Way-of-Work** del source con el modelo formal de **dos capas**
-   (governance vs execution-runtime), en forma **genérica** (el runtime de
-   intake/implement/finish lo elige el adoptante).
+**Includes:**
+1. **North-Star governance** (base + `/align` + gate in `/distill` + Pillar column +
+   self-check), as a stack-agnostic contract.
+2. **Refining the Way-of-Work** of the source with the formal **two-layer** model
+   (governance vs execution-runtime), in **generic** form (the intake/implement/finish
+   runtime is chosen by the adopter).
 
-**No incluye:** el contenido específico de poirot (`north-star.md` con la misión de
-MEXBANK, la API, traducciones a inglés). En el source, `north-star.md` es un
-**placeholder** a completar por proyecto (como el `constitution.md` de ejemplo).
+**Does not include:** poirot-specific content (`north-star.md` with the MEXBANK mission,
+the API, English translations). In the source, `north-star.md` is a **placeholder** to
+be filled in per project (like the example `constitution.md`).
 
-## Componentes (aterrizan en el source, en español)
+## Components (land in the source, in Spanish)
 
-1. **`memory/north-star/base/`** — `schema.md` (forma medible requerida:
-   `mission`, `pillars[]` con `id`+`statement`+`signal`, `scope.in/out`, `alignment`
-   con `threshold`+`rubric`), `alignment-rubric.md` (3 dimensiones: pillar fit,
-   scope compliance, mission advancement; 0–5; pass = todas ≥ threshold, default 3, y
-   sin `out_of_scope`), `amendment-protocol.md` (amendment = **ADR + PR**),
-   `adr-template.md`, `README.md` (mecanismo `extends: base`), `decisions/.gitkeep`.
+1. **`memory/north-star/base/`** — `schema.md` (required measurable form:
+   `mission`, `pillars[]` with `id`+`statement`+`signal`, `scope.in/out`, `alignment`
+   with `threshold`+`rubric`), `alignment-rubric.md` (3 dimensions: pillar fit,
+   scope compliance, mission advancement; 0-5; pass = all >= threshold, default 3, and
+   no `out_of_scope`), `amendment-protocol.md` (amendment = **ADR + PR**),
+   `adr-template.md`, `README.md` (`extends: base` mechanism), `decisions/.gitkeep`.
 2. **`memory/north-star/north-star.md`** — **placeholder** (`extends: base` +
-   bloque JSON canónico esqueleto con `_(completar por proyecto)_`).
-3. **`.claude/commands/align.md` + `.claude/skills/align/SKILL.md`** — el gate
-   `/align`: valida el North Star (fail-closed si no es medible), extrae objetivos
-   del brief, corre el modelo de 3 capas (scope predicates deterministas + orphan
-   check + LLM-judge cuantificado), escribe `specs/<feature>/alignment.md` con
-   veredicto `aligned | needs-amendment | rejected`. Declara que el **checker
-   determinista lo provee cada stack** (contrato), citando la reference impl de
-   poirot.
-4. **Gate en `/distill`** — editar `.claude/skills/distill/SKILL.md`: **Paso 0 —
-   Measurability Gate** (lee `alignment.md`; solo `aligned` avanza; falta/`rejected`/
-   `needs-amendment` frena; excepción bootstrap para la feature que introduce
+   skeleton canonical JSON block with `_(fill in per project)_`).
+3. **`.claude/commands/align.md` + `.claude/skills/align/SKILL.md`** — the
+   `/align` gate: validates the North Star (fail-closed if not measurable), extracts
+   objectives from the brief, runs the 3-layer model (deterministic scope predicates +
+   orphan check + quantified LLM-judge), writes `specs/<feature>/alignment.md` with
+   verdict `aligned | needs-amendment | rejected`. Declares that the **deterministic
+   checker is provided by each stack** (contract), citing the poirot reference impl.
+4. **Gate in `/distill`** — edit `.claude/skills/distill/SKILL.md`: **Step 0 —
+   Measurability Gate** (reads `alignment.md`; only `aligned` proceeds; missing/`rejected`/
+   `needs-amendment` blocks; bootstrap exception for the feature that introduces
    `/align`).
-5. **`specs/_template/coverage.md`** — columna **Pillar** (`pillar → objetivo →
-   criterio`).
-6. **`tests/check_80_north_star.sh`** — self-check bash (el source usa `tests/`):
-   base presente, `north-star.md` con `extends: base`, comando+skill `/align`
-   existen, y el skill de `distill` contiene el wiring del gate. Auto-tomado por el
-   glob de `tests/run.sh`.
-7. **Way-of-Work (dos capas)** — enriquecer el README/docs del source: el harness
-   **gobierna**; los pasos que no son comandos (intake→brief, implement, finish) los
-   provee un **execution-runtime** que elige el adoptante. Genérico (sin nombrar
-   superpowers como obligatorio).
+5. **`specs/_template/coverage.md`** — **Pillar** column (`pillar -> objective ->
+   criterion`).
+6. **`tests/check_80_north_star.sh`** — bash self-check (the source uses `tests/`):
+   base present, `north-star.md` with `extends: base`, `/align` command+skill exist,
+   and the `distill` skill contains the gate wiring. Auto-picked up by the
+   `tests/run.sh` glob.
+7. **Way-of-Work (two layers)** — enrich the source README/docs: the harness
+   **governs**; the steps that are not commands (intake->brief, implement, finish) are
+   provided by an **execution-runtime** chosen by the adopter. Generic (without naming
+   superpowers as mandatory).
 
-## Cómo se construye
+## How it is built
 
-**Dogfooding del propio harness del source**: este diseño → `brief.md` en
-`specs/002-north-star-governance/` → `/distill → /plan → /contract → /tasks →
-implement`. `/align` se **saltea para esta feature** (bootstrap: no puede gatearse a
-sí misma), igual que el bootstrap original del harness salteó sus propios gates.
-Self-check `tests/run.sh` verde + `check_80` nuevo verde. Rama → **PR**.
+**Dogfooding the source harness itself**: this design -> `brief.md` in
+`specs/002-north-star-governance/` -> `/distill -> /plan -> /contract -> /tasks ->
+implement`. `/align` is **skipped for this feature** (bootstrap: it cannot gate
+itself), just as the original harness bootstrap skipped its own gates.
+Self-check `tests/run.sh` green + new `check_80` green. Branch -> **PR**.
 
-## Modelo chequeable (3 capas) — el contrato
+## Checkable model (3 layers) — the contract
 
-1. **Determinista dura — scope predicates:** un objetivo que matchea `out_of_scope`
-   (match conservador por frase contigua) → `rejected`.
-2. **Determinista dura — orphan check:** todo objetivo mapea a ≥1 pilar; si no →
-   bloqueado.
-3. **Cuantificada — LLM-judge:** puntúa 3 dimensiones 0–5 contra la rúbrica; pass =
-   todas ≥ threshold y sin scope hit → `aligned`; in-scope pero por debajo →
+1. **Hard deterministic — scope predicates:** an objective that matches `out_of_scope`
+   (conservative match by contiguous phrase) -> `rejected`.
+2. **Hard deterministic — orphan check:** every objective maps to >=1 pillar; if not ->
+   blocked.
+3. **Quantified — LLM-judge:** scores 3 dimensions 0-5 against the rubric; pass =
+   all >= threshold and no scope hit -> `aligned`; in-scope but below threshold ->
    `needs-amendment`.
 
-Ley por encima (**Measurability Gate**): sin North Star medible, con objetivo
-huérfano, o con score por debajo del umbral (sin amendment aprobado) → el flujo no
-corre.
+Law above all (**Measurability Gate**): without a measurable North Star, with an orphan
+objective, or with a score below the threshold (without an approved amendment) -> the
+workflow does not run.
 
-## Riesgos / limitaciones
+## Risks / limitations
 
-- **Contrato sin motor en la plantilla:** un adoptante debe implementar el checker
-  determinista en su stack. Se mitiga con la spec explícita (`schema.md`,
-  rúbrica, semántica del veredicto) + la reference impl de poirot citada.
-- **Frontera semántica vs determinista:** los scope predicates por keyword no
-  capturan drift semántico → la dimensión *scope compliance* del judge es el backstop
-  (y `scopeReject` es deliberadamente conservador para no producir falsos rechazos).
-- **Bootstrap:** `/align` no puede gatear la feature que lo introduce — documentado
-  como única excepción.
+- **Contract without engine in the template:** an adopter must implement the
+  deterministic checker in their stack. Mitigated by the explicit spec (`schema.md`,
+  rubric, verdict semantics) + the poirot reference impl cited.
+- **Semantic vs deterministic boundary:** keyword scope predicates do not
+  capture semantic drift -> the *scope compliance* judge dimension is the backstop
+  (and `scopeReject` is deliberately conservative to avoid producing false rejections).
+- **Bootstrap:** `/align` cannot gate the feature that introduces it — documented
+  as the sole exception.
 
-## Fuera de alcance
+## Out of scope
 
-- El motor ejecutable en el source (queda por-stack; poirot es la reference).
-- Reescribir el ejemplo `specs/001-example` para pasar por `/align` (predata el gate).
-- Cambiar el idioma del source (se mantiene español).
+- The runnable engine in the source (remains per-stack; poirot is the reference).
+- Rewriting the `specs/001-example` example to pass through `/align` (predates the gate).
+- Changing the source language (remains Spanish).

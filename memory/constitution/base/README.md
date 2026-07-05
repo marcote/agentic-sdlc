@@ -1,9 +1,9 @@
-# Cómo funciona la herencia de la constitution
+# How constitution inheritance works
 
-- `base/` es un asset compartido **vendored**: se copia con el template.
-- El `constitution.md` del proyecto declara `extends: base` y agrega deltas/overrides.
-- Cada archivo en `base/patterns/` es una "given practice": además de un principio en
-  prosa, declara **criterios de aceptación inyectados** que `/distill` agrega
-  automáticamente como filas `[given]` en `coverage.md` de cada feature aplicable.
-- Para actualizar la base: editá `base/`, seguí `../update-checklist.md`, y re-copiá
-  a los proyectos que la heredan (sincronización explícita, sin submodules).
+- `base/` is a **vendored** shared asset: copied with the template.
+- The project's `constitution.md` declares `extends: base` and adds deltas/overrides.
+- Each file in `base/patterns/` is a "given practice": in addition to a prose principle,
+  it declares **injected acceptance criteria** that `/distill` automatically adds
+  as `[given]` rows in each applicable feature's `coverage.md`.
+- To update the base: edit `base/`, follow `../update-checklist.md`, and re-copy
+  to the projects that inherit it (explicit synchronization, no submodules).
