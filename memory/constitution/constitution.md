@@ -31,6 +31,12 @@ amendments. That preserves Principle 4 — local commits and pushes to work bran
 free — but it is worth being explicit: `main` is a protected integration point for
 everything, not only for `pillars`/`scope` changes.
 
+### D2 — Language
+
+All repo artifacts are written in English: docs, specs, skills, commands, memory,
+scripts, and CI configs. The developer may interact with the agent in any language;
+the agent writes to the repo in English regardless.
+
 ## Inherited pattern overrides
 _(none — to deactivate a pattern, list it here with its justification)_
 
