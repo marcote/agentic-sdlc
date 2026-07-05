@@ -1,0 +1,34 @@
+specs/002-north-star-governance/coverage.md
+  s_89e92a6ccd6c1a::t_cb1e320843df20 1-61
+specs/002-north-star-governance/plan.md
+  s_89e92a6ccd6c1a::t_0c88f26f0eb016 1-148
+specs/002-north-star-governance/acceptance.md
+  s_89e92a6ccd6c1a::t_387f80acc4803d 1-106
+evals/cases/north-star-judge.md
+  s_89e92a6ccd6c1a::t_d37e0236a11b93 1-66
+specs/002-north-star-governance/tasks.md
+  s_89e92a6ccd6c1a::t_2c99da211952e4 1-94,96-101
+  s_89e92a6ccd6c1a::t_3b9c931a64610b 95
+tests/check_80_north_star.sh
+  s_89e92a6ccd6c1a::t_23637167c8c79b 1-25
+specs/002-north-star-governance/brief.md
+  s_89e92a6ccd6c1a::t_c19e459b25bba2 1-50
+specs/002-north-star-governance/spec.md
+  s_89e92a6ccd6c1a::t_4375165aae9ab9 1-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1aedd5969da665f82929539f72260ed5d61e385f",
+  "prompts": {},
+  "sessions": {
+    "s_89e92a6ccd6c1a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee71364e-c7ea-4d6a-880f-ac36227c144c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "marcotorres_meli <marcosrafael.torres@mercadolibre.com>"
+    }
+  }
+}
