@@ -72,11 +72,7 @@ assert_contains memory/constitution/constitution.md "pillars/scope"
 #     does not exist -> RED until the impl creates the script. And when it exists, it must
 #     not invoke any installable toolchain (only bash/coreutils + python3 stdlib).
 assert_file "$GATE"
-if grep -qiE '(^|[^[:alnum:]-])(npm|npx|node|uv|pip3?|pnpm|yarn)([^[:alnum:]-]|$)' "$GATE" 2>/dev/null; then
-  _fail "DEP-FREE: $GATE invokes an installable toolchain (npm/node/uv/pip…)"
-elif [ -f "$GATE" ]; then
-  _pass "DEP-FREE: $GATE no installable toolchain (bash/coreutils + python3)"
-fi
+assert_dep_free "$GATE"   # shared helper (feature 008, candidate B)
 # (b) repo guardrail: the feature does not introduce installable manifests
 dep_free=1
 for d in package.json package-lock.json pnpm-lock.yaml yarn.lock node_modules uv.lock requirements.txt; do
