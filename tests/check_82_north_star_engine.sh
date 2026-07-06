@@ -87,10 +87,8 @@ assert_file "$ENG"
 if [ -f "$ENG" ]; then
   if grep -qE '^[[:space:]]*(import|from)[[:space:]]+(requests|yaml|numpy|pydantic|click|rich|toml)' "$ENG"; then
     _fail "DEP-FREE: $ENG imports a third-party package"
-  elif grep -qiE '(^|[^[:alnum:]-])(npm|npx|node|uv|pip3?|pnpm|yarn)([^[:alnum:]-]|$)' "$ENG"; then
-    _fail "DEP-FREE: $ENG invokes an installable toolchain"
   else
-    _pass "DEP-FREE: $ENG imports only python3 stdlib, no toolchain"
+    assert_dep_free "$ENG"   # shared helper (feature 008, candidate B)
   fi
 fi
 
