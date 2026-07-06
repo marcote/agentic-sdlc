@@ -12,6 +12,13 @@ verification must comply with them. They are inherited via `extends: base`.
    verifies exists. `green-by-construction` (green with nothing implemented) **does not count
    as 🔴** and the `/tasks` gate rejects it; tying it to the deliverable is the correct way
    to give it the RED→GREEN arc.
+   *Must-not-regress guard exception:* a criterion whose sole job is to assert that an
+   **already-green** behavior stays green through a change (e.g. "the existing gate behaves
+   identically after a refactor") has **no honest RED phase** — breaking the behavior to
+   redden it would be theater. Such a criterion is **annotated as a guard** (its linked test
+   is the pre-existing green suite) and **excluded from the `/contract` RED-required set**,
+   the same way `UAT (config)` rows are excluded. This is the complement of the rule above:
+   fake-green that *should* be red is rejected; a guard that *protects* real behavior is kept.
 3. **Full traceability.** Every objective in the brief reaches a criterion; every criterion
    maps to an eval or UAT step. Orphan rows = gap that blocks the spec freeze.
 4. **Productivity first.** Verification is on-demand: no blocking per-commit hooks,
