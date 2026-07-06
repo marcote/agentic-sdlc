@@ -39,11 +39,25 @@ held (all four stayed green through the refactor).
      guarded by the full suite staying green (the must-not-regress rule added to principle 2
      this same session).
 
-## 4. UAT  — appended by /uat, against acceptance.md
-_(pending — run in `/uat`)_
+## 4. UAT  — against acceptance.md + the brief objective
+Walk on the **real features** of this repo (not fixtures):
+
+- **006, 007** (DONE) → `feature DONE`, exit 0. ✓
+- **008** (in-flight) → `current: uat`, `next: /uat` — correctly self-reports *while its own
+  `/uat` runs*. ✓
+- **001-example** → a genuine `⚠ anomaly`: it has no `alignment.md` (it predates the `/align`
+  gate), so align is pending while distill/plan/contract/tasks are done — status.sh honestly
+  catches the pre-`/align` artifact, plus surfaces its `🔴` coverage gap. ✓ (a real detection,
+  not a status.sh bug).
+- **unknown feature** → clear error + exit 2. ✓
+
+Does it move the success metric? **Yes** — the tracklist is now **computed** from artifacts,
+not inferred by hand; the workflow is self-navigating and skips are caught. Dogfooding during
+implementation caught two real placeholder false positives — the strongest evidence it works on
+real artifacts. **No product gap.**
 
 ## 5. Verdict
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: pending · coverage: 100% (13/13) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (13/13) · retro: pending
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/008-phase-tracker/retro.md`.
 Gaps routed: none.
