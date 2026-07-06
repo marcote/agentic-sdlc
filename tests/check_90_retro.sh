@@ -11,6 +11,16 @@ for h in "Face A" "Face B" "Face C" "Evidence" "deriv"; do
   assert_contains specs/_template/retro.md "$h"
 done
 
+# --- has_placeholder blind-spot fix (feature 008 retro): code-span aware ---
+_tp=$(mktemp)
+printf 'a retro that documents the `_(placeholder)_` marker in prose.\n' > "$_tp"
+if has_placeholder "$_tp"; then _fail "has_placeholder: documented marker in a code span is a false positive"
+else _pass "has_placeholder: ignores a marker inside a backtick code span"; fi
+printf 'a genuinely unfilled _(placeholder)_ line.\n' > "$_tp"
+if has_placeholder "$_tp"; then _pass "has_placeholder: catches a bare unfilled marker"
+else _fail "has_placeholder: missed a bare unfilled marker"; fi
+rm -f "$_tp"
+
 # --- DONE contract wiring ---
 assert_contains CLAUDE.md "retro ✅"
 assert_contains docs/workflow.md "retro ✅"
@@ -32,8 +42,8 @@ for report in verification/reports/*.md; do
   retro="${featdir}retro.md"
   if [ ! -f "$retro" ]; then _fail "feature $nnn DONE but $retro is missing"; continue; fi
   _pass "feature $nnn DONE has $retro"
-  # No unfilled placeholders
-  if grep -qE '_\([^)]*\)_|<[^ >][^>]*>' "$retro"; then _fail "$retro has unfilled placeholders"; else _pass "$retro no placeholders"; fi
+  # No unfilled placeholders (code-span aware — a retro may *document* a marker)
+  if has_placeholder "$retro"; then _fail "$retro has unfilled placeholders"; else _pass "$retro no placeholders"; fi
   # Valid mission verdict
   if grep -qE '(Veredicto de misión|Mission verdict):[*[:space:]]*(confirmed|refuted|pending-observation|n/a)' "$retro"; then
     _pass "$retro valid mission verdict"

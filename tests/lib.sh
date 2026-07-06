@@ -17,4 +17,9 @@ assert_dep_free(){
     _pass "dep-free: $1 (bash/coreutils + python3, no toolchain)"
   fi
 }
+# has_placeholder FILE : true (exit 0) if the file still has an UNFILLED template marker
+# (`_(...)_` or `<...>`). Strips backtick code spans first, so a doc that legitimately
+# *documents* a marker (e.g. a retro discussing placeholder detection) is not a false
+# positive — the same blind-spot fix status.sh's filled() carries (feature 008 retro).
+has_placeholder(){ sed 's/`[^`]*`//g' "$1" 2>/dev/null | grep -qE '_\([^)]*\)_|<[^ >][^>]*>'; }
 summary(){ echo "---"; echo "TOTAL PASS=$PASSES FAIL=$FAILS"; [ "$FAILS" -eq 0 ]; }
