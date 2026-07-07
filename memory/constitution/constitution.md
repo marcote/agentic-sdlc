@@ -37,6 +37,22 @@ All repo artifacts are written in English: docs, specs, skills, commands, memory
 scripts, and CI configs. The developer may interact with the agent in any language;
 the agent writes to the repo in English regardless.
 
+### D3 — Reflexive dogfood (workflow tooling runs against its own in-flight feature)
+
+A feature that produces **workflow tooling** — a checker, tracker, gate, or report that operates on
+the SDLC's own artifacts (`coverage.md`, retros, `specs/*`, `status.sh`, `check_*`, the North Star
+engine) — must be **run against its own in-flight feature before closing**, not only against
+synthetic fixtures. The tool's first real user is the very feature that ships it.
+
+**Why:** a workflow tool exercised only on hermetic fixtures hides the blind spots that appear on
+real artifacts. Feature 008 caught **two real bugs** this way (`status.sh` flagged its own
+placeholder false-positives; the same blind spot then surfaced in `check_90`). Reflexive use is the
+cheapest UAT a workflow tool has, and it is harness-specific: an adopter shipping app code does not
+inherit this delta (their UAT is against their product objective, per the base UAT step).
+
+*This is a project delta, not a base principle:* it presumes the deliverable is tooling over the
+workflow itself, which is unique to this harness-as-product.
+
 ## Inherited pattern overrides
 _(none — to deactivate a pattern, list it here with its justification)_
 

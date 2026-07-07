@@ -11,6 +11,9 @@ assert_contains memory/constitution/base/principles.md "Interactive-IO exception
 assert_file memory/constitution/base/README.md
 assert_file memory/constitution/constitution.md
 assert_contains memory/constitution/constitution.md "extends: base"
+# D3 (candidate from 008 retro): workflow tooling must be run against its own in-flight
+# feature before closing (reflexive dogfood) — harness-specific project delta.
+assert_contains memory/constitution/constitution.md "Reflexive dogfood"
 assert_file memory/constitution/update-checklist.md
 for p in audit-logging rate-limiting idempotency hermetic-tests; do
   assert_file "memory/constitution/base/patterns/$p.md"
