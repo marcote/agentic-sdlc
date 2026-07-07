@@ -62,4 +62,8 @@ to a single documented `curl … | bash`. No product gap → no route to `/disti
 BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (11/11) · retro: ✅ — **DONE**
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/009-bootstrap/retro.md` (closes the measurable prediction from `/align`).
-Gaps routed: none (no BUILD/TRAJECTORY/UAT gap).
+Gaps routed: none at close. **Post-merge disclosure:** CI (`self-verify`, run 28835273808) caught
+2 portability bugs the local `/verify` missed — `[ -r /dev/tty ]` terminal detection (fixed:
+`exec 3<>/dev/tty && [ -t 3 ]`) and `check_88` assuming a local `main` branch (fixed: export the
+committed HEAD tree into a throwaway `main` source). Implementation gap → fixed on the branch; see
+retro Face B "Rework post-/verify". Suite green locally (239/0) and re-pushed for CI.

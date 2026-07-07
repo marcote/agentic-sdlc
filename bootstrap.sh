@@ -34,22 +34,27 @@ if ! command -v git >/dev/null 2>&1; then
 fi
 
 # --- Consent gate (before any clone, so an abort leaves nothing to clean up) ---
-# --yes → apply. Else read [y/N] from /dev/tty (stdin is taken by the curl|bash pipe).
-# No controlling terminal and no --yes → abort; never write blind.
-consent() {
-  [ "$ASSUME_YES" -eq 1 ] && return 0
-  if [ -r /dev/tty ]; then
-    local ans=""
-    printf 'Apply the harness to %s? [y/N] ' "$TARGET" > /dev/tty
-    read -r ans < /dev/tty || return 1
-    case "$ans" in y|Y|yes|YES) return 0 ;; *) return 1 ;; esac
-  fi
-  return 1  # no TTY, no --yes
+# Detect a REAL controlling terminal: a readable /dev/tty node is not enough — CI runners
+# expose one with no terminal behind it. Open fd 3 on /dev/tty and require [ -t 3 ]; opening
+# fails fast (ENXIO) when there is no controlling terminal, so this never blocks.
+open_tty() {
+  { exec 3<>/dev/tty; } 2>/dev/null || return 1
+  [ -t 3 ] || return 1
+  return 0
 }
 
-# The plan is shown before consent (below), so we clone first — but preconditions above have
-# already gated git + the no-TTY-no-yes case, so a bare non-interactive run never reaches here.
-if [ "$ASSUME_YES" -eq 0 ] && [ ! -r /dev/tty ]; then
+# --yes → apply. Else prompt [y/N] on fd 3 (opened by the precondition below); stdin is taken
+# by the curl|bash pipe, so we never read consent from stdin. No terminal + no --yes → abort.
+consent() {
+  [ "$ASSUME_YES" -eq 1 ] && return 0
+  local ans=""
+  printf 'Apply the harness to %s? [y/N] ' "$TARGET" >&3
+  read -r ans <&3 || return 1
+  case "$ans" in y|Y|yes|YES) return 0 ;; *) return 1 ;; esac
+}
+
+# Gate the no-TTY-no-yes case before any clone (nothing to clean up on this abort).
+if [ "$ASSUME_YES" -eq 0 ] && ! open_tty; then
   echo "bootstrap: no terminal to confirm on and no --yes given — aborting (nothing written)." >&2
   echo "  re-run with --yes to apply non-interactively (CI), or from an interactive terminal." >&2
   exit 1

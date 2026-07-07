@@ -16,7 +16,17 @@ VENDOR=scripts/vendor.sh
 have(){ [ -f "$BOOT" ]; }
 mk(){ mktemp -d 2>/dev/null || mktemp -d -t boot; }
 BASH_BIN=$(command -v bash)
-SRC=$(pwd)   # local harness checkout → hermetic clone source (its `main` has vendor.sh + engine)
+# Hermetic clone source with a real `main` branch. Can't use $(pwd) directly: CI checkouts are
+# detached / lack a local `main`, so `git clone --branch main` would fail there. Export the
+# committed HEAD tree (includes vendor.sh + engine + the DROP edit) into a throwaway repo on main.
+SRC=$(mk)
+if have; then
+  git -C "$SRC" init -q 2>/dev/null
+  git archive HEAD 2>/dev/null | tar -x -C "$SRC" 2>/dev/null
+  git -C "$SRC" add -A 2>/dev/null
+  git -C "$SRC" -c user.email=t@t -c user.name=t commit -q -m snapshot 2>/dev/null
+  git -C "$SRC" branch -M main 2>/dev/null
+fi
 
 # run bootstrap into a fresh target with a sandboxed TMPDIR, no controlling stdin.
 # echoes: "<target>|<sandbox>" ; caller inspects then cleans.
@@ -118,3 +128,5 @@ fi
 
 # --- SELF-CHECK: the deliverable exists and is exercised by this suite ---
 assert_file "$BOOT"
+
+rm -rf "$SRC"
