@@ -11,6 +11,26 @@ verification/UAT as north star.
 > **constitution** concept comes from **Spec Kit** (GitHub / Microsoft). See
 > [Credits and references](#credits-and-references).
 
+## Install (from zero)
+Land the harness on a repo starting from scratch, in one command:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/marcote/agentic-sdlc/main/bootstrap.sh | bash
+```
+
+`bootstrap.sh` fetches the harness, prints the vendoring **plan** (KEEP / SEED / DROP + your
+detected stack + provenance), asks for confirmation on `/dev/tty`, then applies — preserving
+`vendor.sh`'s dry-run-first safety. Nothing is written until you confirm. For CI / non-interactive
+use, consent explicitly with `--yes`:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/marcote/agentic-sdlc/main/bootstrap.sh | bash -s -- --yes
+```
+
+With no terminal and no `--yes`, it aborts rather than writing blind. After it applies, merge any
+`.harness-new` files and run `/constitution` → seed your North Star → first `/align`. Already have
+the harness cloned? Use `scripts/vendor.sh` directly (see `docs/vendoring.md`).
+
 ## The loop at a glance
 `/constitution → brief → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat`
 
