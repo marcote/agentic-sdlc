@@ -53,5 +53,9 @@ Source: `alignment.md` mapping (frictionless-adoption, real-enforcement, agnosti
   branch layout, `$TMPDIR`, or locale should be written to survive a detached-HEAD, no-terminal
   CI checkout (build fixtures, don't read the ambient repo); `/verify` green on one box is not CI
   green. Apply via `memory/constitution/update-checklist.md`.
+  - **APPLIED (2026-07-06):** (2) landed as the *Interactive-IO exception* in
+    `base/principles.md` (principle 2); (1)+(3) merged into a new base pattern
+    `base/patterns/hermetic-tests.md` (injected `[given]` for offline-seam + no-ambient-assumption),
+    both validated by `tests/check_10_constitution.sh`.
 - **Candidate amendments → North Star:** none. scopeCompliance was 5 with no edge; the "host the
   raw URL" follow-up is operational, not a governance change. Leave the North Star as-is.

@@ -19,6 +19,14 @@ verification must comply with them. They are inherited via `extends: base`.
    is the pre-existing green suite) and **excluded from the `/contract` RED-required set**,
    the same way `UAT (config)` rows are excluded. This is the complement of the rule above:
    fake-green that *should* be red is rejected; a guard that *protects* real behavior is kept.
+   *Interactive-IO exception:* a criterion whose observable behavior **is** a real interactive
+   terminal exchange (e.g. a `[y/N]` prompt read from `/dev/tty`) has **no honest hermetic RED** —
+   it cannot be reddened in an automated suite without a real controlling terminal, and faking one
+   is theater. Such a criterion is **UAT-observed** (validated by hand — e.g. over a pseudo-terminal
+   — at `/uat`) and **excluded from the `/contract` RED-required set**, like `UAT (config)` rows.
+   Its **deterministic neighbors stay in** the RED set: the non-interactive paths around it (an
+   explicit `--yes`/consent flag, a no-terminal abort) must still redden and green normally; only
+   the terminal read itself is deferred to UAT.
 3. **Full traceability.** Every objective in the brief reaches a criterion; every criterion
    maps to an eval or UAT step. Orphan rows = gap that blocks the spec freeze.
 4. **Productivity first.** Verification is on-demand: no blocking per-commit hooks,
