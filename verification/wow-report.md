@@ -1,4 +1,4 @@
-# WoW Report — @ 3ba9a7c  (generated snapshot; do not edit manually)
+# WoW Report — @ c052a42  (generated snapshot; do not edit manually)
 
 > **N=6, small sample, no statistics.** DONE features with retros: 003, 004, 006, 007, 008, 009.
 > (001-example is a demo; 002 introduced `/align` and is gate-exempt.) The repo's North Star is now
@@ -13,14 +13,15 @@ Cross of each `alignment.md` objective→pillar mapping × the Face-A signal ver
 |---|---|---|---|
 | **real-enforcement** | 004, 006, 007, 008, 009 | ✅ 004 (PR blocked + push rejected), 007 (`/align` ran on the real engine), 008 (skip detected + exit 1), 009 (no-TTY abort, plan-first); 006 dogfood-sub ✅ / gate-block ⏳ | **served — strongest pillar**, moved by 4 features with hard locators |
 | **frictionless-adoption** | 006, 007, 008, 009 | ✅ 007 (1-command vendoring), 008 (`status.sh` self-navigates), 009 (`curl\|bash` from zero, incl. live internet fetch); 006 ⏳→closed by 007 | **served**, moved by 3 features |
-| **agnostic-portability** | 004, 006, 007, 009 | ✅ 007 + 009 — **but only on synthetic throwaway targets**; 004 ⏳ (real repo/stack) and 006 ⏳→closed-partial by 007 | **served on synthetic evidence only** — see §2/§5: real-project portability never walked |
+| **agnostic-portability** | 004, 006, 007, 009 | ✅ 007 + 009 (synthetic) **+ real repo `porfolio-doctor` @ c052a42** — vendored via the live `curl\|bash`; engine + amendment-gate ran intact, dep-free, zero per-stack tweaks | **served — now with real-repo evidence** (residual: target is stackless, so stack-detection wasn't exercised on a manifest) |
 | **measurable-impact** | 004 | ✅ 004 (narrow block caught real drift pre-merge without slowing throughput) | **thinly served** — only 1 feature ever mapped to it |
 
 **Measurable drift (promised but no signal moved): none.** Every pillar that was promised did move
 at least once. Two soft spots, not drift:
-- **agnostic-portability** — every ✅ rests on a *temporary* `git init` target; the real-external-
-  project evidence (004's re-check) is still open. The verdicts are honest (007 and 009 both
-  self-flag "synthetic"), but the pillar's real-world proof is perpetually deferred.
+- **agnostic-portability** — 004's re-check is now **CLOSED**: vendored onto a real persistent repo
+  (`porfolio-doctor`), the contract (schema/gates/artifacts) ran intact and dependency-free with no
+  per-stack tweaks. Residual nuance only: that repo is *stackless*, so stack-detection defaulted to
+  `TODO` (by design) instead of matching a real manifest.
 - **measurable-impact** — served by a single feature (004). Not drift, but the least-exercised
   pillar; nothing since 004 has claimed a prevent-rework signal.
 
@@ -28,14 +29,16 @@ at least once. Two soft spots, not drift:
 
 | From | Signal | Trigger | Status |
 |---|---|---|---|
-| 004 | agnostic-portability | vendor onto a **real** repo/stack; verify `amendment-gate.yml` + `.sh` run intact (python3 stdlib, `--range`) with no per-stack tweaks | **OPEN** — 007/009 vendored only synthetic temp repos; the amendment-gate was never re-run on a vendored target. Aging (5 features old). |
+| 004 | agnostic-portability | vendor onto a **real** repo/stack; verify `amendment-gate.yml` + `.sh` run intact (python3 stdlib, `--range`) with no per-stack tweaks | **CLOSED (2026-07-06)** — vendored onto `porfolio-doctor` (real repo, `@ c052a42`); engine + gate ran intact, dep-free, zero tweaks. Residual: target stackless (stack-detect not on a manifest; `--range` still hermetic-suite-only). |
 | 006 | frictionless-adoption + agnostic-portability | feature 007 vendors the engine | **CLOSED** by 007 (both moved) |
-| 007 | agnostic-portability | vendor onto a large real project (not a temp repo) | **OPEN (soft)** — same theme as 004 |
+| 007 | agnostic-portability | vendor onto a large real project (not a temp repo) | **CLOSED** — `porfolio-doctor` (see 004 row); real but stackless |
 | 009 | frictionless-adoption (network hop) | live raw URL reachable → run real `curl\|bash` | **CLOSED** — validated end-to-end (provenance `@ 3070acd`) |
-| 009 | agnostic-portability | real project | **OPEN (soft)** — same theme as 004/007 |
+| 009 | agnostic-portability | real project | **CLOSED** — `porfolio-doctor` (see 004 row) |
 
-**One real worklist item, three times over:** prove agnostic-portability by vendoring onto a genuine
-external repo/stack (and re-run the amendment-gate there). Everything else is closed.
+**Worklist now empty of hard items.** The agnostic-portability re-check (open across 004/007/009) is
+closed by the real vendoring onto `porfolio-doctor`. Only residual: exercise stack-detection on a
+real *manifest* and the `--range` git path on a real target — both trigger naturally once
+`porfolio-doctor` grows a stack + commit history.
 
 ## 3. Method — does the WoW add value? (N=6, small sample, no statistics)
 
@@ -93,12 +96,12 @@ rule proposed across all six retros is now codified in the constitution or shipp
   friction items, so they read honest.
 - **Evidence locators present** for all `confirmed`/`moved` verdicts (004/007/008/009 Face A cells
   are SHAs, PR states, coverage rows — not prose). ✅
-- **Watch:** *agnostic-portability's repeated ✅ on synthetic targets.* It is disclosed each time
-  (not hidden), so it is not theater — but three ✅ verdicts leaning on throwaway repos while the
-  real-project re-check (§2) stays open is the one place the ledger looks greener than the evidence.
-  Treat agnostic-portability as **provisionally served** until a real adoption walks it.
-- **Aging worklist item:** 004's portability re-check is 5 features old. Not overdue by trigger (no
-  real adoption has happened yet), but it is the single accumulating debt.
+- **Watch RESOLVED:** *agnostic-portability's synthetic-target reliance.* Closed by the real
+  vendoring onto `porfolio-doctor` (§1/§2) — the contract ran intact on a genuine repo, dep-free,
+  no per-stack tweaks. The ledger now matches the evidence. Remaining residual is narrow and
+  honestly scoped: stack-detection-on-a-manifest and the `--range` git path await the target
+  growing a stack + history — not a portability doubt, just an un-walked sub-path.
+- **No aging worklist items:** the once-5-features-old portability re-check is now closed.
 - **N-honesty:** N=6, one team, self-dogfooding. The Method signal (front-loaded gaps, near-zero
   rework) is encouraging but is the harness grading its own homework — the Mission signal for
   agnostic-portability + frictionless-adoption only becomes external evidence when a *different*

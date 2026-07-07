@@ -19,6 +19,7 @@ Source: `alignment.md` (objective→pillar mapping) + `north-star.md` (signal pe
 - **Mission verdict:** confirmed
   - Closed by the central pillar `real-enforcement` with hard evidence (PR blocked + push rejected, gate live on `main`). `agnostic-portability` remains as an open sub-observation.
   - **re-check trigger** (portability): when vendoring the harness onto a real repo/stack, verify that `amendment-gate.yml` + `scripts/amendment-gate.sh` run intact (python3 stdlib present, `--range` derives correctly) without per-stack adjustments.
+  - **re-check CLOSED (2026-07-06):** vendored onto a real persistent repo (`~/Code/porfolio-doctor`) via the live `curl|bash` bootstrap (source `@ c052a42`). The contract ran **intact and dependency-free with zero per-stack tweaks**: `engine.py schema-valid` exit 0 on the seeded North Star, `scope-reject`/`align-verdict`/`sets-changed` correct, and `amendment-gate.sh --files` returned `not applicable` (exit 0) orchestrating the vendored engine. Residual nuance: that repo is *stackless*, so `vendor.sh` stack-detection defaulted to `TODO` (by design) rather than matching a real manifest — the `--range` git-derivation path is still only exercised in the hermetic suite, not on this target. agnostic-portability now has **real-repo evidence**, no longer synthetic-only.
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts, not authored
 Each field carries its `[deriv: …]` marker — the locator of where the figure came from.
