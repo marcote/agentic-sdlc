@@ -39,7 +39,7 @@ KEEP=(
 SEED=( CLAUDE.md memory/constitution/constitution.md memory/north-star/north-star.md scripts/test.sh )
 DROP=( "specs/0*-* (except _template)" memory/north-star/decisions verification/reports \
   verification/wow-report.md docs/superpowers evals/cases README.md tests \
-  scripts/vendor.sh docs/vendoring.md )
+  scripts/vendor.sh docs/vendoring.md bootstrap.sh )
 
 # --- Stack detection -> default test command ---
 detect_testcmd(){

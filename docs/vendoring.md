@@ -10,6 +10,12 @@ scripts/vendor.sh --apply <target>  # applies the vendoring
 
 Always dry-run first — it prints exactly what each path will become before touching the target.
 
+> **Starting from zero?** You do not need to clone the harness by hand first. `bootstrap.sh`
+> (repo root) is the from-zero entry point: `curl -fsSL <raw>/bootstrap.sh | bash` fetches the
+> harness into a temp dir, runs the dry-run **plan** below, confirms, applies `vendor.sh`, and
+> cleans up. `vendor.sh` (this guide) is the step `bootstrap.sh` wraps — use it directly once you
+> already have a local checkout.
+
 ## The four buckets
 
 `scripts/vendor.sh` is the single source of truth for this classification (arrays at the top).
