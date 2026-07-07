@@ -28,6 +28,12 @@ Source: `alignment.md` mapping (frictionless-adoption, real-enforcement, agnosti
   - **Re-check trigger:** once `raw.githubusercontent.com/marcote/agentic-sdlc/main/bootstrap.sh`
     is reachable, run the real `curl … | bash` against a throwaway repo once — that closes the
     network hop this retro leaves open.
+  - **Re-check CLOSED (2026-07-06):** after PR #11 merged (`3070acd`), the live raw URL was
+    curled and `curl -fsSL … | bash -s -- --yes` ran against a throwaway `git init` repo. It
+    cloned over HTTPS from `github.com/marcote/agentic-sdlc.git` and landed the full harness —
+    the stamped provenance `source: https://github.com/marcote/agentic-sdlc.git @ 3070acd222…`
+    is the evidence the network hop (not just the local-checkout mechanism) works end-to-end.
+    frictionless-adoption is now confirmed **including** the internet fetch; no caveat remains.
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts
 - **Gaps caught by /distill:** 1 blocking grilling ambiguity (the `--yes` / `/dev/tty` / no-TTY consent model) + edge cases (pipe holds stdin → `/dev/tty`; no-TTY-no-`--yes` abort; `--yes` with no TTY; decline path; git absent; temp leak; self-leak via DROP; fork/test source) `[deriv: spec.md "Edge cases" + coverage.md; distill AskUserQuestion on --yes]` — the notable one: grilling surfaced that the interactive prompt has **no honest hermetic RED**, so `CONFIRM-TTY` was carved out as UAT-only and a testability seam (`HARNESS_REPO`) entered the design.
