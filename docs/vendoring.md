@@ -39,6 +39,7 @@ The harness's own product content, which you do not want:
 `specs/0*-*` (except `_template`), `memory/north-star/decisions/*`,
 `verification/reports/*`, `verification/wow-report.md`, `docs/superpowers/*`,
 `docs/backlog.md` (the harness's own parked findings, not yours),
+`scripts/prose.sh` (a style rule for this repo's own artifacts; your prose conventions are yours),
 `scripts/nvc.sh` (it reads `tests/check_*.sh`, this repo's own test conventions — you inherit the
 *pattern* in `memory/constitution/base/patterns/non-vacuous-checks.md` and mechanise it in your stack),
 `evals/cases/*`, `README.md`, `tests/` (harness self-validation — your runtime is
