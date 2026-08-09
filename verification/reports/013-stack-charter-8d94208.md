@@ -103,7 +103,9 @@ and closed through the proper route.
 
 ## 5. Verdict
 
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19 deterministic) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19 deterministic) · retro: ✅
+
+**DONE.** Mission verdict `pending-observation` — the charter mechanism is built and self-exercised, but it has prevented no rework yet because no feature has run through it. See `specs/013-stack-charter/retro.md` for the re-check trigger.
 
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/013-stack-charter/retro.md` (closes the measurable prediction from `/align`).
