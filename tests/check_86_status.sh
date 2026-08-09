@@ -137,7 +137,7 @@ rm -rf "$R"
 
 # --- DEPFREE: status.sh dep-free, via the shared helper (candidate B) ---
 if type assert_dep_free >/dev/null 2>&1 && [ -f "$STATUS" ]; then
-  assert_dep_free "$STATUS"
+  assert_dep_free "$STATUS" "DEPFREE"
 else
   _fail "DEPFREE: assert_dep_free helper or scripts/status.sh missing"
 fi

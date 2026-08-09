@@ -8,13 +8,17 @@ assert_contains(){ if grep -qE "$2" "$1" 2>/dev/null; then _pass "$1 =~ /$2/"; e
 # assert_dep_free FILE : the file invokes no installable toolchain. Invocation-aware —
 # excludes comment (#…) and echo lines so a script may legitimately NAME a toolchain as
 # data (e.g. vendor.sh seeds "npm test") without failing. (feature 008, candidate B.)
+# assert_dep_free FILE [LABEL] : optional LABEL prefixes the result so it can be traced
+# back to a coverage row. Without it the criterion runs but its output cannot be tied to
+# the row it satisfies -- which is not a dead assertion, but an unauditable one.
 assert_dep_free(){
-  if [ ! -f "$1" ]; then _fail "dep-free: missing $1"; return; fi
+  local _l="${2:+$2: }"
+  if [ ! -f "$1" ]; then _fail "${_l}dep-free: missing $1"; return; fi
   if grep -vE '^[[:space:]]*#|echo' "$1" \
      | grep -qiE '(^|[^[:alnum:]-])(npm|npx|node|uv|pip3?|pnpm|yarn)([^[:alnum:]-]|$)'; then
-    _fail "dep-free: $1 invokes an installable toolchain"
+    _fail "${_l}dep-free: $1 invokes an installable toolchain"
   else
-    _pass "dep-free: $1 (bash/coreutils + python3, no toolchain)"
+    _pass "${_l}dep-free: $1 (bash/coreutils + python3, no toolchain)"
   fi
 }
 # has_placeholder FILE : true (exit 0) if the file still has an UNFILLED template marker
