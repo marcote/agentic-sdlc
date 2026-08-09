@@ -80,6 +80,26 @@ exemption without a recorded justification is exactly the defect being measured.
 *This is a project delta, not a base principle:* it presumes the deliverable is a gate over the
 workflow itself, which is unique to this harness-as-product.
 
+### D5 — One sentence, one idea: 35 words
+
+No sentence in artifact prose runs past **35 words**. Enforced by `scripts/prose.sh`, run in the
+suite. Tables, fenced blocks and blockquotes are exempt: they are data and citations.
+
+**Why.** The artifacts drifted into sentences that carry three claims joined by dashes. The worst
+ran **73 words**. A reader cannot hold that, and neither can a reviewer looking for the one clause
+that matters. Compressing 17 offenders removed no evidence — every `[deriv:]` locator, verdict and
+count survived. The fat was connective tissue, not content.
+
+**What it does not enforce.** Word choice, paragraph length, repetition, or whether the point was
+worth making. A short sentence can still be padding. Those stay with review.
+
+**Why 35 and not less.** Measured before choosing: 40 words left 10 offenders, 35 left 17, 30 left
+32. Thirty-five is the tightest cap the existing corpus could reach in one pass without cutting
+evidence. Lower it when the corpus supports it, not before.
+
+*Project delta, not a base principle:* an adopter's prose conventions are their own. They inherit
+the harness's artifacts, not its style.
+
 ## Inherited pattern overrides
 
 ### `base/patterns/non-vacuous-checks.md` — two of five rows discharged by a gate, not per feature

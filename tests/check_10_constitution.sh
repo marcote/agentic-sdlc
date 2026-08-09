@@ -20,6 +20,26 @@ assert_contains memory/constitution/constitution.md "Reflexive dogfood"
 assert_contains memory/constitution/constitution.md "Gate bootstrap"
 assert_contains memory/constitution/constitution.md "from being blocked, never from being run"
 assert_contains memory/constitution/constitution.md "real verdict"
+# --- PROSE-CAP (D5): sentences in artifact prose stay under the cap ---
+# The rule and its enforcement are asserted together. A delta describing a cap that nothing runs is
+# the shape OVERRIDE-LIVE exists to prevent one section above.
+assert_contains memory/constitution/constitution.md "One sentence, one idea"
+if [ -x scripts/prose.sh ] && bash scripts/prose.sh >/tmp/prose_out 2>&1; then
+  _pass "PROSE-CAP: no sentence over the cap across specs, memory, docs"
+else _fail "PROSE-CAP: $(tail -1 /tmp/prose_out 2>/dev/null || echo 'scripts/prose.sh missing or not executable')"; fi
+# self-test: the checker must actually reject a long sentence, or PROSE-CAP passes on an empty scan
+_pfx=$(mktemp -d); mkdir -p "$_pfx/d"
+python3 -c "print('word ' * 60)" > "$_pfx/d/long.md"
+if bash scripts/prose.sh "$_pfx/d" >/dev/null 2>&1; then
+  _fail "PROSE-CAP-SELF: the checker accepted a 60-word sentence, so the scan above proves nothing"
+else _pass "PROSE-CAP-SELF: the checker rejects a 60-word sentence"; fi
+printf 'Short and clear.\n' > "$_pfx/d/long.md"
+bash scripts/prose.sh "$_pfx/d" >/dev/null 2>&1 \
+  && _pass "PROSE-CAP-SELF-NEG: it accepts short prose, so it is not simply always failing" \
+  || _fail "PROSE-CAP-SELF-NEG: the checker rejects even short prose"
+rm -rf "$_pfx"
+assert_dep_free scripts/prose.sh "PROSE-CAP-DEPFREE"
+
 assert_file memory/constitution/update-checklist.md
 for p in audit-logging rate-limiting idempotency hermetic-tests non-vacuous-checks; do
   assert_file "memory/constitution/base/patterns/$p.md"
