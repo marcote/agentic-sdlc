@@ -18,7 +18,10 @@ that posture explicitly.
 Exit contract (shell-friendly):
   0 = valid / emitted
   1 = invalid (reasons on stderr)
-  2 = error — the file cannot be read or contains no pin at all
+  2 = error — the file cannot be read or parsed
+  3 = empty — a well-formed charter with zero pins. Distinct from 2 on purpose: a freshly
+      vendored repo seeds a stub, so "no pins yet" is an adopter's day-one state, not a
+      defect. Reporting it as malformed sends them hunting a bug that is not there.
 stdout carries the payload; reasons and errors go to stderr.
 """
 import sys
@@ -34,7 +37,11 @@ REQUIRED = ("Confidence", "Because", "Buys", "Forecloses", "Falsifier")
 
 
 class Malformed(Exception):
-    """The charter cannot be parsed into pins (→ exit 2)."""
+    """The charter cannot be read or parsed (→ exit 2)."""
+
+
+class Empty(Exception):
+    """A well-formed charter with zero pins (→ exit 3). Not a defect: work not yet done."""
 
 
 def _parse(path):
@@ -81,7 +88,7 @@ def _parse(path):
         elif not raw.strip():
             last = None
     if not pins:
-        raise Malformed("no pin found in %s" % path)
+        raise Empty("no pins yet in %s — run /stack to elicit them" % path)
     return pins
 
 
@@ -123,7 +130,12 @@ def cmd_pin_valid(args):
 
 
 def cmd_exposure(args):
-    pins = [p for p in _parse(args.file) if not p["superseded"]]
+    try:
+        pins = [p for p in _parse(args.file) if not p["superseded"]]
+    except Empty:
+        print("0 pins · 0 PINNED · 0 PROVISIONAL")
+        print("Exposure: no pins yet — run /stack")
+        return 0
     prov = [p for p in pins if p["fields"].get("Confidence", "").upper().startswith("PROVISIONAL")]
     pinned = len(pins) - len(prov)
     print("%d pins · %d PINNED · %d PROVISIONAL" % (len(pins), pinned, len(prov)))
@@ -135,7 +147,11 @@ def cmd_exposure(args):
 
 
 def cmd_guards(args):
-    for p in _parse(args.file):
+    try:
+        pins = _parse(args.file)
+    except Empty:
+        return 0  # no stance pin means nothing to run, which is not a failure
+    for p in pins:
         if p["stance"] and not p["superseded"] and _has(p, "Guard"):
             print(p["fields"]["Guard"])
     return 0
@@ -160,6 +176,9 @@ def main(argv=None):
     args = p.parse_args(argv)
     try:
         return args.fn(args)
+    except Empty as e:
+        sys.stderr.write("empty: %s\n" % e)
+        return 3
     except Malformed as e:
         sys.stderr.write("malformed: %s\n" % e)
         return 2

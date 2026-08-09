@@ -103,6 +103,12 @@
 - **An adopter with no charter yet.** `/plan`'s guard must degrade to a clear "run `/stack`
   first" rather than a crash or a silent pass — the same shape as `/distill`'s absent
   `alignment.md`.
+- **A charter that is present but empty** — *found at `/uat`, routed back here as a product
+  gap.* Vendoring never produces "no charter": it seeds a stub, so an adopter's day-one state
+  is a well-formed file with zero pins. That is a third state, and treating it as malformed is
+  wrong — the file is fine, the work simply has not been done. The engine must report **empty**
+  distinctly from **malformed**, `guards` must emit nothing and succeed (no stance pins is not
+  an error), and `/plan`'s gate must refuse on empty exactly as it refuses on absent.
 - **Re-running `/stack`.** A repeatable write over an existing charter; must not clobber
   (FR-22).
 - **`TRIPPED` where the hedge was skipped.** The guard must say so plainly rather than quote

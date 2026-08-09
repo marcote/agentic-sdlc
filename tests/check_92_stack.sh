@@ -304,6 +304,42 @@ else
 fi
 rm -rf "$_fx"
 
+# --- EMPTY-CHARTER (found at /uat, routed back through /distill) -----------------
+# An adopter's day-one state is a well-formed charter with zero pins. That is "empty",
+# not "malformed": the file is fine, the work has not been done. Exit 3 marks it.
+_fx=$(mktemp -d)
+cat > "$_fx/empty.md" <<'EOF'
+# Stack Charter — <Your Project>
+
+_(no pins yet — run `/stack`)_
+EOF
+if [ -f "$ENGINE" ]; then
+  python3 "$ENGINE" pin-valid "$_fx/empty.md" >/dev/null 2>&1; _ec=$?
+  [ "$_ec" -eq 3 ] && _pass "EMPTY-CHARTER: pin-valid exits 3 (empty), distinct from 2 (malformed)" \
+                   || _fail "EMPTY-CHARTER: pin-valid on an empty charter exited $_ec, expected 3"
+  python3 "$ENGINE" pin-valid "$_fx/empty.md" 2>&1 | grep -qE '/stack' \
+    && _pass "EMPTY-CHARTER: the empty message tells the adopter to run /stack" \
+    || _fail "EMPTY-CHARTER: the empty message does not point at /stack"
+  _g=$(python3 "$ENGINE" guards "$_fx/empty.md" 2>/dev/null); _gc=$?
+  [ "$_gc" -eq 0 ] && [ -z "$_g" ] \
+    && _pass "EMPTY-CHARTER: guards emits nothing and exits 0 (no stance pin is not an error)" \
+    || _fail "EMPTY-CHARTER: guards on an empty charter exited $_gc with output '$_g'"
+  python3 "$ENGINE" exposure "$_fx/empty.md" >/dev/null 2>&1 \
+    && _pass "EMPTY-CHARTER: exposure succeeds on an empty charter" \
+    || _fail "EMPTY-CHARTER: exposure failed on an empty charter"
+  # a genuinely unreadable file must still be 2, or the distinction is meaningless
+  python3 "$ENGINE" pin-valid "$_fx/does-not-exist.md" >/dev/null 2>&1; _mc=$?
+  [ "$_mc" -eq 2 ] && _pass "EMPTY-CHARTER: an unreadable charter is still 2 (malformed)" \
+                   || _fail "EMPTY-CHARTER: unreadable charter exited $_mc, expected 2"
+else
+  _fail "EMPTY-CHARTER: missing $ENGINE"
+fi
+rm -rf "$_fx"
+# specific, not just the word "empty" appearing somewhere: the gate must treat a
+# present-but-empty charter the same way it treats an absent one.
+assert_contains .claude/commands/plan.md '[Aa]bsent .*or empty|empty .*or absent|empty \(zero pins\)'
+assert_contains .claude/commands/plan.md 'zero pins'
+
 # --- HERMETIC-ENV  [given] base/hermetic-tests ----------------------------------
 # A self-scanning checker must not carry the forbidden literal in its own pattern, or it
 # detects itself — the sibling of check_90's placeholder blind spot. Both patterns are

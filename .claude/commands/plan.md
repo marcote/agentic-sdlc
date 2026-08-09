@@ -6,8 +6,15 @@ description: Produce the technical plan (plan.md) grounded in the constitution, 
 
 Inputs: `specs/<feature>/acceptance.md` (frozen by `/distill`) × `memory/stack/stack.md`.
 
-**Charter absent** → refuse. Tell the human to run `/stack` first, the same way `/distill`
-refuses without `alignment.md`. Do not proceed on an empty charter and do not invent one.
+**Charter absent, or present but empty (zero pins)** → refuse identically. Tell the human to run
+`/stack` first, the same way `/distill` refuses without `alignment.md`. Never invent pins.
+
+The two states are one refusal on purpose: vendoring seeds a **stub** charter, so a fresh
+adopter never has "no charter" — they have a well-formed file with zero pins. Treating that as
+a pass would let the very first feature of every adopted repo through the gate unexamined,
+which is the mute assumption this whole mechanism exists to stop. `scripts/stack/engine.py`
+reports it as **empty** (exit 3), distinct from **malformed** (exit 2), so the message can say
+"run `/stack`" instead of sending someone hunting a bug that is not there.
 
 Otherwise emit **exactly one** of the three verdicts below. **Silence is not a verdict** — an
 unspoken pass is indistinguishable from not having looked, which is the mute assumption this

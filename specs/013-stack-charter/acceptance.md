@@ -145,6 +145,16 @@ When I inspect its SUPERSEDED entry
 Then it records the date, the reason, and what tripped it
 ```
 
+## Criterion: EMPTY-CHARTER  (deterministic)
+```gherkin
+Given a freshly vendored target whose memory/stack/stack.md is the seeded stub with zero pins
+When the engine validates it, emits its guards and computes its exposure, and /plan reads it
+Then "empty" is reported distinctly from "malformed": pin-valid exits 3 with a "run /stack"
+  message and not the malformed code 2; guards emits nothing and exits 0, because having no
+  stance pin is not an error; exposure reports zero pins and exits 0; and /plan's gate
+  documents refusing on an empty charter exactly as it refuses on an absent one
+```
+
 ## Criterion: HERMETIC-ENV  (deterministic)  ·  `[given] base/hermetic-tests`
 ```gherkin
 Given a detached-HEAD checkout with no controlling terminal

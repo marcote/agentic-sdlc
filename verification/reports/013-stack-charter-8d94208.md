@@ -67,14 +67,58 @@ without having scanned anything.
 
 None are BUILD failures; all four are evidence the checks were exercised rather than assumed.
 
+## 4. UAT — against the brief's objective (2026-08-08)
+
+UAT was run against the **objective**, not the spec: the harness verifying itself is a weak
+test for a feature about adopters, so the walk was done by vendoring onto a clean repo and
+inspecting what an adopter actually receives.
+
+| Walked | Result |
+|---|---|
+| Adopter receives the mechanism | ✅ `base/README.md`, `base/pin-template.md`, both engines, the guard |
+| The harness's own pins do **not** travel | ✅ target gets a stub with zero pins |
+| The dead `## Stack` stub now points at the charter | ✅ hand-off names `/stack` |
+| `NO-PRESCRIBE` against **shipped artifacts**, not the brief's promise | ✅ green — the scope edge `/align` scored at 4 was not crossed |
+| Adopter's day-one state is coherent | ❌ **gap found** → routed, fixed, re-verified (below) |
+
+**Product gap found and closed.** Vendoring never produces "no charter" — it seeds a stub, so
+an adopter's day-one state is a well-formed file with **zero pins**. The engine called that
+`malformed` (exit 2) and `/plan`'s gate only handled an *absent* charter. A fresh adopter's
+first interaction with this feature was an error about a bug that did not exist, on the very
+path `frictionless-adoption` measures.
+
+This was a **missing criterion, not a failing one**, so it routed to `/distill` per the UAT
+checklist rather than being patched quietly. `EMPTY-CHARTER` was specified, **proved 🔴 RED**
+(4 failing assertions; a fifth passed as the control that an unreadable charter still exits 2,
+without which the empty/malformed distinction would be meaningless), then implemented. Suite
+315/4 → **320 PASS / 0 FAIL**.
+
+A second **vacuous assertion** was caught in the same pass: `plan.md =~ /empty/` passed because
+the word already appeared in an unrelated sentence. Replaced with assertions on the real
+contract. That is the second vacuous-assertion catch in this feature and the fourth
+self-scanning/vacuity defect overall — see §3.
+
+**UAT verdict: ✅** — 19/19 deterministic criteria walked and observable, one product gap found
+and closed through the proper route.
+
 ## 5. Verdict
 
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: pending · coverage: 100% (18/18 deterministic) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19 deterministic) · retro: pending
 
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/013-stack-charter/retro.md` (closes the measurable prediction from `/align`).
 
-**Gaps routed:** none to implementation. Two items carried to `/uat` and `/retro`:
+**Gaps routed:** one product gap (`EMPTY-CHARTER`) found at `/uat`, routed to `/distill`,
+proved RED and closed. None to implementation.
+
+**Pending observation carried to `/retro`** (the three `📋` eval rows, deliberately not closed):
+`JUDGE-TRIPPED`, `JUDGE-COHERENCE` and `JUDGE-HEDGE-COST` would have been scored by the same
+model that authored them. That is not evidence, so they stay open with an explicit trigger:
+**the first feature (014+) whose `/plan` gate emits a real `UNPINNED` or `TRIPPED`, or whose
+`/stack` run produces a real coherence objection.** Until then their honest state is *unproven*,
+not *passing*.
+
+Two items carried to `/retro`:
 
 - **`/uat` must check the scope edge on the shipped artifacts, not on the brief's promise.**
   `alignment.md` scored `scopeCompliance` at 4 because a charter's content *is* runtime and
