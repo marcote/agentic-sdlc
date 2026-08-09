@@ -81,7 +81,7 @@ half and it belongs in the retro.
 
 ## 5. Verdict
 
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19 deterministic) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19 deterministic) · retro: ✅ → **DONE**
 
 Suite **399 PASS / 0 FAIL** at close (404 mid-implementation; several bare `assert_*` calls were
 consolidated into single labelled emissions — fewer assertions, same criteria, all attributable).

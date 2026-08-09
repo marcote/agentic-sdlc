@@ -93,6 +93,21 @@ argues that an exemption must be *recorded*, which rules out the cheapest option
 
 ---
 
+## B5 — "Reports clean" must mean every rule ran
+
+**Status:** open · **Raised:** 2026-08-09 (015 `/uat`) · **Size:** small
+
+An assertion that a tool reports *clean* must execute every rule that tool enforces, and name
+which ones it ran. `NVC-ZERO-FP` claimed the standing suite was clean while never running
+`traceability` — the suite read **404/0 with fifteen criteria untraceable**.
+
+Distinct from the five rows already in `base/patterns/non-vacuous-checks.md`: `check-can-fail`
+asks whether an assertion *can* fail; this asks whether it *exercised what it claims*.
+
+**Deliberately not written into the constitution yet.** Proposing this family as prose is exactly
+what failed three times. It ships as a `[given]` row only together with an obvious mechanical form;
+until one exists it lives here, where an unimplemented rule is honest instead of decorative.
+
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_
