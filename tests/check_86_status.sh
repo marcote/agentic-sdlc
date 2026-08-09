@@ -135,6 +135,35 @@ if have && [ "$RC" -ne 0 ] && grep -qiE "not found|unknown|no such|does not exis
 else _fail "UNKNOWN-FEATURE: no clean error (rc=$RC)"; fi
 rm -rf "$R"
 
+# --- LEGACY-REPORT: a report with no `-<ref>` suffix still counts (found 2026-08-09) ---
+# The convention is `reports/<feature>-<ref>.md`, but 004 predates it and its report is
+# `004-ci-amendment-gate.md`. A `$feat-*.md` glob cannot see it, so a feature that is DONE
+# (BUILD ✅ · UAT ✅ · retro ✅) read `next: /verify`. Fixture writes ONLY the un-suffixed
+# form, so this assertion fails against the pre-fix glob rather than passing for free.
+R=$(mkrepo); D="$R/specs/demo"
+fill "$D/brief.md"; align_ok "$D/alignment.md"; fill "$D/spec.md"; fill "$D/acceptance.md"
+cov "$D/coverage.md" green; fill "$D/plan.md"; fill "$D/tasks.md"; fill "$D/retro.md"
+report "$R/verification/reports/demo.md" "✅" "✅" "✅"
+have && run_status "$R"
+if have && grep -q "feature DONE" /tmp/st_out && [ "${RC:-1}" -eq 0 ]; then
+  _pass "LEGACY-REPORT: un-suffixed report counts; closed feature reads DONE"
+else _fail "LEGACY-REPORT: closed feature misread as unfinished (out: $(grep -E '^(current|next):' /tmp/st_out | tr '\n' ' '))"; fi
+rm -rf "$R"
+
+# --- REPORT-PRECEDENCE: the conventional `-<ref>` form wins, even when older ---
+# Accepting both forms must not resurrect a stale verdict. Precedence is by NAMING, not mtime:
+# the fixture makes the stale legacy report the NEWEST file, so a newest-first implementation
+# across both globs fails here instead of passing for free.
+R=$(mkrepo); D="$R/specs/demo"
+stage "$R" retro green                                       # writes demo-a.md: all ✅
+report "$R/verification/reports/demo.md" "-" "-" "pending"   # stale legacy...
+touch "$R/verification/reports/demo.md"                      # ...and it is the newest file
+have && run_status "$R"
+if have && grep -q "feature DONE" /tmp/st_out; then
+  _pass "REPORT-PRECEDENCE: -<ref> report wins over a newer un-suffixed one"
+else _fail "REPORT-PRECEDENCE: newer legacy report shadowed the conventional one (out: $(grep -E '^(current|next):' /tmp/st_out | tr '\n' ' '))"; fi
+rm -rf "$R"
+
 # --- DEPFREE: status.sh dep-free, via the shared helper (candidate B) ---
 if type assert_dep_free >/dev/null 2>&1 && [ -f "$STATUS" ]; then
   assert_dep_free "$STATUS" "DEPFREE"

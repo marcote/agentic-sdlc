@@ -14,7 +14,16 @@ feat="${1:-}"
 [ -n "$feat" ] || { echo "usage: status.sh <feature>" >&2; exit 2; }
 D="specs/$feat"
 [ -d "$D" ] || { echo "status: feature not found: $D" >&2; exit 2; }
+# The convention is `reports/<feature>-<ref>.md` (see .claude/skills/verify), but a report
+# written before that convention has no `-<ref>` suffix and a `$feat-*.md` glob cannot see it.
+# Accept the un-suffixed form too: a tracker that reports a CLOSED feature as unfinished loses
+# the finding while still reading as rigorous. Found by sweeping every feature on 2026-08-09 —
+# 004 is DONE (BUILD ✅ · UAT ✅ · retro ✅) and read `next: /verify`.
+# Precedence is by NAMING, not by mtime: the conventional `-<ref>` form always wins, and the
+# un-suffixed form is only a fallback. Ordering the two globs by newest-first instead would let
+# a stale legacy report shadow the current one merely by being touched later.
 report=$(ls -t "verification/reports/$feat"-*.md 2>/dev/null | head -1)
+[ -n "$report" ] || report=$(ls "verification/reports/$feat.md" 2>/dev/null | head -1)
 
 # A doc artifact is "filled" iff it has no leftover template placeholder. The marker is the
 # italic-paren form `_(...)_` (present in every _template file) — NOT `<...>`, which real
