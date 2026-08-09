@@ -22,4 +22,12 @@ assert_dep_free(){
 # *documents* a marker (e.g. a retro discussing placeholder detection) is not a false
 # positive — the same blind-spot fix status.sh's filled() carries (feature 008 retro).
 has_placeholder(){ sed 's/`[^`]*`//g' "$1" 2>/dev/null | grep -qE '_\([^)]*\)_|<[^ >][^>]*>'; }
+# prose_only FILE : emit the file with every fenced block AND inline code span removed,
+# so a scan matches only what the document *asserts in prose* — not what it *illustrates*
+# in an example. Required by NO-PRESCRIBE (feature 013): the pin template necessarily names
+# real tools (DuckDB, Postgres, Railway) inside fenced example pins, and a naive grep would
+# fail against the harness's own documentation. Same blind spot has_placeholder carries.
+prose_only(){
+  awk '/^[[:space:]]*```/{f=!f; next} !f' "$1" 2>/dev/null | sed 's/`[^`]*`//g'
+}
 summary(){ echo "---"; echo "TOTAL PASS=$PASSES FAIL=$FAILS"; [ "$FAILS" -eq 0 ]; }
