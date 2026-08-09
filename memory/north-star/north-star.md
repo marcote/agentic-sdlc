@@ -28,8 +28,13 @@ A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spe
   Its `signal`: gates block closure when a condition is missing and violations are caught before merge; the harness proves this by **dogfooding itself** (the retro ledger and `wow-report` are the evidence). Self-validation is not a separate pillar: it is the measurable proxy of *this one*.
 - **`agnostic-portability`** — Runs on any stack or project without imposing technology or runtime.
   Its `signal`: the contract (schema, gates, artifacts) remains intact when vendored onto an arbitrary repo/stack.
-- **`frictionless-adoption`** — Incorporating the harness into a new repo costs little.
-  Its `signal`: steps/time to adopt the harness in a project (lower = better).
+- **`frictionless-adoption`** — Incorporating the harness into a new repo costs little, and
+  every cost it does impose is justified by what that cost prevents.
+  Its `signal`: steps/time to adopt (lower = better), with every mandatory step carrying a
+  recorded justification proportional to what it prevents. The defect is an **unjustified**
+  step, not a step as such — a signal that merely counted steps would be maximised by shipping
+  nothing, and would put this pillar at war with the mission's word *enforces* (see
+  `decisions/0004-*`).
 - **`measurable-impact`** — The discipline the harness imposes must translate into better software, not gates that fire for the sake of firing.
   Its `signal`: gaps caught early (grilling/`/contract`) and late rework avoided (post-`/verify`/`/uat`), aggregated per feature in the "Method" section of the `wow-report`. Distinguishes *enforcing* (`real-enforcement`) from *enforcement that works* — the same anti-theater line from retro, elevated to the harness level.
 
@@ -67,8 +72,8 @@ The block below is the single source of truth, read by the deterministic validat
     },
     {
       "id": "frictionless-adoption",
-      "statement": "Incorporating the harness into a new repo costs little.",
-      "signal": "Steps/time to adopt the harness in a project (lower = better)."
+      "statement": "Incorporating the harness into a new repo costs little, and every cost it does impose is justified by what that cost prevents.",
+      "signal": "Steps/time to adopt (lower = better), with every mandatory step carrying a recorded justification proportional to what it prevents. The defect is an unjustified step, not a step as such: friction that buys nothing is what is being measured."
     },
     {
       "id": "measurable-impact",
