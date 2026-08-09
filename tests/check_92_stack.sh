@@ -189,7 +189,10 @@ assert_contains "$SBASE/README.md" 'secret-scan|P6'
 _fx=$(mktemp -d)
 printf 'The template illustrates a pin:\n\n```\n- Datastore: PostgreSQL 16\n```\n' > "$_fx/fenced.md"
 printf 'The harness requires PostgreSQL for all projects.\n' > "$_fx/prose.md"
-_DENY='postgres|postgresql|duckdb|sqlite|railway|vercel|heroku|django|rails|fastapi|pytest|jest|poetry|uv|npm|pnpm|yarn|cargo'
+# Word-boundary anchored (the assert_dep_free idiom): an unanchored `rails` matches
+# "guardrails" and an unanchored `uv` matches any word containing it. A dash counts as a
+# boundary, so "postgres-first" still trips.
+_DENY='(^|[^[:alnum:]])(postgres|postgresql|duckdb|sqlite|railway|vercel|heroku|django|rails|fastapi|pytest|jest|poetry|uv|npm|pnpm|yarn|cargo|python|bash)([^[:alnum:]]|$)'
 prose_only "$_fx/fenced.md" | grep -qiE "$_DENY" \
   && _fail "NO-PRESCRIBE: scanner trips on a fenced example (false positive)" \
   || _pass "NO-PRESCRIBE: scanner ignores names inside fenced examples"
