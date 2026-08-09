@@ -101,8 +101,22 @@ exactly this reason.
 - **A CI gate on pin amendment.** Principle 4 (productivity first). Deliberately unlike the
   North Star `amendment-gate`, which protects *product* governance; a technical pin is
   feature throughput.
-- **Retrofitting a charter onto this repo's closed features.** 013 seeds the harness's own
-  charter going forward; features 001–012 are not re-planned.
+- **Re-planning this repo's closed features.** Features 001–012 are not reopened, re-briefed,
+  or re-verified against the charter. *(Distinct from seeding: see Dependency below — the
+  harness's own charter **is** seeded in 013 with the decisions that are live today. Recording
+  a decision that already governs the repo is not retrofitting a spec onto a closed feature.)*
+
+## Reflexive dogfood (D3)
+
+Per constitution delta D3, this feature is workflow tooling and must run against **its own
+in-flight feature** before closing. Concretely:
+
+- `/stack` is run on the harness itself, seeding `memory/stack/stack.md` with the decisions
+  that are **already live and load-bearing**: the py3 reference engine (006), the bash-only
+  dependency-free baseline, and the "impose no runtime" stance. Some of these were contested
+  when taken; if the mechanism cannot articulate decisions already known to have been made, it
+  will not articulate future ones.
+- 013's own `/plan` passes through the new `/plan` guard and must emit a real verdict.
 
 ## Dependency
 
