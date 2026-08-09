@@ -120,6 +120,54 @@ else
 fi
 rm -rf "$_fx"
 
+# --- SUBSTRATE-GUARD (found after /uat: a declared Guard was silently dropped) ---
+_fx=$(mktemp -d)
+cat > "$_fx/sub.md" <<'EOF'
+### S1 — Dependency & task management [substrate]
+- Confidence: PINNED
+- Because: one tool for dependencies, lockfile and task running
+- Buys: reproducible installs
+- Forecloses: other resolvers and their lockfiles
+- Falsifier: a dependency that ships only for another resolver
+- Guard: true SUBSTRATE_GUARD_MARKER
+EOF
+cat > "$_fx/nosub.md" <<'EOF'
+### S1 — Runtime version [substrate]
+- Confidence: PINNED
+- Because: the current stable release
+- Buys: security updates
+- Forecloses: features of later releases
+- Falsifier: a required capability lands only in a later release
+EOF
+if [ -f "$ENGINE" ]; then
+  python3 "$ENGINE" guards "$_fx/sub.md" 2>/dev/null | grep -q 'SUBSTRATE_GUARD_MARKER' \
+    && _pass "SUBSTRATE-GUARD: a [substrate] Guard is emitted for execution" \
+    || _fail "SUBSTRATE-GUARD: a declared [substrate] Guard was silently dropped"
+  python3 "$ENGINE" pin-valid "$_fx/nosub.md" >/dev/null 2>&1 \
+    && _pass "SUBSTRATE-GUARD: a Guard stays optional on [substrate]" \
+    || _fail "SUBSTRATE-GUARD: [substrate] wrongly requires a Guard"
+  # the stance requirement must NOT be relaxed by this change — fixture built HERE, not
+  # borrowed from another block, or the assertion silently checks a missing file and
+  # records nothing (caught while writing this very check).
+  cat > "$_fx/stance-noguard.md" <<'EOF'
+### S1 — Data-driven core [stance]
+- Confidence: PINNED
+- Because: several consumers are plausible
+- Buys: new transports are adapters
+- Forecloses: free incremental streaming
+- Falsifier: the core becomes single-consumer by contract
+- Injects: every capability returns structured data
+EOF
+  if python3 "$ENGINE" pin-valid "$_fx/stance-noguard.md" >/dev/null 2>&1; then
+    _fail "SUBSTRATE-GUARD: [stance] no longer requires a Guard (regression)"
+  else
+    _pass "SUBSTRATE-GUARD: [stance] still requires a Guard (not relaxed)"
+  fi
+else
+  _fail "SUBSTRATE-GUARD: missing $ENGINE"
+fi
+rm -rf "$_fx"
+
 # --- GUARD-RUNS -----------------------------------------------------------------
 assert_contains .claude/skills/verify/SKILL.md 'Guard'
 assert_contains .claude/skills/verify/SKILL.md 'guards'

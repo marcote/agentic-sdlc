@@ -99,7 +99,7 @@ ask for it.
 | ------ | ------------ |
 | Project start | The elicitation step derives `S0`, drafts pins from the North Star, prices each one, asks only what it cannot infer, accepts *"I don't know"* as `PROVISIONAL` + a hedge, and objects to the set as a whole. |
 | Every feature's technical plan | A fail-closed gate reads the feature's acceptance criteria against the charter and emits exactly one verdict — never silence. An unpinned load-bearing decision stops the feature and is elicited on the spot; a criterion matching a declared `Falsifier` stops it and presents the previously declared cost, plus whether the hedge that was paid for actually exists. |
-| Verification | Each `[stance]` pin's `Guard` command is executed and must exit 0. The harness asserts the *shape* — a named, runnable, passing check — and knows nothing about what it inspects. That is how a project's own opinions become enforceable without the harness prescribing any of its own. |
+| Verification | Every pin that declares a `Guard` — of either kind — has that command executed, and it must exit 0. The harness asserts the *shape* — a named, runnable, passing check — and knows nothing about what it inspects. That is how a project's own opinions become enforceable without the harness prescribing any of its own. |
 
 ## Amendment
 

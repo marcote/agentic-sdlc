@@ -16,7 +16,13 @@
 3. **A `PROVISIONAL` pin carries a non-empty `Hedge`.** Declared uncertainty must buy an
    architectural hedge, emitted as a `[given]` row in the consuming feature's `coverage.md`.
 4. **A `[stance]` pin names a `Guard`** — an executable command — and an `Injects` clause.
-   Substrate pins carry neither.
+   **Any pin may carry a `Guard`**; on `[substrate]` it is optional. `Injects` is stance-only.
+   *(Corrected after `/uat`: the original text tied `Guard` to the pin kind, conflating two
+   orthogonal things — whether a pin injects a per-feature coverage row (stance only) and
+   whether it can be checked by a command (both). A substrate choice such as a dependency
+   tool is often more mechanically checkable than a stance, and the harness silently accepted
+   and then ignored such a `Guard` — a declared check that never runs, which is the vacuity
+   failure mode this feature exists to prevent.)*
 5. **`S0` (rigor tier) is the first pin**, derived from blast-radius questions rather than
    chosen by label, and carries its own `Falsifier` so a rising tier is announced.
 6. **The charter emits an exposure header** — pin counts by `Confidence` and the list of
@@ -94,6 +100,10 @@
 - **A `Guard` that passes vacuously.** A named check that greps a directory which does not
   exist is green by construction. The `Guard` contract requires the command to be tied to an
   observable deliverable, per Principle 2.
+- **A `Guard` that is never executed at all** — *found after `/uat`, worse than a vacuous one.*
+  A `[substrate]` pin's `Guard` was accepted by `pin-valid` and then dropped by `guards`, so an
+  author could enforce nothing while believing otherwise. Silent acceptance is the aggravating
+  factor: a rejected field would have been visible.
 - **`S0` rises mid-project** (script starts running on a server). Closed features are not
   re-verified at the new tier; the tier applies from the next feature forward, and the rise
   is announced because `S0` carries a `Falsifier`.

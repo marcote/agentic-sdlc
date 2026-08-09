@@ -9,7 +9,7 @@ description: On-demand verification of a feature. Runs output + trajectory eval 
 1. Copy `verification/verification-report.md` to `verification/reports/<feature>-<ref>.md`.
 2. **Output eval (BUILD):** run the deterministic tests linked in `coverage.md`.
    Task success = green/total. Threshold 100% (non-negotiable).
-3. **Stance Guards (BUILD, cont.):** obtain each `[stance]` pin's check with
+3. **Guards (BUILD, cont.):** obtain every declared check — from pins of **either** kind — with
    `python3 scripts/stack/engine.py guards memory/stack/stack.md`, execute every command, and
    require exit 0. Run them **by name only** — never inspect or second-guess what a `Guard`
    checks; the harness asserts that a named, runnable check exists and passes, which is what

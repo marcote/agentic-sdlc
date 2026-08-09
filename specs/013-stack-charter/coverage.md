@@ -20,7 +20,8 @@ override seam. **`rate-limiting`** does not apply: no network-exposed surface.
 | `measurable-impact` · `real-enforcement` | O1 no assumption stays mute | A pin is well-formed only with Confidence/Because/Buys/Forecloses/Falsifier | PIN-SHAPE | project | `check_92_stack.sh` | ✅ uat |
 | `measurable-impact` · `real-enforcement` | O3 uncertainty pays a verifiable hedge | A PROVISIONAL pin carries a non-empty Hedge | PROVISIONAL-HEDGE | project | `check_92_stack.sh` | ✅ uat |
 | `agnostic-portability` | O4 adopter opinions enforceable, no stack prescribed | A [stance] pin names a Guard command + Injects clause | STANCE-GUARD | project | `check_92_stack.sh` | ✅ uat |
-| `real-enforcement` · `agnostic-portability` | O4 adopter opinions enforceable | `/verify` runs each stance Guard and requires exit 0 | GUARD-RUNS | project | `check_92_stack.sh` + `tests/run.sh` | ✅ uat |
+| `agnostic-portability` · `real-enforcement` | O4 adopter opinions enforceable | A `[substrate]` pin's Guard is emitted and executed; `Injects` stays stance-only | SUBSTRATE-GUARD | project · **found after `/uat`** | `check_92_stack.sh` | ✅ uat |
+| `real-enforcement` · `agnostic-portability` | O4 adopter opinions enforceable | `/verify` runs each declared Guard and requires exit 0 | GUARD-RUNS | project | `check_92_stack.sh` + `tests/run.sh` | ✅ uat |
 | `real-enforcement` | O2 stop the feature at the step that can act | `/plan` fails closed: PASS / UNPINNED / TRIPPED, never silence | PLAN-GATE | project | `check_92_stack.sh` | ✅ uat |
 | `real-enforcement` | O2 stop the feature at the step that can act | UNPINNED minting a stance pin bounces back to `/distill` | PLAN-BOUNCE | project | `check_92_stack.sh` | ✅ uat |
 | `measurable-impact` · `real-enforcement` | O2 · O3 the honest bill | TRIPPED reports criterion×pin, declared cost, hedge-exists, two paths | TRIPPED-BILL | project | `check_92_stack.sh` | ✅ uat |
@@ -128,3 +129,27 @@ output, which is not evidence. They become a `pending-observation` for `/retro`,
 explicit trigger: **the first feature (014+) whose `/plan` gate emits a real `UNPINNED` or
 `TRIPPED` verdict, or whose `/stack` run produces a real coherence objection.** Until then the
 honest state is *unproven*, not *passing*.
+
+**Post-UAT correction — a declared `Guard` was accepted and then silently dropped.**
+
+Raised by the maintainer asking where enforcing a dependency tool would live. A `[substrate]`
+pin's `Guard` validated cleanly and was never emitted for execution: an author could believe a
+substrate choice was enforced while nothing checked it. **Worse than a vacuous guard** — with a
+vacuous one something at least runs; here validation passed and nothing ran.
+
+Root cause was a design error in `§3.2` of the design doc: `Guard` was tied to the pin kind,
+conflating two orthogonal properties — whether a pin injects a per-feature coverage row (stance
+only) and whether it can be checked by a command (both, and substrate choices are usually the
+easier to check). Corrected: any pin may declare a `Guard`; `[stance]` still requires one;
+`Injects` on `[substrate]` is now explicitly rejected.
+
+Routed through `/distill` like `EMPTY-CHARTER`: `SUBSTRATE-GUARD` specified, proved 🔴 RED
+(1 real failure; 1 control confirming `Guard` stays optional on substrate), then fixed. A
+non-regression assertion was added so relaxing substrate cannot silently relax stance.
+**325/1 → 327 PASS / 0 FAIL. 20 deterministic criteria ✅ uat.**
+
+*Fifth vacuous assertion of this feature, caught while writing this very check:* the
+non-regression assertion first pointed at a fixture built in a different block, so it silently
+checked a missing file and recorded neither PASS nor FAIL. Fixed by building the fixture in
+place. The evidence for the `non-vacuous-checks` constitution rule is now five occurrences plus
+`e6bc658`.

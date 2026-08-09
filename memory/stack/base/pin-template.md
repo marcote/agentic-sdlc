@@ -29,18 +29,24 @@ Pin ids are stable and never reused. Ordering is document order; `S0` is always 
 | `Forecloses` | every pin | **The price.** The expensive surprise is never the decision — it is the cost nobody stated. A block without this is not a pin. |
 | `Falsifier` | every pin | What evidence would overturn it, declared *in advance*. This is what lets the gate ask a mechanical question — *does this new acceptance criterion match a declared falsifier?* — instead of re-arguing the whole set every feature. |
 | `Hedge` | `PROVISIONAL` only | The cheap escape that declared uncertainty must buy. Emitted as a `[given]` coverage row, so it is verified rather than merely written. **A `PROVISIONAL` pin without a `Hedge` is a lie.** |
-| `Guard` | `[stance]` only | An executable command asserting the stance still holds. The harness runs it by name and requires exit 0; it never inspects what the command checks. |
-| `Injects` | `[stance]` only | The `[given]` row(s) added to each applicable feature's coverage matrix. |
+| `Guard` | required on `[stance]`, optional on `[substrate]` | An executable command asserting the pin still holds. The harness runs it by name and requires exit 0; it never inspects what the command checks. **Any pin kind may declare one** — whether a pin injects a per-feature coverage row is a separate question from whether it can be checked. A substrate choice is often the easier of the two to check mechanically. |
+| `Injects` | `[stance]` only | The `[given]` row(s) added to each applicable feature's coverage matrix. Rejected on `[substrate]`: a substrate choice is a constraint on the plan, not a per-feature observable. |
 | `Superseded` | amended pins | `<date> — <reason>`, including what tripped the pin. History stays inline; the pin keeps its id and gains a `SUPERSEDED` marker on its heading. |
 
 ## The two kinds
 
-**`[substrate]`** — what the work runs on. Constrains the technical plan; produces no
-acceptance criterion, because a substrate choice is a constraint, not an observable behaviour.
+**`[substrate]`** — what the work runs on. Constrains the technical plan and produces no
+acceptance criterion, because a substrate choice is a constraint rather than an observable
+behaviour. It **may** still carry a `Guard`, and often should: a choice of toolchain or version
+is usually a one-line check.
 
-**`[stance]`** — the shape of the seam; it defines what *done* means. Carries a `Guard` and an
-`Injects`, so it is enforced rather than aspirational. A stance written only in prose degrades:
-by the seventh feature something violates it and nobody notices.
+**`[stance]`** — the shape of the seam; it defines what *done* means. **Requires** both a
+`Guard` and an `Injects`, so it is enforced rather than aspirational. A stance written only in
+prose degrades: by the seventh feature something violates it and nobody notices.
+
+The two kinds differ in whether they inject coverage rows — **not** in whether they can be
+enforced. Tying `Guard` to the kind was this template's original error: it let a substrate pin
+declare a check that validated cleanly and was then never executed.
 
 ## Worked examples
 
@@ -90,3 +96,6 @@ An amended pin, keeping its history inline:
   nothing.
 - **A `Falsifier` nobody could observe.** *"If this turns out to be wrong"* is not a falsifier.
   Write the condition an acceptance criterion could plausibly state.
+- **A `Guard` that is accepted and then never run.** Worse than a vacuous check, because
+  nothing looks wrong: validation passes and the author believes the pin is enforced. Confirm a
+  new `Guard` actually appears in the emitted guard list before trusting it.

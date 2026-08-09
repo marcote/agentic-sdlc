@@ -8,7 +8,11 @@ Deterministic capabilities over a project's stack charter (memory/stack/stack.md
                      SUPERSEDED pin records a date AND a reason/trigger.
   exposure FILE      the charter's exposure header — counts by Confidence plus the
                      ids you are exposed on. Byte-stable across runs.
-  guards FILE        one [stance] Guard command per line, for /verify to execute.
+  guards FILE        one Guard command per line, for /verify to execute. ANY pin kind may
+                     declare one: whether a pin injects a per-feature coverage row (stance
+                     only) is orthogonal to whether it can be checked by a command (both).
+                     A substrate choice such as a dependency tool is often the more
+                     mechanically checkable of the two.
 
 This is a *reference* engine, not a requirement: the contract lives in the template
 (memory/stack/base/), and an adopting repo may reimplement it in its own stack — the
@@ -108,10 +112,14 @@ def _validate(pins):
         if p["fields"].get("Confidence", "").upper().startswith("PROVISIONAL") and not _has(p, "Hedge"):
             bad.append("%s: PROVISIONAL without a Hedge" % p["id"])
         if p["stance"]:
+            # required on stance (a stance without teeth degrades to prose); optional on
+            # substrate, but emitted and executed either way — see cmd_guards.
             if not _has(p, "Guard"):
                 bad.append("%s: [stance] without a Guard" % p["id"])
             if not _has(p, "Injects"):
                 bad.append("%s: [stance] without an Injects" % p["id"])
+        if p["substrate"] and _has(p, "Injects"):
+            bad.append("%s: [substrate] cannot carry Injects (coverage rows are stance-only)" % p["id"])
         if p["superseded"]:
             sup = p["fields"].get("Superseded", "")
             if not re.search(r"\d{4}-\d{2}-\d{2}", sup):
@@ -152,7 +160,7 @@ def cmd_guards(args):
     except Empty:
         return 0  # no stance pin means nothing to run, which is not a failure
     for p in pins:
-        if p["stance"] and not p["superseded"] and _has(p, "Guard"):
+        if not p["superseded"] and _has(p, "Guard"):
             print(p["fields"]["Guard"])
     return 0
 

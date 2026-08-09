@@ -103,7 +103,9 @@ and closed through the proper route.
 
 ## 5. Verdict
 
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (19/19 deterministic) · retro: ✅
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (20/20 deterministic) · retro: ✅
+
+*Re-verified after the post-UAT `SUBSTRATE-GUARD` correction: `bash tests/run.sh` → **327 PASS / 0 FAIL**.*
 
 **DONE.** Mission verdict `pending-observation` — the charter mechanism is built and self-exercised, but it has prevented no rework yet because no feature has run through it. See `specs/013-stack-charter/retro.md` for the re-check trigger.
 

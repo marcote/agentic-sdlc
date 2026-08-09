@@ -39,6 +39,16 @@ Then the pin names both a Guard command and an Injects clause, the named command
   executable from the repo root, and a fixture stance pin with no Guard is reported as malformed
 ```
 
+## Criterion: SUBSTRATE-GUARD  (deterministic)
+```gherkin
+Given a charter whose [substrate] pin declares a Guard command
+When the engine emits the charter's guards
+Then that command is emitted and executed like any other, so a substrate decision such as a
+  dependency tool is enforceable and not merely declared; a [stance] pin still REQUIRES a
+  Guard, while on [substrate] it stays optional; and no declared Guard is ever accepted as
+  valid and then silently dropped
+```
+
 ## Criterion: GUARD-RUNS  (deterministic)
 ```gherkin
 Given .claude/skills/verify/SKILL.md and the harness's own charter
