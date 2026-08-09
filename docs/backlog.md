@@ -13,9 +13,18 @@ it is **dropped with a reason**. Silence is not a disposition.
 
 ---
 
-## B1 — A mechanical meta-check for vacuous assertions
+## ~~B1~~ — A mechanical meta-check for vacuous assertions
 
-**Status:** open · **Raised:** 2026-08-09 (013 + 014 retros, `wow-report` §3) · **Size:** small
+**Status: PROMOTED 2026-08-09 → `specs/015-non-vacuous-checks/`** · Raised: 013 + 014 retros,
+`wow-report` §3 · **Size:** small
+
+**What moved it:** occurrence twelve. A vacuous assertion (`REPORT-PRECEDENCE` in `check_86`)
+shipped **hours after** the pattern landed, while deliberately applying it. That does not formally
+refute the pattern — the tracker fix was a direct patch carrying no `[given]` rows — but it
+removes the reason to defer: if manual application fails in the context of highest attention, it
+fails everywhere.
+
+*Original entry retained below for the record.*
 
 The constitution now carries `base/patterns/non-vacuous-checks.md`, which is the **review half**.
 The mechanical half is not built: a check in `tests/` that reads `tests/check_*.sh` and fails when a
