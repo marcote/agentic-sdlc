@@ -62,11 +62,47 @@ can check whether the mapping is real or whether the rows were satisfied by rest
 the easiest place to satisfy that rule circularly. `/uat` must judge the five rows against the
 delivered check's *behaviour on fixtures*, not against this table.
 
-## UAT
+## UAT — 2026-08-09
 
-Pending — filled at `/uat`. Every row must reach `✅ uat` except the `deferred` ones,
-whose reasons are recorded above, and `JUDGE-SCOPE-HONEST`, which stays `📋 case` unless an
-independent judge scores it.
+All 19 deterministic criteria walked against `acceptance.md` → **✅ uat**. `JUDGE-SCOPE-HONEST`
+stays `📋 case`. The three `deferred` rows keep their recorded reasons; `S2-HEDGE` stayed deferred
+because the implementation is bash, as planned.
+
+### The falsification test set in `alignment.md`, answered
+
+> *Does the meta-check flag at least one real instance in the standing, green suite that was
+> **not already known**? `DEPFREE` in 008 does not count.*
+
+**Yes — fifteen, across five files, from features 004, 006, 007, 008 and 009.**
+
+| File | Untraceable criteria | Cause |
+|---|---|---|
+| `check_95` | `AMEND-BLOCK-NO-ADR`, `AMEND-PASS-WITH-ADR`, `AMEND-NO-ADR-FOR-PROSE`, `AMEND-SET-SEMANTICS`, `AMEND-SCHEMA-VALID`, `AMEND-SUITE-GREEN`, `DEV-UNBLOCKED`, `CONST-EXCEPTION`, `SELF-CHECK` | results emitted through `gate_pass`/`gate_block`, which printed `gate PASSES: <desc>` with no criterion label |
+| `check_82`, `check_84`, `check_86`, `check_88` | `SELF-CHECK` ×4 | declared as a header, emitted by bare `assert_file` → `file <path>` |
+| `check_84`, `check_88` | `DEPFREE` ×2 | `assert_dep_free` called without its label — the *same* defect fixed in `check_86` on 2026-08-09, in two more files |
+
+All fifteen fixed. `traceability`, `duplicates` and `selfscan` now exit 0 on the standing suite.
+
+### PRODUCT gap found at UAT and routed back
+
+**`NVC-ZERO-FP` was itself vacuous.** As frozen it ran `--declarations-only`, `selfscan` and
+`duplicates` — **never `traceability` against a real run log**. The suite read 404/0 while fifteen
+criteria were untraceable.
+
+A zero-false-positive claim that never runs the rule it claims about is the exact failure this
+feature exists to catch, committed by this feature, inside the check named after it. It was caught
+by walking the acceptance criterion by hand at `/uat` rather than by any assertion — which is the
+honest limit of the mechanical half and belongs in the retro, not in a footnote.
+
+Corrected: `NVC-ZERO-FP` now consumes the same real log as `NVC-INNER-GUARD` and asserts all three
+rules. Proved failable — reintroducing one unlabelled emission makes it fail with a diagnostic
+naming the file and the label.
+
+### Suite count
+
+**399 PASS / 0 FAIL**, down from 404 mid-implementation. Not a regression: several bare
+`assert_file`/`assert_contains` calls were consolidated into single labelled emissions. Fewer
+assertions, the same criteria, and every one of them now attributable.
 
 ## RED state (`/contract`, 2f95fb3 → contract)
 

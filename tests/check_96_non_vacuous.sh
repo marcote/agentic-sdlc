@@ -51,16 +51,41 @@ if have_nvc && grep -q "HEADERONLY" /tmp/nvc_out && ! grep -q "PHANTOM" /tmp/nvc
 else _fail "NVC-DECLARE-FORMS: parser took a heredoc body as a declaration, or missed a header"; fi
 rm -rf "$R"
 
-# --- NVC-ZERO-FP: clean against the real, standing suite, and provably non-empty ---
-if have_nvc; then
-  bash "$NVC" traceability --tests tests --output /dev/null --declarations-only >/tmp/nvc_out 2>&1
-  n=$(grep -c . /tmp/nvc_out 2>/dev/null || echo 0)
+# --- NVC-INNER-GUARD: the nested run terminates, and this check judges its own file ---
+# `timeout` is NOT used: it is absent on macOS, so it exits 127 and the assertion would have
+# passed for an unrelated reason -- the exact shape occurrences 6-8 had. Non-recursion is proved
+# by counting how many times the runner announced its first check: exactly one means no nesting.
+if [ "${NVC_INNER:-0}" = "1" ]; then
+  _skip "NVC-INNER-GUARD: nested run, spawn suppressed by the guard"
+  _skip "NVC-ZERO-FP: nested run, the real-log scan belongs to the outer run"
+elif have_nvc && [ -f tests/check_96_non_vacuous.sh ]; then
+  ( NVC_INNER=1 bash tests/run.sh ) >/tmp/nvc_inner 2>&1
+  depth=$(grep -c "== tests/check_00_skeleton.sh ==" /tmp/nvc_inner 2>/dev/null || echo 0)
+  own=$(bash "$NVC" declarations tests/check_96_non_vacuous.sh 2>/dev/null | wc -l | tr -d ' ')
+  seen=0
+  for lbl in $(bash "$NVC" declarations tests/check_96_non_vacuous.sh 2>/dev/null | awk '{print $2}'); do
+    grep -qE "(PASS|FAIL|SKIP): ${lbl}:" /tmp/nvc_inner && seen=$((seen+1))
+  done
+  if [ "${depth:-0}" -eq 1 ] && [ "${own:-0}" -gt 0 ] && [ "${seen:-0}" -eq "${own:-0}" ]; then
+    _pass "NVC-INNER-GUARD: exactly one nested run; all ${own} of this check's own labels emitted in it"
+  else _fail "NVC-INNER-GUARD: recursion or self-exemption (depth=${depth:-0} own=${own:-0} seen=${seen:-0})"; fi
+
+  # --- NVC-ZERO-FP: all three rules clean against the REAL suite, and provably non-empty ---
+  # Corrected at /uat. As frozen this assertion ran only --declarations-only, selfscan and
+  # duplicates -- never traceability against a real log. The suite was green at 404/0 while
+  # FIFTEEN criteria across five files were untraceable. A zero-false-positive claim that never
+  # runs the rule it claims is itself the vacuity this feature exists to catch.
+  bash "$NVC" traceability --tests tests --output /tmp/nvc_inner >/tmp/nvc_tr 2>&1; TR=$?
   bash "$NVC" selfscan --tests tests >/tmp/nvc_ss 2>&1; SS=$?
   bash "$NVC" duplicates --tests tests >/tmp/nvc_dup 2>&1; DUP=$?
+  n=$(bash "$NVC" traceability --tests tests --output /dev/null --declarations-only 2>/dev/null | wc -l | tr -d ' ')
+  if [ "${TR:-1}" -eq 0 ] && [ "${SS:-1}" -eq 0 ] && [ "${DUP:-1}" -eq 0 ] && [ "${n:-0}" -gt 50 ]; then
+    _pass "NVC-ZERO-FP: all three rules clean on the real suite, ${n} labels examined (>50, not vacuously empty)"
+  else _fail "NVC-ZERO-FP: violations on a known-good suite (trace=${TR:-?} $(head -1 /tmp/nvc_tr 2>/dev/null) selfscan=${SS:-?} dup=${DUP:-?} n=${n:-0})"; fi
+else
+  _fail "NVC-INNER-GUARD: deliverable absent, nesting unproved"
+  _fail "NVC-ZERO-FP: deliverable absent, real-suite scan unproved"
 fi
-if have_nvc && [ "${SS:-1}" -eq 0 ] && [ "${DUP:-1}" -eq 0 ] && [ "${n:-0}" -gt 50 ]; then
-  _pass "NVC-ZERO-FP: standing suite clean, ${n} labels examined (>50, so not vacuously empty)"
-else _fail "NVC-ZERO-FP: false positives on a known-good suite, or examined too few labels (n=${n:-0} selfscan=${SS:-?} dup=${DUP:-?})"; fi
 
 # --- NVC-LABEL-SCOPED: a result must land in its own file's section ---
 R=$(nvcrepo)
@@ -122,27 +147,6 @@ rm -rf "$R"
 # and the helper the rule depends on must exist
 if type _skip >/dev/null 2>&1; then _pass "NVC-SKIP-EXPLICIT-HELPER: lib.sh provides _skip"
 else _fail "NVC-SKIP-EXPLICIT-HELPER: lib.sh has no _skip, so silence is still the only option"; fi
-
-# --- NVC-INNER-GUARD: the nested run terminates, and this check judges its own file ---
-# `timeout` is NOT used: it is absent on macOS, so it exits 127 and the assertion would have
-# passed for an unrelated reason -- the exact shape occurrences 6-8 had. Non-recursion is proved
-# by counting how many times the runner announced its first check: exactly one means no nesting.
-if [ "${NVC_INNER:-0}" = "1" ]; then
-  _skip "NVC-INNER-GUARD: nested run, spawn suppressed by the guard"
-elif have_nvc && [ -f tests/check_96_non_vacuous.sh ]; then
-  ( NVC_INNER=1 bash tests/run.sh ) >/tmp/nvc_inner 2>&1
-  depth=$(grep -c "== tests/check_00_skeleton.sh ==" /tmp/nvc_inner 2>/dev/null || echo 0)
-  own=$(bash "$NVC" declarations tests/check_96_non_vacuous.sh 2>/dev/null | wc -l | tr -d ' ')
-  seen=0
-  for lbl in $(bash "$NVC" declarations tests/check_96_non_vacuous.sh 2>/dev/null | awk '{print $2}'); do
-    grep -qE "(PASS|FAIL|SKIP): ${lbl}:" /tmp/nvc_inner && seen=$((seen+1))
-  done
-  if [ "${depth:-0}" -eq 1 ] && [ "${own:-0}" -gt 0 ] && [ "${seen:-0}" -eq "${own:-0}" ]; then
-    _pass "NVC-INNER-GUARD: exactly one nested run; all ${own} of this check's own labels emitted in it"
-  else _fail "NVC-INNER-GUARD: recursion or self-exemption (depth=${depth:-0} own=${own:-0} seen=${seen:-0})"; fi
-else
-  _fail "NVC-INNER-GUARD: deliverable absent, nesting unproved"
-fi
 
 # --- NVC-RED-SUITE: an unusable run yields no traceability verdict, and names what it ran ---
 R=$(nvcrepo)

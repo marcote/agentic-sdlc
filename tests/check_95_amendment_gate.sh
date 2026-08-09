@@ -17,62 +17,67 @@ GATE=scripts/amendment-gate.sh
 ADR="memory/north-star/decisions/0003-nuevo.md"   # a valid new ADR (added)
 
 # --- gate helpers (use _pass/_fail from lib.sh) ---
-gate_pass(){ # desc, args...
-  local desc="$1"; shift
-  if bash "$GATE" "$@" >/tmp/ag_out 2>&1; then _pass "gate PASSES: $desc"
-  else _fail "gate should PASS: $desc (exit $?, out: $(head -1 /tmp/ag_out))"; fi
+# LABEL is first: without it these helpers emitted "gate PASSES: <desc>", which cannot be tied
+# back to the criterion it satisfies. Nine criteria in this file were untraceable that way, found
+# by scripts/nvc.sh at 015's UAT against a suite that had been green since feature 004.
+gate_pass(){ # label, desc, args...
+  local lbl="$1" desc="$2"; shift 2
+  if bash "$GATE" "$@" >/tmp/ag_out 2>&1; then _pass "$lbl: gate PASSES: $desc"
+  else _fail "$lbl: gate should PASS: $desc (exit $?, out: $(head -1 /tmp/ag_out))"; fi
 }
-gate_block(){ # desc, regex, args...
-  local desc="$1" re="$2"; shift 2
+gate_block(){ # label, desc, regex, args...
+  local lbl="$1" desc="$2" re="$3"; shift 3
   if bash "$GATE" "$@" >/tmp/ag_out 2>&1; then
-    _fail "gate should BLOCK: $desc (passed with exit 0)"
-  elif grep -qiE "$re" /tmp/ag_out; then _pass "gate BLOCKS: $desc (cites /$re/)"
-  else _fail "gate blocked but without /$re/ message: $desc (out: $(head -1 /tmp/ag_out))"; fi
+    _fail "$lbl: gate should BLOCK: $desc (passed with exit 0)"
+  elif grep -qiE "$re" /tmp/ag_out; then _pass "$lbl: gate BLOCKS: $desc (cites /$re/)"
+  else _fail "$lbl: gate blocked but without /$re/ message: $desc (out: $(head -1 /tmp/ag_out))"; fi
 }
 
 # --- AMEND-BLOCK-NO-ADR: sets change, no new ADR -> blocks citing ADR ---
-gate_block "sets change without ADR" "adr" \
+gate_block "AMEND-BLOCK-NO-ADR" "sets change without ADR" "adr" \
   --files "$F/base.md" "$F/set-added-valid.md" --added "" --suite-cmd true
 
 # --- AMEND-PASS-WITH-ADR: sets change + ADR + schema-valid + green suite -> passes ---
-gate_pass "sets change with ADR + schema ok + green suite" \
+gate_pass "AMEND-PASS-WITH-ADR" "sets change with ADR + schema ok + green suite" \
   --files "$F/base.md" "$F/set-added-valid.md" --added "$ADR" --suite-cmd true
 
 # --- AMEND-NO-ADR-FOR-PROSE: prose only (same block) -> passes without ADR ---
-gate_pass "prose only, no ADR" \
+gate_pass "AMEND-NO-ADR-FOR-PROSE" "prose only, no ADR" \
   --files "$F/base.md" "$F/prose-only.md" --added "" --suite-cmd true
 # reinforcement: only alignment.threshold changed -> also does not require ADR
-gate_pass "threshold only, no ADR" \
+gate_pass "AMEND-NO-ADR-FOR-PROSE" "threshold only, no ADR" \
   --files "$F/base.md" "$F/threshold.md" --added "" --suite-cmd true
 
 # --- AMEND-SET-SEMANTICS: reordered/reformatted, same sets -> passes (no false positive) ---
-gate_pass "reformat without sets change" \
+gate_pass "AMEND-SET-SEMANTICS" "reformat without sets change" \
   --files "$F/base.md" "$F/reformatted.md" --added "" --suite-cmd true
 
 # --- AMEND-SCHEMA-VALID: sets change, with ADR, but JSON schema-invalid -> blocks citing schema ---
-gate_block "sets change schema-invalid (even with ADR)" "schema|invalid" \
+gate_block "AMEND-SCHEMA-VALID" "sets change schema-invalid (even with ADR)" "schema|invalid" \
   --files "$F/base.md" "$F/set-added-invalid.md" --added "$ADR" --suite-cmd true
 
 # --- AMEND-SUITE-GREEN: sets change, ADR, schema ok, but RED suite -> blocks ---
-gate_block "sets change with red suite" "suite|red" \
+gate_block "AMEND-SUITE-GREEN" "sets change with red suite" "suite|red" \
   --files "$F/base.md" "$F/set-added-valid.md" --added "$ADR" --suite-cmd false
 
 # --- DEV-UNBLOCKED: diff does not touch sets (normal work) -> passes (preserves Principle 4) ---
-gate_pass "normal work, does not touch sets (base==base)" \
+gate_pass "DEV-UNBLOCKED" "normal work, does not touch sets (base==base)" \
   --files "$F/base.md" "$F/base.md" --added "src/algo.ts" --suite-cmd true
 
 # --- CONST-EXCEPTION: the project constitution records the narrow Principle 4 exception ---
-assert_file memory/constitution/constitution.md
-assert_contains memory/constitution/constitution.md "amendment-gate"
-assert_contains memory/constitution/constitution.md "[Pp]rinciple 4"
-assert_contains memory/constitution/constitution.md "pillars/scope"
+ce=1
+for pat in "amendment-gate" "[Pp]rinciple 4" "pillars/scope"; do
+  grep -qE "$pat" memory/constitution/constitution.md 2>/dev/null || ce=0
+done
+[ "$ce" -eq 1 ] && _pass "CONST-EXCEPTION: constitution records the narrow Principle 4 exception" \
+  || _fail "CONST-EXCEPTION: constitution does not record the narrow Principle 4 exception"
 
 # --- DEP-FREE: the new layer (gate) is dependency-free ---
 # (a) tied to the deliverable: cannot verify dep-freeness of a gate that
 #     does not exist -> RED until the impl creates the script. And when it exists, it must
 #     not invoke any installable toolchain (only bash/coreutils + python3 stdlib).
 assert_file "$GATE"
-assert_dep_free "$GATE"   # shared helper (feature 008, candidate B)
+assert_dep_free "$GATE" "DEP-FREE"   # labelled so the result ties to the criterion (015)
 # (b) repo guardrail: the feature does not introduce installable manifests
 dep_free=1
 for d in package.json package-lock.json pnpm-lock.yaml yarn.lock node_modules uv.lock requirements.txt; do
@@ -81,6 +86,7 @@ done
 [ "$dep_free" -eq 1 ] && _pass "DEP-FREE: repo without installable package manifests"
 
 # --- SELF-CHECK: wiring — the gate script and workflow exist and are wired ---
-assert_file "$GATE"
-assert_file .github/workflows/amendment-gate.yml
-assert_contains .github/workflows/amendment-gate.yml "amendment-gate.sh"
+if [ -f "$GATE" ] && [ -f .github/workflows/amendment-gate.yml ] \
+   && grep -q "amendment-gate.sh" .github/workflows/amendment-gate.yml 2>/dev/null; then
+  _pass "SELF-CHECK: gate script and workflow exist and are wired"
+else _fail "SELF-CHECK: gate script or workflow missing or not wired"; fi

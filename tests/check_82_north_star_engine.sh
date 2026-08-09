@@ -94,4 +94,5 @@ fi
 
 # --- SELF-CHECK: the suite exercises the engine deliverable (globbed by run.sh) ---
 # Tied to the deliverable: the engine must exist for the suite to exercise it.
-assert_file "$ENG"
+if [ -f "$ENG" ]; then _pass "SELF-CHECK: deliverable present at "$ENG""
+else _fail "SELF-CHECK: missing deliverable "$ENG""; fi
