@@ -62,6 +62,26 @@ document that legitimately *documents* a marker inside a code span is not a plac
 Left open rather than fixed on sight because it changes the exit contract of a shipped engine
 command, which is a feature-sized decision, not a patch.
 
+## B4 — `status.sh` flags three anomalies that will never clear
+
+**Status:** open · **Raised:** 2026-08-09 (feature sweep) · **Size:** small
+
+Sweeping every feature, `001-example`, `002-north-star-governance` and `003-wow-self-validation`
+each exit non-zero with `⚠ anomaly: done phase(s) … follow a pending one`. All three are
+**legitimate**: 001 is the deliberately partial template example, 002 is the declared `/align`
+bootstrap exception (it could not run the gate it shipped — now `D4`), and 003 is a partial
+dogfood with only a brief and a retro.
+
+The tracker is correct and the artifacts are correct. The problem is the standing baseline: a
+tool whose normal output is three permanent warnings trains its reader to skip the warnings, and
+the next *real* anomaly arrives into that habit. Same shape as the finding that produced sweep
+dates — a signal nobody reads is worse than no signal, because it still looks rigorous.
+
+**Not fixed on sight** because the right answer is a design choice, not a patch: an explicit
+`exempt` marker in the feature folder, a repo-level known-anomalies list, or accepting that
+pre-`004` features are simply out of the tracker's scope. Each has a different cost, and `D4`
+argues that an exemption must be *recorded*, which rules out the cheapest option.
+
 ---
 
 ## Dropped

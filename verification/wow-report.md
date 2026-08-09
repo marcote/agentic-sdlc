@@ -108,6 +108,19 @@ cannot restore an untracked file. Both are shapes on the list above. Re-run with
 sandbox per fixture, each mutation failed on exactly its own assertions (7 / 2 / 1 / 1) against a
 clean 36 / 0 baseline.*
 
+**First use of the pattern, same day, and it paid.** A sweep of all ten features found `004`
+reading `next: /verify` while its report says `BUILD ✅ · TRAJECTORY ✅ · UAT ✅ · coverage 100% ·
+retro ✅ → DONE`: `status.sh` globbed `reports/<feature>-<ref>.md` only, and 004's report predates
+that convention. **A tracker reporting a closed feature as unfinished is the §2 failure in tool
+form** — state misread while still looking rigorous. Fixed, with two assertions. Applying
+`check-can-fail` to them immediately caught one of *them* as vacuous: `REPORT-PRECEDENCE` passed
+against a fixture built to break it, because `ls` sorts its arguments and `demo-a.md` precedes
+`demo.md` by ASCII regardless of order. Chasing that exposed a real defect in the fix itself —
+precedence was resolving by **mtime**, so a stale legacy report could shadow the current one by
+being touched later. Precedence is now by naming, and both assertions fail on their own isolated
+fixture (14/1 each against a clean 15/0). Neither the vacuity nor the underlying defect would have
+been found by reading.
+
 ## 5. Theater smells (human spot-check)
 
 - **No all-green retros.** Every retro records gaps, exceptions or friction. 013 and 014 each
