@@ -123,7 +123,7 @@ rm -rf "$T"
 # Uses the shared invocation-aware helper (feature 008, candidate B): vendor.sh legitimately
 # NAMES test commands ("npm test", …) as seeded data — the helper excludes echo/comment lines.
 assert_file "$VENDOR"
-have && assert_dep_free "$VENDOR"
+have && assert_dep_free "$VENDOR" "DEPFREE"   # labelled so the result ties to the criterion (015)
 
 # --- HANDOFF: docs/vendoring.md documents buckets, plugs, first step ---
 DOC=docs/vendoring.md
@@ -135,4 +135,5 @@ else
 fi
 
 # --- SELF-CHECK: the deliverable exists and is exercised by this suite ---
-assert_file "$VENDOR"
+if [ -f "$VENDOR" ]; then _pass "SELF-CHECK: deliverable present at "$VENDOR""
+else _fail "SELF-CHECK: missing deliverable "$VENDOR""; fi

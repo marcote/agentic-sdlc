@@ -113,7 +113,7 @@ rm -rf "$T"
 
 # --- DEPFREE: bootstrap.sh invokes no installable toolchain (invariant tied to deliverable) ---
 assert_file "$BOOT"
-have && assert_dep_free "$BOOT"
+have && assert_dep_free "$BOOT" "DEPFREE"   # labelled so the result ties to the criterion (015)
 
 # --- HANDOFF-DOC: the curl one-liner (+ --yes) documented in README + docs/vendoring.md ---
 readme_ok=0; vend_ok=0
@@ -127,6 +127,7 @@ else
 fi
 
 # --- SELF-CHECK: the deliverable exists and is exercised by this suite ---
-assert_file "$BOOT"
+if [ -f "$BOOT" ]; then _pass "SELF-CHECK: deliverable present at "$BOOT""
+else _fail "SELF-CHECK: missing deliverable "$BOOT""; fi
 
 rm -rf "$SRC"

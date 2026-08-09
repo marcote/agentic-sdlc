@@ -88,10 +88,11 @@ if [ -f "$ENG" ]; then
   if grep -qE '^[[:space:]]*(import|from)[[:space:]]+(requests|yaml|numpy|pydantic|click|rich|toml)' "$ENG"; then
     _fail "DEP-FREE: $ENG imports a third-party package"
   else
-    assert_dep_free "$ENG"   # shared helper (feature 008, candidate B)
+    assert_dep_free "$ENG" "DEP-FREE"   # labelled so the result ties to the criterion (015)
   fi
 fi
 
 # --- SELF-CHECK: the suite exercises the engine deliverable (globbed by run.sh) ---
 # Tied to the deliverable: the engine must exist for the suite to exercise it.
-assert_file "$ENG"
+if [ -f "$ENG" ]; then _pass "SELF-CHECK: deliverable present at "$ENG""
+else _fail "SELF-CHECK: missing deliverable "$ENG""; fi

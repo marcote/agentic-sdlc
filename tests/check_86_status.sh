@@ -2,8 +2,7 @@
 # (scripts/status.sh): read-only, derives each pipeline phase's done/pending state from a
 # feature's artifacts + coverage.md states + report verdicts. Exercised hermetically against
 # temp repo fixtures (mini specs/<feat>/ + verification/reports/) at various stages.
-# Covers 13 deterministic criteria. Also covers candidate B: the shared assert_dep_free helper.
-#
+# Covers 13 deterministic criteria. Also covers candidate B: the shared assert_dep_free helper. "DEPFREE"   # labelled so the result ties to the criterion (015)
 # Output contract the implementation must satisfy (per phase, in pipeline order):
 #   "✓ <phase>"  done   ·   "· <phase>"  pending
 #   "current: <phase>"  +  "next: <command>"   ·   "feature DONE" when all done
@@ -181,4 +180,5 @@ done
   || _fail "HELPER-SHARED: shared assert_dep_free missing or not adopted by the checks"
 
 # --- SELF-CHECK: the deliverable exists and is exercised ---
-assert_file "$STATUS"
+if [ -f "$STATUS" ]; then _pass "SELF-CHECK: deliverable present at "$STATUS""
+else _fail "SELF-CHECK: missing deliverable "$STATUS""; fi
