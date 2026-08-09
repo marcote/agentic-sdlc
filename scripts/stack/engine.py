@@ -42,7 +42,19 @@ import sys
 import argparse
 
 # "### S3 — Datastore: DuckDB   [substrate] SUPERSEDED"
-_HEAD = re.compile(r"^###\s+(S\d+)\s*(.*)$")
+# The id prefix is the ADOPTER'S choice, not this repository's. It was hardcoded to `S\d+` until
+# 2026-08-09, when a charter written with `### P1 —` parsed to zero pins and reported *empty* — a
+# well-formed charter, full of pins, silently invisible. Any short uppercase prefix is accepted;
+# `GR` is reserved for ground rules and their declinations.
+# `GR` is excluded, not merely "reserved by convention": it fits the widened shape (two uppercase
+# letters + a digit), and without the exclusion a `### GR2 — n/a` declination is counted as a pin.
+# Caught by NA-FORM in check_94 within a minute of widening the pattern.
+_HEAD = re.compile(r"^###\s+(?!GR\d)([A-Z]{1,3}\d+)\s*(.*)$")
+# Any `### <something>` heading, so a block that LOOKS like a pin but carries an unusable id can
+# be rejected by name instead of skipped in silence. Silently ignoring an unknown id is the exact
+# failure 014 named for `Answers:` — it reports the rule uncovered while the author believes it
+# was answered.
+_ANYHEAD = re.compile(r"^###\s+(\S+)")
 # "- Confidence: PROVISIONAL — leaning this way"
 _FIELD = re.compile(r"^-\s+([A-Za-z][A-Za-z-]*):\s*(.*)$")
 # "### GR2 — n/a"  (a declination; NOT a pin)
@@ -74,6 +86,8 @@ def _parse(path):
         raise Malformed("cannot read %s: %s" % (path, e))
 
     pins, cur, last, fenced = [], None, None, False
+    orphan = None   # a heading whose id is unusable, pending proof that it meant to be a pin
+    orphans = []
     for raw in lines:
         if raw.lstrip().startswith("```"):
             fenced = not fenced
@@ -93,6 +107,19 @@ def _parse(path):
             }
             pins.append(cur)
             last = None
+            orphan = None
+            continue
+        a = _ANYHEAD.match(raw)
+        if a:
+            # A heading the pin grammar cannot address. Harmless on its own — charters carry prose
+            # headings — so it is only an error once it turns out to carry pin fields.
+            cur, last = None, None
+            orphan = a.group(1) if not _RULE.match(raw) else None
+            continue
+        if orphan is not None and _FIELD.match(raw):
+            if _FIELD.match(raw).group(1) in REQUIRED:
+                orphans.append(orphan)
+                orphan = None
             continue
         if cur is None:
             continue
@@ -104,6 +131,13 @@ def _parse(path):
             cur["fields"][last] = (cur["fields"][last] + " " + raw.strip()).strip()
         elif not raw.strip():
             last = None
+    if orphans:
+        raise Malformed(
+            "%s: heading(s) %s carry pin fields but their id does not match the grammar "
+            "(expected 1-3 uppercase letters + digits, e.g. S1 or P12; GR is reserved). "
+            "Rejected rather than skipped: a silently ignored pin reports a charter as empty "
+            "while it is full." % (path, ", ".join(sorted(set(orphans))))
+        )
     if not pins:
         raise Empty("no pins yet in %s — run /stack to elicit them" % path)
     return pins
