@@ -46,10 +46,24 @@ that was already present (`wow-report =~ /pin/`), or is too loose to discriminat
 name matching a longer word), requires knowing what the assertion *means*. Claiming otherwise
 would repeat this pattern's own failure mode one level up.
 
-**A mechanical meta-check is the missing half and is not shipped.** A traceability scan written in
-minutes on 2026-08-09 found a real instance in a feature closed a month earlier — so the mechanical
-approach works — but its first, naive version reported 112 false positives, so designing it is real
-work. It is backlogged, not done, and this pattern does not stand in for it.
+**An undeclared criterion is invisible to any mechanisation of this.** A tool can verify that
+everything *declared* emits; it cannot know about a criterion nobody wrote down.
+
+**Two of these five can be mechanised, and doing so is worth more than the rows.** `check-traceable`
+and `check-no-self-match` are decidable from a run log and the check sources: parse the criterion
+labels a file declares, require each to emit a result inside that file's own section of the run,
+and require a scan whose target can include the scanning file to build its pattern at runtime.
+Built that way in this repository's own suite on 2026-08-09, it found **fifteen** untraceable
+criteria across five files from five closed features — none of which a per-feature coverage row
+would have reached, because none of those features were open.
+
+**Mechanise them in your stack and you may stop injecting those two rows**, recording the swap as
+an override with the gate it depends on named, so the exemption cannot outlive the gate. The
+harness ships no such tool: any implementation is bound to its own suite's conventions, and one
+built for another repo's conventions would be an imposed answer rather than a required question.
+
+The remaining three stay with review either way. `check-can-fail` needs to know whether a fixture
+genuinely violates what the assertion asserts, and that is a question about meaning.
 
 ## Why a `[given]` row should do what prose did not
 

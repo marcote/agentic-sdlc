@@ -81,7 +81,35 @@ exemption without a recorded justification is exactly the defect being measured.
 workflow itself, which is unique to this harness-as-product.
 
 ## Inherited pattern overrides
-_(none — to deactivate a pattern, list it here with its justification)_
+
+### `base/patterns/non-vacuous-checks.md` — two of five rows discharged by a gate, not per feature
+
+**Overridden here only:** `check-traceable` and `check-no-self-match` are **not** injected as
+per-feature `[given]` rows in this repository. The other three (`check-can-fail`,
+`check-rejects-by-diagnostic`, `check-names-its-tree`) are injected exactly as before.
+
+**Justification.** `tests/check_96_non_vacuous.sh` runs `scripts/nvc.sh` on **every** invocation of
+the suite and fails it when any declared criterion does not emit a result in its own section, or
+when a self-including scan uses an inline literal without a self-test. That is strictly stronger
+than a coverage row: it covers every check in the repository on every run, including checks from
+features closed months ago, rather than only the checks a feature happens to touch. It found
+fifteen instances the per-feature rows never would have.
+
+Under the amended `frictionless-adoption` signal (ADR `0004`) a mandatory step whose harm is
+**already prevented by a gate** is friction without a justification — the defect the amendment
+made measurable. Carrying both is bookkeeping, and the coverage row is the weaker of the two.
+
+**Why the base pattern is unchanged.** An adopter inherits the pattern but **not** the enforcement:
+`tests/` is DROP and `scripts/nvc.sh` is DROP, because both encode this repository's own test
+conventions (`_pass`/`_fail`, criterion labels) rather than anything portable. For an adopter the
+two rows are the only thing standing there, so removing them from `base/` would delete the rule for
+everyone who cannot mechanise it. **This override is valid precisely because it is scoped to the
+one repository that runs the gate**, and it stops being valid the day `nvc.sh` stops running.
+
+*Reversal condition, stated so this cannot rot silently:* if `check_96` is removed, disabled, or
+stops covering the whole `tests/` tree, this override lapses and the two rows return to per-feature
+injection. `tests/check_10_constitution.sh` asserts the pairing, so the override cannot outlive the
+gate it depends on.
 
 ## Inner loop budget (tuneable)
 - Escalate to human after **2 identical failures** or **3 total attempts** per task.

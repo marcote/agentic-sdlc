@@ -414,4 +414,77 @@ grep -qE "$_AMB_PAT" "$_fx/tty.sh" \
   && _pass "HERMETIC-ENV: ambient pattern catches a real terminal read" \
   || _fail "HERMETIC-ENV: ambient pattern is vacuous (matches nothing)"
 rm -rf "$_fx"
-[ -f "$ENGINE" ] && assert_dep_free "$ENGINE" || _fail "HERMETIC-ENV: missing $ENGINE"
+[ -f "$ENGINE" ] && assert_dep_free "$ENGINE" "HERMETIC-ENV" || _fail "HERMETIC-ENV: missing $ENGINE"
+
+# --- PIN-ID-ADOPTER: the id prefix belongs to the adopter, not to this repository ---
+# Hardcoded to S\d+ until 2026-08-09. A charter written with `### P1 —` parsed to ZERO pins and
+# reported *empty* -- full charter, silently invisible. Found by vendoring onto a real Python repo
+# and writing the pin a user actually asked for.
+_fx=$(mktemp -d)
+cat > "$_fx/adopter.md" <<'EOF'
+### P1 — Python toolchain: uv                                   [substrate]
+- Confidence: PINNED
+- Because:    one tool resolves, locks and runs
+- Buys:       a lockfile that reproduces anywhere
+- Forecloses: pip/poetry workflows
+- Falsifier:  a dependency uv cannot resolve
+- Answers:    GR4
+EOF
+if [ -f "$ENGINE" ] && python3 "$ENGINE" pin-valid "$_fx/adopter.md" >/dev/null 2>&1 \
+   && python3 "$ENGINE" exposure "$_fx/adopter.md" 2>/dev/null | grep -qE '^1 pins'; then
+  _pass "PIN-ID-ADOPTER: a non-S id prefix parses as a pin"
+else _fail "PIN-ID-ADOPTER: an adopter's own id prefix is invisible to the engine"; fi
+
+# --- PIN-ID-REJECT: an unusable id carrying pin fields is rejected BY NAME, never skipped ---
+# Silently ignoring it is the failure 014 named for `Answers:`: it reports the charter empty while
+# it is full. The exit code alone is not asserted -- the diagnostic must name the offending id.
+cat > "$_fx/unusable.md" <<'EOF'
+### Datastore — DuckDB                                          [substrate]
+- Confidence: PINNED
+- Because:    embedded, no server
+- Buys:       zero ops
+- Forecloses: concurrent writers
+- Falsifier:  a second writer appears
+EOF
+_e=$(python3 "$ENGINE" pin-valid "$_fx/unusable.md" 2>&1 >/dev/null); _r=$?
+if [ "$_r" -eq 2 ] && printf '%s' "$_e" | grep -q 'Datastore'; then
+  _pass "PIN-ID-REJECT: an unusable id with pin fields is rejected, naming it"
+else _fail "PIN-ID-REJECT: unusable id exited $_r without naming it (out: $(printf '%s' "$_e" | head -1))"; fi
+
+# --- PIN-ID-PROSE: a plain prose heading is NOT a violation ---
+# The paired negative. Without it, PIN-ID-REJECT would pass against an engine that rejects every
+# heading it does not recognise, which would make any charter with a "## Notes" section unusable.
+cat > "$_fx/prose.md" <<'EOF'
+### Notes for reviewers
+Prose only, no pin fields.
+### S1 — Something real                                         [substrate]
+- Confidence: PINNED
+- Because:    x
+- Buys:       y
+- Forecloses: z
+- Falsifier:  w
+EOF
+if python3 "$ENGINE" pin-valid "$_fx/prose.md" >/dev/null 2>&1; then
+  _pass "PIN-ID-PROSE: a prose heading beside a real pin is not a false positive"
+else _fail "PIN-ID-PROSE: a prose heading was rejected as a malformed pin"; fi
+
+# --- PIN-ID-GR: GR is excluded from the pin shape, not merely reserved by convention ---
+# GR2 fits the widened shape (two uppercase letters + a digit). Without an explicit exclusion a
+# declination is counted as a pin -- which is exactly what happened when the pattern was widened.
+cat > "$_fx/decl.md" <<'EOF'
+### S1 — Something                                              [substrate]
+- Confidence: PINNED
+- Because:    x
+- Buys:       y
+- Forecloses: z
+- Falsifier:  w
+- Answers:    GR1, GR2, GR4, GR5, GR6
+### GR3 — n/a
+- Because:    a personal tool, never deployed
+- Falsifier:  a second person needs to run it
+EOF
+if python3 "$ENGINE" exposure "$_fx/decl.md" 2>/dev/null | grep -qE '^1 pins' \
+   && python3 "$ENGINE" ground-rules "$_fx/decl.md" 2>/dev/null | grep -qE '^GR3: n/a'; then
+  _pass "PIN-ID-GR: a GR declination is not counted as a pin"
+else _fail "PIN-ID-GR: a declination leaked into the pin count once the id shape was widened"; fi
+rm -rf "$_fx"

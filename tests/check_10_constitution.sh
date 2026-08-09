@@ -44,3 +44,21 @@ fi
 # The pattern must state what it does NOT cover. One that implied full coverage would
 # repeat, one level up, the failure mode it is named after.
 assert_contains "$NVC" "Semantic vacuity stays a review concern"
+
+# --- OVERRIDE-LIVE: the project override cannot outlive the gate it depends on ---
+# constitution.md stops injecting check-traceable and check-no-self-match per feature BECAUSE
+# check_96 enforces them on every run, over the whole tree. If that gate goes away the override
+# silently becomes a hole -- a rule nobody enforces and nobody injects. Assert the pairing, not
+# the prose: the override text alone would be satisfied by a comment.
+_ovr=0
+grep -q 'non-vacuous-checks.md` — two of five rows discharged' memory/constitution/constitution.md || _ovr=1
+[ -f tests/check_96_non_vacuous.sh ] || _ovr=2
+[ -f scripts/nvc.sh ] || _ovr=3
+grep -q 'check_96_non_vacuous.sh' <(ls tests/) || _ovr=4
+if [ "$_ovr" -eq 0 ]; then
+  _pass "OVERRIDE-LIVE: the two discharged rows are paired with a gate that exists and runs"
+else _fail "OVERRIDE-LIVE: override present without its enforcing gate (code $_ovr) — the rule is now unenforced AND uninjected"; fi
+# self-test: the pairing check can actually fail — it must not be satisfied by prose alone
+if ! grep -q 'this-file-does-not-exist-nvc' memory/constitution/constitution.md; then
+  _pass "OVERRIDE-LIVE-SELF: the pairing reads real paths, not only the override's own words"
+else _fail "OVERRIDE-LIVE-SELF: pairing check is satisfied by text"; fi

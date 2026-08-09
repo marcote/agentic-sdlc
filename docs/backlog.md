@@ -93,6 +93,32 @@ argues that an exemption must be *recorded*, which rules out the cheapest option
 
 ---
 
+## B6 — The 5:1 governance-to-code ratio
+
+**Status:** open · **Raised:** 2026-08-09 (measured) · **Size:** unknown
+
+`specs/*.md` is **6093 lines** against **1236 lines** of `scripts/`. Coverage tables grew
+20 → 25 → 31 → 37 rows across 006 → 013 → 014 → 015. Some of that is deliberate — evidence is the
+product here — but `spec.md`, `plan.md` and `tasks.md` overlap heavily, and nobody has measured how
+much of the overlap is load-bearing.
+
+**Not acted on** because the cheap move (merge the three) would destroy the `/contract` boundary
+that makes RED provable, and the right move needs a measurement nobody has taken: which sections
+are ever *read again* after the feature closes. The first correction landed on 2026-08-09 in the
+other direction — the constitution override that stops injecting two `[given]` rows per feature.
+
+## B7 — The nested suite run scales linearly
+
+**Status:** open · **Raised:** 2026-08-09 (measured) · **Size:** small
+
+The suite takes **12s**; **6s** of that is `check_96` running the whole suite again to obtain a
+real log. Fine today, and free of cost to adopters (`tests/` is DROP), but it doubles forever and
+the doubling grows with the suite.
+
+**Not acted on** because the alternative — having `run.sh` tee its own output for `check_96` to
+read — would let the meta-check judge a log that does not yet contain its own results, which is
+precisely the self-subjection `D4` requires. Any fix has to keep that.
+
 ## B5 — "Reports clean" must mean every rule ran
 
 **Status:** open · **Raised:** 2026-08-09 (015 `/uat`) · **Size:** small
