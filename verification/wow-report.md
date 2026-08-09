@@ -80,17 +80,33 @@ first), and `specs/_template/retro.md` requires it going forward.
 
 | | Proposed | Landed |
 |---|---|---|
-| Constitution patterns | `non-vacuous-checks` (013, 014) | **0 of 1** |
-| Constitution deltas | gate-bootstrap exception (013, 014) | **0 of 1** — `D1`–`D3` predate both |
+| Constitution patterns | `non-vacuous-checks` (013, 014) | **1 of 1** — landed 2026-08-09 |
+| Constitution deltas | gate-bootstrap exception (013, 014) | **1 of 1** — `D4`, landed 2026-08-09 |
 | North Star amendments | ADR `0004` | **1 of 1** (PR #17) |
 
-**The loop closes on governance and stalls on practice.** An amendment to the North Star went
-through its full protocol in one day. Two constitution rules have been proposed twice each,
-across two features, and neither has landed — while the failure one of them describes recurred
-five more times in between.
+**The loop closed on governance in a day and took two features to close on practice.** Both
+constitution candidates were proposed in 013, restated in 014, and landed only when this report
+named the gap — after the failure one of them describes had recurred five more times in between.
 
-That asymmetry is the honest reading of this section: the harness improves the rules it *gates*
-and forgets the rules it merely *records*.
+The asymmetry that produced them is still the honest reading: the harness improves the rules it
+*gates* and forgets the rules it merely *records*. What closed the gap was not discipline, it was
+putting the count in a table.
+
+**What landed, and what it does not claim.** `base/patterns/non-vacuous-checks.md` ships five
+injected `[given]` criteria (`check-can-fail`, `check-traceable`, `check-rejects-by-diagnostic`,
+`check-no-self-match`, `check-names-its-tree`), each carrying the occurrences it prevents; `D4`
+formalises the gate-bootstrap exemption as *from being blocked, never from being run*, on four
+conditions. The pattern states in its own text that it is **the non-mechanical half** — semantic
+vacuity stays a review concern and the meta-check remains backlogged. The claim that a `[given]`
+row will do what prose did not is written down as **falsifiable**: the next feature to ship a
+vacuous check while carrying these rows refutes it.
+
+*Method note: the first attempt to prove the new assertions could fail was itself vacuous — the
+fixture harness ran the check file standalone, where the assertion helpers are undefined, so it
+emitted neither PASS nor FAIL; the second leaked state between fixtures because `git checkout`
+cannot restore an untracked file. Both are shapes on the list above. Re-run with an isolated
+sandbox per fixture, each mutation failed on exactly its own assertions (7 / 2 / 1 / 1) against a
+clean 36 / 0 baseline.*
 
 ## 5. Theater smells (human spot-check)
 
@@ -131,6 +147,8 @@ report will not claim it is. It is the strongest thing the charter has done so f
 Nothing in §1–§6 recommends a new feature. The two actionable items are both small and both
 overdue rather than new:
 
-1. **Land one of the two candidate constitution rules**, or drop them explicitly. Proposing a
-   rule twice and landing it zero times is the loop failing quietly (§4).
+1. ~~**Land one of the two candidate constitution rules**, or drop them explicitly.~~ **DONE
+   2026-08-09** — both landed (§4). Proposing a rule twice and landing it zero times was the loop
+   failing quietly.
 2. **Sweep the ledger on 2026-09-08.** That date now exists precisely because it did not before.
+   Two items are open (013, 014) and both have a trigger *and* a date.

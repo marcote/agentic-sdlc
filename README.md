@@ -154,7 +154,8 @@ feature "DONE"  ⟺  BUILD ✅  AND  TRAJECTORY ✅  AND  UAT ✅  AND  coverage
 - `evals/` — 5-dimension rubric + non-deterministic cases.
 - `verification/` — report, UAT and code-review checklists + `reports/` (observability).
 - `.claude/` — skills (distill/verify/uat), 7 commands, advisory hook, settings.
-- `docs/` — `factory-model.md` and `workflow.md` (detailed reference).
+- `docs/` — `factory-model.md` and `workflow.md` (detailed reference) + `backlog.md`
+  (findings parked with a reason, so they are neither forgotten nor started on sight).
 
 ## Starting a feature
 1. `cp -r specs/_template specs/001-my-feature` and write the `brief.md`.
