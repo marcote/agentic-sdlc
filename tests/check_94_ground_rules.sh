@@ -9,8 +9,11 @@ GRPROJ=memory/stack/ground-rules.md
 CHARTER=memory/stack/stack.md
 ENGINE=scripts/stack/engine.py
 
-# gr_ids FILE : emit the ground rule ids in document order.
-gr_ids(){ grep -oE '^### GR[0-9]+' "$1" 2>/dev/null | awk '{print $2}'; }
+# gr_ids FILE : emit the ground rule ids in document order, IGNORING fenced blocks —
+# ground-rules.md necessarily shows an example declination (`### GR2 — n/a`) inside a
+# fence, and a fence-blind counter reads it as a seventh rule. Same code-span blindness
+# as prose_only and the engine parser, this time in a counter rather than a scanner.
+gr_ids(){ awk '/^[[:space:]]*```/{f=!f; next} !f' "$1" 2>/dev/null | grep -oE '^### GR[0-9]+' | awk '{print $2}'; }
 
 # --- GR-SIX ---------------------------------------------------------------------
 assert_file "$GRBASE"
@@ -166,9 +169,20 @@ fi
 rm -rf "$_fx"
 
 # --- PLAN-UNCOVERED -------------------------------------------------------------
-assert_contains .claude/commands/plan.md 'UNCOVERED'
-assert_contains .claude/commands/plan.md 'ground rule'
-for tok in 'PASS' 'UNPINNED' 'TRIPPED'; do assert_contains .claude/commands/plan.md "$tok"; done
+# Labelled explicitly: assert_contains reports the path and pattern but not the criterion,
+# so its results cannot be traced back to a coverage row. T7 of this feature is exactly
+# "confirm each assertion actually runs" — an unlabelled result cannot answer that.
+_pu_bad=0
+for tok in 'UNCOVERED' 'ground rule' 'PASS' 'UNPINNED' 'TRIPPED'; do
+  grep -qE "$tok" .claude/commands/plan.md || { _pu_bad=1; echo "    (plan.md missing /$tok/)"; }
+done
+[ "$_pu_bad" -eq 0 ] \
+  && _pass "PLAN-UNCOVERED: /plan documents four verdicts including UNCOVERED" \
+  || _fail "PLAN-UNCOVERED: /plan does not document all four verdicts"
+# the gate must evaluate coverage FIRST — a charter below the floor makes the rest premature
+awk '/UNCOVERED/{u=NR} /### `PASS`/{p=NR} END{exit !(u && p && u < p)}' .claude/commands/plan.md \
+  && _pass "PLAN-UNCOVERED: UNCOVERED is documented before the other verdicts" \
+  || _fail "PLAN-UNCOVERED: UNCOVERED is not evaluated first"
 
 # --- STACK-WALKS-SIX ------------------------------------------------------------
 assert_contains .claude/skills/stack/SKILL.md 'ground rule'
@@ -184,10 +198,26 @@ assert_contains .claude/skills/stack/SKILL.md 'migrat'
 _grace=0
 for f in .claude/commands/plan.md .claude/skills/stack/SKILL.md "$GRBASE"; do
   [ -f "$f" ] || continue
-  grep -qiE 'grace period|warn(ing)? only|does not block yet' "$f" && { _grace=1; echo "    ($f documents a grace period)"; }
+  # A denial is not a grant: the enforcement surface legitimately says "there is NO grace
+  # period", and a pattern that cannot tell assertion from negation flags its own fix.
+  if grep -iE 'grace period|warn(ing)? only|does not block yet' "$f" \
+     | grep -viE 'no grace period|without a grace period|never a grace period' | grep -q .; then
+    _grace=1; echo "    ($f grants a grace period)"
+  fi
 done
-[ "$_grace" -eq 0 ] && _pass "MIGRATION: no grace period documented — the gate stays hard" \
+[ "$_grace" -eq 0 ] && _pass "MIGRATION: no grace period granted — the gate stays hard" \
                     || _fail "MIGRATION: a grace period leaked into the enforcement surface"
+# non-vacuity: the pattern must still catch a real grant, and must not catch a denial
+_fx=$(mktemp -d)
+printf 'Adopters get a grace period of three features before this blocks.\n' > "$_fx/grant.md"
+printf 'There is no grace period; the gate blocks from the first run.\n' > "$_fx/deny.md"
+grep -iE 'grace period' "$_fx/grant.md" | grep -viE 'no grace period|without a grace period|never a grace period' | grep -q . \
+  && _pass "MIGRATION: the grace-period pattern catches a real grant" \
+  || _fail "MIGRATION: the grace-period pattern is vacuous (matches no grant)"
+grep -iE 'grace period' "$_fx/deny.md" | grep -viE 'no grace period|without a grace period|never a grace period' | grep -q . \
+  && _fail "MIGRATION: the grace-period pattern flags a denial as a grant" \
+  || _pass "MIGRATION: the pattern tells a denial apart from a grant"
+rm -rf "$_fx"
 
 # --- GR-FLOOR-NO-SCALE ----------------------------------------------------------
 assert_contains "$GRBASE" 'S0'

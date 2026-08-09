@@ -31,6 +31,7 @@ Pin ids are stable and never reused. Ordering is document order; `S0` is always 
 | `Hedge` | `PROVISIONAL` only | The cheap escape that declared uncertainty must buy. Emitted as a `[given]` coverage row, so it is verified rather than merely written. **A `PROVISIONAL` pin without a `Hedge` is a lie.** |
 | `Guard` | required on `[stance]`, optional on `[substrate]` | An executable command asserting the pin still holds. The harness runs it by name and requires exit 0; it never inspects what the command checks. **Any pin kind may declare one** — whether a pin injects a per-feature coverage row is a separate question from whether it can be checked. A substrate choice is often the easier of the two to check mechanically. |
 | `Injects` | `[stance]` only | The `[given]` row(s) added to each applicable feature's coverage matrix. Rejected on `[substrate]`: a substrate choice is a constraint on the plan, not a per-feature observable. |
+| `Answers` | optional, any pin | The ground rule id(s) this pin settles — `Answers: GR2, GR4`. Optional: not every pin answers one. An id outside the effective set is **rejected**, never ignored; silently dropping a typo would report the real rule as uncovered while the author believes it is answered. A `SUPERSEDED` pin's claim does not count. |
 | `Superseded` | amended pins | `<date> — <reason>`, including what tripped the pin. History stays inline; the pin keeps its id and gains a `SUPERSEDED` marker on its heading. |
 
 ## The two kinds
@@ -47,6 +48,21 @@ prose degrades: by the seventh feature something violates it and nobody notices.
 The two kinds differ in whether they inject coverage rows — **not** in whether they can be
 enforced. Tying `Guard` to the kind was this template's original error: it let a substrate pin
 declare a check that validated cleanly and was then never executed.
+
+## Declining a ground rule
+
+A ground rule that genuinely does not apply is **declined**, not answered:
+
+```markdown
+### GR2 — n/a
+- Because:   a pure transformation; nothing outlives the process and nothing is written
+- Falsifier: any output is retained between runs, including a cache
+```
+
+A declination is **not a pin**. No decision was taken, so there is nothing to price — no `Buys`
+and no `Forecloses`, and inventing empty ones would be filler-to-comply. Its `Falsifier` is what
+makes it **expire**: the decline stops being valid the moment the project crosses the stated
+line, instead of silently outliving the conditions that justified it.
 
 ## Worked examples
 

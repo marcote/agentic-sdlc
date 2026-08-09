@@ -16,14 +16,26 @@ which is the mute assumption this whole mechanism exists to stop. `scripts/stack
 reports it as **empty** (exit 3), distinct from **malformed** (exit 2), so the message can say
 "run `/stack`" instead of sending someone hunting a bug that is not there.
 
-Otherwise emit **exactly one** of the three verdicts below. **Silence is not a verdict** — an
+Otherwise emit **exactly one** of the four verdicts below. **Silence is not a verdict** — an
 unspoken pass is indistinguishable from not having looked, which is the mute assumption this
 gate exists to prevent. Both classifications are your judgment, not a string match: apply the
 inclusion test (*changing it later costs rework*) and read each criterion against the declared
 `Falsifier` semantically.
 
+### `UNCOVERED` — evaluated first
+Run `python3 scripts/stack/engine.py ground-rules memory/stack/stack.md`. If any ground rule
+reports `uncovered`, stop: the charter is below the floor and every other verdict is premature.
+Name the uncovered rules and hand control to the `stack` skill, which walks them and — on a
+charter that predates the ground rules — proposes which existing pin answers which rule and
+where an `n/a` belongs.
+
+There is **no grace period**. A warning that does not block is a mute assumption with extra
+steps, and the first feature of every adopted repository is exactly where that would do the
+most damage. The migration is what makes this friction justified rather than a wall: it states
+what it prevents and hands over the fix.
+
 ### `PASS`
-Every load-bearing decision this plan needs is pinned, and no criterion trips a `Falsifier`.
+Every ground rule has a verdict, every load-bearing decision this plan needs is pinned, and no criterion trips a `Falsifier`.
 Proceed, and **cite** in `plan.md` the pins each decision rests on.
 
 ### `UNPINNED`

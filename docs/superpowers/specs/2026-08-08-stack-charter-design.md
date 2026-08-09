@@ -1,4 +1,4 @@
-  # Design — Stack Charter: pinning load-bearing decisions before they are expensive
+    # Design — Stack Charter: pinning load-bearing decisions before they are expensive
 
 **Date:** 2026-08-08
 **Status:** design approved, pending implementation plan
