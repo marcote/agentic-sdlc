@@ -1,16 +1,17 @@
 # Workflow end-to-end
 
 ```
-/constitution → (brief.md) → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat → /retro
+/constitution → seed North Star → /stack → (brief.md) → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat → /retro
 ```
 
 | Command | Input | Output | Verification |
 |---|---|---|---|
 | `/constitution` | — | `memory/constitution/` | seed + filter |
 | (intake) | objective | `brief.md` | success metrics |
+| `/stack` | `north-star.md` (+ existing charter) | `memory/stack/stack.md` | elicits the load-bearing decisions with their price; "I don't know" is valid and buys a hedge |
 | `/align` | `brief.md` + `north-star.md` | `alignment.md` | **Measurability Gate**: scores the brief against the North Star; only `aligned` advances |
-| `/distill` | `brief.md` + `alignment.md` | `spec` + `acceptance` + `coverage` | grilling loop, zero orphan rows; Step 0 requires `aligned` |
-| `/plan` | `spec` | `plan.md` | grounded in constitution |
+| `/distill` | `brief.md` + `alignment.md` + charter | `spec` + `acceptance` + `coverage` | grilling loop, zero orphan rows; Step 0 requires `aligned`; injects `[stance]` pins' rows |
+| `/plan` | `spec` + `acceptance` + charter | `plan.md` | **fail-closed stack gate**: `PASS` / `UNPINNED` (elicit + append; a new `[stance]` bounces back to `/distill`) / `TRIPPED` (declared cost + is the hedge there?); then the plan, grounded in constitution |
 | `/contract` | `acceptance` | tests 🔴 + eval cases 📋 | proves it is RED |
 | `/tasks` | `coverage` | `tasks.md` | GATE: refuses if RED contract is missing |
 | implement | `tasks` | code | inner loop 🔴→🟢 (budget → ESCALATE) |

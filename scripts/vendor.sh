@@ -33,10 +33,13 @@ KEEP=(
   evals/rubric.md evals/README.md
   verification/uat-checklist.md verification/code-review-checklist.md verification/verification-report.md
   docs/factory-model.md docs/workflow.md
-  scripts/north-star/engine.py scripts/amendment-gate.sh scripts/setup-branch-protection.sh
+  memory/stack/base
+  scripts/north-star/engine.py scripts/stack/engine.py scripts/guards
+  scripts/amendment-gate.sh scripts/setup-branch-protection.sh
   .github/workflows/amendment-gate.yml
 )
-SEED=( CLAUDE.md memory/constitution/constitution.md memory/north-star/north-star.md scripts/test.sh )
+SEED=( CLAUDE.md memory/constitution/constitution.md memory/north-star/north-star.md \
+  memory/stack/stack.md scripts/test.sh )
 DROP=( "specs/0*-* (except _template)" memory/north-star/decisions verification/reports \
   verification/wow-report.md docs/superpowers evals/cases README.md tests \
   scripts/vendor.sh docs/vendoring.md bootstrap.sh )
@@ -73,15 +76,33 @@ Governance harness vendored via `scripts/vendor.sh`. Fill in your stack below,
 then run `/constitution` and seed your North Star before your first `/align`.
 
 ## Stack
-_(your language/framework; your test command lives in `scripts/test.sh`)_
+Your load-bearing technical decisions live in `memory/stack/stack.md` (the **charter**),
+not here. Run `/stack` to elicit them — it asks what this harness would otherwise assume
+in silence. Your test command lives in `scripts/test.sh`.
 
 ## Workflow
-`/constitution` → brief → `/align` → `/distill` → `/plan` → `/contract` → `/tasks`
-→ implement → `/verify` → `/uat` → `/retro`. See `docs/workflow.md`.
+`/constitution` → seed North Star → `/stack` → brief → `/align` → `/distill` → `/plan`
+→ `/contract` → `/tasks` → implement → `/verify` → `/uat` → `/retro`. See `docs/workflow.md`.
 
 ## Hard rules (details in memory/constitution/)
 - No deterministic criterion advances to implementation without a test in 🔴 RED (`/contract`).
 - A feature closes only with BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
+EOF
+}
+stack_stub(){ cat <<'EOF'
+---
+extends: base
+---
+
+# Stack Charter — <Your Project>
+
+> The load-bearing technical decisions of this repository: those where **changing it later
+> costs rework**. Run `/stack` to elicit them; see `base/README.md` for the rules and
+> `base/pin-template.md` for the grammar.
+>
+> Empty is not neutral — it means every such decision is still being made by omission.
+
+_(no pins yet — run `/stack`)_
 EOF
 }
 constitution_stub(){ cat <<'EOF'
@@ -179,6 +200,7 @@ copy_keep
 seed_file "CLAUDE.md" "$(claude_stub)"
 seed_file "memory/constitution/constitution.md" "$(constitution_stub)"
 seed_file "memory/north-star/north-star.md" "$(northstar_stub)"
+seed_file "memory/stack/stack.md" "$(stack_stub)"
 seed_file "scripts/test.sh" "$(testsh_stub)"
 
 {
@@ -198,4 +220,4 @@ if [ "${#NEWFILES[@]}" -gt 0 ]; then
   echo "  ${#NEWFILES[@]} file(s) need merge (.harness-new):"
   for f in "${NEWFILES[@]}"; do echo "    - $f"; done
 fi
-echo "  next: /constitution → seed your North Star → first feature (see docs/vendoring.md)"
+echo "  next: /constitution → seed your North Star → /stack → first feature (see docs/vendoring.md)"
