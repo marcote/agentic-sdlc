@@ -157,6 +157,36 @@ written before the file.
 Two trackers, two answers, and **the wrong one is the reassuring one** — the same shape as the
 overdue `pending-observation` that went invisible for 35 days.
 
+## B10 — Every count carries its derivation, not just Face B's five fields
+
+**Status:** open · **Raised:** 2026-08-09 · **Size:** unknown
+
+Three claims in one session were precise and wrong. Each was a count written from memory instead of
+derived when written.
+
+| claimed | actual | caught by |
+|---|---|---|
+| "3 of 5 rows mechanised" | 2 | re-checking before acting |
+| `AMEND-PROV-ONLY` catches the wrong implementation | false | mutation testing |
+| 013: "12 gaps caught by /distill" | 8 | the user asking |
+
+None was vague. Vagueness was not the problem. Hedge words number **24** across the whole corpus.
+
+The mechanism already exists: `[deriv:]`, with the retro skill's instruction *"do not type numbers
+from memory"*. It covers **five fields of one artifact**. All three failures happened outside them.
+
+**No cheap mechanical form, measured twice.** A loose count detector flagged 322 items, most of
+them feature ids read as counts. A tighter one flagged 24, most of them rhetorical: *"two
+features"*, *"three times"*, *"one exists"*. A check that fires on correct artifacts gets disabled,
+and then the coverage row still reads green.
+
+**Not written as a prose rule.** This repository has measured that this family does not land as
+prose. Three proposals, three recurrences. It waits here for a mechanical form or a better idea.
+
+**One candidate:** require the locator only where the count is *about this repository's own
+artifacts* — the class all three failures belong to. Distinguishing that from a rhetorical count
+is the unsolved part.
+
 ## B5 — "Reports clean" must mean every rule ran
 
 **Status:** open · **Raised:** 2026-08-09 (015 `/uat`) · **Size:** small
