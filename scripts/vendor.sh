@@ -135,7 +135,7 @@ extends: base
 {
   "mission": "TODO: one sentence — why this product exists",
   "pillars": [
-    { "id": "todo-pillar", "statement": "TODO: what it means", "signal": "TODO: measurable indicator" }
+    { "id": "todo-pillar", "statement": "TODO: what it means", "signal": "TODO: measurable indicator", "since": "TODO: ADR that introduced it" }
   ],
   "scope": {
     "in_scope": ["TODO: what this product does"],

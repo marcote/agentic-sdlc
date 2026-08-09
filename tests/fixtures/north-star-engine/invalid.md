@@ -7,7 +7,7 @@ The JSON parses fine, but `mission` is empty → schema-invalid.
 {
   "mission": "",
   "pillars": [
-    { "id": "a", "statement": "sa", "signal": "ga" }
+    { "id": "a", "statement": "sa", "signal": "ga", "since": "0001" }
   ],
   "scope": {
     "in_scope": ["x"],

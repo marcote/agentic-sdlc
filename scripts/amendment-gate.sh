@@ -24,6 +24,36 @@ command -v python3 >/dev/null 2>&1 || die "requires python3 (stdlib json) — no
 # All JSON parsing / schema validation / governed-set comparison / ADR detection lives
 # in scripts/north-star/engine.py (feature 006). The gate orchestrates; the engine decides.
 ENGINE="$(dirname "$0")/north-star/engine.py"
+# provenance staleness (016): a pillar whose statement/signal moved while its `since` stayed put.
+# ADDITIVE — the governed hash is unchanged. Changing `since` alone is metadata, not an amendment:
+# requiring an ADR for it would mean recording that ADR 0005 changed a signal needs ADR 0006,
+# forever. This is the inverse check, and it is where the value is: it makes the record
+# self-maintaining instead of a convention someone has to remember.
+stale_provenance(){ # OLD NEW -> prints offending pillar ids, exit 0 if any
+  python3 - "$1" "$2" <<'PROV'
+import sys, json, re
+def load(p):
+    m = re.search(r"```json\s*\n(.*?)\n```", open(p, encoding="utf-8").read(), re.S)
+    return json.loads(m.group(1)) if m else {}
+try:
+    old, new = load(sys.argv[1]), load(sys.argv[2])
+except Exception:
+    sys.exit(1)
+o = {p.get("id"): p for p in old.get("pillars", []) if isinstance(p, dict)}
+bad = []
+for p in new.get("pillars", []):
+    if not isinstance(p, dict):
+        continue
+    q = o.get(p.get("id"))
+    if not q:
+        continue                     # a new pillar is a set change, already governed
+    governed_moved = (q.get("statement"), q.get("signal")) != (p.get("statement"), p.get("signal"))
+    if governed_moved and q.get("since") == p.get("since"):
+        bad.append("%s (since stayed %s)" % (p.get("id"), p.get("since")))
+print("\n".join(bad))
+sys.exit(0 if bad else 1)
+PROV
+}
 [ -f "$ENGINE" ] || die "missing engine: $ENGINE"
 
 # --- suite_green : the suite is green (injectable override in tests) ---
@@ -65,7 +95,12 @@ if [ "$(python3 "$ENGINE" sets-changed "$OLD" "$NEW")" = "same" ]; then
   exit 0
 fi
 
-# The sets changed: it is a governed amendment. Require all three conditions.
+# The sets changed: it is a governed amendment. Require all four conditions.
+# Provenance first: it names the specific pillar, so a stale record is fixed in one edit rather
+# than after chasing the other three.
+if _stale=$(stale_provenance "$OLD" "$NEW"); then
+  die "amendment moves a pillar's statement/signal WITHOUT updating its since: $(printf '%s' "$_stale" | tr '\n' ' ')(comparing $OLD -> $NEW)"
+fi
 if ! python3 "$ENGINE" has-adr-for --added "$ADDED"; then
   die "amendment of pillars/scope WITHOUT a new ADR (memory/north-star/decisions/NNNN-*.md)"
 fi

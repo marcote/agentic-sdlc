@@ -28,6 +28,24 @@ aggregator artifact.
 | O4 — `/align` stamps provenance into `alignment.md` so a retro can tell whether the signal moved under its prediction | `measurable-impact` |
 | O5 — the amendment gate rejects a governed change with stale provenance; provenance alone is not an amendment | `real-enforcement`, `measurable-impact` |
 
+## Pillar provenance (stamped by `/align`, R6)
+
+The ADR each mapped pillar's `statement`/`signal` last came from, at the moment this brief was
+scored. A later `/retro` reads this to tell whether the signal moved **underneath** the prediction
+it is closing — without it, a `pending-observation` deferred for a month is judged against whatever
+the signal says then, with nothing recording that it changed.
+
+| Pillar | `since` |
+|---|---|
+| `real-enforcement` | `0001` |
+| `agnostic-portability` | `0001` |
+| `measurable-impact` | `0002` |
+| `frictionless-adoption` | `0004` |
+
+**This feature is scored under `frictionless-adoption` as amended by `0004`**, three days old and
+still unproven — 014's retro recorded that its discriminating half has never fired. Stamped rather
+than asserted: if it fires before this feature's own sweep, the record exists.
+
 ## Orphans
 
 None.

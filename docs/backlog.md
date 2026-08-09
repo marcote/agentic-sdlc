@@ -119,6 +119,44 @@ the doubling grows with the suite.
 read — would let the meta-check judge a log that does not yet contain its own results, which is
 precisely the self-subjection `D4` requires. Any fix has to keep that.
 
+## ~~B3~~ — A North Star stub with `TODO:` placeholders passes `schema-valid`
+
+**Status: DONE 2026-08-09 → `specs/016-north-star-integrity/`.** Exit 3 = unfilled, byte identity
+with the seeded values, refused against a real vendored target. Widened at the user's prompting to
+also carry per-pillar provenance.
+
+## B8 — Semantic vacuity has now cost two features, and stays unmechanised
+
+**Status:** open · **Raised:** 2026-08-09 (016 `/uat`) · **Size:** unknown
+
+Two of 016's own assertions were vacuous and `nvc.sh` caught neither: one grepped `since`, an
+ordinary English word that appeared in a scoring rationale; one could not reach the code it claimed
+to test, because the gate short-circuits before it. 015 had the same shape. **Two consecutive
+features where the mechanical half missed the vacuity and reading caught it.**
+
+`base/patterns/non-vacuous-checks.md` already declares semantic vacuity out of mechanical scope, so
+the pattern is *accurate* — this entry records what that accuracy costs, now measured rather than
+asserted.
+
+**Deliberately not written as a rule.** *"An assertion must not match an ordinary word"* is
+semantic vacuity by definition, and this repository has measured that this family is prose-
+resistant three times. A rule with no mechanical form belongs here, not in the constitution.
+
+**Two candidate mechanisms, neither obviously right:** flag a pattern that matches the file it is
+asserting against *before* the change (a before/after differential), or require every assertion to
+name what it expects to be absent. Both need designing.
+
+## B9 — `status.sh` and `check_90` disagree about DONE
+
+**Status:** open · **Raised:** 2026-08-09 (016) · **Size:** very small
+
+`status.sh` reported `feature DONE` while `check_90` was blocking the close for a missing retro.
+The tracker trusts the report's `retro: ✅` line; the gate reads the retro file. The line was
+written before the file.
+
+Two trackers, two answers, and **the wrong one is the reassuring one** — the same shape as the
+overdue `pending-observation` that went invisible for 35 days.
+
 ## B5 — "Reports clean" must mean every rule ran
 
 **Status:** open · **Raised:** 2026-08-09 (015 `/uat`) · **Size:** small

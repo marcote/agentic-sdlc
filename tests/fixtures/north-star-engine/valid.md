@@ -6,8 +6,8 @@ Human prose. The canonical block below is what the engine reads.
 {
   "mission": "A reusable harness that governs a disciplined agentic SDLC.",
   "pillars": [
-    { "id": "real-enforcement", "statement": "gates block, not intentions", "signal": "gaps caught before merge" },
-    { "id": "frictionless-adoption", "statement": "cheap to adopt", "signal": "steps to adopt (lower better)" }
+    { "id": "real-enforcement", "statement": "gates block, not intentions", "signal": "gaps caught before merge", "since": "0001" },
+    { "id": "frictionless-adoption", "statement": "cheap to adopt", "signal": "steps to adopt (lower better)", "since": "0001" }
   ],
   "scope": {
     "in_scope": ["governance workflow commands and gates", "adoption tooling"],

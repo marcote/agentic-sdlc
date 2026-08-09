@@ -7,8 +7,8 @@ only the mission string and this surrounding text differ. `sets-changed` must re
 {
   "mission": "A totally reworded mission that does not touch pillars or scope.",
   "pillars": [
-    { "id": "real-enforcement", "statement": "gates block, not intentions", "signal": "gaps caught before merge" },
-    { "id": "frictionless-adoption", "statement": "cheap to adopt", "signal": "steps to adopt (lower better)" }
+    { "id": "real-enforcement", "statement": "gates block, not intentions", "signal": "gaps caught before merge", "since": "0001" },
+    { "id": "frictionless-adoption", "statement": "cheap to adopt", "signal": "steps to adopt (lower better)", "since": "0001" }
   ],
   "scope": {
     "in_scope": ["governance workflow commands and gates", "adoption tooling"],

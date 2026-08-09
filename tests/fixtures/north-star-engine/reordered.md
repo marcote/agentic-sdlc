@@ -7,8 +7,8 @@ Pillars swapped, scope arrays reordered — the SET content is identical to vali
 {
   "mission": "A reusable harness that governs a disciplined agentic SDLC.",
   "pillars": [
-    { "id": "frictionless-adoption", "statement": "cheap to adopt", "signal": "steps to adopt (lower better)" },
-    { "id": "real-enforcement", "statement": "gates block, not intentions", "signal": "gaps caught before merge" }
+    { "id": "frictionless-adoption", "statement": "cheap to adopt", "signal": "steps to adopt (lower better)", "since": "0001" },
+    { "id": "real-enforcement", "statement": "gates block, not intentions", "signal": "gaps caught before merge", "since": "0001" }
   ],
   "scope": {
     "in_scope": ["adoption tooling", "governance workflow commands and gates"],

@@ -111,6 +111,9 @@ if [ "$NSRC" -eq 1 ] && printf '%s' "$NSOUT" | grep -q "explainability"; then
 else _fail "NS-SINCE-REQUIRED: exited $NSRC without naming the pillar (out: $(printf '%s' "$NSOUT" | head -1))"; fi
 
 # --- NS-SINCE-RESOLVES: an unresolvable ADR id is rejected BY NAME ---
+# The fixture ships its own decisions/ dir: without one the engine has nothing to resolve against
+# and skips the check, which would make this assertion pass for an unrelated reason.
+mkdir -p "$_FX80/decisions" && : > "$_FX80/decisions/0001-seed.md"
 _mkns "$_FX80/badsince.md" '{
   "mission": "Diagnose a portfolio of stocks",
   "pillars": [ { "id": "explainability", "statement": "Every call shows its reasoning", "signal": "share of calls with a cited source", "since": "0099" } ],

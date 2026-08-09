@@ -19,6 +19,11 @@ Exit contract (bash-friendly, consumed by scripts/amendment-gate.sh):
   0 = affirmative / valid / hit / present
   1 = negative    / invalid (reason on stderr) / no-hit / absent
   2 = error       — malformed input: broken JSON or no canonical ```json``` block
+  3 = unfilled    — a well-formed North Star still carrying the values vendor.sh seeds.
+                    Distinct from 2 on purpose: vendoring writes a stub, so an adopter's day-one
+                    state is a valid file with nothing in it, not a broken one. The message must
+                    say "seed it", not send someone hunting a bug that is not there. Mirrors the
+                    charter engine's exit 3 = empty (feature 013), same cause and same remedy.
 stdout carries the minimal payload; reasons/errors go to stderr.
 """
 import sys
@@ -31,6 +36,35 @@ _JSON_BLOCK = re.compile(r"```json\s*\n(.*?)\n```", re.S)
 
 class Malformed(Exception):
     """Input cannot be parsed into a canonical North Star (→ exit 2)."""
+
+
+class Unfilled(Exception):
+    """A well-formed North Star still carrying seeded values (→ exit 3)."""
+
+
+# The values scripts/vendor.sh seeds, verbatim. SINGLE SOURCE: check_80's NS-SEED-TABLE-SYNC
+# asserts this table still matches what vendor.sh actually writes. Two copies of a sentinel that
+# drift apart would make the detector silently stop catching anything, which is the failure family
+# this repository spent feature 015 mechanising.
+#
+# Byte identity is the discriminator, deliberately, NOT the word "TODO". A product whose domain is
+# to-do lists legitimately writes `"out_of_scope": ["TODO tracking beyond a single workspace"]`, and
+# refusing that would be worse than the defect being fixed: it blocks real work.
+SEEDED = frozenset((
+    "TODO: one sentence — why this product exists",
+    "todo-pillar",
+    "TODO: what it means",
+    "TODO: measurable indicator",
+    "TODO: ADR that introduced it",
+    "TODO: what this product does",
+    "TODO: what it explicitly does not do",
+))
+# The unfilled markers the templates use, for a value that was never a seeded string.
+_MARKER = re.compile(r"_\([^)]*\)_|<[^ >][^>]*>")
+
+
+def _unfilled(v):
+    return isinstance(v, str) and (v in SEEDED or bool(_MARKER.search(v)))
 
 
 def _load(path):
@@ -53,6 +87,38 @@ def _nonempty_str(v):
     return isinstance(v, str) and v.strip() != ""
 
 
+def _seeded_fields(ns):
+    """Every still-seeded field, named by its JSON path. Naming them is the point: 'something is
+    seeded' sends the reader looking, 'pillars[0].signal is seeded' does not."""
+    out = []
+    if _unfilled(ns.get("mission")):
+        out.append("mission")
+    for i, p in enumerate(ns.get("pillars") or []):
+        if not isinstance(p, dict):
+            continue
+        for k in ("id", "statement", "signal", "since"):
+            if _unfilled(p.get(k)):
+                out.append("pillars[%d].%s" % (i, k))
+    sc = ns.get("scope") or {}
+    if isinstance(sc, dict):
+        for k in ("in_scope", "out_of_scope"):
+            for j, x in enumerate(sc.get(k) or []):
+                if _unfilled(x):
+                    out.append("scope.%s[%d]" % (k, j))
+    return out
+
+
+def _adr_ids(path):
+    """ADR numbers present in decisions/, resolved relative to the North Star's own directory."""
+    import os
+    d = os.path.join(os.path.dirname(os.path.abspath(path)), "decisions")
+    try:
+        names = os.listdir(d)
+    except OSError:
+        return None
+    return set(n.split("-", 1)[0] for n in names if n.endswith(".md"))
+
+
 def _validate(ns):
     """Return '' if schema-valid, else a precise reason (per base/schema.md)."""
     if not _nonempty_str(ns.get("mission")):
@@ -63,9 +129,13 @@ def _validate(ns):
     for i, p in enumerate(pillars):
         if not isinstance(p, dict):
             return "pillars[%d] must be an object" % i
-        for k in ("id", "statement", "signal"):
+        for k in ("id", "statement", "signal", "since"):
             if not _nonempty_str(p.get(k)):
-                return "pillars[%d].%s is empty or missing" % (i, k)
+                return "pillars[%s].%s is empty or missing" % (p.get("id") or i, k)
+        if not re.fullmatch(r"\d{4}", p.get("since").strip()):
+            return ("pillars[%s].since must be a 4-digit ADR number (got %r) — the ADR number is "
+                    "the stable identity, a path breaks on rename"
+                    % (p.get("id"), p.get("since")))
     sc = ns.get("scope")
     if not isinstance(sc, dict):
         return "scope is missing"
@@ -98,10 +168,31 @@ def _norm(s):
 
 
 def cmd_schema_valid(args):
-    reason = _validate(_load(args.file))
+    ns = _load(args.file)
+    # UNFILLED IS CHECKED FIRST, before structure and before provenance resolution. A seeded North
+    # Star has a seeded `since` too, and reporting "ADR 'TODO: ...' does not resolve" would be
+    # technically true and practically misleading -- the reader would go looking for a missing ADR
+    # instead of seeding their North Star.
+    seeded = _seeded_fields(ns)
+    if seeded:
+        sys.stderr.write(
+            "unfilled: still carrying seeded values in %s — seed your North Star before "
+            "running /align, or its verdict scores a placeholder\n" % ", ".join(seeded))
+        return 3
+    reason = _validate(ns)
     if reason:
         sys.stderr.write(reason + "\n")
         return 1
+    known = _adr_ids(args.file)
+    if known is not None:
+        for p in ns.get("pillars") or []:
+            since = (p.get("since") or "").strip()
+            if since not in known:
+                sys.stderr.write(
+                    "pillars[%s].since names ADR %s, which has no file in decisions/ — rejected "
+                    "rather than ignored: a silently accepted id records a provenance that does "
+                    "not exist\n" % (p.get("id"), since))
+                return 1
     return 0
 
 

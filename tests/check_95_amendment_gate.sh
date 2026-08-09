@@ -109,8 +109,23 @@ _out=$(bash "$GATE" --files "$_P/old.md" "$_P/stale.md" --added "memory/north-st
 if [ "$_rc" -ne 0 ] && printf '%s' "$_out" | grep -q "p1"; then
   _pass "AMEND-PROV-STALE: a governed field moving with stale provenance is blocked, citing the pillar"
 else _fail "AMEND-PROV-STALE: stale provenance passed (exit $_rc, out: $(printf '%s' "$_out" | head -1))"; fi
+# Provenance changing ALONE: the sets are unchanged, so the gate short-circuits before reaching
+# the provenance code at all. That is correct behaviour, but as an assertion it discriminates
+# nothing -- it passes against ANY implementation, including one that blocks everything. Proved by
+# mutation: making stale_provenance fire unconditionally left this green while breaking three other
+# criteria. Kept for the behaviour, and explicitly not counted as the paired positive.
 _out=$(bash "$GATE" --files "$_P/old.md" "$_P/provonly.md" --added "" --suite-cmd true 2>&1); _rc=$?
-if [ "$_rc" -eq 0 ]; then
-  _pass "AMEND-PROV-ONLY: provenance changing alone is not an amendment"
+if [ "$_rc" -eq 0 ] && printf '%s' "$_out" | grep -qi "not applicable"; then
+  _pass "AMEND-PROV-ONLY: a provenance-only edit is not an amendment (short-circuits, does not reach the check)"
 else _fail "AMEND-PROV-ONLY: a provenance-only edit was treated as an amendment (exit $_rc, out: $(printf '%s' "$_out" | head -1))"; fi
+
+# --- AMEND-PROV-FRESH: the real paired positive ---
+# A governed field moves AND its `since` is updated -> the gate must PASS. This one DOES reach the
+# provenance code, so it fails against a staleness check implemented as "block anything touching a
+# pillar" -- the wrong implementation AMEND-PROV-ONLY was wrongly credited with catching.
+_mkp "$_P/fresh.md" "REWORDED signal" "0002"
+_out=$(bash "$GATE" --files "$_P/old.md" "$_P/fresh.md" --added "memory/north-star/decisions/0002-x.md" --suite-cmd true 2>&1); _rc=$?
+if [ "$_rc" -eq 0 ]; then
+  _pass "AMEND-PROV-FRESH: a governed change WITH updated provenance passes the gate"
+else _fail "AMEND-PROV-FRESH: correct provenance was still blocked (exit $_rc, out: $(printf '%s' "$_out" | head -1))"; fi
 rm -rf "$_P"
