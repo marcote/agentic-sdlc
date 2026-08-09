@@ -85,7 +85,9 @@ only a mechanical check will.
 
 ## 5. Verdict
 
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (14/14 deterministic) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (14/14 deterministic) · retro: ✅
+
+**DONE.** Mission verdict `pending-observation`. The floor is built, enforced and dogfooded, but the falsification test set before the result was known came back negative: **nothing was rejected for lacking justification**, so ADR `0004` is unproven rather than vindicated. See `specs/014-ground-rules/retro.md`.
 
 ## 4b. UAT — against the brief's objective (2026-08-09)
 
