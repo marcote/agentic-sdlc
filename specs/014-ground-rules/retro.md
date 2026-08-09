@@ -64,3 +64,16 @@ is whether the replacement can ever say *no*.
   1. **`base/patterns/non-vacuous-checks.md`** — carried from 013 and **strengthened by the evidence rather than merely repeated**. Ten occurrences across two features plus `e6bc658`, and the decisive new datapoint: **013's retro proposed this rule, 014's plan restated it as D10, and occurrences 6–10 happened anyway.** Prose in a plan does not prevent it; only a mechanical check will. Injected criteria: every check ships a negative fixture on which it exits non-zero; a check that scans its own source assembles the forbidden literal at runtime; a newly declared check is confirmed present in what the runner actually executes; **a rejection assertion requires the diagnostic, not only the exit code** (new, from occurrences 6–8); and **a check that reports on a tree must state which tree** (new, from the two operator errors above).
   2. **A project delta for the gate-bootstrap exception** — carried unchanged from 013 and reinforced: 014 introduced `UNCOVERED` and its own charter was subject to it, handled ad hoc by task ordering (T6 before T7). Third occurrence of a situation still negotiated case by case.
 - **Candidate amendments → North Star:** none. ADR `0004` is three days old and **unproven** rather than wrong; amending it again before its discriminating half has ever fired would be thrashing. `S2` was strained a second time (`plan.md` gate note) with the threshold recorded: **a third strain is the falsifier arriving, not another near-miss.**
+
+---
+
+## Deferral hygiene (added 2026-08-09)
+
+**Sweep by: 2026-09-08** — a date, not only an event, whichever comes first. On that date the
+verdict is either closed with evidence or re-deferred with a *new* date and a stated reason.
+
+Added because feature 006 sat `pending-observation` for **35 days after its evidence already
+existed**: its trigger fired when 007 merged on 2026-07-05 and nobody swept the ledger.
+`wow-report` §2 exists to list overdue re-checks and had never been run across eight features.
+A deferral mechanism nobody sweeps loses findings while the ledger still reads as rigorous —
+which is a worse failure than an open item, because it is invisible.

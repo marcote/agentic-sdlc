@@ -1,108 +1,136 @@
-# WoW Report — @ c052a42  (generated snapshot; do not edit manually)
+# WoW Report — generated 2026-08-09
 
-> **N=6, small sample, no statistics.** DONE features with retros: 003, 004, 006, 007, 008, 009.
-> (001-example is a demo; 002 introduced `/align` and is gate-exempt.) The repo's North Star is now
-> **real and schema-valid** — Mission Face is measured for the harness dogfooding itself, no longer
-> `n/a`-by-placeholder (that was 003's state). Observes, never gates.
+Aggregates the retro ledger. **Observes, never gates** — the deterministic teeth are
+`tests/check_90_retro.sh`. Input: all `specs/*/retro.md`, their `alignment.md`, and
+`verification/reports/*`.
 
-## 1. Mission — is each North Star pillar being served?
+**N = 7 closed features** (004, 006, 007, 008, 009, 013, 014). Small sample, no statistics.
+Per-feature and themes only; no trends are claimed.
 
-Cross of each `alignment.md` objective→pillar mapping × the Face-A signal verdict in each `retro.md`.
+> **First run.** This report had never been generated across eight features. That is itself the
+> report's most important finding, and §2 is where it shows.
 
-| Pillar | Features that promised it | Signal moved? | Verdict |
+---
+
+## 1. Mission — is each pillar being served?
+
+| Pillar | Features that claimed it | Signal moved | Drift |
 |---|---|---|---|
-| **real-enforcement** | 004, 006, 007, 008, 009 | ✅ 004 (PR blocked + push rejected), 007 (`/align` ran on the real engine), 008 (skip detected + exit 1), 009 (no-TTY abort, plan-first); 006 dogfood-sub ✅ / gate-block ⏳ | **served — strongest pillar**, moved by 4 features with hard locators |
-| **frictionless-adoption** | 006, 007, 008, 009 | ✅ 007 (1-command vendoring), 008 (`status.sh` self-navigates), 009 (`curl\|bash` from zero, incl. live internet fetch); 006 ⏳→closed by 007 | **served**, moved by 3 features |
-| **agnostic-portability** | 004, 006, 007, 009 | ✅ 007 + 009 (synthetic) **+ real repo `porfolio-doctor` @ c052a42** — vendored via the live `curl\|bash`; engine + amendment-gate ran intact, dep-free, zero per-stack tweaks | **served — now with real-repo evidence** (residual: target is stackless, so stack-detection wasn't exercised on a manifest) |
-| **measurable-impact** | 004 | ✅ 004 (narrow block caught real drift pre-merge without slowing throughput) | **thinly served** — only 1 feature ever mapped to it |
+| `real-enforcement` | 004, 006, 007, 008, 009, 013, 014 | **7 / 7** | none |
+| `agnostic-portability` | 004, 006, 007, 009, 013, 014 | **6 / 6** | none |
+| `frictionless-adoption` | 006, 007, 008, 009, 014 | **4 / 5** — 014 `⏳` | watch |
+| `measurable-impact` | 004, 013, 014 | **1 / 3** — 013 `⏳`, 014 `⏳` | **⚠ measurable drift** |
 
-**Measurable drift (promised but no signal moved): none.** Every pillar that was promised did move
-at least once. Two soft spots, not drift:
-- **agnostic-portability** — 004's re-check is now **CLOSED**: vendored onto a real persistent repo
-  (`porfolio-doctor`), the contract (schema/gates/artifacts) ran intact and dependency-free with no
-  per-stack tweaks. Residual nuance only: that repo is *stackless*, so stack-detection defaulted to
-  `TODO` (by design) instead of matching a real manifest.
-- **measurable-impact** — served by a single feature (004). Not drift, but the least-exercised
-  pillar; nothing since 004 has claimed a prevent-rework signal.
+**`measurable-impact` is the drifting pillar, and the pattern is legible.** The two features
+that deferred it are the two that produce *rules about how to work* rather than a tool with an
+observable outcome. Every `confirmed` verdict in this ledger belongs to a feature that shipped
+something that does a thing — a CI gate, vendoring, a tracker, a bootstrap. Both `⏳` belong to
+governance mechanisms whose value is real but whose *measurement* was deferred to a future
+feature.
+
+That deferral chain is the harness's structural weak spot: a method feature's proof lives in the
+next feature, and the next feature keeps being another method feature.
 
 ## 2. Pending re-checks (worklist)
 
-| From | Signal | Trigger | Status |
-|---|---|---|---|
-| 004 | agnostic-portability | vendor onto a **real** repo/stack; verify `amendment-gate.yml` + `.sh` run intact (python3 stdlib, `--range`) with no per-stack tweaks | **CLOSED (2026-07-06)** — vendored onto `porfolio-doctor` (real repo, `@ c052a42`); engine + gate ran intact, dep-free, zero tweaks. Residual: target stackless (stack-detect not on a manifest; `--range` still hermetic-suite-only). |
-| 006 | frictionless-adoption + agnostic-portability | feature 007 vendors the engine | **CLOSED** by 007 (both moved) |
-| 007 | agnostic-portability | vendor onto a large real project (not a temp repo) | **CLOSED** — `porfolio-doctor` (see 004 row); real but stackless |
-| 009 | frictionless-adoption (network hop) | live raw URL reachable → run real `curl\|bash` | **CLOSED** — validated end-to-end (provenance `@ 3070acd`) |
-| 009 | agnostic-portability | real project | **CLOSED** — `porfolio-doctor` (see 004 row) |
-
-**Worklist now empty of hard items.** The agnostic-portability re-check (open across 004/007/009) is
-closed by the real vendoring onto `porfolio-doctor`. Only residual: exercise stack-detection on a
-real *manifest* and the `--range` git path on a real target — both trigger naturally once
-`porfolio-doctor` grows a stack + commit history.
-
-## 3. Method — does the WoW add value? (N=6, small sample, no statistics)
-
-| Feature | Gaps caught pre-code | RED→GREEN | Rework verify / uat | Escalations |
+| Feature | Deferred since | Trigger | Sweep by | State |
 |---|---|---|---|---|
-| 003 | 0 (no `/distill`; brainstorm-era) | yes | **1** / 0 | 1 (design) |
-| 004 | 6 edge + 1 reframe + **1 `/tasks`-gate** | yes | 0 / 0 | 1 (UAT scope) |
-| 006 | 3 grilling + 5 edge | yes | 0 / 0 | 0 |
-| 007 | 3 grilling + edges + 1 reclass | yes | 0 / 0 | 0 |
-| 008 | 3 grilling + 5 edge | yes | 0 / 0 | 0 |
-| 009 | 1 grilling + 8 edge | yes | **1 (CI-caught)** / 0 | 0 |
-| **Σ** | **~40 gaps caught before implementation** | **6/6 clean** | **2 / 0** | **3** |
+| ~~006~~ | 2026-07-05 | feature 007 vendors the engine | — | **✅ CLOSED 2026-08-09 → `confirmed`** |
+| 013 | 2026-08-08 | a real `UNPINNED`/`TRIPPED` against a **pre-existing** pin, or a real coherence objection | **2026-09-08** | open — did not fire in 014 |
+| 014 | 2026-08-09 | friction **rejected** for lacking justification, or another feature stopped by `UNCOVERED` | **2026-09-08** | open — neither occurred |
 
-- **RED discipline is unbroken (6/6).** Every feature reddened its deterministic contract before
-  code; disclosed refinements (007's DEPFREE assert, 008's placeholder false-positives) were
-  test-bug fixes inside a genuine RED→GREEN arc, not fake-green.
-- **Rework is rare but real: 2 post-verify, 0 post-uat.** 003 (deriv≥4 hardening) and **009 (2
-  portability bugs caught by CI, not the local `/verify`)**. Zero product gaps at UAT across all 6
-  — the grilling front-loads the cost.
-- **Recurring friction themes** (and their fate):
-  1. *Hand-inferred phase tracklist* — flagged by 006, 007, 008 → **RESOLVED** (008 `status.sh`).
-  2. *DEPFREE check names toolchains as data* — 007 → **RESOLVED** (shared `assert_dep_free`).
-  3. *Invariant/must-not-regress has no natural RED* — 004, 006 → **RESOLVED** (principle 2:
-     tie-to-deliverable + guard exception).
-  4. *Interactive-IO + network-fetch + env-sensitive tests aren't hermetic; `/verify`-green ≠
-     CI-green* — 004, 009 → **RESOLVED** (PR #13: `hermetic-tests` pattern + Interactive-IO
-     exception).
-  5. *Placeholder regex blind spot (code spans)* — 008 → **RESOLVED** (`has_placeholder` in lib.sh).
-  6. *agnostic-portability only shown on synthetic targets* — 007, 009 → **OPEN** (see §2).
+**⚠ The finding that justifies this whole section: 006 sat `pending-observation` for 35 days
+after its evidence already existed.** Its trigger fired when 007 merged on 2026-07-05; the
+agnostic-portability half was even explicitly re-checked by 012 (`2602a36`). Nobody swept the
+ledger, and this report — the tool built to list exactly this — had never been run.
+
+A deferral mechanism nobody sweeps **loses findings while the ledger still reads as rigorous**,
+which is worse than an open item because it is invisible. Two corrections landed today: every
+`pending-observation` now carries a **sweep date** as well as an event trigger (whichever comes
+first), and `specs/_template/retro.md` requires it going forward.
+
+## 3. Method — does the WoW add value? (N = 7)
+
+| Feature | Gaps caught pre-impl | RED discipline | Rework post-verify / post-uat | Escalations |
+|---|---|---|---|---|
+| 004 | — | yes | 0 / 0 | — |
+| 006 | 3 + 5 edge cases | yes, no exceptions | 0 / 0 | — |
+| 007 | — | yes | 0 / 0 | — |
+| 008 | — | yes | 0 / 0 | — |
+| 009 | — | yes | 0 / 0 | — |
+| 013 | 8 | yes, 7 documented exceptions | 0 / **1** (`EMPTY-CHARTER`) | 9 |
+| 014 | 10 | yes, 10 documented exceptions | 0 / **0** | 4 |
+
+**Recurring friction themes:**
+
+1. **Vacuous and untraceable checks — 11 occurrences, the dominant theme by far.** `e6bc658`
+   (008), five in 013, five in 014, plus one found today in 008's `DEPFREE`. Shapes:
+   self-detection, untraceable results, passing for an unrelated reason, semantic vacuity,
+   reporting on the wrong tree. **013's retro proposed a rule; 014's plan restated it as D10;
+   occurrences 6–10 happened anyway, in the same branch as the warning.** Prose does not prevent
+   this. The mechanical half was demonstrated on 2026-08-09 in minutes and found a real instance
+   in a feature closed a month earlier.
+2. **A feature that introduces a gate cannot be gated by it.** 002, 013, 014 — three
+   occurrences, negotiated ad hoc each time.
+3. **Checks run against the wrong tree return confident false verdicts.** Twice on 2026-08-09:
+   the amendment gate over an empty commit range, and a hermeticity check against uncommitted
+   work.
 
 ## 4. Loop — does the WoW improve itself?
 
-Candidate rules proposed in Face C vs. landed in the constitution:
-
-| Source | Candidate | Landed? |
+| | Proposed | Landed |
 |---|---|---|
-| 004 | invariant criterion tied to a deliverable (no green-by-construction) | ✅ `principles.md` P2 (asserted by check_10) |
-| 006 | phase state is derived, not inferred | ✅ as feature 008 (`status.sh`) |
-| 006 | must-not-regress guards excluded from RED set | ✅ `principles.md` P2 guard exception |
-| 007 | shared invocation-aware DEPFREE helper | ✅ `assert_dep_free` in `tests/lib.sh` |
-| 008 | shared code-span-aware placeholder helper | ✅ `has_placeholder` in `tests/lib.sh` |
-| 009 | Interactive-IO criteria are UAT-observed | ✅ `principles.md` P2 Interactive-IO exception (PR #13) |
-| 009 | hermetic tests: fetch-seam + no ambient assumptions | ✅ `base/patterns/hermetic-tests.md` (PR #13) |
-| 008 | *reflexive dogfood* — run workflow tooling against its own in-flight feature | ✅ `constitution.md` project delta **D3** (asserted by check_10) |
+| Constitution patterns | `non-vacuous-checks` (013, 014) | **0 of 1** |
+| Constitution deltas | gate-bootstrap exception (013, 014) | **0 of 1** — `D1`–`D3` predate both |
+| North Star amendments | ADR `0004` | **1 of 1** (PR #17) |
 
-**North Star amendments:** 1 optional proposed (006 — clarify the `out_of_scope` "deterministic
-engine" wording), **deliberately not pursued** (007 didn't re-litigate the edge). **0 ADRs** — the
-governed sets never changed. The loop is healthy: **8 of 8 method candidates landed** — every Face-C
-rule proposed across all six retros is now codified in the constitution or shipped as tooling.
+**The loop closes on governance and stalls on practice.** An amendment to the North Star went
+through its full protocol in one day. Two constitution rules have been proposed twice each,
+across two features, and neither has landed — while the failure one of them describes recurred
+five more times in between.
 
-## 5. Theater smells (human spot-check, Layer 4)
+That asymmetry is the honest reading of this section: the harness improves the rules it *gates*
+and forgets the rules it merely *records*.
 
-- **No all-green retros.** Every feature reports non-empty friction — no "zero gaps + zero rework +
-  zero friction" retro (the classic filler tell). 006 and 007 have 0 rework but both carry real
-  friction items, so they read honest.
-- **Evidence locators present** for all `confirmed`/`moved` verdicts (004/007/008/009 Face A cells
-  are SHAs, PR states, coverage rows — not prose). ✅
-- **Watch RESOLVED:** *agnostic-portability's synthetic-target reliance.* Closed by the real
-  vendoring onto `porfolio-doctor` (§1/§2) — the contract ran intact on a genuine repo, dep-free,
-  no per-stack tweaks. The ledger now matches the evidence. Remaining residual is narrow and
-  honestly scoped: stack-detection-on-a-manifest and the `--range` git path await the target
-  growing a stack + history — not a portability doubt, just an un-walked sub-path.
-- **No aging worklist items:** the once-5-features-old portability re-check is now closed.
-- **N-honesty:** N=6, one team, self-dogfooding. The Method signal (front-loaded gaps, near-zero
-  rework) is encouraging but is the harness grading its own homework — the Mission signal for
-  agnostic-portability + frictionless-adoption only becomes external evidence when a *different*
-  repo adopts it (which 009's `bootstrap.sh` now makes a one-liner).
+## 5. Theater smells (human spot-check)
+
+- **No all-green retros.** Every retro records gaps, exceptions or friction. 013 and 014 each
+  self-report defects that make their author look worse — the most reliable signal available
+  that they were not written to pass.
+- **`⏳` verdicts are used honestly and repeatedly**, including one (014) that came back negative
+  against a falsification test *written before the result was known*.
+- **⚠ One real smell, now corrected:** an overdue `pending-observation` invisible for 35 days
+  (§2). Not a dishonest retro — a ledger nobody read.
+- **⚠ Watch:** 12 eval cases across three files have **never been scored**, by design, because
+  the authoring model grading its own output is not evidence. They are honestly open and
+  honestly blocked; if they stay open indefinitely they become decoration rather than deferral.
+
+## 6. Charter health — is pinning decisions earning its ceremony?
+
+| Signal | Count | Reading |
+|---|---|---|
+| Pins that **tripped** | **0** | The charter has never caught a decision going bad before the rework |
+| Rework with **no pin** covering it | **0** | No rework has been traced to a missing pin either |
+| Pins that **never trip and never constrain** | 0 of 9 | No bloat: every pin has been read by a gate |
+| Pins **strained but not tripped** | `S1` ×1, `S2` ×2 | `S2`'s third strain is declared to be the falsifier arriving |
+| Pins **created by a gate** | `S4` (013 `UNPINNED`), `S5`–`S8` (014 `UNCOVERED`) | 5 of 9 pins exist because a gate demanded them |
+
+**Honest reading: too early, and the ratio is uninformative at 0/0.** The charter cannot yet be
+called working or decorative. What *is* evidence: **5 of 9 pins exist only because a gate forced
+them**, and two of those (`S7` green proves the harness's machinery not a product; `S8` fail
+closed, never partially apply) recorded decisions that had governed this repository **since
+feature 001 and 007 respectively without ever being written down**.
+
+Surfacing an eight-month-old undocumented decision is not the same as preventing rework, and this
+report will not claim it is. It is the strongest thing the charter has done so far.
+
+---
+
+## What this report says to do next
+
+Nothing in §1–§6 recommends a new feature. The two actionable items are both small and both
+overdue rather than new:
+
+1. **Land one of the two candidate constitution rules**, or drop them explicitly. Proposing a
+   rule twice and landing it zero times is the loop failing quietly (§4).
+2. **Sweep the ledger on 2026-09-08.** That date now exists precisely because it did not before.
