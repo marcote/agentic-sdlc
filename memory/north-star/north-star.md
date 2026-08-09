@@ -63,22 +63,22 @@ The block below is the single source of truth, read by the deterministic validat
     {
       "id": "real-enforcement",
       "statement": "Discipline is enforced by deterministic gates, not good intentions.",
-      "signal": "Gates block closure when a condition is missing; violations are caught before merge (and the harness proves this by dogfooding itself: retro ledger / wow-report)."
+      "signal": "Gates block closure when a condition is missing; violations are caught before merge (and the harness proves this by dogfooding itself: retro ledger / wow-report).", "since": "0001"
     },
     {
       "id": "agnostic-portability",
       "statement": "Runs on any stack or project without imposing technology or runtime.",
-      "signal": "The contract (schema, gates, artifacts) remains intact when vendored onto an arbitrary repo/stack."
+      "signal": "The contract (schema, gates, artifacts) remains intact when vendored onto an arbitrary repo/stack.", "since": "0001"
     },
     {
       "id": "frictionless-adoption",
       "statement": "Incorporating the harness into a new repo costs little, and every cost it does impose is justified by what that cost prevents.",
-      "signal": "Steps/time to adopt (lower = better), with every mandatory step carrying a recorded justification proportional to what it prevents. The defect is an unjustified step, not a step as such: friction that buys nothing is what is being measured."
+      "signal": "Steps/time to adopt (lower = better), with every mandatory step carrying a recorded justification proportional to what it prevents. The defect is an unjustified step, not a step as such: friction that buys nothing is what is being measured.", "since": "0004"
     },
     {
       "id": "measurable-impact",
       "statement": "The discipline the harness imposes must translate into better software: less rework and gaps caught before production, not gates that fire for the sake of firing.",
-      "signal": "Gaps caught early (grilling/contract) and late rework avoided (post-verify/uat), aggregated per feature in the Method section of the wow-report; high = discipline prevents, not just bureaucratizes."
+      "signal": "Gaps caught early (grilling/contract) and late rework avoided (post-verify/uat), aggregated per feature in the Method section of the wow-report; high = discipline prevents, not just bureaucratizes.", "since": "0002"
     }
   ],
   "scope": {

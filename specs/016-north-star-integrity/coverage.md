@@ -1,0 +1,122 @@
+# Coverage — 016-north-star-integrity
+
+> Traceability matrix = source of truth for the state of each criterion and gap detector.
+> Chain: **pillar → objective → criterion**, per `alignment.md`.
+
+**Status legend:** `no contract` → `🔴 red` → `🟢 green` → `✅ uat` ·
+`📋 case` · `[given]` (inherited) · `deferred` (justified gap)
+
+| Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked test/eval | Status |
+|---|---|---|---|---|---|---|
+| `real-enforcement`, `frictionless-adoption` | O1 unfilled is not valid | R1 exit 3 | NS-UNFILLED | project | `tests/check_80_north_star.sh` | 🟢 green |
+| `real-enforcement`, `frictionless-adoption` | O1 unfilled is not valid | R1 names the fields | NS-UNFILLED-PARTIAL | project | idem | 🟢 green |
+| `real-enforcement`, `agnostic-portability` | O2 no false positive | G-a byte identity | NS-TODO-NOT-FALSE-POSITIVE | project | idem | 🟢 green |
+| `real-enforcement`, `agnostic-portability` | O2 no false positive | G-a single source | NS-SEED-TABLE-SYNC | project | idem | 🟢 green |
+| `measurable-impact` | O3 provenance per pillar | R3 required | NS-SINCE-REQUIRED | project | idem | 🟢 green |
+| `measurable-impact` | O3 provenance per pillar | R3 resolves | NS-SINCE-RESOLVES | project | idem | 🟢 green |
+| `real-enforcement` | O1 · O3 ordering | R1 · R3 (edge 3) | NS-UNFILLED-BEFORE-SINCE | project | idem | 🟢 green |
+| `measurable-impact` | O3 harness migrated | R4 · `D3` | NS-OWN-MIGRATED | project | idem | 🟢 green |
+| `real-enforcement`, `measurable-impact` | O5 gate requires provenance | R5 blocked | AMEND-PROV-STALE | project | `tests/check_95_amendment_gate.sh` | 🟢 green |
+| `real-enforcement`, `measurable-impact` | O5 provenance alone is not an amendment | R5 passes | AMEND-PROV-ONLY | project | idem | 🟢 green |
+| `real-enforcement`, `measurable-impact` | O5 correct provenance is not blocked | R5 paired positive | AMEND-PROV-FRESH | project | idem | 🟢 green |
+| `real-enforcement`, `frictionless-adoption` | O1 `/align` fail-closed | R2 | ALIGN-REFUSES-UNFILLED | project | `tests/check_50_skills.sh` | 🟢 green |
+| `measurable-impact` | O4 stamp into alignment.md | R6 | ALIGN-STAMPS-PROVENANCE | project | idem | 🟢 green |
+| `real-enforcement`, `frictionless-adoption` | O1 against a real target | R7 | NS-VENDORED-STUB-REJECTED | project | `tests/check_84_vendor.sh` | 🟢 green |
+| `measurable-impact` | O3 | `S2` Hedge | NS-ENGINE-CLI-ONLY | `[given] stack/S2 Hedge` | `tests/check_80_north_star.sh` | 🟢 green |
+| `measurable-impact` | O4 | R6 | JUDGE-PROVENANCE-USEFUL | project | `evals/cases/provenance-judge.md` | 📋 case |
+| `agnostic-portability` | — | hermetic under CI conditions | HERMETIC-ENV-80 | `[given] base/hermetic-tests` | `tests/check_80_north_star.sh` | 🟢 green |
+| `agnostic-portability` | — | the hermetic scan's own pattern is not vacuous | HERMETIC-ENV-80-SELF | `[given] base/non-vacuous-checks` | `tests/check_80_north_star.sh` | 🟢 green |
+| `real-enforcement` | O1 · O3 | each rule has a negative fixture | check-can-fail | `[given] base/non-vacuous-checks` | → NS-* fixtures | 🟢 green |
+| `real-enforcement` | O1 · O3 | rejection requires the diagnostic | check-rejects-by-diagnostic | `[given] base/non-vacuous-checks` | → NS-SINCE-RESOLVES | 🟢 green |
+| `real-enforcement` | O5 | the gate names what it compared | check-names-its-tree | `[given] base/non-vacuous-checks` | → AMEND-PROV-STALE | 🟢 green |
+| — | — | no network or remote source reached | hermetic-offline | `[given] base/hermetic-tests` | — | deferred |
+| — | — | `S1` no tool named as a default in `memory/stack/base/` | S1-NO-PRESCRIBE | `[given] stack/S1 Injects` | — | deferred |
+
+## Deferral reasons (required)
+
+- **`hermetic-offline`** — this feature reaches no network, remote repo or live service.
+- **`S1-NO-PRESCRIBE`** — `S1`'s `Injects` governs `memory/stack/base/`; this feature touches
+  `memory/north-star/base/` and `scripts/`. Carried and deferred rather than dropped so the stance
+  pin's injection stays auditable; `no-prescribe.sh` still runs at `/verify` as `S1`'s `Guard`.
+
+## Rows this feature does NOT carry, and why
+
+`check-traceable` and `check-no-self-match` are **discharged by `check_96`** under the project
+override in `memory/constitution/constitution.md` — the gate covers the whole tree on every run,
+which is strictly stronger than a per-feature row. This is the first feature to benefit from that
+override, so it is the first evidence that the optimisation actually reduces per-feature cost:
+**21 rows here against 015's 37**, with no loss of enforcement.
+
+## UAT
+
+Pending. Filled at `/uat`: every row reaches `✅ uat` except the two `deferred` ones and
+`JUDGE-PROVENANCE-USEFUL`, which cannot be scored before the 2026-09-08 sweep.
+
+## RED state (`/contract`)
+
+Suite **414 PASS / 12 FAIL**. Every assertion touching a 016 artifact is 🔴 against an engine that
+still accepts a placeholder.
+
+**Three assertions pass at RED, documented here rather than discovered at `/verify`:**
+
+- `NS-TODO-NOT-FALSE-POSITIVE` — a *must-not-reject* criterion. Today's engine accepts everything,
+  so it is green by construction. It has no red state and its value is entirely in the future: it
+  fails the moment the discriminator becomes the bare word `TODO` instead of byte identity, which
+  is the one way this feature could ship something worse than the defect it fixes.
+- `HERMETIC-ENV-80` and `HERMETIC-ENV-80-SELF` — a scan and its own non-vacuity self-test, the same
+  documented exception 013, 014 and 015 recorded.
+- `AMEND-PROV-ONLY` — also a *must-not-block* criterion, green against a gate that does not yet
+  know about provenance.
+
+  **Correction, made at implementation:** the sentence above originally claimed this criterion's
+  "whole job is to fail if the staleness check is implemented as *block anything that touches a
+  pillar*". **That was false, and mutation testing proved it.** A provenance-only edit leaves the
+  governed sets unchanged, so the gate short-circuits at `sets-changed` and never reaches the
+  provenance code — the assertion passes against *any* implementation, including the broken one.
+  Firing `stale_provenance` unconditionally left `AMEND-PROV-ONLY` green while breaking three
+  unrelated criteria.
+
+  `AMEND-PROV-FRESH` is the real paired positive: a governed field moves **and** its `since` is
+  updated, so the gate must pass. That path does reach the provenance code.
+
+## GREEN state + UAT — 2026-08-09
+
+Suite **427 PASS / 0 FAIL** (pre-016 baseline 410). All 20 deterministic criteria 🟢 → **✅ uat**.
+`JUDGE-PROVENANCE-USEFUL` stays `📋 case`; the two `deferred` rows keep their reasons.
+
+### The gate note's risk 1, tested against the real thing
+
+`NS-TODO-NOT-FALSE-POSITIVE` uses a fully written North Star for a shared to-do list whose scope
+says `"TODO tracking beyond a single workspace"`. It validates, exit 0. Mutating the discriminator
+to the bare word `TODO` refuses it — the one way this feature could have shipped something worse
+than the defect it fixes.
+
+### The gate note's risk 2: migration cost, measured
+
+**One field per pillar, and nothing else** — as the brief claimed. 10 fixtures migrated
+mechanically, plus a `decisions/` directory for two fixture sets so provenance has something to
+resolve against. No caller changed, no schema field removed, no exit code repurposed.
+
+### Failability, one isolated sandbox per rule
+
+| fixture | mutation | result |
+|---|---|---|
+| F1 | unfilled check removed | 4 FAIL |
+| F2 | discriminator becomes the bare word `TODO` | 1 FAIL (`NS-TODO-NOT-FALSE-POSITIVE`) |
+| F3 | `SEEDED` table drifts from the stub | 1 FAIL |
+| F4 | `since` not required to resolve | 1 FAIL |
+| F5 | gate blocks anything touching a pillar | `AMEND-PROV-FRESH` + 3 pre-existing |
+
+### Two of my own assertions were vacuous, both caught, both recorded
+
+**`ALIGN-STAMPS-PROVENANCE` grepped for the word `since`** — an ordinary English word that appeared
+in a scoring rationale, so it passed against an `alignment.md` with no stamp at all. Semantic
+vacuity, in the assertion written to enforce provenance. Caught by reading, which is exactly what
+`base/patterns/non-vacuous-checks.md` says that shape costs. Now it requires each pillar id paired
+with a 4-digit ADR on the same line.
+
+**`AMEND-PROV-ONLY` cannot catch what `coverage.md` claimed it caught.** A provenance-only edit
+leaves the governed sets unchanged, so the gate short-circuits at `sets-changed` and never reaches
+the provenance code — it passes against *any* implementation. Proved by mutation: firing
+`stale_provenance` unconditionally left it green while breaking three unrelated criteria.
+`AMEND-PROV-FRESH` was added as the real paired positive and does fail against that mutation.

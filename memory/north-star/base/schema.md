@@ -22,7 +22,7 @@ wins**.
 {
   "mission": "string",
   "pillars": [
-    { "id": "string", "statement": "string", "signal": "string" }
+    { "id": "string", "statement": "string", "signal": "string", "since": "NNNN" }
   ],
   "scope": {
     "in_scope": ["string"],
@@ -33,6 +33,38 @@ wins**.
   }
 }
 ```
+
+## `since` — per-pillar provenance
+
+`since` is the **4-digit number of the ADR that last changed that pillar's `statement` or
+`signal`**. Required. It answers a question the file could not answer before: reading a North Star,
+you could not tell that a signal means something different than it did last month, because the only
+record was the ADR list and a sentence of prose.
+
+- **Not a path.** Paths break on rename; the ADR number is the stable identity the amendment
+  protocol already uses.
+- **Must resolve** to a file in `decisions/`. An id that does not resolve is rejected by name —
+  silently accepting it records a provenance that does not exist.
+- **`since` is metadata, not a governed field.** Changing it alone is not an amendment and needs no
+  ADR: otherwise recording that ADR `0005` changed a signal would itself need ADR `0006`, forever.
+  The governed sets stay `(id, statement, signal)` + `scope`.
+- **The gate enforces the inverse**: a `statement` or `signal` moving while `since` stays put is
+  rejected. That is what keeps the record self-maintaining rather than a convention someone
+  remembers.
+- **A purely mechanical change does not move it.** ADR `0003` renamed every pillar id and changed
+  no meaning; no pillar records it. `since` means *last changed in meaning*, not *last touched*.
+
+## Unfilled is not valid
+
+A North Star still carrying the values a vendoring stub seeds is **unfilled**, and unfilled is not
+valid. The validator reports it with an exit code **distinct from malformed**, because an adopter's
+day-one state is a well-formed file with nothing in it, not a broken one — the message must say
+*seed it*, not send someone hunting a bug that is not there.
+
+The discriminator is **byte identity with the seeded values**, never the presence of a word like
+`TODO`. A product whose domain is to-do lists writes `TODO` legitimately in its own scope, and
+refusing that would be worse than the defect: it blocks real work. Unfilled detection catches *not
+having done the step*; it cannot catch *having done it badly*.
 
 ## Field rules
 

@@ -29,9 +29,15 @@ truly executed until one exists — this is explicit, not a silent fallback.
    `memory/north-star/north-star.md`, extract its canonical JSON block, and run the
    stack's schema validator (equivalent to `validateNorthStar`, see
    `memory/north-star/base/schema.md`). If it is **not** schema-valid — empty mission,
-   no pillar with `id`+`statement`+`signal`, empty `scope.in_scope`/`out_of_scope`,
+   no pillar with `id`+`statement`+`signal`+`since`, empty `scope.in_scope`/`out_of_scope`,
    or missing `alignment.threshold` — **stop**: do not read the brief, do not
-   propose a mapping. The Measurability Gate refuses to run against a non-measurable
+   propose a mapping.
+
+   **`exit 3` = unfilled is its own outcome, and it is the common one.** A freshly vendored repo
+   has a well-formed North Star full of seeded values. Do not report it as malformed: say the North
+   Star is **unfilled** and must be **seeded** before `/align` can mean anything, and name the
+   fields the engine listed. Scoring a brief against a placeholder produces a verdict that reads
+   like a result and is not one — which is the whole reason this gate exists. The Measurability Gate refuses to run against a non-measurable
    North Star (criterion `MEAS-GATE`). Report the errors to the human and exit; do not
    write `alignment.md`.
 
@@ -92,7 +98,11 @@ truly executed until one exists — this is explicit, not a silent fallback.
    Include:
    - the `verdict` and `scores` per dimension (the score the gate actually used,
      from step 5);
-   - the `mapping` objective→pillar;
+   - the `mapping` objective→pillar, **each mapped pillar stamped with its `since`**
+     (the ADR its `statement`/`signal` last came from). This is what lets a later `/retro` tell
+     whether the signal moved *underneath* the prediction it is closing: a `pending-observation`
+     deferred for a month is otherwise judged against whatever the signal says then, with nothing
+     recording that it changed;
    - the `orphans` (empty list if none);
    - if `verdict` is not `aligned`, the required next step:
      - `rejected` → cite the matched `out_of_scope` predicate(s); the flow is
