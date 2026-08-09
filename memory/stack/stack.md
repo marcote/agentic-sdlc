@@ -13,7 +13,7 @@ extends: base
 > harness; the pins below are ours and do not.
 
 <!-- generated: python3 scripts/stack/engine.py exposure memory/stack/stack.md -->
-4 pins · 3 PINNED · 1 PROVISIONAL
+5 pins · 4 PINNED · 1 PROVISIONAL
 Exposure: S2 Reference deterministic engines written in python3
 
 ---
@@ -74,3 +74,16 @@ Exposure: S2 Reference deterministic engines written in python3
               including ones that would make the checks considerably shorter to write.
 - Falsifier:  a gate that cannot be expressed within this baseline without becoming
               unmaintainable, established by attempting it rather than by predicting it.
+
+### S4 — Charter format: one line-oriented markdown file            [substrate]
+- Confidence: PINNED
+- Because:    the charter has three readers that must all work without tooling — a
+              shell-level engine, the gates, and a human editing it by hand in a review diff.
+              Minted by the `UNPINNED` verdict on feature 013's own plan (decision D1), which
+              is the first run of the accretion loop.
+- Buys:       greppable within the S3 baseline, diffable in review, editable with no parser
+              and no schema step.
+- Forecloses: nested or typed pin values — a field is a string, so anything structured has to
+              be flattened into prose.
+- Falsifier:  a field genuinely needs structure that flattening destroys — e.g. a `Guard` that
+              must be an argument vector rather than a single shell string.

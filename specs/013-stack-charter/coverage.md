@@ -16,24 +16,24 @@ override seam. **`rate-limiting`** does not apply: no network-exposed surface.
 
 | Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked test/eval | Status |
 |---|---|---|---|---|---|---|
-| `measurable-impact` · `real-enforcement` | O1 no assumption stays mute | `memory/stack/` + `/stack` command & skill, positioned in the loop | STACK-CMD | project | `check_92_stack.sh` | 🔴 red |
-| `measurable-impact` · `real-enforcement` | O1 no assumption stays mute | A pin is well-formed only with Confidence/Because/Buys/Forecloses/Falsifier | PIN-SHAPE | project | `check_92_stack.sh` | 🔴 red |
-| `measurable-impact` · `real-enforcement` | O3 uncertainty pays a verifiable hedge | A PROVISIONAL pin carries a non-empty Hedge | PROVISIONAL-HEDGE | project | `check_92_stack.sh` | 🔴 red |
-| `agnostic-portability` | O4 adopter opinions enforceable, no stack prescribed | A [stance] pin names a Guard command + Injects clause | STANCE-GUARD | project | `check_92_stack.sh` | 🔴 red |
-| `real-enforcement` · `agnostic-portability` | O4 adopter opinions enforceable | `/verify` runs each stance Guard and requires exit 0 | GUARD-RUNS | project | `check_92_stack.sh` + `tests/run.sh` | 🔴 red |
-| `real-enforcement` | O2 stop the feature at the step that can act | `/plan` fails closed: PASS / UNPINNED / TRIPPED, never silence | PLAN-GATE | project | `check_92_stack.sh` | 🔴 red |
-| `real-enforcement` | O2 stop the feature at the step that can act | UNPINNED minting a stance pin bounces back to `/distill` | PLAN-BOUNCE | project | `check_92_stack.sh` | 🔴 red |
-| `measurable-impact` · `real-enforcement` | O2 · O3 the honest bill | TRIPPED reports criterion×pin, declared cost, hedge-exists, two paths | TRIPPED-BILL | project | `check_92_stack.sh` | 🔴 red |
-| `measurable-impact` | O1 no assumption stays mute | S0 is the first pin, blast-radius-derived, carries a Falsifier | S0-PIN | project | `check_92_stack.sh` | 🔴 red |
-| `real-enforcement` | O1 · O4 rigor without softening the rules | S0 scales scope only; RED gate, 100% coverage and the P6 floor do not scale | S0-SCOPE-ONLY | project | `check_92_stack.sh` | 🔴 red |
-| `agnostic-portability` | O4 no stack prescribed | No tool/language/runtime/vendor named as a required default in `memory/stack/base/` | NO-PRESCRIBE | project | `check_92_stack.sh` | 🔴 red |
-| `real-enforcement` | O3 hedge is verified, not written | `/distill` step 1 injects [stance] pins' Injects rows | DISTILL-STANCE | project | `check_92_stack.sh` | 🔴 red |
-| `agnostic-portability` · `frictionless-adoption` | O4 the mechanism vendors, the pins do not | `vendor.sh`: `memory/stack/base/` KEEP, `stack.md` SEED, CLAUDE.md `## Stack` points at charter | VENDOR-STACK | project | `check_92_stack.sh` | 🔴 red |
-| `measurable-impact` | O5 charter health backed by evidence | `wow-report` emits pins-tripped vs rework-with-no-pin | WOW-HEALTH | project | `check_92_stack.sh` | 🔴 red |
-| `real-enforcement` · `measurable-impact` | O1 (D3 reflexive dogfood) | The harness's own live decisions are pinned (py3 engine, bash-only, no-runtime) | CHARTER-SEED | project | `check_92_stack.sh` | 🔴 red |
-| — | — | Re-running `/stack` does not duplicate or drop pins; SUPERSEDED preserved | RERUN-IDEMPOTENT | `[given] base/idempotency` | `check_92_stack.sh` | 🔴 red |
-| — | — | Each amended pin records date + reason + what tripped it | AMEND-TRAIL | `[given] base/audit-logging` | `check_92_stack.sh` | 🔴 red |
-| — | — | Suite builds own fixtures; passes detached-HEAD, no-TTY | HERMETIC-ENV | `[given] base/hermetic-tests` | `check_92_stack.sh` | 🔴 red |
+| `measurable-impact` · `real-enforcement` | O1 no assumption stays mute | `memory/stack/` + `/stack` command & skill, positioned in the loop | STACK-CMD | project | `check_92_stack.sh` | 🟢 green |
+| `measurable-impact` · `real-enforcement` | O1 no assumption stays mute | A pin is well-formed only with Confidence/Because/Buys/Forecloses/Falsifier | PIN-SHAPE | project | `check_92_stack.sh` | 🟢 green |
+| `measurable-impact` · `real-enforcement` | O3 uncertainty pays a verifiable hedge | A PROVISIONAL pin carries a non-empty Hedge | PROVISIONAL-HEDGE | project | `check_92_stack.sh` | 🟢 green |
+| `agnostic-portability` | O4 adopter opinions enforceable, no stack prescribed | A [stance] pin names a Guard command + Injects clause | STANCE-GUARD | project | `check_92_stack.sh` | 🟢 green |
+| `real-enforcement` · `agnostic-portability` | O4 adopter opinions enforceable | `/verify` runs each stance Guard and requires exit 0 | GUARD-RUNS | project | `check_92_stack.sh` + `tests/run.sh` | 🟢 green |
+| `real-enforcement` | O2 stop the feature at the step that can act | `/plan` fails closed: PASS / UNPINNED / TRIPPED, never silence | PLAN-GATE | project | `check_92_stack.sh` | 🟢 green |
+| `real-enforcement` | O2 stop the feature at the step that can act | UNPINNED minting a stance pin bounces back to `/distill` | PLAN-BOUNCE | project | `check_92_stack.sh` | 🟢 green |
+| `measurable-impact` · `real-enforcement` | O2 · O3 the honest bill | TRIPPED reports criterion×pin, declared cost, hedge-exists, two paths | TRIPPED-BILL | project | `check_92_stack.sh` | 🟢 green |
+| `measurable-impact` | O1 no assumption stays mute | S0 is the first pin, blast-radius-derived, carries a Falsifier | S0-PIN | project | `check_92_stack.sh` | 🟢 green |
+| `real-enforcement` | O1 · O4 rigor without softening the rules | S0 scales scope only; RED gate, 100% coverage and the P6 floor do not scale | S0-SCOPE-ONLY | project | `check_92_stack.sh` | 🟢 green |
+| `agnostic-portability` | O4 no stack prescribed | No tool/language/runtime/vendor named as a required default in `memory/stack/base/` | NO-PRESCRIBE | project | `check_92_stack.sh` | 🟢 green |
+| `real-enforcement` | O3 hedge is verified, not written | `/distill` step 1 injects [stance] pins' Injects rows | DISTILL-STANCE | project | `check_92_stack.sh` | 🟢 green |
+| `agnostic-portability` · `frictionless-adoption` | O4 the mechanism vendors, the pins do not | `vendor.sh`: `memory/stack/base/` KEEP, `stack.md` SEED, CLAUDE.md `## Stack` points at charter | VENDOR-STACK | project | `check_92_stack.sh` | 🟢 green |
+| `measurable-impact` | O5 charter health backed by evidence | `wow-report` emits pins-tripped vs rework-with-no-pin | WOW-HEALTH | project | `check_92_stack.sh` | 🟢 green |
+| `real-enforcement` · `measurable-impact` | O1 (D3 reflexive dogfood) | The harness's own live decisions are pinned (py3 engine, bash-only, no-runtime) | CHARTER-SEED | project | `check_92_stack.sh` | 🟢 green |
+| — | — | Re-running `/stack` does not duplicate or drop pins; SUPERSEDED preserved | RERUN-IDEMPOTENT | `[given] base/idempotency` | `check_92_stack.sh` | 🟢 green |
+| — | — | Each amended pin records date + reason + what tripped it | AMEND-TRAIL | `[given] base/audit-logging` | `check_92_stack.sh` | 🟢 green |
+| — | — | Suite builds own fixtures; passes detached-HEAD, no-TTY | HERMETIC-ENV | `[given] base/hermetic-tests` | `check_92_stack.sh` | 🟢 green |
 | — | — | External dependency behind an override seam | (hermetic-offline) | `[given] base/hermetic-tests` | — | `deferred` — 013 reaches no network or remote source |
 | `real-enforcement` | O2 the TRIPPED verdict is judged, not matched | Judge fires on a real falsifier match, stays silent on keyword overlap | JUDGE-TRIPPED | project | `evals/cases/stack-charter-judge.md` | 📋 case |
 | `real-enforcement` | O1 the set must cohere, not just the pins | Judge objects on an incoherent set, returns explicit "coherent" otherwise — never silence | JUDGE-COHERENCE | project | `evals/cases/stack-charter-judge.md` | 📋 case |
@@ -87,3 +87,15 @@ deliberately not claimed — this feature adds a workflow step and a third `memo
 that signal the wrong way. The trade is only worth it if `measurable-impact` shows a
 compensating gain in rework avoided, and at close there will be `N=1` charter datapoint.
 `/retro` must rule on that trade explicitly, not only on the pillars the brief claims.
+
+**Implementation done (T1–T9):** all 18 deterministic criteria **🟢 GREEN** —
+`bash tests/run.sh` → **313 PASS / 0 FAIL** (244/0 before 013; 251/53 at RED). The three
+`📋 case` rows stay `📋` for `/verify`; the `deferred` row is unchanged.
+
+**D3 reflexive dogfood — result.** The finished `/plan` guard was run retroactively against
+this feature's own `acceptance.md` × the seeded charter (recorded in `plan.md`). Verdict
+**`UNPINNED`**, not a trivial `PASS`: the charter's own file format was a load-bearing,
+unpinned decision, and the accretion loop minted `S4` on the feature that introduced the loop.
+`S2` was strained but not tripped by `VENDOR-STACK` shipping a second reference engine, and
+the `S2` hedge (shell-CLI-only, no importable API) held — which is the hedge-exists check
+producing a real answer on a real pin rather than a hypothetical one.

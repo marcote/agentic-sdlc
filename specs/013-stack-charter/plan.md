@@ -21,6 +21,36 @@ close**, not by this exemption:
 
 Every feature from 014 onward passes the guard normally, without exception.
 
+### Retroactive run (obligation 2, discharged at T9)
+
+Ran the finished guard against `specs/013-stack-charter/acceptance.md` × the seeded charter.
+
+**Verdict: `UNPINNED`** — not a trivial `PASS`.
+
+- **What was unpinned:** decision **D1** below fixes the charter as one line-oriented markdown
+  file with a strict pin grammar. Changing that later means rewriting the parser, all 18
+  checks, the template, and migrating every adopter's charter — it passes the inclusion test
+  (*changing it later costs rework*) and nothing pinned it. The accretion loop fired on the
+  feature's own plan and minted **`S4` — Charter format**. `S4` is `[substrate]`, so no bounce
+  back to `/distill` was required.
+- **No `TRIPPED`:** no criterion matches a declared `Falsifier`.
+- **`S2` strained but not tripped, and worth recording.** `VENDOR-STACK` ships a *second*
+  reference engine into every adopter target, so a target with no such interpreter now has two
+  gates that cannot run instead of one. `S2`'s falsifier requires an adopter actually reporting
+  the harness "needs" it, or the intake gate scoring the hosting against the runtime predicate
+  — neither has happened, so the honest verdict is *not tripped*. **The `S2` hedge held:**
+  `scripts/stack/engine.py` exposes no importable API, only subcommands with an exit contract,
+  so a reimplementation stays drop-in. This is exactly the moment-of-truth check the `TRIPPED`
+  branch exists to perform, and it was answerable because the hedge was declared up front.
+- **Pins this plan rests on** (`PASS` citation requirement): `S3` (D2 and the whole check suite
+  stay within shell + coreutils + the reference interpreter), `S1` (D3/D4 — the harness asserts
+  guard *shape*, never content), `S2` (D2 hosts a reference engine under the 006 doctrine),
+  `S4` (D1, minted by this very run).
+
+The dogfood therefore proved something rather than nothing: the guard found a real unpinned
+decision inside the feature that introduced it, and the hedge-exists check produced a real
+answer on a real pin.
+
 ## Technical decisions
 
 - **D1 — The charter is one markdown file with a strict, parseable pin grammar.**
