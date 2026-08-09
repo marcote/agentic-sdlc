@@ -15,7 +15,8 @@
 ### G-a — The unfilled discriminator is **byte identity with the seeded stub**, not the word `TODO`
 
 A value is *unfilled* iff it is byte-identical to the value `vendor.sh` seeds, **or** it still
-carries a template marker (`_(…)_`, `<…>`). Zero false positives **by construction**: a product
+carries an unfilled template marker in the two forms the templates use. Zero false positives **by
+construction**: a product
 whose domain is to-do lists can write `"out_of_scope": ["TODO tracking beyond a single list"]` and
 it is not byte-identical to `"TODO: what it explicitly does not do"`.
 

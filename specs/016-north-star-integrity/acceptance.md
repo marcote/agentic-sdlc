@@ -127,7 +127,7 @@ Then it is green and assumes no terminal and no local main
 ```
 
 ### check-can-fail · check-rejects-by-diagnostic · check-names-its-tree
-_(from `base/patterns/non-vacuous-checks.md`)_ — three of five; `check-traceable` and
+From `base/patterns/non-vacuous-checks.md` — three of five; `check-traceable` and
 `check-no-self-match` are discharged by `check_96` per the project override in
 `memory/constitution/constitution.md`.
 

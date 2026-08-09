@@ -90,3 +90,27 @@ if [ -f "$GATE" ] && [ -f .github/workflows/amendment-gate.yml ] \
    && grep -q "amendment-gate.sh" .github/workflows/amendment-gate.yml 2>/dev/null; then
   _pass "SELF-CHECK: gate script and workflow exist and are wired"
 else _fail "SELF-CHECK: gate script or workflow missing or not wired"; fi
+
+# --- AMEND-PROV-STALE / AMEND-PROV-ONLY (016) ---
+# Provenance is metadata: changing `since` alone is NOT an amendment (otherwise recording that ADR
+# 0005 changed a signal would itself need ADR 0006, forever). The gate gains the INVERSE check —
+# a governed field moving while `since` stays put is rejected. Both directions, because one
+# without the other is half a rule: STALE alone would pass against a gate that blocks everything.
+_P=$(mktemp -d)
+_mkp(){ # _mkp <file> <signal> <since>
+  { printf -- '---\nextends: base\n---\n\n```json\n'
+    printf '{ "mission": "m", "pillars": [ { "id": "p1", "statement": "s", "signal": "%s", "since": "%s" } ], "scope": { "in_scope": ["a"], "out_of_scope": ["b"] }, "alignment": { "threshold": 3 } }\n' "$2" "$3"
+    printf '```\n'; } > "$1"
+}
+_mkp "$_P/old.md"       "original signal" "0001"
+_mkp "$_P/stale.md"     "REWORDED signal" "0001"
+_mkp "$_P/provonly.md"  "original signal" "0002"
+_out=$(bash "$GATE" --files "$_P/old.md" "$_P/stale.md" --added "memory/north-star/decisions/0002-x.md" --suite-cmd true 2>&1); _rc=$?
+if [ "$_rc" -ne 0 ] && printf '%s' "$_out" | grep -q "p1"; then
+  _pass "AMEND-PROV-STALE: a governed field moving with stale provenance is blocked, citing the pillar"
+else _fail "AMEND-PROV-STALE: stale provenance passed (exit $_rc, out: $(printf '%s' "$_out" | head -1))"; fi
+_out=$(bash "$GATE" --files "$_P/old.md" "$_P/provonly.md" --added "" --suite-cmd true 2>&1); _rc=$?
+if [ "$_rc" -eq 0 ]; then
+  _pass "AMEND-PROV-ONLY: provenance changing alone is not an amendment"
+else _fail "AMEND-PROV-ONLY: a provenance-only edit was treated as an amendment (exit $_rc, out: $(printf '%s' "$_out" | head -1))"; fi
+rm -rf "$_P"
