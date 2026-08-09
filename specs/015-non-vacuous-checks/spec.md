@@ -65,9 +65,23 @@ A criterion that legitimately does not execute in this environment emits `SKIP: 
 **Silence is never a valid outcome** — the same doctrine as `/plan`'s "exactly one verdict, never
 silence". `lib.sh` gains `_skip()`.
 
-### R4 — Label uniqueness
-The same label declared in two files makes "did this criterion run?" unanswerable from the output.
-Rejected, naming both files.
+### R4 — Section-scoped traceability  *(corrected at implementation — see below)*
+A criterion's result must appear in **its own file's section** of the run log, not merely somewhere
+in it. `run.sh` prints `== tests/check_XX.sh ==` before each file, so `(file, label)` attribution
+already exists and is what makes a result actually traceable.
+
+A label declared **twice inside the same file** stays a violation: sections cannot disambiguate
+that one.
+
+> **Spec correction, made at implementation and recorded rather than silently applied.** R4
+> originally demanded **global** label uniqueness. Run against the standing, green suite it fired
+> **four times** — `HERMETIC-ENV` (check_92, check_94), `SELF-CHECK` (five files), `DEP-FREE` and
+> `DEPFREE`. Those are not defects: an inherited `[given]` criterion is *supposed* to recur across
+> the features that carry it, and that is the constitution's injection mechanism working. A rule
+> that is wrong on a known-good suite is the one that gets disabled, which this feature's own
+> `alignment.md` scored as a commitment. Section-scoping is strictly stronger — it catches a result
+> emitted under the wrong file, which global uniqueness never could — and it has zero false
+> positives here.
 
 ### R5 — Recursion guard, and self-subjection (`D4`)
 The inner run is spawned with a guard variable. In the inner run the meta-check **skips only the

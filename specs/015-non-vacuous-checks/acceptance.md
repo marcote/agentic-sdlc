@@ -28,11 +28,13 @@ Then it reports zero violations
 And the run is proved to be non-empty by asserting the number of labels it examined is > 50
 ```
 
-## Criterion: NVC-LABEL-UNIQUE  (deterministic)
+## Criterion: NVC-LABEL-SCOPED  (deterministic)
 ```gherkin
-Given the same criterion label declared in two different check files
+Given a criterion declared in check_a.sh whose only result appears in check_b.sh's section
 When the meta-check runs
-Then it fails, naming both files and the duplicated label
+Then it fails, naming the file that declared it
+And the same label legitimately declared in two files, each emitting in its own section, is clean
+And a label declared twice inside one file is rejected, since sections cannot disambiguate it
 ```
 
 ## Criterion: NVC-SKIP-EXPLICIT  (deterministic)

@@ -12,19 +12,23 @@
 NVC="$PWD/scripts/nvc.sh"
 have_nvc(){ [ -f "$NVC" ]; }
 
-# nvcrepo: a minimal fake suite. Fixtures write check-shaped text, which is exactly why the
-# declaration parser must ignore heredoc bodies.
+# nvcrepo: a minimal fake suite. Fixtures are written as HEREDOCS on purpose: their bodies are
+# check-shaped, and the declaration parser must ignore them or it manufactures phantom criteria
+# that can never emit. Measured: the first run of this file reported 110 declarations across the
+# suite instead of ~78, every extra one a fixture string of this file's own.
 nvcrepo(){ local r; r=$(mktemp -d); mkdir -p "$r/tests"; echo "$r"; }
-mkcheck(){ printf '%s\n' "$2" > "$1"; }
 runlog(){ printf '%s\n' "$2" > "$1"; }
 
 # --- NVC-DECLARED-EMITTED: a declared label that never emits is a violation ---
 R=$(nvcrepo)
-mkcheck "$R/tests/check_a.sh" '# --- ALPHA: does a thing ---
+cat > "$R/tests/check_a.sh" <<'FIXTURE'
+# --- ALPHA: does a thing ---
 if true; then _pass "ALPHA: ok"; else _fail "ALPHA: no"; fi
 # --- GHOST: declared but never reached ---
-if false; then _pass "GHOST: ok"; else :; fi'
-runlog "$R/log.txt" '  PASS: ALPHA: ok'
+if false; then _pass "GHOST: ok"; else :; fi
+FIXTURE
+runlog "$R/log.txt" '== tests/check_a.sh ==
+  PASS: ALPHA: ok'
 if have_nvc; then ( cd "$R" && bash "$NVC" traceability --tests tests --output log.txt ) >/tmp/nvc_out 2>&1; RC=$?; fi
 if have_nvc && [ "${RC:-0}" -eq 1 ] && grep -q "GHOST" /tmp/nvc_out && ! grep -q "ALPHA" /tmp/nvc_out; then
   _pass "NVC-DECLARED-EMITTED: unemitted label flagged, emitted one left alone"
@@ -33,12 +37,14 @@ rm -rf "$R"
 
 # --- NVC-DECLARE-FORMS: header form counts, heredoc body does not ---
 R=$(nvcrepo)
-mkcheck "$R/tests/check_b.sh" '# --- HEADERONLY: declared only as a header ---
+cat > "$R/tests/check_b.sh" <<'FIXTURE'
+# --- HEADERONLY: declared only as a header ---
 assert_dep_free "$X" "HEADERONLY"
-cat > "$T/tests/check_fake.sh" <<'"'"'EOF'"'"'
+cat > "$T/tests/check_fake.sh" <<'EOF'
 # --- PHANTOM: this lives inside a heredoc and is not a declaration ---
 _pass "PHANTOM: ok"
-EOF'
+EOF
+FIXTURE
 if have_nvc; then ( cd "$R" && bash "$NVC" declarations tests/check_b.sh ) >/tmp/nvc_out 2>&1; fi
 if have_nvc && grep -q "HEADERONLY" /tmp/nvc_out && ! grep -q "PHANTOM" /tmp/nvc_out; then
   _pass "NVC-DECLARE-FORMS: header declared, heredoc body ignored"
@@ -56,26 +62,58 @@ if have_nvc && [ "${SS:-1}" -eq 0 ] && [ "${DUP:-1}" -eq 0 ] && [ "${n:-0}" -gt 
   _pass "NVC-ZERO-FP: standing suite clean, ${n} labels examined (>50, so not vacuously empty)"
 else _fail "NVC-ZERO-FP: false positives on a known-good suite, or examined too few labels (n=${n:-0} selfscan=${SS:-?} dup=${DUP:-?})"; fi
 
-# --- NVC-LABEL-UNIQUE: the same label in two files is unanswerable, so rejected ---
+# --- NVC-LABEL-SCOPED: a result must land in its own file's section ---
 R=$(nvcrepo)
-mkcheck "$R/tests/check_c.sh" '# --- TWICE: here ---
-_pass "TWICE: ok"'
-mkcheck "$R/tests/check_d.sh" '# --- TWICE: and here too ---
-_pass "TWICE: ok"'
+cat > "$R/tests/check_c.sh" <<'FIXTURE'
+# --- TWICE: declared here ---
+_pass "TWICE: ok"
+FIXTURE
+cat > "$R/tests/check_d.sh" <<'FIXTURE'
+# --- TWICE: and legitimately here too ---
+_pass "TWICE: ok"
+FIXTURE
+# both emit, each inside its own section -> clean. A globally-unique rule would reject this,
+# and it fired four times on the real suite where the recurrence was legitimate.
+runlog "$R/ok.log" '== tests/check_c.sh ==
+  PASS: TWICE: ok
+== tests/check_d.sh ==
+  PASS: TWICE: ok'
+if have_nvc; then ( cd "$R" && bash "$NVC" traceability --tests tests --output ok.log ) >/tmp/nvc_ok 2>&1; OKRC=$?; fi
+# check_d's result is missing from its own section, though the label appears in the log
+runlog "$R/bad.log" '== tests/check_c.sh ==
+  PASS: TWICE: ok
+== tests/check_d.sh ==
+  PASS: SOMETHINGELSE: ok'
+if have_nvc; then ( cd "$R" && bash "$NVC" traceability --tests tests --output bad.log ) >/tmp/nvc_out 2>&1; RC=$?; fi
+if have_nvc && [ "${OKRC:-1}" -eq 0 ] && [ "${RC:-0}" -eq 1 ] \
+   && grep -q "check_d" /tmp/nvc_out && ! grep -q "check_c" /tmp/nvc_out; then
+  _pass "NVC-LABEL-SCOPED: result required in its own section; legitimate cross-file repeat is clean"
+else _fail "NVC-LABEL-SCOPED: section scoping wrong (ok=${OKRC:-absent} bad=${RC:-absent})"; fi
+rm -rf "$R"
+# --- NVC-LABEL-SAMEFILE: a label declared twice in one file cannot be disambiguated ---
+R=$(nvcrepo)
+cat > "$R/tests/check_c2.sh" <<'FIXTURE'
+# --- SAME: first ---
+_pass "SAME: ok"
+# --- SAME: second, and nothing can tell them apart ---
+_pass "SAME: ok"
+FIXTURE
 if have_nvc; then ( cd "$R" && bash "$NVC" duplicates --tests tests ) >/tmp/nvc_out 2>&1; RC=$?; fi
-if have_nvc && [ "${RC:-0}" -eq 1 ] && grep -q "TWICE" /tmp/nvc_out \
-   && grep -q "check_c" /tmp/nvc_out && grep -q "check_d" /tmp/nvc_out; then
-  _pass "NVC-LABEL-UNIQUE: duplicate label rejected, naming both files"
-else _fail "NVC-LABEL-UNIQUE: duplicate not caught or diagnostic does not name both files"; fi
+if have_nvc && [ "${RC:-0}" -eq 1 ] && grep -q "SAME" /tmp/nvc_out && grep -q "check_c2" /tmp/nvc_out; then
+  _pass "NVC-LABEL-SAMEFILE: same-file duplicate rejected, naming label and file"
+else _fail "NVC-LABEL-SAMEFILE: same-file duplicate not caught (rc=${RC:-absent})"; fi
 rm -rf "$R"
 
 # --- NVC-SKIP-EXPLICIT: SKIP counts as emitted; silence never does ---
 R=$(nvcrepo)
-mkcheck "$R/tests/check_e.sh" '# --- SKIPPY: cannot run here ---
+cat > "$R/tests/check_e.sh" <<'FIXTURE'
+# --- SKIPPY: cannot run here ---
 _skip "SKIPPY: no network in this environment"
 # --- MUTE: emits nothing at all ---
-:'
-runlog "$R/log.txt" '  SKIP: SKIPPY: no network in this environment'
+:
+FIXTURE
+runlog "$R/log.txt" '== tests/check_e.sh ==
+  SKIP: SKIPPY: no network in this environment'
 if have_nvc; then ( cd "$R" && bash "$NVC" traceability --tests tests --output log.txt ) >/tmp/nvc_out 2>&1; RC=$?; fi
 if have_nvc && [ "${RC:-0}" -eq 1 ] && grep -q "MUTE" /tmp/nvc_out && ! grep -q "SKIPPY" /tmp/nvc_out; then
   _pass "NVC-SKIP-EXPLICIT: SKIP accepted as emitted, silence rejected"
@@ -86,22 +124,32 @@ if type _skip >/dev/null 2>&1; then _pass "NVC-SKIP-EXPLICIT-HELPER: lib.sh prov
 else _fail "NVC-SKIP-EXPLICIT-HELPER: lib.sh has no _skip, so silence is still the only option"; fi
 
 # --- NVC-INNER-GUARD: the nested run terminates, and this check judges its own file ---
-if have_nvc && [ -f tests/check_96_non_vacuous.sh ]; then
-  ( NVC_INNER=1 timeout 120 bash tests/run.sh ) >/tmp/nvc_inner 2>&1; IRC=$?
+# `timeout` is NOT used: it is absent on macOS, so it exits 127 and the assertion would have
+# passed for an unrelated reason -- the exact shape occurrences 6-8 had. Non-recursion is proved
+# by counting how many times the runner announced its first check: exactly one means no nesting.
+if [ "${NVC_INNER:-0}" = "1" ]; then
+  _skip "NVC-INNER-GUARD: nested run, spawn suppressed by the guard"
+elif have_nvc && [ -f tests/check_96_non_vacuous.sh ]; then
+  ( NVC_INNER=1 bash tests/run.sh ) >/tmp/nvc_inner 2>&1
+  depth=$(grep -c "== tests/check_00_skeleton.sh ==" /tmp/nvc_inner 2>/dev/null || echo 0)
   own=$(bash "$NVC" declarations tests/check_96_non_vacuous.sh 2>/dev/null | wc -l | tr -d ' ')
   seen=0
   for lbl in $(bash "$NVC" declarations tests/check_96_non_vacuous.sh 2>/dev/null | awk '{print $2}'); do
     grep -qE "(PASS|FAIL|SKIP): ${lbl}:" /tmp/nvc_inner && seen=$((seen+1))
   done
+  if [ "${depth:-0}" -eq 1 ] && [ "${own:-0}" -gt 0 ] && [ "${seen:-0}" -eq "${own:-0}" ]; then
+    _pass "NVC-INNER-GUARD: exactly one nested run; all ${own} of this check's own labels emitted in it"
+  else _fail "NVC-INNER-GUARD: recursion or self-exemption (depth=${depth:-0} own=${own:-0} seen=${seen:-0})"; fi
+else
+  _fail "NVC-INNER-GUARD: deliverable absent, nesting unproved"
 fi
-if have_nvc && [ "${IRC:-1}" -ne 124 ] && [ "${own:-0}" -gt 0 ] && [ "${seen:-0}" -eq "${own:-0}" ]; then
-  _pass "NVC-INNER-GUARD: nested run terminates; all ${own} of this check's own labels emitted in it"
-else _fail "NVC-INNER-GUARD: recursion, or the meta-check is not subject to its own rule (own=${own:-0} seen=${seen:-0} rc=${IRC:-absent})"; fi
 
 # --- NVC-RED-SUITE: an unusable run yields no traceability verdict, and names what it ran ---
 R=$(nvcrepo)
-mkcheck "$R/tests/check_f.sh" '# --- SOMETHING: x ---
-_pass "SOMETHING: ok"'
+cat > "$R/tests/check_f.sh" <<'FIXTURE'
+# --- SOMETHING: x ---
+_pass "SOMETHING: ok"
+FIXTURE
 : > "$R/empty.log"
 if have_nvc; then ( cd "$R" && bash "$NVC" traceability --tests tests --output empty.log ) >/tmp/nvc_out 2>&1; RC=$?; fi
 if have_nvc && [ "${RC:-0}" -eq 2 ] && grep -qiE "empty|no output|unusable" /tmp/nvc_out \
@@ -112,8 +160,10 @@ rm -rf "$R"
 
 # --- NVC-SELFSCAN-ASSEMBLED: literal pattern over a self-including target is rejected ---
 R=$(nvcrepo)
-mkcheck "$R/tests/check_g.sh" '# --- SCANNER: looks for a bad word across the suite ---
-if grep -qE "forbidden-literal" tests/check_*.sh; then _fail "SCANNER: found"; else _pass "SCANNER: clean"; fi'
+cat > "$R/tests/check_g.sh" <<'FIXTURE'
+# --- SCANNER: looks for a bad word across the suite ---
+if grep -qE "forbidden-literal" tests/check_*.sh; then _fail "SCANNER: found"; else _pass "SCANNER: clean"; fi
+FIXTURE
 if have_nvc; then ( cd "$R" && bash "$NVC" selfscan --tests tests ) >/tmp/nvc_out 2>&1; RC=$?; fi
 if have_nvc && [ "${RC:-0}" -eq 1 ] && grep -q "check_g" /tmp/nvc_out && grep -q "forbidden-literal" /tmp/nvc_out; then
   _pass "NVC-SELFSCAN-ASSEMBLED: inline literal over a self-including target rejected, both named"
@@ -122,12 +172,14 @@ rm -rf "$R"
 # closed target set that excludes the scanner must NOT be flagged (this is the false positive
 # the rule is designed to avoid -- check_86 in the real suite is exactly this shape)
 R=$(nvcrepo)
-mkcheck "$R/tests/check_h.sh" '# --- CLOSED: greps named files, never itself ---
+cat > "$R/tests/check_h.sh" <<'FIXTURE'
+# --- CLOSED: greps named files, never itself ---
 _P=x
 if grep -q "some_helper" tests/lib.sh && grep -q "some_helper" tests/check_g.sh; then
   _pass "CLOSED: ok"; else _fail "CLOSED: no"; fi
 # --- CLOSED-SELF: assembled-pattern self test ---
-_pass "CLOSED-SELF: ok"'
+_pass "CLOSED-SELF: ok"
+FIXTURE
 if have_nvc; then ( cd "$R" && bash "$NVC" selfscan --tests tests ) >/tmp/nvc_out 2>&1; RC=$?; fi
 if have_nvc && [ "${RC:-1}" -eq 0 ]; then
   _pass "NVC-SELFSCAN-CLOSED: a closed target set excluding the scanner is not flagged"
@@ -136,9 +188,11 @@ rm -rf "$R"
 
 # --- NVC-SELFSCAN-SELFTEST: a self-including scanner with no self-test is rejected ---
 R=$(nvcrepo)
-mkcheck "$R/tests/check_i.sh" '# --- ASSEMBLED: assembles its pattern but declares no self test ---
+cat > "$R/tests/check_i.sh" <<'FIXTURE'
+# --- ASSEMBLED: assembles its pattern but declares no self test ---
 _PAT="forb""idden"
-if grep -qE "$_PAT" tests/check_*.sh; then _fail "ASSEMBLED: found"; else _pass "ASSEMBLED: clean"; fi'
+if grep -qE "$_PAT" tests/check_*.sh; then _fail "ASSEMBLED: found"; else _pass "ASSEMBLED: clean"; fi
+FIXTURE
 if have_nvc; then ( cd "$R" && bash "$NVC" selfscan --tests tests ) >/tmp/nvc_out 2>&1; RC=$?; fi
 if have_nvc && [ "${RC:-0}" -eq 1 ] && grep -q "check_i" /tmp/nvc_out && grep -qi "self.test" /tmp/nvc_out; then
   _pass "NVC-SELFSCAN-SELFTEST: assembled pattern without a self-test rejected"
@@ -155,18 +209,30 @@ else _fail "NVC-FIX-82: check_82 still emits an untraceable dep-free result"; fi
 # NVC-SELFSCAN-CLOSED is the paired positive proving it is not simply always failing.
 if have_nvc; then
   cf=0
-  R=$(nvcrepo); mkcheck "$R/tests/check_j.sh" '# --- ONLY: x ---
-:'; runlog "$R/l" 'nothing'
+  R=$(nvcrepo); cat > "$R/tests/check_j.sh" <<'FIXTURE'
+# --- ONLY: never emits ---
+:
+FIXTURE
+  runlog "$R/l" '== tests/check_j.sh ==
+  PASS: OTHER: unrelated'
   ( cd "$R" && bash "$NVC" traceability --tests tests --output l ) >/dev/null 2>&1; [ $? -eq 1 ] && cf=$((cf+1)); rm -rf "$R"
-  R=$(nvcrepo); mkcheck "$R/tests/check_k.sh" '# --- DUP: x ---
-_pass "DUP: ok"'; mkcheck "$R/tests/check_l.sh" '# --- DUP: y ---
-_pass "DUP: ok"'
+  R=$(nvcrepo); cat > "$R/tests/check_k.sh" <<'FIXTURE'
+# --- DUP: x ---
+_pass "DUP: ok"
+# --- DUP: x again, same file ---
+_pass "DUP: ok"
+FIXTURE
   ( cd "$R" && bash "$NVC" duplicates --tests tests ) >/dev/null 2>&1; [ $? -eq 1 ] && cf=$((cf+1)); rm -rf "$R"
-  R=$(nvcrepo); mkcheck "$R/tests/check_m.sh" '# --- S: x ---
-grep -qE "lit" tests/check_*.sh && _fail "S: a" || _pass "S: b"'
+  R=$(nvcrepo); cat > "$R/tests/check_m.sh" <<'FIXTURE'
+# --- S: x ---
+grep -qE "lit" tests/check_*.sh && _fail "S: a" || _pass "S: b"
+FIXTURE
   ( cd "$R" && bash "$NVC" selfscan --tests tests ) >/dev/null 2>&1; [ $? -eq 1 ] && cf=$((cf+1)); rm -rf "$R"
-  R=$(nvcrepo); mkcheck "$R/tests/check_n.sh" '# --- T: x ---
-_pass "T: ok"'; : > "$R/e"
+  R=$(nvcrepo); cat > "$R/tests/check_n.sh" <<'FIXTURE'
+# --- T: x ---
+_pass "T: ok"
+FIXTURE
+  : > "$R/e"
   ( cd "$R" && bash "$NVC" traceability --tests tests --output e ) >/dev/null 2>&1; [ $? -eq 2 ] && cf=$((cf+1)); rm -rf "$R"
 fi
 if have_nvc && [ "${cf:-0}" -eq 4 ]; then
@@ -197,4 +263,7 @@ if printf '%s\n' "/dev/${_TTY96##*/}" | grep -q "$_TTY96"; then
 else _fail "HERMETIC-ENV-96-SELF: assembled pattern is broken, so the scan above proves nothing"; fi
 
 # --- NVC-SELF: the deliverable exists and is exercised ---
-assert_file "$NVC"
+# Emitted with its label rather than via bare assert_file: an unlabelled result is untraceable,
+# which is the defect this file exists to catch. Dogfooding starts here.
+if [ -f "$NVC" ]; then _pass "NVC-SELF: deliverable present at $NVC"
+else _fail "NVC-SELF: missing deliverable $NVC"; fi
