@@ -85,7 +85,24 @@ only a mechanical check will.
 
 ## 5. Verdict
 
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: pending · coverage: 100% (14/14 deterministic) · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% (14/14 deterministic) · retro: pending
+
+## 4b. UAT — against the brief's objective (2026-08-09)
+
+Vendored onto a clean repository and walked the adopter's real path. **The hole 014 was built to
+close is closed, on a real target rather than on the harness itself**: a one-pin charter that
+`pin-valid` calls VALID now reports `GR1–GR6 uncovered` (exit 1), so `/plan` returns
+`UNCOVERED`. Day-one behaviour from 013 still holds (`empty … run /stack`, exit 3), the
+extension path is documented, and a missing project layer degrades to exit 1 rather than a crash.
+
+**No product gap found.**
+
+The one judgment no check can settle was escalated rather than self-certified: `GR-NO-PRESCRIBE`
+proves no tool is *named*, but cannot prove a question does not *smuggle an answer*. Five of six
+read as neutral; **`GR1` leans** — it asks whether the core is separable from its transport, and
+its `Prevents` argues the asymmetry. **The maintainer ruled it a question; `GR1` stands.** The
+tension is recorded, not resolved: it is the rule nearest the scope edge that `/align` scored at
+3.
 
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/014-ground-rules/retro.md`.

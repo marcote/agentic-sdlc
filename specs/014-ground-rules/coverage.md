@@ -24,20 +24,20 @@ the constitution:**
 
 | Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked test/eval | Status |
 |---|---|---|---|---|---|---|
-| `agnostic-portability` · `frictionless-adoption` | O2 six universal rules, questions not answers | Exactly six ground rules ship, ids GR1–GR6, cap asserted | GR-SIX | project | `check_94_ground_rules.sh` | 🟢 green |
-| `real-enforcement` | O3 coverage mechanically reportable | A pin may declare `Answers: GRn`; an unknown id is rejected | ANSWERS-FIELD | project | `check_94_ground_rules.sh` | 🟢 green |
-| `real-enforcement` · `frictionless-adoption` | O1 · O4 declining stays cheap but expires | `n/a` carries `Because` + `Falsifier`, is not a pin | NA-FORM | `[given] base/audit-logging` | `check_94_ground_rules.sh` | 🟢 green |
-| `real-enforcement` | O3 coverage mechanically reportable | `engine.py ground-rules` emits pin / n/a / uncovered, stable | GR-COVERAGE | project | `check_94_ground_rules.sh` | 🟢 green |
-| `real-enforcement` | O1 a project cannot start below the bar | A `SUPERSEDED` pin does not count as coverage | SUPERSEDED-NOT-COVERAGE | project | `check_94_ground_rules.sh` | 🟢 green |
-| `real-enforcement` · `measurable-impact` | O1 a project cannot start below the bar | `/plan` emits `UNCOVERED` as a fourth verdict, never silence | PLAN-UNCOVERED | project | `check_94_ground_rules.sh` | 🟢 green |
-| `frictionless-adoption` | O2 friction bounded and justified | `/stack` walks all six in Grill | STACK-WALKS-SIX | project | `check_94_ground_rules.sh` | 🟢 green |
-| `frictionless-adoption` · `real-enforcement` | O1 · O2 hard gate, guided fix | Pre-existing charter gets guided migration; no grace period | MIGRATION | project | `check_94_ground_rules.sh` | 🟢 green |
-| `real-enforcement` | O4 floor independent of the rigor tier | `S0` never affects whether a ground rule is answered | GR-FLOOR-NO-SCALE | project | `check_94_ground_rules.sh` | 🟢 green |
-| `agnostic-portability` | O4 the floor is additive only | A project layer may add; omitting a base rule is rejected | GR-ADD-NOT-REMOVE | project | `check_94_ground_rules.sh` | 🟢 green |
-| `real-enforcement` · `measurable-impact` | O5 reflexive dogfood | The harness's own charter resolves all six | CHARTER-COVERED | project | `check_94_ground_rules.sh` | 🟢 green |
-| — | — | The new capability is shell-CLI only, no importable API | ENGINE-CLI-ONLY | `[given]` charter `S2` Hedge | `check_94_ground_rules.sh` | 🟢 green |
-| — | — | `ground-rules.md` names no tool/runtime/vendor in prose | GR-NO-PRESCRIBE | `[given]` charter `S1` Injects | `check_94_ground_rules.sh` + `no-prescribe.sh` | 🟢 green |
-| — | — | Suite builds own fixtures; passes detached-HEAD, no-TTY | HERMETIC-ENV | `[given] base/hermetic-tests` | `check_94_ground_rules.sh` | 🟢 green |
+| `agnostic-portability` · `frictionless-adoption` | O2 six universal rules, questions not answers | Exactly six ground rules ship, ids GR1–GR6, cap asserted | GR-SIX | project | `check_94_ground_rules.sh` | ✅ uat |
+| `real-enforcement` | O3 coverage mechanically reportable | A pin may declare `Answers: GRn`; an unknown id is rejected | ANSWERS-FIELD | project | `check_94_ground_rules.sh` | ✅ uat |
+| `real-enforcement` · `frictionless-adoption` | O1 · O4 declining stays cheap but expires | `n/a` carries `Because` + `Falsifier`, is not a pin | NA-FORM | `[given] base/audit-logging` | `check_94_ground_rules.sh` | ✅ uat |
+| `real-enforcement` | O3 coverage mechanically reportable | `engine.py ground-rules` emits pin / n/a / uncovered, stable | GR-COVERAGE | project | `check_94_ground_rules.sh` | ✅ uat |
+| `real-enforcement` | O1 a project cannot start below the bar | A `SUPERSEDED` pin does not count as coverage | SUPERSEDED-NOT-COVERAGE | project | `check_94_ground_rules.sh` | ✅ uat |
+| `real-enforcement` · `measurable-impact` | O1 a project cannot start below the bar | `/plan` emits `UNCOVERED` as a fourth verdict, never silence | PLAN-UNCOVERED | project | `check_94_ground_rules.sh` | ✅ uat |
+| `frictionless-adoption` | O2 friction bounded and justified | `/stack` walks all six in Grill | STACK-WALKS-SIX | project | `check_94_ground_rules.sh` | ✅ uat |
+| `frictionless-adoption` · `real-enforcement` | O1 · O2 hard gate, guided fix | Pre-existing charter gets guided migration; no grace period | MIGRATION | project | `check_94_ground_rules.sh` | ✅ uat |
+| `real-enforcement` | O4 floor independent of the rigor tier | `S0` never affects whether a ground rule is answered | GR-FLOOR-NO-SCALE | project | `check_94_ground_rules.sh` | ✅ uat |
+| `agnostic-portability` | O4 the floor is additive only | A project layer may add; omitting a base rule is rejected | GR-ADD-NOT-REMOVE | project | `check_94_ground_rules.sh` | ✅ uat |
+| `real-enforcement` · `measurable-impact` | O5 reflexive dogfood | The harness's own charter resolves all six | CHARTER-COVERED | project | `check_94_ground_rules.sh` | ✅ uat |
+| — | — | The new capability is shell-CLI only, no importable API | ENGINE-CLI-ONLY | `[given]` charter `S2` Hedge | `check_94_ground_rules.sh` | ✅ uat |
+| — | — | `ground-rules.md` names no tool/runtime/vendor in prose | GR-NO-PRESCRIBE | `[given]` charter `S1` Injects | `check_94_ground_rules.sh` + `no-prescribe.sh` | ✅ uat |
+| — | — | Suite builds own fixtures; passes detached-HEAD, no-TTY | HERMETIC-ENV | `[given] base/hermetic-tests` | `check_94_ground_rules.sh` | ✅ uat |
 | — | — | External dependency behind an override seam | (hermetic-offline) | `[given] base/hermetic-tests` | — | `deferred` — 014 reaches no network |
 | `real-enforcement` | O3 coverage must mean something | Judge rejects a pin claiming a ground rule it does not answer | JUDGE-GR-ANSWERED | project | `evals/cases/ground-rules-judge.md` | 📋 case |
 | `measurable-impact` | O1 the escape hatch must not become a hole | Judge rejects a false `n/a`, accepts a legitimate one | JUDGE-NA-HONEST | project | `evals/cases/ground-rules-judge.md` | 📋 case |
@@ -136,3 +136,41 @@ for a `SUPERSEDED` trail; that was declined here, because superseding claims a d
 and this one did not — it was under-specified. The clarification is recorded inline instead, with
 its reason. Its `Falsifier` gained a second clause: *any artifact under `base/` stating an answer
 rather than a question.*
+
+**UAT (2026-08-09) — no product gap. The objective is demonstrated end to end.**
+
+Walked against the **objective**, not the spec: vendored onto a clean repository and exercised
+the adopter's real path.
+
+| Walked | Result |
+|---|---|
+| Adopter receives the floor | ✅ `base/ground-rules.md` travels as KEEP with the rest of `base/` |
+| Day one (empty charter) | ✅ `empty: no pins yet — run /stack`, exit 3 — 013's fix still holds |
+| **A one-pin charter no longer passes** | ✅ `pin-valid` says VALID, `ground-rules` reports **GR1–GR6 uncovered, exit 1** → `/plan` returns `UNCOVERED` |
+| The extension path is discoverable | ✅ `base/ground-rules.md` documents adding a project layer, additive only |
+| A missing project layer is tolerated | ✅ engine works on `base/` alone — exit 1 (incomplete), not a crash |
+| No tool named in prose | ✅ `no-prescribe.sh` green on the shipped artifact |
+
+**The exact hole 014 was built to close is closed**, and on a real vendored target rather than
+on the harness itself: a charter that the previous feature called *valid* now cannot reach a
+technical plan while any aspect of the work has no recorded rationale.
+
+**Human judgment on the scope edge — the thing no check can settle.** `GR-NO-PRESCRIBE` proves
+no tool is *named*; it cannot prove a question does not *smuggle an answer*. Audited all six;
+five read as neutral. **`GR1` leans**: it asks whether the core is separable from the way it is
+reached, and its `Prevents` argues that separating costs nothing now while fusing costs a
+rewrite. Two honest readings — an architectural opinion in a question's clothes, or the
+`Prevents` field doing exactly its job by naming the asymmetry that motivated the whole design.
+
+**Ruled by the maintainer: it is a question. `GR1` stands as written.** The reasoning: `Prevents`
+exists to record what the friction buys — without it, the amended `frictionless-adoption` signal
+has nothing to measure — and *"separable or not"* honestly admits *"no, and here is why"*.
+The tension is recorded rather than resolved: `GR1` is the rule closest to the scope edge, and
+if a future reviewer reads it as prescription, this is where that argument starts.
+
+**14 deterministic criteria ✅ uat · coverage 100%.**
+
+**The two `📋 case` rows stay open**, on 013's precedent and for the same reason: scoring
+`JUDGE-GR-ANSWERED` and `JUDGE-NA-HONEST` here would be the authoring model grading its own
+output. `pending-observation` for `/retro`, with the trigger inherited from 013 — the first
+feature whose gate produces a real verdict against pins that predate it.
