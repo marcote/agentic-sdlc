@@ -38,6 +38,7 @@ and reports it for manual merge — it never overwrites your file:
 The harness's own product content, which you do not want:
 `specs/0*-*` (except `_template`), `memory/north-star/decisions/*`,
 `verification/reports/*`, `verification/wow-report.md`, `docs/superpowers/*`,
+`docs/backlog.md` (the harness's own parked findings, not yours),
 `evals/cases/*`, `README.md`, `tests/` (harness self-validation — your runtime is
 `scripts/test.sh`), and the vendoring tooling itself (`scripts/vendor.sh`, `docs/vendoring.md`).
 

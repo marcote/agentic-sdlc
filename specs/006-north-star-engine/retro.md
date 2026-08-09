@@ -11,12 +11,24 @@ Source: `alignment.md` mapping (real-enforcement, frictionless-adoption, agnosti
 | Pillar (mapping) | Predicted signal | Verdict | Evidence (locator MANDATORY) |
 |---|---|---|---|
 | real-enforcement | Gates block closure; harness dogfoods itself (retro ledger) | ✅ moved (dogfood sub-signal) / ⏳ not yet observable (gate-blocking) | RED→GREEN `7968674`→`8bb07f0`; this retro + `verification/reports/006-north-star-engine-8bb07f0.md`; gate-blocking unchanged by design → coverage row `GATE-REGRESSION` ✅ |
-| frictionless-adoption | Steps/time to adopt the harness (lower = better) | ⏳ not yet observable | Precondition met: `scripts/north-star/engine.py` @ `8bb07f0` runs; steps-to-adopt measured in feature 007 |
-| agnostic-portability | The contract stays intact when vendored onto an arbitrary stack | ⏳ not yet observable | `DEP-FREE` ✅ coverage row (engine imports only stdlib) preserves portability; vendored-intact test in feature 007 |
+| frictionless-adoption | Steps/time to adopt the harness (lower = better) | ✅ moved *(closed 2026-08-09)* | `vendor.sh --apply` onto a fresh repo lands `scripts/north-star/engine.py` as KEEP and produces **0 `.harness-new` files** — zero adopter wiring — and the engine executes in the target untouched. Re-verified today; the vendoring path itself shipped at `58f43c0` (007) |
+| agnostic-portability | The contract stays intact when vendored onto an arbitrary stack | ✅ moved *(closed 2026-08-09)* | Closed by feature 012 against a **real repository** (`2602a36`), and re-confirmed since on every vendoring run in 013 and 014 (`VENDOR-STACK` ✅ uat). `DEP-FREE` still holds: stdlib only |
 
 - **Align calibration:** pillarFit 4 held (the engine cleanly serves the mapped pillars); scopeCompliance 3 held — the batteries-included call was validated in UAT (the engine runs on the real `north-star.md`); missionAdvancement 4 was **slightly optimistic** — for 2 of 3 pillars the signal is only observable once feature 007 vendors the engine, so a 3 would have been better calibrated.
-- **Mission verdict:** pending-observation
-  - **re-check trigger:** feature 007 (vendoring) — measure frictionless-adoption (engine copied as KEEP with zero adopter wiring) and agnostic-portability (contract intact when vendored). real-enforcement's dogfood sub-signal is already ✅ moved (this retro + the verified RED→GREEN chain); its gate-blocking sub-signal is unchanged by design (`GATE-REGRESSION`, a refactor not a behavior change).
+- **Mission verdict:** confirmed *(closed 2026-08-09; `pending-observation` from 2026-07-05)*
+  - **Original re-check trigger:** feature 007 (vendoring) — measure frictionless-adoption
+    (engine copied as KEEP with zero adopter wiring) and agnostic-portability (contract intact
+    when vendored). real-enforcement's dogfood sub-signal was already ✅ moved; its gate-blocking
+    sub-signal is unchanged by design (`GATE-REGRESSION`, a refactor not a behavior change).
+  - **Closure:** both signals moved, evidence in the rows above. The trigger **fired on
+    2026-07-05** when 007 merged (`58f43c0`), and the agnostic-portability half was explicitly
+    re-checked by 012 (`2602a36`) — but **the verdict here was never updated, so the ledger read
+    `pending-observation` for 35 days after the evidence existed.**
+  - **What that exposes, and it is worth more than this closure:** `pending-observation` had no
+    owner and no due date. `wow-report` §2 exists to list overdue re-checks and was never run
+    across eight features. A deferral mechanism nobody sweeps is a way of losing findings while
+    appearing rigorous — and this retro is the proof, because the verdict it deferred was
+    already true a month before anyone looked.
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts
 - **Gaps caught by /distill:** 3 grilling ambiguities (boundary, scope-reject algorithm, CLI error contract) + 5 edge cases `[deriv: spec.md "Edge cases" + coverage rows SCHEMA-MALFORMED / SETS-ORDER-AGNOSTIC / SCOPE-NORMALIZE / VERDICT precedence / ADR-ABSENT; git ed5ce11]` — the notable one: malformed (exit 2) must never collapse into schema-invalid (exit 1).

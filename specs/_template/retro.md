@@ -17,6 +17,9 @@ Source: `specs/<feature>/alignment.md` (objective→pillar mapping) + `north-sta
 - **Mission verdict:** <confirmed | refuted | pending-observation | n/a>
   - if `confirmed`/`refuted` → the Evidence cell(s) above CANNOT be empty.
   - if `pending-observation` → **re-check trigger:** <when / what signal to look at>
+    · **sweep by:** <YYYY-MM-DD — a date, not only an event. Whichever comes first.>
+    A deferral with no date is how a finding is lost while the ledger still looks rigorous:
+    feature 006 sat `pending-observation` for 35 days after its evidence already existed.
   - if `n/a` → **reason:** <why this feature does not close against any signal>
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
