@@ -10,27 +10,30 @@
 
 | Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked test/eval | Status |
 |---|---|---|---|---|---|---|
-| `real-enforcement` | O1 mechanical half of the gate | R2 emission verification | NVC-DECLARED-EMITTED | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O1 mechanical half of the gate | R1 declaration parsing | NVC-DECLARE-FORMS | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement`, `measurable-impact` | O2 traceability, zero false positives | R2 · D-a | NVC-ZERO-FP | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O2 traceability | R4 label uniqueness | NVC-LABEL-UNIQUE | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O2 traceability | R3 explicit skip | NVC-SKIP-EXPLICIT | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O1 · `D4` gate bootstrap | R5 recursion guard, self-subjection | NVC-INNER-GUARD | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O1 mechanical half of the gate | R6 fail closed on unusable run | NVC-RED-SUITE | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O3 constrain self-scanning checks | R7 · D-b | NVC-SELFSCAN-ASSEMBLED | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O3 constrain self-scanning checks | R7 · D-b | NVC-SELFSCAN-SELFTEST | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement`, `measurable-impact` | O5 run against the standing suite, fix what it flags | R8 | NVC-FIX-82 | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O4 proved non-vacuous | R1–R7 negative fixtures | NVC-CAN-FAIL | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement` | O1 mechanical half of the gate | `S3` shell + coreutils | NVC-DEPFREE | project | `tests/check_96_non_vacuous.sh` | no contract |
-| `real-enforcement`, `measurable-impact` | O5 state the scope split | R9 | NVC-SCOPE-STATED | project | `tests/check_96_non_vacuous.sh` | no contract |
+| `real-enforcement` | O1 mechanical half of the gate | R2 emission verification | NVC-DECLARED-EMITTED | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O1 mechanical half of the gate | R1 declaration parsing | NVC-DECLARE-FORMS | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement`, `measurable-impact` | O2 traceability, zero false positives | R2 · D-a | NVC-ZERO-FP | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O2 traceability | R4 label uniqueness | NVC-LABEL-UNIQUE | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O2 traceability | R3 explicit skip | NVC-SKIP-EXPLICIT | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O1 · `D4` gate bootstrap | R5 recursion guard, self-subjection | NVC-INNER-GUARD | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O1 mechanical half of the gate | R6 fail closed on unusable run | NVC-RED-SUITE | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O3 constrain self-scanning checks | R7 · D-b | NVC-SELFSCAN-ASSEMBLED | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O3 constrain self-scanning checks | R7 · D-b | NVC-SELFSCAN-SELFTEST | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement`, `measurable-impact` | O5 run against the standing suite, fix what it flags | R8 | NVC-FIX-82 | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O4 proved non-vacuous | R1–R7 negative fixtures | NVC-CAN-FAIL | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O1 mechanical half of the gate | `S3` shell + coreutils | NVC-DEPFREE | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement`, `measurable-impact` | O5 state the scope split | R9 | NVC-SCOPE-STATED | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
 | `real-enforcement`, `measurable-impact` | O5 state the scope split | R9 | JUDGE-SCOPE-HONEST | project | `evals/cases/non-vacuous-scope-judge.md` | 📋 case |
-| `agnostic-portability` | — | hermetic under CI conditions | hermetic-env | `[given] base/hermetic-tests` | `tests/check_96_non_vacuous.sh` | no contract |
+| `real-enforcement` | O2 traceability | R3 explicit skip | NVC-SKIP-EXPLICIT-HELPER | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `real-enforcement` | O3 constrain self-scanning checks | R7 · D-b (the false positive to avoid) | NVC-SELFSCAN-CLOSED | project | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `agnostic-portability` | — | hermetic under CI conditions | HERMETIC-ENV-96 | `[given] base/hermetic-tests` | `tests/check_96_non_vacuous.sh` | 🔴 red |
+| `agnostic-portability` | — | the hermetic scan's own pattern is not vacuous | HERMETIC-ENV-96-SELF | `[given] base/non-vacuous-checks` | `tests/check_96_non_vacuous.sh` | 🟢 green |
 | — | — | no network or remote source reached | hermetic-offline | `[given] base/hermetic-tests` | — | deferred |
-| `real-enforcement` | O4 proved non-vacuous | R1–R7 negative fixtures | check-can-fail | `[given] base/non-vacuous-checks` | → NVC-CAN-FAIL | no contract |
-| `real-enforcement` | O2 traceability | R2 emission verification | check-traceable | `[given] base/non-vacuous-checks` | → NVC-DECLARED-EMITTED | no contract |
-| `real-enforcement` | O1 mechanical half of the gate | R7 rejection names the file and literal | check-rejects-by-diagnostic | `[given] base/non-vacuous-checks` | → NVC-SELFSCAN-ASSEMBLED | no contract |
-| `real-enforcement` | O3 constrain self-scanning checks | R7 · D-b | check-no-self-match | `[given] base/non-vacuous-checks` | → NVC-SELFSCAN-SELFTEST | no contract |
-| `real-enforcement` | O1 · O5 | R6 names what it executed | check-names-its-tree | `[given] base/non-vacuous-checks` | → NVC-RED-SUITE | no contract |
+| `real-enforcement` | O4 proved non-vacuous | R1–R7 negative fixtures | check-can-fail | `[given] base/non-vacuous-checks` | → NVC-CAN-FAIL | 🔴 red |
+| `real-enforcement` | O2 traceability | R2 emission verification | check-traceable | `[given] base/non-vacuous-checks` | → NVC-DECLARED-EMITTED | 🔴 red |
+| `real-enforcement` | O1 mechanical half of the gate | R7 rejection names the file and literal | check-rejects-by-diagnostic | `[given] base/non-vacuous-checks` | → NVC-SELFSCAN-ASSEMBLED | 🔴 red |
+| `real-enforcement` | O3 constrain self-scanning checks | R7 · D-b | check-no-self-match | `[given] base/non-vacuous-checks` | → NVC-SELFSCAN-SELFTEST | 🔴 red |
+| `real-enforcement` | O1 · O5 | R6 names what it executed | check-names-its-tree | `[given] base/non-vacuous-checks` | → NVC-RED-SUITE | 🔴 red |
 | — | — | `S1` no tool/language/runtime named as a default in `memory/stack/base/` prose | S1-NO-PRESCRIBE | `[given] stack/S1 Injects` | — | deferred |
 | — | — | `S2` engine reachable only via a documented shell CLI | S2-HEDGE | `[given] stack/S2 Hedge` | — | deferred |
 
@@ -64,3 +67,15 @@ delivered check's *behaviour on fixtures*, not against this table.
 Pending — filled at `/uat`. Every row must reach `✅ uat` except the `deferred` ones,
 whose reasons are recorded above, and `JUDGE-SCOPE-HONEST`, which stays `📋 case` unless an
 independent judge scores it.
+
+## RED state (`/contract`, 2f95fb3 → contract)
+
+Suite **386 PASS / 17 FAIL**. All 17 assertions touching a 015 artifact are 🔴 against an absent
+`scripts/nvc.sh`.
+
+**One assertion passes at RED, by design and documented here rather than discovered later:**
+`HERMETIC-ENV-96-SELF` proves that `HERMETIC-ENV-96`'s runtime-assembled pattern actually matches
+a genuine occurrence. It is a non-vacuity self-test of a *scan*, not of the deliverable, so it has
+no red state — the same documented exception 013 and 014 recorded for their own self-tests. Its
+value is precisely that it would fail if the assembled pattern were broken, which is the failure
+mode that made `HERMETIC-ENV` vacuous in 013.

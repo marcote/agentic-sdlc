@@ -126,9 +126,17 @@ conditions, all four discharged here:
 
 ## Components
 
+> **Deviation, recorded at `/contract` before any code.** This table originally put the scanner
+> *inside* `tests/check_96_non_vacuous.sh`. That is not contractable: a check file cannot go 🔴 RED
+> against itself, so every criterion would have been green-by-construction — the exact failure
+> `base/principles.md` names. The scanner moves to `scripts/nvc.sh` and the check exercises it,
+> which is also the shape every other feature here already uses (`status.sh` × `check_86`,
+> `engine.py` × `check_82`). The brief's "no new command" holds: nothing new for a human to run.
+
 | Unit | Responsibility | Interface |
 |---|---|---|
-| `tests/check_96_non_vacuous.sh` | declaration parse · inner run · emission cross-reference · self-scan rule | sourced by `run.sh`; emits `_pass`/`_fail`/`_skip` |
+| `scripts/nvc.sh` | **deliverable.** declaration parse · emission cross-reference · duplicate labels · self-scan rule | shell CLI, subcommands, exit 0 clean / 1 violations / 2 unusable |
+| `tests/check_96_non_vacuous.sh` | exercises `nvc.sh` against negative fixtures and against the standing suite | sourced by `run.sh`; emits `_pass`/`_fail`/`_skip` |
 | `tests/lib.sh` `_skip()` | third outcome so silence is never valid | `_skip "LABEL: reason"` |
 | guard variable | suppresses only the spawn step in the inner run | env var read by `check_96` |
 | `tests/check_82_north_star_engine.sh` | `DEP-FREE` gains its label (R8) | `assert_dep_free "$ENG" "DEP-FREE"` |
