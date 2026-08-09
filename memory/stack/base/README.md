@@ -83,6 +83,18 @@ One mode of operation, calibrated. Full coverage of three criteria is not theate
 feature was small. If the tier could switch these off, *non-negotiable* would mean
 *non-negotiable except when not*, and the constitution would stop working as a filter.
 
+## The ground rules — the coverage floor
+
+`ground-rules.md` holds the **floor of the charter**: aspects that must have a recorded
+rationale before implementation begins. Each is answered by a pin declaring `Answers: GR<n>`, or
+declined with an `n/a` block carrying `Because` + `Falsifier`. `/plan` refuses to proceed while
+any ground rule lacks a verdict (`UNCOVERED`).
+
+A ground rule names a **question**, never an answer — which is what lets the floor be universal
+without imposing anything. `S0` scales how deep an answer goes and how many pins exist beyond
+the floor; it never scales whether a ground rule is answered. Read the file itself for the six
+and for how to extend the set (additive only).
+
 ## The floor does not scale at all
 
 Some rules hold identically at every tier, including the most disposable one. They are **not

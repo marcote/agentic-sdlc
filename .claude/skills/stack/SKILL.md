@@ -50,6 +50,40 @@ know, but they do know facts from which it follows:
 
 You perform the translation domain → non-functional requirement → pin.
 
+### 3b. Walk the six ground rules — the floor
+`memory/stack/base/ground-rules.md` (plus any project layer) defines the **floor of the
+charter**: aspects that must have a recorded rationale before implementation begins. Walk them
+explicitly, by id, so the default path produces a covered charter instead of one that trips
+`/plan`'s `UNCOVERED` verdict later:
+
+- **`GR1` Consumption** — how does anything outside reach this, and is the core separable from
+  the way it is reached?
+- **`GR2` Persistence and concurrency** — what holds state, and how many things write to it at
+  once?
+- **`GR3` Deployment and topology** — where does it run, and in how many instances?
+- **`GR4` Language, runtime and execution** — what is it written in, which version, how are
+  dependencies declared, and how is it run?
+- **`GR5` What "verified" means** — what does the verification command exercise, and what does a
+  passing run prove?
+- **`GR6` Failure posture** — when it breaks: retry, corrupt, alert, or continue silently?
+
+Each resolves to a pin declaring `Answers: GR<n>`, or to a declination (`### GR<n> — n/a` with
+`Because` + `Falsifier`). Declining is legitimate and cheap — but a decline that is *convenient*
+rather than *true* is a defect, not a shortcut, and it is the easiest way to defeat the floor
+without appearing to.
+
+The floor does **not** scale with `S0`. At the most disposable tier the answers get shorter and
+more of them are declines; the questions still get asked.
+
+### 3c. Migrate a charter that predates the floor
+On a charter below coverage — which is every charter written before the ground rules existed —
+do not simply report `UNCOVERED`. Read the existing pins and **propose which one answers which
+rule**, then ask where an `n/a` belongs. The gate itself does not soften; the migration is what
+makes a hard gate justified friction rather than a wall.
+
+Verify with `python3 scripts/stack/engine.py ground-rules memory/stack/stack.md` before
+finishing: exit 0 means covered, exit 1 lists what is still open.
+
 ### 4. "I don't know" is a valid answer
 It produces `Confidence: PROVISIONAL` plus a **mandatory** `Hedge`, and never blocks. If not
 knowing blocked the interview, the human would invent an answer to get through it.

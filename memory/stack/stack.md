@@ -13,7 +13,7 @@ extends: base
 > harness; the pins below are ours and do not.
 
 <!-- generated: python3 scripts/stack/engine.py exposure memory/stack/stack.md -->
-5 pins · 4 PINNED · 1 PROVISIONAL
+9 pins · 8 PINNED · 1 PROVISIONAL
 Exposure: S2 Reference deterministic engines written in python3
 
 ---
@@ -32,16 +32,22 @@ Exposure: S2 Reference deterministic engines written in python3
 - Falsifier:  the harness stops being consumed by anyone other than the author, or stops
               writing into other people's repositories.
 
-### S1 — Impose no runtime: the harness ships mechanism, never opinions   [stance]
+### S1 — Impose no answers: mechanism and a floor of questions, never answers   [stance]
 - Confidence: PINNED
 - Because:    the North Star names "imposing or naming a mandatory execution runtime" as an
               out-of-scope predicate, and `agnostic-portability` is measured by the contract
-              surviving a vendoring onto an arbitrary repo and stack.
+              surviving a vendoring onto an arbitrary repo and stack. *Wording sharpened by
+              feature 014, which ships six mandatory ground rules: the original text said
+              "never opinions", which no longer described the harness. Not marked SUPERSEDED —
+              the decision did not change, it was under-specified. A required question is
+              mechanism; a prescribed answer is an opinion. That line is the whole distinction
+              this harness stands on.*
 - Buys:       an adopter's own technical opinions become enforceable checks without inheriting
               ours; the intake gate keeps scoring in-scope.
 - Forecloses: shipping ready-made guards for common stances, which would be immediately useful
               and immediately a prescription.
-- Falsifier:  a deliberate, ADR-backed decision that the harness targets one ecosystem.
+- Falsifier:  a deliberate, ADR-backed decision that the harness targets one ecosystem, or
+              any artifact under `base/` stating an answer rather than a question.
 - Guard:      bash scripts/guards/no-prescribe.sh
 - Injects:    [given] no artifact under `memory/stack/base/` names a tool, language, runtime or
               vendor as a default in prose; concrete names appear only inside fenced examples.
@@ -58,6 +64,7 @@ Exposure: S2 Reference deterministic engines written in python3
 - Falsifier:  the reference engines start being read as a *requirement* rather than a
               convenience — e.g. an adopter reports the harness "needs" this interpreter, or
               the intake gate scores the hosting against the out-of-scope runtime predicate.
+- Answers:    GR4
 - Hedge:      every engine is reachable only through a documented shell-level CLI contract
               (subcommands, exit codes, stdout payload) with no importable API, so a
               reimplementation in another stack is drop-in and no caller has to change. This
@@ -74,6 +81,7 @@ Exposure: S2 Reference deterministic engines written in python3
               including ones that would make the checks considerably shorter to write.
 - Falsifier:  a gate that cannot be expressed within this baseline without becoming
               unmaintainable, established by attempting it rather than by predicting it.
+- Answers:    GR4
 
 ### S4 — Charter format: one line-oriented markdown file            [substrate]
 - Confidence: PINNED
@@ -87,3 +95,64 @@ Exposure: S2 Reference deterministic engines written in python3
               be flattened into prose.
 - Falsifier:  a field genuinely needs structure that flattening destroys — e.g. a `Guard` that
               must be an argument vector rather than a single shell string.
+
+### S5 — Delivery: vendored files executed in place                 [substrate]
+- Confidence: PINNED
+- Because:    answering GR1 and GR3 together, because vendoring settles both. The harness
+              reaches its users by being **copied into their repository** (`vendor.sh`,
+              `bootstrap.sh`) and runs there — on a developer machine and in that repo's CI.
+              It is not installed, not hosted, and not a service; there is no instance count
+              because there is no deployment, only as many copies as there are clones. The
+              engines are reachable as shell commands and the skills are prose that calls
+              them, so the core is separable from the way it is reached.
+- Buys:       adoption with nothing to install; each repo owns its copy and can diverge; the
+              engines stay usable without the agent.
+- Forecloses: pushing an update to existing adopters — copy-once means they re-vendor
+              deliberately or not at all; and any capability that would need a running
+              process.
+- Falsifier:  a capability that cannot work as files-in-a-repo — anything needing a daemon,
+              a registry, or cross-repo state at runtime.
+- Answers:    GR1, GR3
+
+### S6 — State lives in versioned markdown; git is the concurrency control  [substrate]
+- Confidence: PINNED
+- Because:    answering GR2. Every artifact the workflow reads or writes — charter, coverage,
+              specs, reports, retros — is a markdown file in the repository. There is no
+              database, no state file and no lock: the writer is one developer-plus-agent at a
+              time, and concurrent edits are resolved by git the way any other file conflict is.
+- Buys:       every state change is reviewable in a diff and recoverable from history, which is
+              what makes Principle 5 (auditable trail) hold without extra machinery.
+- Forecloses: any workflow step needing atomic multi-file transactions or safe simultaneous
+              writers; and querying state without parsing files.
+- Falsifier:  two agents writing the same feature's artifacts concurrently as a normal mode of
+              work rather than an accident.
+- Answers:    GR2
+
+### S7 — Green proves the harness's machinery, never a product        [substrate]
+- Confidence: PINNED
+- Because:    answering GR5. `tests/run.sh` exercises this repository's **own** governance
+              artifacts — that files and contracts exist, that the engines behave on fixtures,
+              that gates block what they claim to block. It asserts nothing about an adopting
+              project's code, and it cannot: the harness never sees it.
+- Buys:       a suite that runs anywhere with no product context, and a green that means one
+              precise thing instead of an unstated mixture.
+- Forecloses: using this suite as evidence that an adopter's product works — that is the
+              adopter's own `scripts/test.sh`, and conflating the two would be the exact
+              unstated-meaning failure GR5 exists to prevent.
+- Falsifier:  a check lands here that asserts something about product code rather than about
+              the harness.
+- Answers:    GR5
+
+### S8 — Failure posture: fail closed, write nothing, never partially apply  [substrate]
+- Confidence: PINNED
+- Because:    answering GR6. Established by practice across 007, 009 and 013 and never written
+              down until now: `vendor.sh` prints its plan before touching anything,
+              `bootstrap.sh` aborts rather than applying blind without consent, and every gate
+              refuses rather than continuing on missing input. Nothing retries, nothing
+              half-applies, and nothing continues silently.
+- Buys:       an aborted run leaves the target byte-for-byte unchanged, so the recovery from
+              any failure is to re-run it.
+- Forecloses: best-effort partial progress, and any long operation that would need resumption
+              from a checkpoint.
+- Falsifier:  an operation whose partial application is genuinely more useful than its refusal.
+- Answers:    GR6
