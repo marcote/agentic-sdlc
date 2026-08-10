@@ -216,6 +216,39 @@ asks whether an assertion *can* fail; this asks whether it *exercised what it cl
 what failed three times. It ships as a `[given]` row only together with an obvious mechanical form;
 until one exists it lives here, where an unimplemented rule is honest instead of decorative.
 
+## B12 — `since` is unvalidated when a repository has no `decisions/` directory
+
+**Status:** open · **Raised:** 2026-08-09 (018 `/distill`) · **Size:** small
+
+`_adr_ids()` returns `None` when `decisions/` cannot be listed, and the caller then skips the
+resolution check entirely. A North Star whose pillar claims `"since": "9999"` validates at exit 0,
+provided the directory is absent rather than empty.
+
+That is the from-zero shape: an adopter seeds a North Star before writing any ADR. 016 shipped
+`NS-SINCE-RESOLVES` for the case where `decisions/` exists and the id is not in it.
+
+**Not widened into 018.** The fixture ships one ADR, so this feature never reaches the path, and
+016's own spec may have intended the allowance. Deciding that needs its own reading.
+
+## B13 — Does `/tasks` earn its place when `coverage.md` is already the work-list?
+
+**Status:** open · **Raised:** 2026-08-09 (018 `/verify`) · **Size:** small
+
+018 implemented straight from `coverage.md` and wrote `tasks.md` afterwards. The question is not
+whether that run was sloppy; it is whether the artifact adds anything once `/distill` has frozen a
+traced criterion matrix.
+
+**Evidence both ways.** 017's `tasks.md` is five headings that restate its coverage rows. 013's and
+014's are seven kilobytes each and did sequence real work — both were features that changed a
+schema every adopter inherits.
+
+Under the amended `frictionless-adoption` signal (ADR `0004`) a mandatory step whose value is
+already delivered elsewhere is friction without a justification. The honest options are to scope
+`/tasks` to features above some size, or to keep it and say what it buys that coverage does not.
+
+Do not resolve this by deleting the step. Resolve it by measuring which features' task lists
+sequenced anything the coverage matrix did not.
+
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_

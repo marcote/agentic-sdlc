@@ -9,7 +9,8 @@ Deterministic capabilities over a project's stack charter (memory/stack/stack.md
   exposure FILE      the charter's exposure header — counts by Confidence plus the
                      ids you are exposed on. Byte-stable across runs.
   ground-rules FILE  coverage of the ground rules (memory/stack/base/ground-rules.md plus
-                     any project layer, overridable with repeatable --rules): one line per
+                     any project layer, resolved from the CHARTER's own directory upward and
+                     overridable with repeatable --rules): one line per
                      rule, "GR<n>: pin <id>" / "n/a" / "uncovered". A SUPERSEDED pin does
                      not count -- history is not a rationale.
   guards FILE        one Guard command per line, for /verify to execute. ANY pin kind may
@@ -184,12 +185,39 @@ def _blocks(path, head_re):
     return out
 
 
-def _effective_rules(paths):
+def _default_rule_paths(charter):
+    """Locate the ground rule layers for a charter, resolving from the CHARTER's own directory
+    upward -- the rule scripts/north-star/engine.py already uses for decisions/ (_adr_ids).
+
+    Resolving against the process cwd instead was a real defect, found at 018's /distill by
+    pointing the gate at a vendored target: `ground-rules TARGET/memory/stack/stack.md` reported
+    `no ground rule file found` for a file sitting right beside the charter. In this repository
+    cwd and artifact always coincided, so three features never saw it.
+
+    cwd stays as the last resort, which keeps every existing caller byte-identical: a charter
+    fixture in a temp directory still finds this repository's rules, as it did before.
+    """
+    roots, d = [], os.path.dirname(os.path.abspath(charter)) or os.getcwd()
+    while True:
+        roots.append(d)
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    roots.append(os.getcwd())
+    for r in roots:
+        base = os.path.join(r, "memory", "stack", "base", "ground-rules.md")
+        if os.path.exists(base):
+            layer = os.path.join(r, "memory", "stack", "ground-rules.md")
+            return [base] + ([layer] if os.path.exists(layer) else [])
+    return []
+
+
+def _effective_rules(paths, charter=None):
     """Assemble the effective ground rule set. Additive only: a layer omitting a base rule
     is rejected, because the auditable escape is a declination, not removal."""
     if not paths:
-        paths = ["memory/stack/base/ground-rules.md", "memory/stack/ground-rules.md"]
-        paths = [p for p in paths if os.path.exists(p)]
+        paths = _default_rule_paths(charter) if charter else []
     if not paths:
         raise Malformed("no ground rule file found")
     base = [b["id"] for b in _blocks(paths[0], _RULE)]
@@ -273,7 +301,7 @@ def cmd_exposure(args):
 
 
 def cmd_ground_rules(args):
-    rules = _effective_rules(args.rules)
+    rules = _effective_rules(args.rules, args.file)
     try:
         pins = _parse(args.file)
     except Empty:
