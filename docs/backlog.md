@@ -187,6 +187,20 @@ prose. Three proposals, three recurrences. It waits here for a mechanical form o
 artifacts* — the class all three failures belong to. Distinguishing that from a rhetorical count
 is the unsolved part.
 
+## B11 — A gate that selects its own inputs by string format can be opted out of by typo
+
+**Status:** open · **Raised:** 2026-08-09 (017) · **Size:** small
+
+`check_90` judges only features whose report reads DONE, detected by matching `BUILD: ✅`. 017's
+report said `BUILD ✅`. The gate never evaluated its retro, `status.sh` reported the feature
+unverified, and it merged that way. Fixing one character moved the suite from 450 to 454.
+
+`VERDICT-FORMAT` now asserts every report parses, which closes this instance. The general shape is
+open: **several gates select their inputs by matching text in the artifact they judge.** A typo
+does not fail them — it removes the artifact from their scope, silently.
+
+Same family as B9, and the same reason it matters: the failure looks like success.
+
 ## B5 — "Reports clean" must mean every rule ran
 
 **Status:** open · **Raised:** 2026-08-09 (015 `/uat`) · **Size:** small
