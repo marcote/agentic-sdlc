@@ -55,3 +55,7 @@ extends: base
 - Forecloses: streaming or progressive results.
 - Falsifier:  a consumer needs partial output more than it needs a trustworthy one.
 - Answers:    GR6
+
+### GR7 — n/a
+- Because:   input arrives on stdin from whoever ran the command; there is no producer to trust
+- Falsifier: the tool reads from anywhere it did not receive on stdin

@@ -97,29 +97,47 @@ else
   _fail "ADOPT-NS-VALID: exit $a98_nsrc on the fixture North Star: $(head -1 /tmp/a98_ns)"
 fi
 
-# --- ADOPT-GR-COVERED: run from inside the target, all six rules have a verdict ---
+# The fixture extends the base six with its own rule layer, so the effective set it must be
+# judged against is NOT this repository's. Both numbers are derived from the target.
+a98_ids_in(){ grep -hoE '^### GR[0-9]+' "$@" 2>/dev/null | awk '{print $2}' | LC_ALL=C sort -u; }
+a98_eff=$(a98_ids_in "$A98_T/memory/stack/base/ground-rules.md" \
+                     "$A98_T/memory/stack/ground-rules.md" | grep -c .)
+a98_extra=$(comm -13 <(a98_ids_in "$A98_T/memory/stack/base/ground-rules.md") \
+                     <(a98_ids_in "$A98_T/memory/stack/ground-rules.md") | head -1)
+
+# --- ADOPT-GR-COVERED: run from inside the target, every effective rule has a verdict ---
 A98_GR_IN=$( cd "$A98_T" 2>/dev/null && python3 scripts/stack/engine.py ground-rules memory/stack/stack.md 2>&1 )
 a98_grin_rc=$?
 a98_n=$(printf '%s\n' "$A98_GR_IN" | grep -cE '^GR[0-9]+: ')
-if a98_have && [ "$a98_grin_rc" -eq 0 ] && [ "$a98_n" -eq 6 ] \
+if a98_have && [ "$a98_grin_rc" -eq 0 ] && [ "${a98_eff:-0}" -ge 7 ] && [ "$a98_n" -eq "$a98_eff" ] \
    && ! printf '%s' "$A98_GR_IN" | grep -q 'uncovered'; then
-  _pass "ADOPT-GR-COVERED: six verdicts, none uncovered, from inside $A98_T"
+  _pass "ADOPT-GR-COVERED: $a98_n verdicts for $a98_eff effective rules, none uncovered, from inside $A98_T"
 else
-  _fail "ADOPT-GR-COVERED: rc=$a98_grin_rc, $a98_n verdict(s) from inside $A98_T: $(printf '%s' "$A98_GR_IN" | head -1)"
+  _fail "ADOPT-GR-COVERED: rc=$a98_grin_rc, $a98_n of $a98_eff verdict(s) from inside $A98_T: $(printf '%s' "$A98_GR_IN" | head -1)"
 fi
 
 # --- ADOPT-REL-RESOLUTION: companion files resolve from the artifact, not the process cwd ---
 # Found at /distill: the stack engine resolved the ground rule file against cwd while the North
-# Star engine resolves decisions/ against the artifact. Only a foreign cwd tells them apart.
-A98_GR_OUT=$(python3 "$A98_SE" ground-rules "$A98_T/memory/stack/stack.md" 2>&1); a98_grout_rc=$?
+# Star engine resolves decisions/ against the artifact.
+#
+# The first version of this criterion was VACUOUS and mutation testing proved it. Comparing the
+# run from this repository's root against the run from inside the target could not discriminate:
+# `base/` is KEEP, so both trees carry the SAME six rules, and cwd-resolution produced identical
+# output. It discriminates only on something the target has and we do not — the fixture's own
+# rule layer — and from a cwd that owns no rules at all.
+A98_N=$(a98_mk); A98_SEABS="$PWD/$A98_SE"
+A98_GR_OUT=$( cd "$A98_N" && python3 "$A98_SEABS" ground-rules "$A98_T/memory/stack/stack.md" 2>&1 )
+a98_grout_rc=$?
 A98_GR_EXP=$(python3 "$A98_SE" ground-rules --rules "$A98_T/memory/stack/base/ground-rules.md" \
-             "$A98_T/memory/stack/stack.md" 2>&1)
-if a98_have && [ "$a98_grout_rc" -eq 0 ] && [ "$A98_GR_OUT" = "$A98_GR_IN" ] \
-   && [ "$A98_GR_EXP" = "$A98_GR_IN" ]; then
-  _pass "ADOPT-REL-RESOLUTION: same six verdicts from $PWD as from inside $A98_T; explicit --rules still wins"
+             --rules "$A98_T/memory/stack/ground-rules.md" "$A98_T/memory/stack/stack.md" 2>&1)
+if a98_have && [ -n "${a98_extra:-}" ] && [ "$a98_grout_rc" -eq 0 ] \
+   && [ "$A98_GR_OUT" = "$A98_GR_IN" ] && [ "$A98_GR_EXP" = "$A98_GR_IN" ] \
+   && printf '%s' "$A98_GR_OUT" | grep -qE "^$a98_extra: "; then
+  _pass "ADOPT-REL-RESOLUTION: from a cwd owning no rules ($A98_N), the gate still judged $A98_T by its own set, including $a98_extra; explicit --rules still wins"
 else
-  _fail "ADOPT-REL-RESOLUTION: rc=$a98_grout_rc from a foreign cwd: $(printf '%s' "$A98_GR_OUT" | head -1)"
+  _fail "ADOPT-REL-RESOLUTION: rc=$a98_grout_rc from a rule-less cwd, extra rule '${a98_extra:-none}': $(printf '%s' "$A98_GR_OUT" | head -1)"
 fi
+rm -rf "$A98_N"
 
 # --- ADOPT-GUARD-BY-NAME: guards are executed as the string the engine emitted ---
 # The harness must not know what a guard checks. Proof: the guard's own name, read from the
