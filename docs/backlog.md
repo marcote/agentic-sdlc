@@ -216,6 +216,20 @@ asks whether an assertion *can* fail; this asks whether it *exercised what it cl
 what failed three times. It ships as a `[given]` row only together with an obvious mechanical form;
 until one exists it lives here, where an unimplemented rule is honest instead of decorative.
 
+## B12 — `since` is unvalidated when a repository has no `decisions/` directory
+
+**Status:** open · **Raised:** 2026-08-09 (018 `/distill`) · **Size:** small
+
+`_adr_ids()` returns `None` when `decisions/` cannot be listed, and the caller then skips the
+resolution check entirely. A North Star whose pillar claims `"since": "9999"` validates at exit 0,
+provided the directory is absent rather than empty.
+
+That is the from-zero shape: an adopter seeds a North Star before writing any ADR. 016 shipped
+`NS-SINCE-RESOLVES` for the case where `decisions/` exists and the id is not in it.
+
+**Not widened into 018.** The fixture ships one ADR, so this feature never reaches the path, and
+016's own spec may have intended the allowance. Deciding that needs its own reading.
+
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_
