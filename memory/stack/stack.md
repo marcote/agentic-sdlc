@@ -13,8 +13,8 @@ extends: base
 > harness; the pins below are ours and do not.
 
 <!-- generated: python3 scripts/stack/engine.py exposure memory/stack/stack.md -->
-9 pins · 8 PINNED · 1 PROVISIONAL
-Exposure: S2 Reference deterministic engines written in python3
+10 pins · 8 PINNED · 2 PROVISIONAL
+Exposure: S2 Reference deterministic engines written in python3, S9 Portability is proved by one worked adopter, not by a stack matrix
 
 ---
 
@@ -162,3 +162,20 @@ Exposure: S2 Reference deterministic engines written in python3
               from a checkpoint.
 - Falsifier:  an operation whose partial application is genuinely more useful than its refusal.
 - Answers:    GR6
+
+### S9 — Portability is proved by one worked adopter, not by a stack matrix   [substrate]
+- Confidence: PROVISIONAL — one example, chosen for what it costs rather than for what it covers
+- Because:    `agnostic-portability` is measured by the contract surviving a vendoring onto an
+              arbitrary repo and stack. Until feature 018 that was tested by checking which files
+              landed. Running the gates needs a target that exists, and a target costs authorship.
+              Minted by the `UNPINNED` verdict on 018's own plan.
+- Buys:       the real gates run against someone else's artifacts on every suite run, for the
+              price of one small repository a reader can hold in their head.
+- Forecloses: any blind spot specific to a stack the fixture does not use. A gate that breaks
+              only on a project with no manifest, or with a compiled toolchain, stays invisible
+              here — and the suite will look green while it does.
+- Falsifier:  an adopter reports a gate failing on their stack in a way one fixture could not
+              have shown; or a second fixture is added, which retires the "one" in this pin.
+- Hedge:      the check reads the fixture's path, pin ids and guard commands **from the fixture
+              itself**, never from constants written into the check. Adding a second target is
+              then a data change rather than a rewrite.
