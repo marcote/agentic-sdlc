@@ -36,7 +36,7 @@ half B, and it is not. Half A moved three other pillars on its own evidence.
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
 
-- **Gaps caught by /distill:** 12 `[deriv: 3 grilling decisions (G-a/G-b/G-c in spec.md) + 9 bullets under the "Edge cases" section, section-scoped]` — the decisive one is G-a: byte identity rather than the word `TODO`, which is the difference between fixing the defect and shipping something worse than it.
+- **Gaps caught by /distill:** 12 [deriv$ echo $(( $(grep -cE '^### G-' specs/016-north-star-integrity/spec.md) + $(awk '/^## Edge cases/,/^## Non-goals/' specs/016-north-star-integrity/spec.md | grep -cE '^[0-9]+\.') )) $] — the decisive one is G-a: byte identity rather than the word `TODO`, which is the difference between fixing the defect and shipping something worse than it.
 - **RED→GREEN discipline:** yes `[deriv: coverage.md state history + 469b15e; 410/0 → 414/12 at /contract → 426/0 → 427/0]` — three assertions passed at RED and were documented in `coverage.md` at contract time: two *must-not-reject* criteria and one self-test.
 - **Rework post-/verify:** 0 · **post-/uat:** 0 `[deriv: verification/reports/016-north-star-integrity-469b15e.md §5 — one gap routed to /distill, none to implementation]`.
 - **Escalations to the human:** 1 `[deriv: one AskUserQuestion on feature scope — B3 alone vs B3 + provenance]` — the only genuine fork; the three grilling ambiguities each had a zero-risk answer and were resolved without asking, which is what the measurement was for.

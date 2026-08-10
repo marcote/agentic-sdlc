@@ -43,6 +43,16 @@ Source: `specs/013-stack-charter/alignment.md` (objective→pillar mapping) + `n
   **(1) A feature that adds a gate cannot be gated by it.** 013 needed a bootstrap exception for `/plan`, exactly as 002 needed one for `/align`. That is now a recurring situation with no rule: each time it is negotiated ad hoc. 013 discharged it with two pre-close obligations (seed the charter; run the finished guard retroactively) and that worked — the retroactive run returned a real `UNPINNED`, not a courtesy `PASS` — but the *pattern* deserves to be written down rather than reinvented.
   **(2) Nothing protects a check from being vacuous.** Five defects of one family appeared in this feature alone: a self-scanning check that matched its own grep line; two assertions that passed because the searched word already existed elsewhere; an unanchored pattern (`rails` matching "guardrails"); and a fifth caught while fixing the fourth — an assertion pointing at a fixture from another block, so it silently checked a missing file and recorded neither PASS nor FAIL. `check_90` was bitten by the same family in `e6bc658`. Every one was caught by hand. The worst — a `Guard` that validated and never ran — was caught only because a human asked a question the artifacts could not answer. The harness has extensive machinery to ensure tests exist and go red. It has none to ensure an assertion can fail. Also minor: the `/tasks` gate had to be walked with hand-written `awk`, since `status.sh` reports phases but does not execute it.
 
+> **Unreproducible count, recorded 2026-08-09 (feature 017).** The `Gaps caught by /distill` figure
+> above cannot be reproduced by command. Its prose derivation is internally contradictory: it says
+> nine bullets minus one, and also plus three grilling ambiguities, while claiming eight. The
+> section now holds ten bullets. No combination of those numbers yields eight.
+>
+> The number is **not** corrected here, because the correct value is unknown. It was already
+> corrected once, from twelve to eight, and that correction is what made it look verified. This
+> retro is left as the record of what a prose derivation buys: a locator that reads as evidence and
+> reproduces nothing.
+
 ## Face C — Loop (self-improvement)
 
 - **Candidate rules → constitution:** two, both promoted from repeated real mistakes rather than from theory (per `memory/constitution/update-checklist.md`):
