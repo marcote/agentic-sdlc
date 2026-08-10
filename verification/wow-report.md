@@ -4,11 +4,12 @@ Aggregates the retro ledger. **Observes, never gates** — the deterministic tee
 `tests/check_90_retro.sh`. Input: all `specs/*/retro.md`, their `alignment.md`, and
 `verification/reports/*`.
 
-**N = 7 closed features** (004, 006, 007, 008, 009, 013, 014). Small sample, no statistics.
-Per-feature and themes only; no trends are claimed.
+**N = 12 closed features** (004, 006, 007, 008, 009, 013, 014, 015, 016, 017, 018, plus 003 as
+`n/a`). Small sample, no statistics. Per-feature and themes only; no trends are claimed.
 
-> **First run.** This report had never been generated across eight features. That is itself the
-> report's most important finding, and §2 is where it shows.
+> **Since the last generation (N was 7).** Five features closed: 015, 016, 017, 018 and the
+> re-check of 012. The headline is in §3: **the harness found 18 real defects in features that
+> were already closed and already green.**
 
 ---
 
@@ -16,152 +17,131 @@ Per-feature and themes only; no trends are claimed.
 
 | Pillar | Features that claimed it | Signal moved | Drift |
 |---|---|---|---|
-| `real-enforcement` | 004, 006, 007, 008, 009, 013, 014 | **7 / 7** | none |
-| `agnostic-portability` | 004, 006, 007, 009, 013, 014 | **6 / 6** | none |
-| `frictionless-adoption` | 006, 007, 008, 009, 014 | **4 / 5** — 014 `⏳` | watch |
-| `measurable-impact` | 004, 013, 014 | **1 / 3** — 013 `⏳`, 014 `⏳` | **⚠ measurable drift** |
+| `real-enforcement` | 004, 006, 007, 008, 009, 013, 014, 015, 016, 017, 018 | **11 / 11** | none |
+| `agnostic-portability` | 004, 006, 007, 009, 013, 014, 015, 016, 018 | **9 / 9** | none |
+| `measurable-impact` | 004, 013, 014, 015, 016, 017, 018 | **3 / 7** · 4 `⏳` | **watch** |
+| `frictionless-adoption` | 006, 007, 008, 009, 014 | **5 / 5**, and 013 recorded it moving the wrong way | none |
 
-**`measurable-impact` is the drifting pillar, and the pattern is legible.** The two features
-that deferred it are the two that produce *rules about how to work* rather than a tool with an
-observable outcome. Every `confirmed` verdict in this ledger belongs to a feature that shipped
-something that does a thing — a CI gate, vendoring, a tracker, a bootstrap. Both `⏳` belong to
-governance mechanisms whose value is real but whose *measurement* was deferred to a future
-feature.
+**`measurable-impact` is the pillar to watch, and it is the honest state rather than a failure.**
+Four features left it `⏳ pending-observation`: 013, 014, 016 and 017. Each declared a trigger and
+a sweep date instead of claiming a signal it could not evidence.
 
-That deferral chain is the harness's structural weak spot: a method feature's proof lives in the
-next feature, and the next feature keeps being another method feature.
+**018 is the first to close it `✅` on a prediction set in advance.** `alignment.md` fixed the
+falsification test before the work — *does a gate behave differently on a foreign target, excluding
+the known pin-id defect?* — and the answer was found at `/distill`.
 
 ## 2. Pending re-checks (worklist)
 
-| Feature | Deferred since | Trigger | Sweep by | State |
+| Feature | What is being observed | Trigger | Sweep by | State |
 |---|---|---|---|---|
-| ~~006~~ | 2026-07-05 | feature 007 vendors the engine | — | **✅ CLOSED 2026-08-09 → `confirmed`** |
-| 013 | 2026-08-08 | a real `UNPINNED`/`TRIPPED` against a **pre-existing** pin, or a real coherence objection | **2026-09-08** | open — did not fire in 014 |
-| 014 | 2026-08-09 | friction **rejected** for lacking justification, or another feature stopped by `UNCOVERED` | **2026-09-08** | open — neither occurred |
+| 013 | the charter preventing stack-decision rework | a feature's `/plan` trips a pin, or reworks a decision no pin covered | 2026-09-08 | **partially answered** — 018's `/plan` returned `UNPINNED` and minted `S9`, the second run of the accretion loop |
+| 014 | ADR `0004`'s amended signal, and `UNCOVERED` stopping a later feature | (a) a mandatory step rejected for lacking a justification · (b) `UNCOVERED` stops a feature other than 014 | 2026-09-08 | open — (b) has now fired against a *foreign* charter in 018's suite, but not against a real feature of ours |
+| 016 | the provenance stamp changing a verdict | a `pending-observation` closed against a pillar whose `since` moved | 2026-09-08 | open |
+| 017 | an executable derivation going red on its own | a spec edited after close, or a wrong number in a future retro | 2026-09-08 | open |
 
-**⚠ The finding that justifies this whole section: 006 sat `pending-observation` for 35 days
-after its evidence already existed.** Its trigger fired when 007 merged on 2026-07-05; the
-agnostic-portability half was even explicitly re-checked by 012 (`2602a36`). Nobody swept the
-ledger, and this report — the tool built to list exactly this — had never been run.
+**None overdue.** One sweep, four verdicts, on 2026-09-08.
 
-A deferral mechanism nobody sweeps **loses findings while the ledger still reads as rigorous**,
-which is worse than an open item because it is invisible. Two corrections landed today: every
-`pending-observation` now carries a **sweep date** as well as an event trigger (whichever comes
-first), and `specs/_template/retro.md` requires it going forward.
+**Worth flagging for that sweep:** 014's trigger (b) is now half-met in a way its author did not
+foresee. `ADOPT-UNCOVERED-FIRES` shows `UNCOVERED` blocking on someone else's charter every time
+the suite runs. That is the mechanism working, but it is not the same evidence as a real feature of
+ours being stopped, and the sweep should not accept it as such.
 
-## 3. Method — does the WoW add value? (N = 7)
+## 3. Method — does the WoW add value? (N=12, small sample, no statistics)
 
-| Feature | Gaps caught pre-impl | RED discipline | Rework post-verify / post-uat | Escalations |
+| Feature | Gaps caught pre-implementation | RED discipline | Rework post-verify | Escalations |
 |---|---|---|---|---|
-| 004 | — | yes | 0 / 0 | — |
-| 006 | 3 + 5 edge cases | yes, no exceptions | 0 / 0 | — |
-| 007 | — | yes | 0 / 0 | — |
-| 008 | — | yes | 0 / 0 | — |
-| 009 | — | yes | 0 / 0 | — |
-| 013 | 8 | yes, 7 documented exceptions | 0 / **1** (`EMPTY-CHARTER`) | 9 |
-| 014 | 10 | yes, 10 documented exceptions | 0 / **0** | 4 |
+| 004 | — | yes | 0 | — |
+| 006 | 3 | yes | 0 | 0 |
+| 007 | 3 | yes | 0 | 0 |
+| 008 | 3 | yes | 0 | 0 |
+| 009 | 1 | yes | 1 | 0 |
+| 013 | 8 | yes | 0 | 9 |
+| 014 | 10 | yes | 0 | 4 |
+| 015 | 15 | yes | 0 | 3 |
+| 016 | 12 | yes | 0 | 1 |
+| 017 | 11 | yes | 0 | 0 |
+| 018 | 16 | yes, 4 documented exceptions | 1 | 0 |
 
-**Recurring friction themes:**
+**The finding that matters: the harness's own tooling found 18 defects in closed, green features.**
 
-1. **Vacuous and untraceable checks — 11 occurrences, the dominant theme by far.** `e6bc658`
-   (008), five in 013, five in 014, plus one found today in 008's `DEPFREE`. Shapes:
-   self-detection, untraceable results, passing for an unrelated reason, semantic vacuity,
-   reporting on the wrong tree. **013's retro proposed a rule; 014's plan restated it as D10;
-   occurrences 6–10 happened anyway, in the same branch as the warning.** Prose does not prevent
-   this. The mechanical half was demonstrated on 2026-08-09 in minutes and found a real instance
-   in a feature closed a month earlier.
-2. **A feature that introduces a gate cannot be gated by it.** 002, 013, 014 — three
-   occurrences, negotiated ad hoc each time.
-3. **Checks run against the wrong tree return confident false verdicts.** Twice on 2026-08-09:
-   the amendment gate over an empty commit range, and a hermeticity check against uncommitted
-   work.
+| Found by | Count | Where they had been hiding |
+|---|---|---|
+| `nvc.sh` traceability (015) | 15 | untraceable criteria, nine of them in `check_95` since feature 004 |
+| hand-vendoring onto a real repo (012, 018) | 2 | the pin-id parser, and the cwd-resolution defect |
+| `check_90`'s verdict parser (017) | 1 | a missing colon that removed 017 from its own gate's scope |
+
+Every one of those features was closed, green and retro'd. **Green did not mean correct; it meant
+nothing had asked the question yet.**
+
+### Recurring friction themes
+
+**Semantic vacuity is the standing cost, and it is still unmechanised.** Four vacuous assertions
+across 015, 016 (two) and 018, each caught by reading or by hand-mutation, none by `nvc.sh`. The
+pattern file declares semantic vacuity out of mechanical scope, so this is a known limit rather
+than a surprise — but it has now cost four features. `docs/backlog.md` B8.
+
+**Mutation testing is the only thing that catches it, and it is entirely manual.** 018 ran eleven
+mutations by hand; one of them exposed the feature's own vacuous criterion. That is a high-value
+step with no tooling behind it.
+
+**Escalations collapsed and that is not obviously good.** 9 → 4 → 3 → 1 → 0 → 0 across 013 to 018.
+Part is genuine: the ground rules and the charter now answer questions that used to need a human.
+Part is the last two sessions running unattended by explicit request. The number should not be read
+as a quality signal until a session with a human in the loop produces one.
 
 ## 4. Loop — does the WoW improve itself?
 
-| | Proposed | Landed |
+| Source | Proposed | Landed |
 |---|---|---|
-| Constitution patterns | `non-vacuous-checks` (013, 014) | **1 of 1** — landed 2026-08-09 |
-| Constitution deltas | gate-bootstrap exception (013, 014) | **1 of 1** — `D4`, landed 2026-08-09 |
-| North Star amendments | ADR `0004` | **1 of 1** (PR #17) |
+| Constitution rules | `D3`, `D4`, `D5`, plus the `non-vacuous-checks` override | all 4 landed |
+| North Star amendments | ADR `0004` (`frictionless-adoption` signal) | landed |
+| Charter pins minted by `/plan` | `S4` (013), `S9` (018) | both landed |
+| Charter wording sharpened, not superseded | `S1` (014), `S7` (018) | both landed |
+| Backlog items | 13 raised | 2 promoted to features (B1→015, B3→016), 10 open, 0 dropped |
 
-**The loop closed on governance in a day and took two features to close on practice.** Both
-constitution candidates were proposed in 013, restated in 014, and landed only when this report
-named the gap — after the failure one of them describes had recurred five more times in between.
+**The loop closes, and the backlog is where it stops being a treadmill.** Ten open items is not a
+failure: `docs/backlog.md` exists precisely because chaining every finding into the next feature is
+the recorded root cause of the loop not converging.
 
-The asymmetry that produced them is still the honest reading: the harness improves the rules it
-*gates* and forgets the rules it merely *records*. What closed the gap was not discipline, it was
-putting the count in a table.
+**Two pins have now been sharpened rather than superseded.** Both times the decision had not
+changed — the wording was under-specified and read as something stronger. `S7` is the clearer case:
+its title said green never proves *a product*, which made every check in this repository a
+violation, because the harness **is** this repository's product.
 
-**What landed, and what it does not claim.** `base/patterns/non-vacuous-checks.md` ships five
-injected `[given]` criteria (`check-can-fail`, `check-traceable`, `check-rejects-by-diagnostic`,
-`check-no-self-match`, `check-names-its-tree`), each carrying the occurrences it prevents; `D4`
-formalises the gate-bootstrap exemption as *from being blocked, never from being run*, on four
-conditions. The pattern states in its own text that it is **the non-mechanical half** — semantic
-vacuity stays a review concern and the meta-check remains backlogged. The claim that a `[given]`
-row will do what prose did not is written down as **falsifiable**: the next feature to ship a
-vacuous check while carrying these rows refutes it.
+## 5. Theater smells (human spot-check, Layer 4)
 
-*Method note: the first attempt to prove the new assertions could fail was itself vacuous — the
-fixture harness ran the check file standalone, where the assertion helpers are undefined, so it
-emitted neither PASS nor FAIL; the second leaked state between fixtures because `git checkout`
-cannot restore an untracked file. Both are shapes on the list above. Re-run with an isolated
-sandbox per fixture, each mutation failed on exactly its own assertions (7 / 2 / 1 / 1) against a
-clean 36 / 0 baseline.*
+| Smell | Feature | Reading |
+|---|---|---|
+| Zero rework, zero escalations, all green | 017 | 11 gaps caught, 6 metacharacter bugs at `/contract`, and its own verdict-line typo found afterwards. Not too clean — the friction moved earlier in the loop, which is where it is supposed to be. |
+| `⏳` on four consecutive features | 013, 014, 016, 017 | The opposite of a smell. Each declined to claim a signal without evidence and fixed a date. 018 is the first that could honestly claim one. |
+| Escalations at 0 for two features | 017, 018 | Explained by unattended sessions, not by the absence of decisions. 018 took a real one — `S9` — without asking, which is the intended behaviour under that instruction but is worth a human's eye. |
+| A retro that praises its own feature | 018 | It records one rework, one recorded deviation (`/tasks` written after implementation), and files two backlog items against itself. Not clean. |
 
-**First use of the pattern, same day, and it paid.** A sweep of all ten features found `004`
-reading `next: /verify` while its report says `BUILD ✅ · TRAJECTORY ✅ · UAT ✅ · coverage 100% ·
-retro ✅ → DONE`: `status.sh` globbed `reports/<feature>-<ref>.md` only, and 004's report predates
-that convention. **A tracker reporting a closed feature as unfinished is the §2 failure in tool
-form** — state misread while still looking rigorous. Fixed, with two assertions. Applying
-`check-can-fail` to them immediately caught one of *them* as vacuous: `REPORT-PRECEDENCE` passed
-against a fixture built to break it, because `ls` sorts its arguments and `demo-a.md` precedes
-`demo.md` by ASCII regardless of order. Chasing that exposed a real defect in the fix itself —
-precedence was resolving by **mtime**, so a stale legacy report could shadow the current one by
-being touched later. Precedence is now by naming, and both assertions fail on their own isolated
-fixture (14/1 each against a clean 15/0). Neither the vacuity nor the underlying defect would have
-been found by reading.
-
-## 5. Theater smells (human spot-check)
-
-- **No all-green retros.** Every retro records gaps, exceptions or friction. 013 and 014 each
-  self-report defects that make their author look worse — the most reliable signal available
-  that they were not written to pass.
-- **`⏳` verdicts are used honestly and repeatedly**, including one (014) that came back negative
-  against a falsification test *written before the result was known*.
-- **⚠ One real smell, now corrected:** an overdue `pending-observation` invisible for 35 days
-  (§2). Not a dishonest retro — a ledger nobody read.
-- **⚠ Watch:** 12 eval cases across three files have **never been scored**, by design, because
-  the authoring model grading its own output is not evidence. They are honestly open and
-  honestly blocked; if they stay open indefinitely they become decoration rather than deferral.
+**No retro has an empty Evidence cell, and none is overdue.**
 
 ## 6. Charter health — is pinning decisions earning its ceremony?
 
-| Signal | Count | Reading |
+**Pins that tripped:** zero `TRIPPED` verdicts across 013–018.
+
+**Pins that constrained without tripping:** this is where the charter is actually earning its keep.
+
+| Pin | Where it constrained | Effect |
 |---|---|---|
-| Pins that **tripped** | **0** | The charter has never caught a decision going bad before the rework |
-| Rework with **no pin** covering it | **0** | No rework has been traced to a missing pin either |
-| Pins that **never trip and never constrain** | 0 of 9 | No bloat: every pin has been read by a gate |
-| Pins **strained but not tripped** | `S1` ×1, `S2` ×2 | `S2`'s third strain is declared to be the falsifier arriving |
-| Pins **created by a gate** | `S4` (013 `UNPINNED`), `S5`–`S8` (014 `UNCOVERED`) | 5 of 9 pins exist because a gate demanded them |
+| `S7` | 018's design | The fixture's own suite result is reported and never counted. Without the pin, adding it to the total would have been the obvious move. |
+| `S3` | 018 `G-c` | `uv` rejected as the fixture's toolchain; the fixture runs on what the suite already has. |
+| `S2` | 016, 018 | Both carried the `Hedge` as a live coverage row; neither opened an importable seam. |
+| `S1` | every feature | `no-prescribe.sh` runs at every `/verify`. |
 
-**Honest reading: too early, and the ratio is uninformative at 0/0.** The charter cannot yet be
-called working or decorative. What *is* evidence: **5 of 9 pins exist only because a gate forced
-them**, and two of those (`S7` green proves the harness's machinery not a product; `S8` fail
-closed, never partially apply) recorded decisions that had governed this repository **since
-feature 001 and 007 respectively without ever being written down**.
+**Rework with no pin (charter gaps):** zero. Every load-bearing decision the last six features
+needed was either pinned or minted at `/plan`.
 
-Surfacing an eight-month-old undocumented decision is not the same as preventing rework, and this
-report will not claim it is. It is the strongest thing the charter has done so far.
+**Pins that never trip and never constrain:** `S0`, `S4`, `S5`, `S6`, `S8` have constrained no
+recorded decision since being written. That is **not yet** bloat — they were seeded in 013 as
+decisions already governing the repository, and four of them answer a ground rule, which is a
+constraint on the floor rather than on a plan. Worth re-reading at the 2026-09-08 sweep.
 
----
-
-## What this report says to do next
-
-Nothing in §1–§6 recommends a new feature. The two actionable items are both small and both
-overdue rather than new:
-
-1. ~~**Land one of the two candidate constitution rules**, or drop them explicitly.~~ **DONE
-   2026-08-09** — both landed (§4). Proposing a rule twice and landing it zero times was the loop
-   failing quietly.
-2. **Sweep the ledger on 2026-09-08.** That date now exists precisely because it did not before.
-   Two items are open (013, 014) and both have a trigger *and* a date.
+**The ratio, read as the skill asks.** Two pins minted by `UNPINNED`, zero charter gaps, zero
+trips. Many trips and no gaps would mean the charter is doing its job; gaps with no trips would
+mean it is decorative. **Zero and zero means it has not been stressed yet** — no feature has taken
+a decision that a pin declared wrong. Until one does, the charter's value is the elicitation, not
+the enforcement, and saying otherwise would be laundering.

@@ -81,11 +81,20 @@ its own work, after two in 016 and one in 015.
 | Dimension | Score | Note |
 |---|---|---|
 | Tool use | ✅ | Every gate run deterministically; every count in this report derived from a command, not from memory. |
-| Skipped steps | ✅ | brief → align → distill → plan → contract (RED at 14 FAIL) → implement → verify. The `UNPINNED` verdict was honoured rather than waved through: `S9` was minted before the plan was written. |
+| Skipped steps | ⚠️ one, recorded | brief → align → distill → plan → contract (RED at 14 FAIL) → **implement** → verify → uat. `/tasks` was written **after** implementation, not before. The `UNPINNED` verdict was honoured rather than waved through: `S9` was minted before the plan was written. |
 | Hallucination | 0 | The one number I nearly asserted from memory — that the fixture would catch the pin-id defect — was proved with M2 instead of claimed. |
 
 **The RED state was real:** 14 of 18 criteria failed before the fixture existed. The 4 that passed at
 RED are documented in `coverage.md` rather than discovered here.
+
+**The `/tasks` deviation, stated plainly.** The work-list this feature ran on was `coverage.md` —
+16 criteria, each a unit of work, already frozen and already traced. `tasks.md` was written
+afterwards and says so in its own first paragraph. Backdating it would have been the cheaper move
+and the dishonest one.
+
+Scored as a deviation rather than a skip because the substance was present and the artifact was
+not. Whether `/tasks` earns its place when `coverage.md` is already the work-list is a real
+question about the workflow, not an excuse for this run: filed as `B13`.
 
 ## 4. UAT — 2026-08-09
 
@@ -135,7 +144,7 @@ No product gap found. Nothing routed to `/distill`.
 
 ## 5. Verdict
 
-BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% · retro: pending
+BUILD: ✅ · TRAJECTORY: ✅ (one recorded deviation, `/tasks` written after implementation) · UAT: ✅ · coverage: 100% · retro: ✅
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/018-adoption-fixture/retro.md`.
 Gaps routed: none.
