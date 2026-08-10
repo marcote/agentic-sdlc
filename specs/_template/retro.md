@@ -22,6 +22,21 @@ Source: `specs/<feature>/alignment.md` (objective→pillar mapping) + `north-sta
     feature 006 sat `pending-observation` for 35 days after its evidence already existed.
   - if `n/a` → **reason:** <why this feature does not close against any signal>
 
+> **Derivations are executed.** A field whose claim is a **number** carries
+> `<n> [deriv$ <command> $]`. The suite runs the command from the repository root and fails if its
+> output disagrees with `<n>`. A claim that is not a number keeps the prose form `[deriv: …]`, which
+> is never executed — forcing a commit trail into a command would be filler-to-comply.
+>
+> The terminator is `$]`, not `]`: a real derivation contains `]` inside a character class.
+>
+> **This runs commands read from a markdown file.** That is the same trust level the charter's
+> `Guard` field already carries, which `/verify` runs by name out of `stack.md` without inspecting
+> it. Object to both or to neither.
+>
+> **A closed retro can go red later.** If the spec a derivation reads is edited after the feature
+> closed, the count no longer reproduces. That is the check working, not a regression: the number
+> written in the retro is now wrong.
+
 ## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
 Each field carries its `[deriv: ...]` marker — the locator where the number came from. Without a locator = invalid.
 

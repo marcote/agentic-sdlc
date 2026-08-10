@@ -39,7 +39,10 @@ for f in sorted(set(files)):
             fenced = not fenced; continue
         if fenced or line.startswith(("|", ">")):
             continue
-        s = re.sub(r"`[^`]*`", "X", line)
+        # a `[deriv$ ... $]` block is a command, not prose. Counting its words made the rule
+        # penalise a precise derivation, which is the opposite of what both rules are for.
+        s = re.sub(r"\[deriv\$.*?\$\]", "X", line)
+        s = re.sub(r"`[^`]*`", "X", s)
         for part in re.split(r"(?<=[.:;!?])\s+", s):
             n = len(part.split())
             if n > mx:

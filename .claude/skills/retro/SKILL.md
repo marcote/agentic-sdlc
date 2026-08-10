@@ -16,8 +16,12 @@ hides: **derive → self-challenge → write**, never the other way.
 
 ## Procedure
 
-1. **Derive first (Face B, Layer 1).** Do not type numbers from memory. Each
-   Method field comes from an artifact with its `[deriv: <locator>]`:
+1. **Derive first (Face B, Layer 1).** Do not type numbers from memory. **Run the command, then
+   write what it printed.** A numeric claim carries `<n> [deriv$ <command> $]` and the suite
+   executes it; a claim that is not a number keeps `[deriv: <locator>]` in prose.
+   A prose locator that reads as evidence and reproduces nothing is worse than none: 013's count
+   carried one, was corrected once, and is still unreproducible.
+   Each Method field comes from an artifact with its locator:
    - Gaps caught by /distill → rows of `coverage.md` + `git log` of the distill phase.
    - RED→GREEN discipline → `coverage.md` state history (🔴 before 🟢) + git.
    - Rework post-/verify and post-/uat → gaps routed in `verification/reports/<feature>`.
