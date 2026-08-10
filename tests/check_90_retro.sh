@@ -76,6 +76,21 @@ for report in verification/reports/*.md; do
 done
 [ "$closed_seen" -eq 1 ] && _pass "close loop exercised" || _pass "no closed features yet (vacuous)"
 
+# --- VERDICT-FORMAT: a report's verdict line must parse, or the retro gate silently skips it ---
+# check_90 only judges features whose report reads DONE, and DONE is detected by string format.
+# 017 shipped with "BUILD ✅" instead of "BUILD: ✅", so status.sh reported it unverified AND this
+# gate never evaluated its retro. The feature merged with its retro unchecked. A typo that exempts
+# a feature from a gate is worse than a red gate: nothing looks wrong.
+_vf=0; _vfbad=""
+for _r in verification/reports/*.md; do
+  case "$(basename "$_r")" in 002-*) continue ;; esac   # 002 is a judge report, not a verification report
+  if grep -qE 'BUILD:[[:space:]]*[✅❌]' "$_r"; then _vf=$((_vf+1))
+  else _vfbad="$_vfbad $(basename "$_r")"; fi
+done
+if [ -z "$_vfbad" ] && [ "$_vf" -ge 10 ]; then
+  _pass "VERDICT-FORMAT: all $_vf verification reports carry a parseable verdict line"
+else _fail "VERDICT-FORMAT: report(s) with an unparseable verdict line —$_vfbad (checked $_vf) — the retro gate skips these in silence"; fi
+
 # ================= 017 — executable derivations =================
 # A numeric claim in a retro carries `<n> [deriv$ <command>]`. The command is EXECUTED and its
 # output compared to n. Prose derivations (`[deriv: ...]`) are never executed.

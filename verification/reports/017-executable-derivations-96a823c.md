@@ -28,6 +28,6 @@ So `measurable-impact` is **⏳**, not ✅ — the mechanism is built and has pr
 finding, the one that motivated it.
 
 ## 5. Verdict
-BUILD ✅ · TRAJECTORY ✅ · UAT ✅ · coverage 100% · retro ✅ → **DONE**
+BUILD: ✅ · TRAJECTORY: ✅ · UAT: ✅ · coverage: 100% · retro: ✅ → **DONE**
 
 **Gaps routed:** one to `/distill` (product): R5's scope was wider than the artifacts allow.
