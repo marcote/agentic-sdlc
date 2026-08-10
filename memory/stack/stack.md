@@ -128,19 +128,25 @@ Exposure: S2 Reference deterministic engines written in python3
               work rather than an accident.
 - Answers:    GR2
 
-### S7 — Green proves the harness's machinery, never a product        [substrate]
+### S7 — Green proves this repository's harness, never an adopting project's product   [substrate]
 - Confidence: PINNED
 - Because:    answering GR5. `tests/run.sh` exercises this repository's **own** governance
               artifacts — that files and contracts exist, that the engines behave on fixtures,
-              that gates block what they claim to block. It asserts nothing about an adopting
-              project's code, and it cannot: the harness never sees it.
-- Buys:       a suite that runs anywhere with no product context, and a green that means one
-              precise thing instead of an unstated mixture.
-- Forecloses: using this suite as evidence that an adopter's product works — that is the
-              adopter's own `scripts/test.sh`, and conflating the two would be the exact
-              unstated-meaning failure GR5 exists to prevent.
-- Falsifier:  a check lands here that asserts something about product code rather than about
-              the harness.
+              that gates block what they claim to block. *Wording sharpened on 2026-08-09: the
+              title read "never a product", which contradicted its own body. The harness IS this
+              repository's product, so an absolute reading made every check here a violation. Not
+              marked SUPERSEDED — the decision did not change, it was under-specified, the same
+              correction S1 took in feature 014.*
+- Buys:       a green that means **one** thing. Whatever else lands in this repository — a sample
+              application, a fixture with real behaviour — its own suite stays separate, so a
+              passing `tests/run.sh` never silently also claims that something else works.
+- Forecloses: using this suite as evidence that any product works, including a sample shipped
+              here. That evidence belongs to that product's own `scripts/test.sh`. Conflating them
+              is the unstated-meaning failure GR5 exists to prevent.
+- Falsifier:  a check in `tests/run.sh` starts asserting the behaviour of an application rather
+              than of the harness's own machinery — so that green means two things at once.
+              *The previous wording ("asserts something about product code rather than about the
+              harness") could not discriminate, because the harness is product code.*
 - Answers:    GR5
 
 ### S8 — Failure posture: fail closed, write nothing, never partially apply  [substrate]
