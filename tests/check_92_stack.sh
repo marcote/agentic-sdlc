@@ -416,6 +416,17 @@ grep -qE "$_AMB_PAT" "$_fx/tty.sh" \
 rm -rf "$_fx"
 [ -f "$ENGINE" ] && assert_dep_free "$ENGINE" "HERMETIC-ENV" || _fail "HERMETIC-ENV: missing $ENGINE"
 
+# --- PIN-DISCRIMINATING: a Falsifier must be able to distinguish a violation from normal work ---
+# S7's read "a check that asserts something about product code rather than about the harness".
+# The harness IS this repository's product, so every check in tests/run.sh matched it. A falsifier
+# that fires on all normal work is the vacuity family one level up: it looks like a tripwire and
+# cannot trip. Caught by the maintainer reading the pin, not by any check -- semantic, and out of
+# mechanical scope per base/patterns/non-vacuous-checks.md.
+if grep -qE 'never an adopting' memory/stack/stack.md \
+   && grep -qE 'green means two things|means two things at once' memory/stack/stack.md; then
+  _pass "PIN-DISCRIMINATING: S7 names an adopting project and a falsifier that can distinguish"
+else _fail "PIN-DISCRIMINATING: S7's title or falsifier is back to the absolute form that could not discriminate"; fi
+
 # --- PIN-ID-ADOPTER: the id prefix belongs to the adopter, not to this repository ---
 # Hardcoded to S\d+ until 2026-08-09. A charter written with `### P1 —` parsed to ZERO pins and
 # reported *empty* -- full charter, silently invisible. Found by vendoring onto a real Python repo
