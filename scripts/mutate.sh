@@ -13,11 +13,20 @@
 #   scripts/mutate.sh list     --tests DIR     one line per declaration: FILE:LINE:LABEL
 #   scripts/mutate.sh criteria --tests DIR     one line per criterion header: FILE:LINE:LABEL
 #   scripts/mutate.sh run      --tests DIR [--only LABEL]
+#   scripts/mutate.sh coverage --tests DIR --spec PATH   which criteria of one feature are obliged
+#   scripts/mutate.sh coverage --tests DIR --all         the standing debt, re-derived
 #
 # Exit contract:
-#   0 = every declared mutation broke its criterion
-#   1 = at least one criterion was not proved failable (named, with its mutation)
-#   2 = unusable input: a malformed or unbound declaration, or no tests directory
+#   0 = every declared mutation broke its criterion / every obliged criterion declares one
+#   1 = at least one criterion was not proved failable, or declares none (named either way)
+#   2 = unusable input: a malformed or unbound declaration, no tests directory, or a coverage row
+#       that looks obliged and cannot be resolved
+#
+# WHY `coverage` EXISTS: 020 made the proving repeatable, not required. 021 measured that the real
+# gap was coverage -- seven of 018's sixteen criteria had never declared a mutation -- so the
+# obligation is derived from the artifact that already names a feature's criteria, its coverage
+# matrix. No branch ref: the trigger "every criterion changed on this branch" is what 019 shipped
+# and CI rejected.
 #
 # Dependency-free: bash + coreutils + python3 (timing only). No installable toolchain.
 #
@@ -29,13 +38,15 @@
 # a check that read `git show main:…`; it was green locally and failed in CI.
 set -u
 
-CMD=""; TESTS=""; ONLY=""
+CMD=""; TESTS=""; ONLY=""; SPEC=""; ALL=0
 while [ $# -gt 0 ]; do
   case "$1" in
-    list|run|criteria) CMD="$1"; shift ;;
+    list|run|criteria|coverage) CMD="$1"; shift ;;
     --tests) TESTS="${2:-}"; shift 2 ;;
     --only)  ONLY="${2:-}"; shift 2 ;;
-    -h|--help) sed -n '2,25p' "$0"; exit 0 ;;
+    --spec)  SPEC="${2:-}"; shift 2 ;;
+    --all)   ALL=1; shift ;;
+    -h|--help) sed -n '2,29p' "$0"; exit 0 ;;
     *) echo "mutate: unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -114,6 +125,116 @@ EOF
 
 now(){ python3 -c 'import time; print("%.2f" % time.time())' 2>/dev/null || echo 0; }
 elapsed(){ python3 -c "print('%.2fs' % ($2 - $1))" 2>/dev/null || echo "?"; }
+
+# --- coverage: which criteria are OBLIGED to declare, and do they ---
+#
+# A row is obliged when all three hold. Each condition removes a row that owns no assertion to
+# break, so obliging it would demand a mutation for nothing:
+#   1. origin is `project`   -- a [given] row is inherited and asserted by whatever it routed to
+#   2. status is 🔴/🟢/✅     -- a 📋 case row is judged, a deferred row is justified as absent
+#   3. the linked-test cell resolves to a check file that exists
+#
+# Condition 3 carries the whole B11 risk. An earlier form required the literal `tests/check_`; it
+# reported 47 undeclared instead of 137, because sixteen matrices written over six weeks are not
+# uniform -- they hold bare filenames, prefixed paths, parentheticals and compounds. A predicate
+# that DISCARDS what it cannot parse reports a smaller, cleaner, wrong number, and the failure
+# renders identically to the success. So non-resolution is never silence:
+#   a check_*.sh token that does not exist        -> UNRESOLVED, exit 2
+#   no check_*.sh but the cell names something.sh -> UNRESOLVED, exit 2  (the typo path)
+#   no script named at all                        -> excluded, and COUNTED
+COV_GAP=1
+COV_UNRESOLVED=2
+COV_SH_FALLBACK='[.]sh'
+
+# cov_rows FILE : emit "STATE<TAB>LABEL<TAB>CELL" per criterion row, resolving `idem` to the row
+# above. STATE is `ex` for a row excluded by rule and `ok` for one that reaches resolution.
+#
+# Excluded rows are EMITTED, not filtered. The first form filtered them in awk and reported
+# `0 excluded` on a fixture holding three -- exclusion had become a silence, which is the family
+# this file exists to close. COV-NOT-OBLIGED-COUNTED caught it.
+#
+# The label pattern is spelled out rather than using {3,}: BSD awk silently ignores interval
+# quantifiers, so `{3,}` matches nothing on macOS and the sweep returns one row per file.
+cov_rows(){
+  awk -F'|' 'NF>6 {
+      t = $7; if (t ~ /idem/) t = prev; else prev = t
+      l = $5; gsub(/[ `]/, "", l)
+      if (l !~ /^[A-Za-z][A-Za-z0-9-][A-Za-z0-9-][A-Za-z0-9-]+$/) next
+      if ($6 !~ /project/ || $8 !~ /red|green|uat/) { print "ex\t" l "\t" t; next }
+      print "ok\t" l "\t" t
+    }' "$1" 2>/dev/null
+}
+
+# cov_resolve CELL : echo the check file path, or "" if none is named, or "!TOKEN" if one is
+# named and unusable. Tried as written first (a cell may carry a real path), then under --tests.
+cov_resolve(){
+  local cell="$1" tok base
+  tok=$(printf '%s' "$cell" | tr -d '`' | grep -oE '[A-Za-z0-9_./-]*check_[0-9a-z_]+\.sh' | head -1)
+  if [ -z "$tok" ]; then
+    printf '%s' "$cell" | grep -qE "$COV_SH_FALLBACK" && { echo "!$(printf '%s' "$cell" | tr -d '`|' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"; return; }
+    echo ""; return
+  fi
+  [ -f "$tok" ] && { echo "$tok"; return; }
+  base=$(basename "$tok")
+  [ -f "$TESTS/$base" ] && { echo "$TESTS/$base"; return; }
+  echo "!$tok"
+}
+
+# cov_one FILE : print findings; echo "obliged undeclared excluded unresolved" on the last line.
+cov_one(){
+  local cf="$1" st lab cell res ob=0 un=0 ex=0 nr=0
+  while IFS=$'\t' read -r st lab cell; do
+    [ -n "$lab" ] || continue
+    if [ "$st" = "ex" ]; then ex=$((ex+1)); continue; fi
+    res=$(cov_resolve "$cell")
+    case "$res" in
+      "")  ex=$((ex+1)) ;;
+      !*)  nr=$((nr+1))
+           echo "UNRESOLVED  $lab ($cf) — linked test ${res#!} names no check file that exists" ;;
+      *)   ob=$((ob+1))
+           if scan "$res" decl | cut -f2 | grep -qx "$lab"; then :; else
+             un=$((un+1))
+             echo "UNDECLARED  $lab ($cf) — obliged by its row, no [mut\$ … \$] in $res"
+           fi ;;
+    esac
+  done <<EOF
+$(cov_rows "$cf")
+EOF
+  echo "COUNTS $ob $un $ex $nr"
+}
+
+if [ "$CMD" = "coverage" ]; then
+  T_C0=$(now)
+  if [ "$ALL" -eq 1 ]; then
+    tob=0; tun=0; tex=0; tnr=0
+    for cf in specs/*/coverage.md; do
+      [ -f "$cf" ] || continue
+      out=$(cov_one "$cf"); counts=${out##*COUNTS }
+      set -- $counts
+      printf '%-46s %3d obliged, %3d undeclared, %2d excluded\n' "$cf" "$1" "$2" "$3"
+      printf '%s\n' "$out" | grep -v '^COUNTS ' | sed 's/^/  /' | grep . || true
+      tob=$((tob+$1)); tun=$((tun+$2)); tex=$((tex+$3)); tnr=$((tnr+$4))
+    done
+    T_C1=$(now)
+    COV_TOTAL_LINE="TOTAL over specs/*/coverage.md: $tob obliged, $tun undeclared, $tex excluded, $tnr unresolvable — total elapsed $(elapsed "$T_C0" "$T_C1")"
+    echo "---"
+    echo "$COV_TOTAL_LINE"
+    [ "$tnr" -eq 0 ] || exit "$COV_UNRESOLVED"
+    exit 0
+  fi
+  [ -n "$SPEC" ] || die "coverage: pass --spec PATH or --all"
+  CF="$SPEC"; [ -d "$SPEC" ] && CF="$SPEC/coverage.md"
+  [ -f "$CF" ] || die "coverage: no coverage matrix at $CF"
+  out=$(cov_one "$CF"); counts=${out##*COUNTS }
+  set -- $counts
+  printf '%s\n' "$out" | grep -v '^COUNTS ' | grep . || true
+  T_C1=$(now)
+  COV_OK_MSG="coverage: $CF — $1 obliged, $2 undeclared, $3 excluded, $4 unresolvable — total elapsed $(elapsed "$T_C0" "$T_C1")"
+  echo "$COV_OK_MSG"
+  [ "$4" -eq 0 ] || exit "$COV_UNRESOLVED"
+  [ "$2" -eq 0 ] || exit "$COV_GAP"
+  exit 0
+fi
 
 case "$CMD" in
   list)
