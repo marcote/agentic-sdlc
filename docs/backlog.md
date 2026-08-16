@@ -254,6 +254,21 @@ sequenced anything the coverage matrix did not.
 unattended. That is a pattern worth measuring, not yet a conclusion — both were small features
 whose criteria were already sequenced by the RED state.
 
+## B14 — Twenty-one `📋 case` rows point at no case file
+
+**Status:** open · **Raised:** 2026-08-16 · **Size:** small
+
+Across `specs/*/coverage.md` there are **32** rows marked `📋 case`. `evals/cases/` holds **8**
+files. Twenty-one rows cite no file at all, and one cites `evals/cases/reject-msg.yaml`, which does
+not exist.
+
+Nothing checks that a `📋 case` row points at anything. Same family as `B5` and `B11`: the failure
+looks exactly like the success, because a row that names nothing and a row whose case is merely
+unscored render identically in the matrix.
+
+Distinct from `B2`, which is about the cases never being **scored**. This is about not knowing how
+many there are to score.
+
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_
