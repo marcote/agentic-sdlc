@@ -8,19 +8,19 @@
 
 | Pillar | Objective (brief) | Requirement (spec) | Criterion (acceptance) | Origin | Linked test/eval | Status |
 |---|---|---|---|---|---|---|
-| `real-enforcement` | O1 name the boundary | R1 | NS-LIFECYCLE-PREDICATES | project | `tests/check_80_north_star.sh` | no contract |
-| `real-enforcement` | O1 nothing else moves | R1 | NS-BOUNDARY-BOUNDED | project | idem | no contract |
-| `real-enforcement` | O5 the predicate is not dead text | R2 | NS-PREDICATE-REACHABLE | project | idem | no contract |
-| `real-enforcement` | O2 whose lifecycle | R3 | NS-ADOPTION-STAYS-IN-SCOPE | project | idem | no contract |
-| `real-enforcement` | O6 rejects nothing built | R4 | NS-REJECTS-NOTHING-BUILT | project | idem | no contract |
-| `real-enforcement` | O3 the protocol is followed | R5 | NS-ADR-0005-COMPLETE | project | idem | no contract |
-| `real-enforcement` | O4 the gate judges this diff | R6 · `D3` | AMEND-LIFECYCLE-REFLEXIVE | project | `tests/check_95_amendment_gate.sh` | no contract |
-| `real-enforcement` | O4 the gate stays narrow | R6 · edge 7 | AMEND-PROVENANCE-QUIET | project | idem | no contract |
+| `real-enforcement` | O1 name the boundary | R1 | NS-LIFECYCLE-PREDICATES | project | `tests/check_80_north_star.sh` | ✅ uat |
+| `real-enforcement` | O1 nothing else moves | R1 | NS-BOUNDARY-BOUNDED | project | idem | ✅ uat |
+| `real-enforcement` | O5 the predicate is not dead text | R2 | NS-PREDICATE-REACHABLE | project | idem | ✅ uat |
+| `real-enforcement` | O2 whose lifecycle | R3 | NS-ADOPTION-STAYS-IN-SCOPE | project | idem | ✅ uat |
+| `real-enforcement` | O6 rejects nothing built | R4 | NS-REJECTS-NOTHING-BUILT | project | idem | ✅ uat |
+| `real-enforcement` | O3 the protocol is followed | R5 | NS-ADR-0005-COMPLETE | project | idem | ✅ uat |
+| `real-enforcement` | O4 the gate judges this diff | R6 · `D3` | AMEND-LIFECYCLE-REFLEXIVE | project | `tests/check_95_amendment_gate.sh` | ✅ uat |
+| `real-enforcement` | O4 the gate stays narrow | R6 · edge 7 | AMEND-PROVENANCE-QUIET | project | idem | ✅ uat |
 | `real-enforcement` | O5 | deferred half | JUDGE-BOUNDARY-CHANGES-A-VERDICT | project | `evals/cases/lifecycle-boundary-judge.md` | 📋 case |
-| `real-enforcement` | O3 | governed write leaves a trail | audit-logging | `[given] base/audit-logging` | → NS-ADR-0005-COMPLETE + the PR | no contract |
-| `real-enforcement` | O6 | the corpus run scored something | check-can-fail | `[given] base/non-vacuous-checks` | → NS-REJECTS-NOTHING-BUILT | no contract |
-| `real-enforcement` | O4 | rejection requires the diagnostic | check-rejects-by-diagnostic | `[given] base/non-vacuous-checks` | → AMEND-LIFECYCLE-REFLEXIVE | no contract |
-| `real-enforcement` | O6 | the check names the corpus it read | check-names-its-tree | `[given] base/non-vacuous-checks` | → NS-REJECTS-NOTHING-BUILT | no contract |
+| `real-enforcement` | O3 | governed write leaves a trail | audit-logging | `[given] base/audit-logging` | → NS-ADR-0005-COMPLETE + the PR | ✅ uat |
+| `real-enforcement` | O6 | the corpus run scored something | check-can-fail | `[given] base/non-vacuous-checks` | → NS-REJECTS-NOTHING-BUILT | ✅ uat |
+| `real-enforcement` | O4 | rejection requires the diagnostic | check-rejects-by-diagnostic | `[given] base/non-vacuous-checks` | → AMEND-LIFECYCLE-REFLEXIVE | ✅ uat |
+| `real-enforcement` | O6 | the check names the corpus it read | check-names-its-tree | `[given] base/non-vacuous-checks` | → NS-REJECTS-NOTHING-BUILT | ✅ uat |
 | `agnostic-portability` | — | hermetic under CI conditions | HERMETIC-ENV-80 | `[given] base/hermetic-tests` | `tests/check_80_north_star.sh` | `[given]` carried by 016 |
 | — | — | no network or remote source reached | hermetic-offline | `[given] base/hermetic-tests` | — | deferred |
 | — | — | `S1` no tool named as a default in `memory/stack/base/` | S1-NO-PRESCRIBE | `[given] stack/S1 Injects` | — | deferred |
@@ -51,10 +51,42 @@ feature's falsification test: a boundary that rejects work the harness already s
 Edge case 4 is why the row carries `check-can-fail` and `check-names-its-tree`: a zero-hit result
 and a run that scored nothing are indistinguishable from outside.
 
-## UAT
+## UAT — 2026-08-16
 
-Pending.
+Every row `✅ uat` except the three `deferred` ones and `JUDGE-BOUNDARY-CHANGES-A-VERDICT`, which
+cannot be scored before the 2026-09-08 sweep.
+
+**The immediate half of the falsification test passed:** 101 objectives across every brief in
+`specs/`, zero hits. A boundary that rejected work already shipped would be wrong.
+
+**What this feature does not prove.** It does not make `/align` reject more briefs. The enforcer is
+the judge; what changed is that the judge now has a line to read where before it had nothing.
 
 ## RED state (`/contract`)
 
-Pending.
+Suite **481 PASS / 6 FAIL** against a North Star with no lifecycle predicates and an ADR that did
+not exist.
+
+**Two assertions passed at RED, recorded here rather than discovered at `/verify`:**
+
+- `NS-ADOPTION-STAYS-IN-SCOPE` — green by construction: with no lifecycle predicates, nothing could
+  exclude adoption tooling. A *must-not* criterion has no honest red state. Proved real by mutation
+  M3.
+- `NS-REJECTS-NOTHING-BUILT` — 101 objectives, 0 hits against the unamended file. The corpus half
+  was live at RED (101 ≥ 90), so only the boundary half was green by construction. Proved real by
+  M4.
+
+## GREEN state — 2026-08-16
+
+Suite **488 PASS / 0 FAIL** (pre-019 baseline 479). Eight mutations, one at a time, in
+`verification/reports/019-lifecycle-boundary-babac0a.md`.
+
+### `NS-PREDICATE-REACHABLE` was vacuous, and mutation proved it
+
+It built its test objective **from the predicate itself**, so the substring was present by
+construction. M2 rewrote a predicate as an 18-word sentence — the exact property the criterion
+forbids — and nothing failed.
+
+The fix adds a **10-word cap**, derived from the five predicates that predate this feature rather
+than invented. Second consecutive feature where a self-satisfying assertion survived until mutation
+testing, after 018's `ADOPT-REL-RESOLUTION`.
