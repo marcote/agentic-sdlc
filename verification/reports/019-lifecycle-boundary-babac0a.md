@@ -135,3 +135,25 @@ BUILD: ✅ · TRAJECTORY: ✅ (one recorded deviation, `/tasks` written after im
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/019-lifecycle-boundary/retro.md`.
 Gaps routed: none.
+
+## 6. Mutation audit — appended 2026-08-16 by feature 021
+
+The table in §2 was written as prose and could not be re-run. 021 re-declared every mutation as a
+command. Two findings about **this** report:
+
+**Coverage: 8 mutations against 8 criteria — complete.**
+
+**Validity: 7 of 8 reproduce. M7 does not, and it was valid when it ran.**
+
+M7 (*"a pillar `statement` moved without its `since`"* → `AMEND-PROVENANCE-QUIET`) was run at
+`babac0a`, when the criterion read the previous North Star with `git show main:…`. A mutated
+working tree genuinely differed from the `old` side. CI then rejected that ref-dependence, and this
+feature's own fix reconstructs `old` **from** `new` — after which the same edit lands on both sides
+and no pillar moves between them.
+
+**The mutation did not decay because it was weak. The criterion changed underneath it**, in this
+same feature, and a table written in prose cannot notice that. The declaration now in
+`check_95_amendment_gate.sh` makes the gate's staleness check fire instead, which is what the
+criterion actually asserts.
+
+**The feature is not reopened.** BUILD, TRAJECTORY and UAT stand.

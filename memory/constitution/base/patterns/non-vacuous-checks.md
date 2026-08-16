@@ -68,6 +68,16 @@ caught only by mutating by hand — an assertion comparing two copies of the sam
 building its test input from the artifact under test. Replayed against this mechanism in the form
 actually shipped, both are reported.
 
+**A scan over its own file must exclude comment lines**, because a mutation declaration lives in
+one. Two criteria went red the moment their declarations were written: one forbidding a fixture's
+guard name in the check, one forbidding a terminal reference. Both declarations contained exactly
+the forbidden literal, and neither criterion was wrong — the scans were reading scaffolding as
+code. This is `check-no-self-match` with a new surface, and the surface arrived with the mechanism.
+
+**A criterion header naming two criteria cannot carry a mutation.** One edit is not the negative of
+two different assertions. A runner that skips such a header removes both criteria from its coverage
+without saying so; reject it by name.
+
 *Adopters inherit the pattern, not the runner.* A runner encodes a repository's own `_pass`/`_fail`
 conventions. The declaration grammar is the portable part.
 

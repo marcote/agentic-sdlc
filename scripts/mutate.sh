@@ -84,6 +84,11 @@ scan(){
       }
       next
     }
+    # A header naming several criteria is UNBINDABLE: a declaration binds to the header above it,
+    # and one edit cannot be the negative of two different assertions. nvc.sh reads both labels of
+    # such a header; this read NEITHER, so both criteria vanished from the coverage count and
+    # neither could carry a mutation. Rejected by name -- silence is how they vanished.
+    /^# --- [A-Z][A-Z0-9-]+[ \t]*·/ { print "ERR\tmulti-label criterion header (two criteria cannot share one header, so neither is bindable)\t" NR; next }
     /^# --- [A-Z][A-Z0-9-]+: / {
       l = $0; sub(/^# --- /, "", l); sub(/:.*/, "", l)
       label = l

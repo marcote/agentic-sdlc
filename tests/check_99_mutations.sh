@@ -217,4 +217,94 @@ if have_mut && ! printf '%s' "$_code99" | grep -q "$_T99" \
 else
   _fail "HERMETIC-ENV-99: $MUT reads a terminal or depends on a branch that a shallow checkout lacks"
 fi
+# ── 021: the audit of 018's and 019's mutation tables ───────────────────────────────────
+A21_98=tests/check_98_adoption.sh
+
+# --- AUDIT-COVERAGE-COMPLETE: every criterion of 018 and 019 declares a mutation ---
+# 018 recorded 11 mutations against 16 criteria. Seven had none, and the report read as though
+# failability was established for the feature.
+# --- [mut$ sed -i.bak '0,/^# --- \[mut\$/{/^# --- \[mut\$/d;}' tests/check_98_adoption.sh $] ---
+# The audited set is a historical fact -- which criteria features 018 and 019 shipped -- so it is
+# written out rather than derived. A derivation would drift as later features add criteria to the
+# same files, and then the audit would silently grow or shrink.
+A21_SET="ADOPT-FIXTURE-BUDGET ADOPT-FIXTURE-DROP ADOPT-VENDOR-APPLY ADOPT-SEED-PRESERVED
+ADOPT-CHARTER-PINS ADOPT-NS-VALID ADOPT-GR-COVERED ADOPT-REL-RESOLUTION ADOPT-GUARD-BY-NAME
+ADOPT-GUARD-CLEAN ADOPT-GUARD-FAILS ADOPT-NO-SILENT-EMPTY ADOPT-UNCOVERED-FIRES S2-HEDGE-98
+HERMETIC-ENV-98 ADOPT-SANDBOX-CLEAN ADOPT-TESTCMD-INVOKED ADOPT-TESTCMD-NOT-COUNTED
+NS-LIFECYCLE-PREDICATES NS-BOUNDARY-BOUNDED NS-PREDICATE-REACHABLE NS-ADOPTION-STAYS-IN-SCOPE
+NS-REJECTS-NOTHING-BUILT NS-ADR-0005-COMPLETE AMEND-LIFECYCLE-REFLEXIVE AMEND-PROVENANCE-QUIET"
+_a21_gap=0; _a21_n=0
+_a21_decl=$(have_mut && bash "$MUT" list --tests tests 2>/dev/null)
+for _lab in $A21_SET; do
+  _a21_n=$((_a21_n+1))
+  printf '%s\n' "$_a21_decl" | grep -q ":$_lab$" || _a21_gap=$((_a21_gap+1))
+done
+if have_mut && [ "$_a21_gap" -eq 0 ] && [ "$_a21_n" -eq 26 ]; then
+  _pass "AUDIT-COVERAGE-COMPLETE: all $_a21_n criteria of 018 and 019 declare a mutation (018 had recorded 11 of 18)"
+else
+  _fail "AUDIT-COVERAGE-COMPLETE: $_a21_gap of $_a21_n audited criteria have no declared mutation"
+fi
+
+# --- AUDIT-ALL-PROVED: the audited set is kept proved, and its result is recorded ---
+# NOT run from here. `mutate.sh run --tests tests` re-runs this very file once per declaration, so
+# invoking it from inside the suite is a 40x40 explosion -- the reentrancy 020's plan named and
+# that I then walked into. It runs where Guards run: at /verify and in CI (MUT-WIRED). What the
+# suite asserts is that the result was recorded with its numbers, the same way a Guard's result is.
+# --- [mut$ sed -i.bak 's|mutation(s) under tests, 0 not proved|mutation(s) under tests, 9 not proved|' verification/reports/021-mutation-audit-*.md $] ---
+_a21_rep21=$(ls verification/reports/021-mutation-audit-*.md 2>/dev/null | head -1)
+if grep -qE '4[0-9] mutation\(s\) under tests, 0 not proved' "$_a21_rep21" 2>/dev/null; then
+  _pass "AUDIT-ALL-PROVED: $_a21_rep21 records the audited run at 0 not proved"
+else
+  _fail "AUDIT-ALL-PROVED: no recorded audited run in ${_a21_rep21:-verification/reports/021-*}"
+fi
+
+# --- MUT-MULTILABEL-REJECTED: a header naming two criteria is unbindable, and says so ---
+# nvc.sh reads both labels of such a header; mutate.sh read NEITHER, so both criteria were absent
+# from the coverage count and neither could carry a mutation. Silent omission.
+# --- [mut$ sed -i.bak 's|multi-label|multi_label_disabled|g' scripts/mutate.sh $] ---
+R=$(mrepo)
+cat > "$R/tests/check_ml.sh" <<'FIXTURE'
+# --- ONE · TWO: two criteria sharing one header ---
+if true; then _pass "ONE: ok"; else _fail "ONE: no"; fi
+FIXTURE
+if have_mut; then ( cd "$R" && bash "$OLDPWD/$MUT" criteria --tests tests ) >"$M99/ml" 2>&1; MRC=$?; fi
+if have_mut && [ "${MRC:-9}" -eq 2 ] && grep -qiE 'multi-label|two criteria|unbindable' "$M99/ml"    && grep -q 'check_ml.sh' "$M99/ml"; then
+  _pass "MUT-MULTILABEL-REJECTED: exit 2 naming $R/tests/check_ml.sh and the shape"
+else
+  _fail "MUT-MULTILABEL-REJECTED: a multi-label header was skipped, not rejected (rc=${MRC:-absent})"
+fi
+rm -rf "$R"
+
+# --- MUT-SELFSCAN-SKIPS-DECLARATION: a scan over its own file ignores comment lines ---
+# A [mut$ … $] declaration lives INSIDE the file it mutates, so a scan for a forbidden literal
+# reads its own scaffolding as the defect. Both check_98 scans went red the moment their
+# declarations were written; neither criterion was wrong.
+# --- [mut$ sed -i.bak 's|grep -vE .\^\[\[:space:\]\]\*#. tests/check_98_adoption.sh | cat tests/check_98_adoption.sh |g' tests/check_98_adoption.sh $] ---
+_a21_scans=$(grep -cE "grep -vE '\^\[\[:space:\]\]\*#' $A21_98" "$A21_98" 2>/dev/null)
+if [ "${_a21_scans:-0}" -ge 2 ]    && grep -q 'mutation declaration lives in' memory/constitution/base/patterns/non-vacuous-checks.md; then
+  _pass "MUT-SELFSCAN-SKIPS-DECLARATION: $_a21_scans self-scans in $A21_98 strip comments; the rule is in the pattern"
+else
+  _fail "MUT-SELFSCAN-SKIPS-DECLARATION: $_a21_scans of 2 self-scans strip comments, or the pattern does not state it"
+fi
+
+# --- AUDIT-REPORTS-CORRECTED: the two reports record what the audit found ---
+# --- [mut$ sed -i.bak '/## 6. Mutation audit/d' verification/reports/018-adoption-fixture-3adc719.md $] ---
+_a21_rep=0
+for _r21 in verification/reports/018-adoption-fixture-*.md verification/reports/019-lifecycle-boundary-*.md; do
+  grep -q '## 6. Mutation audit' "$_r21" 2>/dev/null && _a21_rep=$((_a21_rep+1))
+done
+if [ "$_a21_rep" -eq 2 ]; then
+  _pass "AUDIT-REPORTS-CORRECTED: both audited reports carry their audit section, neither feature reopened"
+else
+  _fail "AUDIT-REPORTS-CORRECTED: $_a21_rep of 2 reports corrected in place"
+fi
+
+# --- AUDIT-COST-REPORTED: the audited run says what it costs ---
+# --- [mut$ sed -i.bak 's|total elapsed|total hidden|' verification/reports/021-mutation-audit-*.md $] ---
+if grep -qE 'total elapsed [0-9]+\.[0-9]+s' "$_a21_rep21" 2>/dev/null; then
+  _pass "AUDIT-COST-REPORTED: $_a21_rep21 carries the measured total elapsed time"
+else
+  _fail "AUDIT-COST-REPORTED: no measured total in ${_a21_rep21:-verification/reports/021-*}"
+fi
+
 rm -rf "$M99"
