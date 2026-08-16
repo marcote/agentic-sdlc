@@ -1,11 +1,11 @@
-# WoW Report — generated 2026-08-09
+# WoW Report — generated 2026-08-16
 
 Aggregates the retro ledger. **Observes, never gates** — the deterministic teeth are
 `tests/check_90_retro.sh`. Input: all `specs/*/retro.md`, their `alignment.md`, and
 `verification/reports/*`.
 
-**N = 12 closed features** (004, 006, 007, 008, 009, 013, 014, 015, 016, 017, 018, plus 003 as
-`n/a`). Small sample, no statistics. Per-feature and themes only; no trends are claimed.
+**N = 13 closed features** (004, 006, 007, 008, 009, 013, 014, 015, 016, 017, 018, 019, plus 003
+as `n/a`). Small sample, no statistics. Per-feature and themes only; no trends are claimed.
 
 > **Since the last generation (N was 7).** Five features closed: 015, 016, 017, 018 and the
 > re-check of 012. The headline is in §3: **the harness found 18 real defects in features that
@@ -39,7 +39,9 @@ the known pin-id defect?* — and the answer was found at `/distill`.
 | 016 | the provenance stamp changing a verdict | a `pending-observation` closed against a pillar whose `since` moved | 2026-09-08 | open |
 | 017 | an executable derivation going red on its own | a spec edited after close, or a wrong number in a future retro | 2026-09-08 | open |
 
-**None overdue.** One sweep, four verdicts, on 2026-09-08.
+| 019 | whether the boundary ever changes a verdict | an `alignment.md` cites a lifecycle predicate by name | 2026-09-08 | open |
+
+**None overdue.** One sweep, five verdicts, on 2026-09-08.
 
 **Worth flagging for that sweep:** 014's trigger (b) is now half-met in a way its author did not
 foresee. `ADOPT-UNCOVERED-FIRES` shows `UNCOVERED` blocking on someone else's charter every time
@@ -61,6 +63,7 @@ ours being stopped, and the sweep should not accept it as such.
 | 016 | 12 | yes | 0 | 1 |
 | 017 | 11 | yes | 0 | 0 |
 | 018 | 16 | yes, 4 documented exceptions | 1 | 0 |
+| 019 | 13 | yes, 2 documented exceptions | 1 | 0 |
 
 **The finding that matters: the harness's own tooling found 18 defects in closed, green features.**
 
@@ -75,14 +78,20 @@ nothing had asked the question yet.**
 
 ### Recurring friction themes
 
-**Semantic vacuity is the standing cost, and it is still unmechanised.** Four vacuous assertions
-across 015, 016 (two) and 018, each caught by reading or by hand-mutation, none by `nvc.sh`. The
-pattern file declares semantic vacuity out of mechanical scope, so this is a known limit rather
-than a surprise — but it has now cost four features. `docs/backlog.md` B8.
+**Semantic vacuity is the standing cost, and it is still unmechanised.** Five vacuous assertions
+across 015, 016 (two), 018 and 019, each caught by reading or by hand-mutation, none by `nvc.sh`.
+The pattern file declares semantic vacuity out of mechanical scope, so this is a known limit rather
+than a surprise. `docs/backlog.md` B8.
+
+**A shape is now visible across the last two.** 018's `ADOPT-REL-RESOLUTION` compared two runs that
+could not differ; 019's `NS-PREDICATE-REACHABLE` built its test input from the thing under test.
+Both are **an assertion whose input guarantees its own outcome** — a narrower family than "semantic
+vacuity", and possibly a mechanisable one.
 
 **Mutation testing is the only thing that catches it, and it is entirely manual.** 018 ran eleven
-mutations by hand; one of them exposed the feature's own vacuous criterion. That is a high-value
-step with no tooling behind it.
+mutations by hand and 019 ran eight; **each caught exactly one vacuous criterion of its own**. Two
+consecutive catches by the same untooled technique is the strongest argument yet that it deserves
+tooling.
 
 **Escalations collapsed and that is not obviously good.** 9 → 4 → 3 → 1 → 0 → 0 across 013 to 018.
 Part is genuine: the ground rules and the charter now answer questions that used to need a human.
@@ -96,8 +105,9 @@ as a quality signal until a session with a human in the loop produces one.
 | Constitution rules | `D3`, `D4`, `D5`, plus the `non-vacuous-checks` override | all 4 landed |
 | North Star amendments | ADR `0004` (`frictionless-adoption` signal) | landed |
 | Charter pins minted by `/plan` | `S4` (013), `S9` (018) | both landed |
+| North Star amendments, second wave | ADR `0005` (lifecycle boundary) | landed |
 | Charter wording sharpened, not superseded | `S1` (014), `S7` (018) | both landed |
-| Backlog items | 13 raised | 2 promoted to features (B1→015, B3→016), 10 open, 0 dropped |
+| Backlog items | 13 raised | 2 promoted to features (B1→015, B3→016), 11 open, 0 dropped |
 
 **The loop closes, and the backlog is where it stops being a treadmill.** Ten open items is not a
 failure: `docs/backlog.md` exists precisely because chaining every finding into the next feature is

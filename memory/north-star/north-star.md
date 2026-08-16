@@ -95,7 +95,11 @@ The block below is the single source of truth, read by the deterministic validat
       "stack-specific deterministic engine (provided by the adopter)",
       "imposing or naming a mandatory execution runtime",
       "blocking commit hooks",
-      "runtime dependencies or frameworks"
+      "runtime dependencies or frameworks",
+      "product discovery and demand validation",
+      "prioritisation, roadmapping or estimation across features",
+      "release, deployment or rollout of the software being built",
+      "production monitoring, incident response or usage analytics"
     ]
   },
   "alignment": {

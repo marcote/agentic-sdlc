@@ -129,3 +129,65 @@ if [ "$_rc" -eq 0 ]; then
   _pass "AMEND-PROV-FRESH: a governed change WITH updated provenance passes the gate"
 else _fail "AMEND-PROV-FRESH: correct provenance was still blocked (exit $_rc, out: $(printf '%s' "$_out" | head -1))"; fi
 rm -rf "$_P"
+
+# ── 019: the gate judges this feature's own diff (D3, reflexive dogfood) ────────────────
+# Every criterion above runs against a fixture. This one runs against the real before/after of
+# the amendment 019 ships, which is the only way to know the gate reaches it at all.
+_R19=$(mktemp -d 2>/dev/null || mktemp -d -t amd19)
+_NS19=memory/north-star/north-star.md
+# NEW = the working tree. OLD = the same file with the four lifecycle predicates removed, which
+# is the state this feature amended.
+#
+# Reconstructed rather than read from git. The first version used `git show main:...`, which is
+# green locally and FAILS in CI: the hermetic-env [given] row this feature carries says the suite
+# must assume a detached HEAD with no local main, and a shallow checkout has neither ref. It
+# scored `changed=0` and both criteria failed on the PR. Caught by CI, which is where that row
+# exists to catch it.
+#
+# Not a fixture: the "before" is derived from the shipped artifact and the shipped ADR, so the
+# diff the gate judges is this feature's real one. If the predicates were ever removed,
+# NS-LIFECYCLE-PREDICATES fails first.
+cp "$_NS19" "$_R19/new.md" 2>/dev/null
+python3 - "$_NS19" "$_R19/old.md" <<'PRE19' 2>/dev/null
+import sys, json, re
+src, dst = sys.argv[1], sys.argv[2]
+s = open(src, encoding="utf-8").read()
+m = re.search(r"```json\s*\n(.*?)\n```", s, re.S)
+d = json.loads(m.group(1))
+out = d["scope"]["out_of_scope"]
+d["scope"]["out_of_scope"] = [p for p in out
+    if not any(w in p for w in ("discovery", "prioritis", "release", "monitoring"))]
+open(dst, "w", encoding="utf-8").write(
+    s[:m.start(1)] + json.dumps(d, indent=2, ensure_ascii=False) + s[m.end(1):])
+PRE19
+_ADR19=$(ls memory/north-star/decisions/0005-*.md 2>/dev/null | head -1)
+_changed19=0
+[ -s "$_R19/old.md" ] && ! cmp -s "$_R19/old.md" "$_R19/new.md" && _changed19=1
+
+# --- AMEND-LIFECYCLE-REFLEXIVE: blocked without 0005, passing with it, on the same diff ---
+# Both directions on ONE diff. One direction alone is what let AMEND-PROV-ONLY pass against any
+# implementation in 016: it never reached the code it claimed to test.
+if [ "$_changed19" -eq 1 ] && [ -n "$_ADR19" ]; then
+  gate_block "AMEND-LIFECYCLE-REFLEXIVE" "019's reconstructed scope diff, no ADR added" 'ADR|decision' \
+    --files "$_R19/old.md" "$_R19/new.md" --added "specs/019-lifecycle-boundary/spec.md" --suite-cmd "true"
+  gate_pass  "AMEND-LIFECYCLE-REFLEXIVE" "019's reconstructed scope diff with 0005 added" \
+    --files "$_R19/old.md" "$_R19/new.md" --added "$_ADR19" --suite-cmd "true"
+else
+  _fail "AMEND-LIFECYCLE-REFLEXIVE: no real scope diff to judge (changed=$_changed19, adr='${_ADR19:-absent}')"
+fi
+
+# --- AMEND-PROVENANCE-QUIET: a scope-only amendment is not asked to move a `since` ---
+# 016's inverse check fires when a pillar's statement/signal moved and its `since` did not. No
+# pillar moves here, so it must stay silent — otherwise every scope edit would demand an ADR
+# about an ADR, which is exactly what 016 refused to build.
+if [ "$_changed19" -eq 1 ] && [ -n "$_ADR19" ]; then
+  bash "$GATE" --files "$_R19/old.md" "$_R19/new.md" --added "$_ADR19" --suite-cmd "true" >/tmp/ag19 2>&1
+  if ! grep -qiE 'provenance|stale|since' /tmp/ag19; then
+    _pass "AMEND-PROVENANCE-QUIET: no provenance complaint on a scope-only amendment"
+  else
+    _fail "AMEND-PROVENANCE-QUIET: the 016 staleness check fired on a diff that moved no pillar: $(head -1 /tmp/ag19)"
+  fi
+else
+  _fail "AMEND-PROVENANCE-QUIET: no real scope diff to judge (changed=$_changed19)"
+fi
+rm -rf "$_R19"

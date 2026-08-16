@@ -32,7 +32,7 @@ Concrete instances raised by the maintainer:
   because compute and transport were fused by omission.
 - Deploy target (Railway vs DigitalOcean vs local) changes architecture, and is usually
   decided last.
-
+//[l,]
 Existing evidence of the hole: `CLAUDE.md` carries a `## Stack` section that `vendor.sh`
 stubs as `_(your language/framework)_`. Nothing obliges anyone to fill it and no command
 reads it.

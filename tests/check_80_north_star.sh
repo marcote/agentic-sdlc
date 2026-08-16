@@ -162,3 +162,127 @@ printf 'read x < %s\n' "$_T80" > "$_FX80/tty.sh"
 grep -q "$_T80" "$_FX80/tty.sh" && _pass "HERMETIC-ENV-80-SELF: pattern matches a genuine occurrence" \
   || _fail "HERMETIC-ENV-80-SELF: assembled pattern is vacuous"
 rm -rf "$_FX80"
+
+# ── 019: the North Star names which parts of the lifecycle the harness governs ──────────
+# out_of_scope had five predicates, four about technology neutrality and one about not writing
+# an adopter's application code. None named a phase of the lifecycle, so /align had nothing to
+# score a discovery or release brief against.
+NS19=memory/north-star/north-star.md
+ENG19=scripts/north-star/engine.py
+# The predicates are read FROM the artifact, never listed here: a check that carries its own copy
+# of what it audits passes when the two drift apart, which is the family check_96 exists for.
+_p19(){ python3 - "$NS19" "$1" <<'P19'
+import sys, json, re
+s = open(sys.argv[1], encoding="utf-8").read()
+d = json.loads(re.search(r"```json\s*\n(.*?)\n```", s, re.S).group(1))
+out = d.get("scope", {}).get("out_of_scope", [])
+sel = [p for p in out if any(w in p for w in ("discovery", "prioritis", "release", "monitoring"))]
+if sys.argv[2] == "lifecycle":
+    print("\n".join(sel))
+elif sys.argv[2] == "count-out":
+    print(len(out))
+elif sys.argv[2] == "count-in":
+    print(len(d.get("scope", {}).get("in_scope", [])))
+elif sys.argv[2] == "all-out":
+    print("\n".join(out))
+elif sys.argv[2] == "pillars":
+    print(",".join(sorted(p["id"] for p in d.get("pillars", []))))
+P19
+}
+_lc19=$(_p19 lifecycle 2>/dev/null)
+_nlc19=$(printf '%s\n' "$_lc19" | grep -c .)
+
+# --- NS-LIFECYCLE-PREDICATES: the boundary is named, and the file stays schema-valid ---
+python3 "$ENG19" schema-valid "$NS19" >/dev/null 2>&1; _sv19=$?
+if [ "$_sv19" -eq 0 ] && [ "$_nlc19" -eq 4 ]; then
+  _pass "NS-LIFECYCLE-PREDICATES: $NS19 schema-valid with $_nlc19 lifecycle predicates in out_of_scope"
+else
+  _fail "NS-LIFECYCLE-PREDICATES: schema-valid=$_sv19, $_nlc19 of 4 lifecycle predicates in $NS19"
+fi
+
+# --- NS-BOUNDARY-BOUNDED: only out_of_scope grew; in_scope and pillars are untouched ---
+# The blast radius of an amendment must be readable in the diff, not reconstructed from it.
+_in19=$(_p19 count-in 2>/dev/null); _out19=$(_p19 count-out 2>/dev/null)
+_pil19=$(_p19 pillars 2>/dev/null)
+if [ "${_in19:-0}" -eq 6 ] && [ "${_out19:-0}" -eq 9 ] \
+   && [ "$_pil19" = "agnostic-portability,frictionless-adoption,measurable-impact,real-enforcement" ]; then
+  _pass "NS-BOUNDARY-BOUNDED: in_scope 6 · out_of_scope 9 · the same four pillar ids in $NS19"
+else
+  _fail "NS-BOUNDARY-BOUNDED: in_scope=$_in19 (want 6) out_of_scope=$_out19 (want 9) pillars=$_pil19"
+fi
+
+# --- NS-PREDICATE-REACHABLE: every predicate is short enough to fire, and does fire ---
+# scope-reject is a contiguous-phrase match, so a compound sentence is a line only a human can
+# ever apply. TWO halves, because the second alone is vacuous: an objective built FROM the
+# predicate contains it by construction and can never fail on length. Mutation M2 proved that —
+# an 18-word predicate passed the reachability half untouched.
+#
+# The cap is 10 words, derived from the five predicates that predate this feature rather than
+# invented: the longest is "application code or product features of an adopting project", at 9.
+_cap19=10; _long19=""; _reach19=1; _nre19=0
+while IFS= read -r _pr19; do
+  [ -n "$_pr19" ] || continue
+  _nre19=$((_nre19+1))
+  [ "$(printf '%s' "$_pr19" | wc -w | tr -d ' ')" -le "$_cap19" ] || _long19="$_long19 [$_pr19]"
+  python3 "$ENG19" scope-reject --north-star "$NS19" "a gate for $_pr19 in every repo" >/dev/null 2>&1 \
+    || _reach19=0
+done <<EOF
+$(_p19 all-out 2>/dev/null)
+EOF
+if [ "$_nre19" -ge 9 ] && [ "$_reach19" -eq 1 ] && [ -z "$_long19" ]; then
+  _pass "NS-PREDICATE-REACHABLE: all $_nre19 out_of_scope predicates are <=$_cap19 words and fire scope-reject"
+else
+  _fail "NS-PREDICATE-REACHABLE: $_nre19 scored, reachable=$_reach19, over the $_cap19-word cap:${_long19:- none}"
+fi
+
+# --- NS-ADOPTION-STAYS-IN-SCOPE: the harness's own delivery is not excluded ---
+# in_scope names "adoption tooling: install, vendoring, and harness inheritance", which IS
+# delivery. This is the one way the feature could ship something worse than the gap it closes.
+_adopt19=1
+for _o19 in "vendor.sh copies the harness into an existing repository" \
+            "bootstrap.sh fetches the harness and applies it from zero" \
+            "adoption tooling: install, vendoring, and harness inheritance"; do
+  python3 "$ENG19" scope-reject --north-star "$NS19" "$_o19" >/dev/null 2>&1 && _adopt19=0
+done
+if [ "$_adopt19" -eq 1 ]; then
+  _pass "NS-ADOPTION-STAYS-IN-SCOPE: 3 adoption objectives clear every predicate in $NS19"
+else
+  _fail "NS-ADOPTION-STAYS-IN-SCOPE: a lifecycle predicate excludes the harness's own delivery"
+fi
+
+# --- NS-REJECTS-NOTHING-BUILT: the boundary rejects nothing already shipped ---
+# The corpus is every `## Success metrics` bullet of every brief in specs/ — what /align step 2
+# actually reads. The COUNT scored is reported because zero hits and an empty run are the same
+# observation from outside (spec.md edge case 4).
+_hits19=0; _tot19=0
+for _b19 in specs/0*/brief.md; do
+  while IFS= read -r _l19; do
+    _o19=$(printf '%s' "$_l19" | sed 's/^- //; s/\*\*//g; s/`//g')
+    [ -n "$_o19" ] || continue
+    _tot19=$((_tot19+1))
+    python3 "$ENG19" scope-reject --north-star "$NS19" "$_o19" >/dev/null 2>&1 && _hits19=$((_hits19+1))
+  done <<EOF
+$(awk '/^## Success metrics/,/^## Out of scope/' "$_b19" | grep -E '^- ')
+EOF
+done
+if [ "$_tot19" -ge 90 ] && [ "$_hits19" -eq 0 ]; then
+  _pass "NS-REJECTS-NOTHING-BUILT: $_tot19 objectives across specs/0*/brief.md scored, $_hits19 hits"
+else
+  _fail "NS-REJECTS-NOTHING-BUILT: $_tot19 objectives scored (want >=90), $_hits19 hit(s) — the boundary rejects shipped work"
+fi
+
+# --- NS-ADR-0005-COMPLETE: the amendment protocol's four sections, each non-empty ---
+# adr-template.md: "an empty placeholder is not a real ADR".
+_adr19=$(ls memory/north-star/decisions/0005-*.md 2>/dev/null | head -1)
+_sec19=0
+if [ -n "$_adr19" ]; then
+  for _h19 in Context Decision Scope-delta Consequences; do
+    awk -v h="## $_h19" 'index($0,h)==1{f=1;next} /^## /{f=0} f && NF' "$_adr19" | grep -q . \
+      && _sec19=$((_sec19+1))
+  done
+fi
+if [ -n "$_adr19" ] && [ "$_sec19" -eq 4 ] && [ ! -e memory/north-star/decisions/0006-*.md ]; then
+  _pass "NS-ADR-0005-COMPLETE: $_adr19 carries 4 non-empty protocol sections, next sequential number"
+else
+  _fail "NS-ADR-0005-COMPLETE: ADR '${_adr19:-absent}' has $_sec19 of 4 non-empty sections"
+fi

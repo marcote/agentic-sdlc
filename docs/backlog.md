@@ -249,6 +249,11 @@ already delivered elsewhere is friction without a justification. The honest opti
 Do not resolve this by deleting the step. Resolve it by measuring which features' task lists
 sequenced anything the coverage matrix did not.
 
+**Second data point, 2026-08-16 (019).** Written after implementation again, for the same reason:
+`coverage.md` was the work-list. Two consecutive features under the same instruction to proceed
+unattended. That is a pattern worth measuring, not yet a conclusion — both were small features
+whose criteria were already sequenced by the RED state.
+
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_
