@@ -193,6 +193,7 @@ _lc19=$(_p19 lifecycle 2>/dev/null)
 _nlc19=$(printf '%s\n' "$_lc19" | grep -c .)
 
 # --- NS-LIFECYCLE-PREDICATES: the boundary is named, and the file stays schema-valid ---
+# --- [mut$ sed -i.bak '/"product discovery and demand validation",/d' memory/north-star/north-star.md $] ---
 python3 "$ENG19" schema-valid "$NS19" >/dev/null 2>&1; _sv19=$?
 if [ "$_sv19" -eq 0 ] && [ "$_nlc19" -eq 4 ]; then
   _pass "NS-LIFECYCLE-PREDICATES: $NS19 schema-valid with $_nlc19 lifecycle predicates in out_of_scope"
@@ -201,6 +202,7 @@ else
 fi
 
 # --- NS-BOUNDARY-BOUNDED: only out_of_scope grew; in_scope and pillars are untouched ---
+# --- [mut$ sed -i.bak 's|"WoW self-validation (retro, wow-report) and method documentation"|"WoW self-validation (retro, wow-report) and method documentation",\n      "something new"|' memory/north-star/north-star.md $] ---
 # The blast radius of an amendment must be readable in the diff, not reconstructed from it.
 _in19=$(_p19 count-in 2>/dev/null); _out19=$(_p19 count-out 2>/dev/null)
 _pil19=$(_p19 pillars 2>/dev/null)
@@ -212,6 +214,7 @@ else
 fi
 
 # --- NS-PREDICATE-REACHABLE: every predicate is short enough to fire, and does fire ---
+# --- [mut$ sed -i.bak 's|"product discovery and demand validation"|"we do not do product discovery or any form of demand validation with real users before a brief is ever written"|' memory/north-star/north-star.md $] ---
 # scope-reject is a contiguous-phrase match, so a compound sentence is a line only a human can
 # ever apply. TWO halves, because the second alone is vacuous: an objective built FROM the
 # predicate contains it by construction and can never fail on length. Mutation M2 proved that —
@@ -236,6 +239,7 @@ else
 fi
 
 # --- NS-ADOPTION-STAYS-IN-SCOPE: the harness's own delivery is not excluded ---
+# --- [mut$ sed -i.bak 's|"release, deployment or rollout of the software being built"|"vendoring"|' memory/north-star/north-star.md $] ---
 # in_scope names "adoption tooling: install, vendoring, and harness inheritance", which IS
 # delivery. This is the one way the feature could ship something worse than the gap it closes.
 _adopt19=1
@@ -251,6 +255,7 @@ else
 fi
 
 # --- NS-REJECTS-NOTHING-BUILT: the boundary rejects nothing already shipped ---
+# --- [mut$ sed -i.bak 's|"blocking commit hooks"|"the suite stays green"|' memory/north-star/north-star.md $] ---
 # The corpus is every `## Success metrics` bullet of every brief in specs/ — what /align step 2
 # actually reads. The COUNT scored is reported because zero hits and an empty run are the same
 # observation from outside (spec.md edge case 4).
@@ -272,6 +277,7 @@ else
 fi
 
 # --- NS-ADR-0005-COMPLETE: the amendment protocol's four sections, each non-empty ---
+# --- [mut$ rm -f memory/north-star/decisions/0005-lifecycle-boundary.md $] ---
 # adr-template.md: "an empty placeholder is not a real ADR".
 _adr19=$(ls memory/north-star/decisions/0005-*.md 2>/dev/null | head -1)
 _sec19=0

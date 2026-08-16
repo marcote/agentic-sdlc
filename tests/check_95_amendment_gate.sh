@@ -165,6 +165,7 @@ _changed19=0
 [ -s "$_R19/old.md" ] && ! cmp -s "$_R19/old.md" "$_R19/new.md" && _changed19=1
 
 # --- AMEND-LIFECYCLE-REFLEXIVE: blocked without 0005, passing with it, on the same diff ---
+# --- [mut$ rm -f memory/north-star/decisions/0005-lifecycle-boundary.md $] ---
 # Both directions on ONE diff. One direction alone is what let AMEND-PROV-ONLY pass against any
 # implementation in 016: it never reached the code it claimed to test.
 if [ "$_changed19" -eq 1 ] && [ -n "$_ADR19" ]; then
@@ -177,6 +178,7 @@ else
 fi
 
 # --- AMEND-PROVENANCE-QUIET: a scope-only amendment is not asked to move a `since` ---
+# --- [mut$ sed -i.bak 's|^stale_provenance(){.*|stale_provenance(){ echo "provenance stale: injected"; return 0;|' scripts/amendment-gate.sh $] ---
 # 016's inverse check fires when a pillar's statement/signal moved and its `since` did not. No
 # pillar moves here, so it must stay silent — otherwise every scope edit would demand an ADR
 # about an ADR, which is exactly what 016 refused to build.

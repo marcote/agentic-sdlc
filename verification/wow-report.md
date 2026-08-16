@@ -4,8 +4,8 @@ Aggregates the retro ledger. **Observes, never gates** — the deterministic tee
 `tests/check_90_retro.sh`. Input: all `specs/*/retro.md`, their `alignment.md`, and
 `verification/reports/*`.
 
-**N = 13 closed features** (004, 006, 007, 008, 009, 013, 014, 015, 016, 017, 018, 019, plus 003
-as `n/a`). Small sample, no statistics. Per-feature and themes only; no trends are claimed.
+**N = 15 closed features** (004, 006, 007, 008, 009, 013, 014, 015, 016, 017, 018, 019, 020, 021,
+plus 003 as `n/a`). Small sample, no statistics. Per-feature and themes only; no trends are claimed.
 
 > **Since the last generation (N was 7).** Five features closed: 015, 016, 017, 018 and the
 > re-check of 012. The headline is in §3: **the harness found 18 real defects in features that
@@ -64,6 +64,8 @@ ours being stopped, and the sweep should not accept it as such.
 | 017 | 11 | yes | 0 | 0 |
 | 018 | 16 | yes, 4 documented exceptions | 1 | 0 |
 | 019 | 13 | yes, 2 documented exceptions | 1 | 0 |
+| 020 | 14 | yes, **0** exceptions | 3 | 0 |
+| 021 | 10 | yes, **0** exceptions | 2 | 0 |
 
 **The finding that matters: the harness's own tooling found 18 defects in closed, green features.**
 
@@ -88,10 +90,15 @@ could not differ; 019's `NS-PREDICATE-REACHABLE` built its test input from the t
 Both are **an assertion whose input guarantees its own outcome** — a narrower family than "semantic
 vacuity", and possibly a mechanisable one.
 
-**Mutation testing is the only thing that catches it, and it is entirely manual.** 018 ran eleven
-mutations by hand and 019 ran eight; **each caught exactly one vacuous criterion of its own**. Two
-consecutive catches by the same untooled technique is the strongest argument yet that it deserves
-tooling.
+**Mutation testing is no longer manual, and the audit corrected the record.** 020 shipped a runner;
+021 re-declared 018's and 019's tables as commands. **18 of 19 reproduce.** 020's own 6-of-14 rate
+did not generalise — it came from mutations written against a tool that was still changing.
+
+**The real defect in those tables was coverage, not validity.** 018 recorded 11 mutations against
+16 criteria. Nobody was looking for that, and it was found by counting rather than by suspecting.
+
+**46 declarations now run at every `/verify` and in CI, at 66s.** `check-can-fail` stopped being a
+sentence in a report.
 
 **Escalations collapsed and that is not obviously good.** 9 → 4 → 3 → 1 → 0 → 0 across 013 to 018.
 Part is genuine: the ground rules and the charter now answer questions that used to need a human.

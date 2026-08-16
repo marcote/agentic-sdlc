@@ -281,9 +281,19 @@ Two candidate triggers, both written down rather than guessed at:
 Do not resolve this by requiring a mutation everywhere. The cost is about a second each, and
 several hundred criteria exist.
 
-## B16 — The by-hand mutation tables of 018 and 019 cannot be reproduced
+**Better informed after 021.** The audit found that the real gap in the two tables was **coverage**,
+not weak mutations: seven criteria of 018 had none at all. So the trigger should be about *criteria
+without a declaration* — cheap to compute and hermetic — rather than about detecting a suspect
+shape, which the two known instances show cannot be done with one pattern.
 
-**Status:** open · **Raised:** 2026-08-16 (020 `/retro`) · **Size:** small
+## ~~B16~~ — The by-hand mutation tables of 018 and 019 cannot be reproduced
+
+**Status: DONE 2026-08-16 → `specs/021-mutation-audit/`.** Re-declared as commands and run.
+**18 of 19 reproduce.** The one that does not was valid when it ran; the criterion changed
+underneath it. The real defect was **coverage** — 018 recorded 11 mutations against 16 criteria —
+and the audit found three defects in 020 while doing it.
+
+*Original entry retained below.* · **Raised:** 2026-08-16 (020 `/retro`) · **Size:** small
 
 018 recorded eleven mutations and 019 eight, each as a sentence in a verification report. 020's
 first run found that **six of its own fourteen** hand-written mutations broke nothing.

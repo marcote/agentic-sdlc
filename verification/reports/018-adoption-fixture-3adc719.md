@@ -148,3 +148,23 @@ BUILD: ✅ · TRAJECTORY: ✅ (one recorded deviation, `/tasks` written after im
 Closes ⟺ BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
 Retro: `specs/018-adoption-fixture/retro.md`.
 Gaps routed: none.
+
+## 6. Mutation audit — appended 2026-08-16 by feature 021
+
+The table in §2 was written as prose and could not be re-run. Feature 020 shipped a runner for
+exactly that, and 021 re-declared every mutation as a command. Two findings about **this** report:
+
+**Coverage: 11 mutations were recorded against 16 criteria.** Seven had none —
+`ADOPT-FIXTURE-DROP`, `ADOPT-VENDOR-APPLY`, `ADOPT-GUARD-CLEAN`, `ADOPT-NO-SILENT-EMPTY`,
+`ADOPT-UNCOVERED-FIRES`, `S2-HEDGE-98`, `HERMETIC-ENV-98`. §2 reads as though failability was
+established for the feature; it was established for two thirds of it. All 18 now declare one
+(16 criteria, plus two freed by splitting a combined header).
+
+**Validity: all 11 recorded mutations reproduce.** Nothing in this table was wrong.
+
+**One defect in this file, found by the audit and fixed there:** `ADOPT-GUARD-BY-NAME` and
+`HERMETIC-ENV-98` scan this check file for a literal, and a `[mut$ … $]` declaration is a comment
+line **inside** the file it mutates. Both went red against their own declarations. Both now strip
+comment lines first. The criteria were right; the scans were reading scaffolding as code.
+
+**The feature is not reopened.** BUILD, TRAJECTORY and UAT stand.
