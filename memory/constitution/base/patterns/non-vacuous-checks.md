@@ -39,6 +39,38 @@ artifacts could not answer.
   false result against a clone of **uncommitted** work. Neither was a tool defect; both were
   invisible because the tool never said what it had looked at.
 
+## `check-can-fail`, executed
+
+The first row above may be satisfied by a human writing *"proved failable"* in a report. The
+proving is real when it happens; it happens **once, by hand, and is never repeated**. A criterion
+that could fail in one month is not thereby asserted to still be able to fail in the next.
+
+A criterion may instead declare the edit that must break it, next to the assertion:
+
+```
+# --- SOME-CRITERION: what it asserts ---
+# --- [mut$ printf 'BAD\n' > subject.txt $] ---
+```
+
+A runner applies that edit to a throwaway copy of the tree, re-runs the check file that owns the
+criterion, and requires it to emit `FAIL`. One that survives is named, with the edit that failed to
+break it.
+
+**Three outcomes, and they are not interchangeable.** *Proved* · *survived its own edit* · *emitted
+nothing at all*. The third must never be read as the first: silence and failure look identical from
+outside, which is this pattern's whole subject.
+
+**The runner needs its own negative.** One reporting every criterion as failable while applying
+nothing is indistinguishable from one that works.
+
+**Evidence it was worth building.** Two vacuous assertions shipped in consecutive features and were
+caught only by mutating by hand — an assertion comparing two copies of the same tree, and one
+building its test input from the artifact under test. Replayed against this mechanism in the form
+actually shipped, both are reported.
+
+*Adopters inherit the pattern, not the runner.* A runner encodes a repository's own `_pass`/`_fail`
+conventions. The declaration grammar is the portable part.
+
 ## What this pattern does not cover
 
 **Semantic vacuity stays a review concern.** Whether an assertion's pattern is satisfied by text

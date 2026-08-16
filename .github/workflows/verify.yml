@@ -10,5 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Harness self-verification
         run: bash tests/run.sh
+      - name: Declared mutations (check-can-fail, executed)
+        run: bash scripts/mutate.sh run --tests tests
       # Placeholder (agent-driven /verify in CI): posting the verification-report as a PR comment
       # is up to each project — depends on the stack and the eval runner.
