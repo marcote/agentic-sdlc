@@ -29,6 +29,7 @@ a98_sandbox(){ local T; T=$(a98_mk); a98_have && cp -R "$A98_FIX/." "$T/" 2>/dev
 a98_vendored(){ local T; T=$(a98_sandbox); [ -f "$A98_VENDOR" ] && bash "$A98_VENDOR" --apply "$T" >/dev/null 2>&1; echo "$T"; }
 
 # --- ADOPT-FIXTURE-BUDGET: the product half stays inert and small ---
+# --- [mut$ python3 -c "open('tests/fixtures/adopter/ledger.py','a').write('#pad\n'*30)" $] ---
 # Product half = everything outside memory/ and scripts/. The budget is what makes "it grew into
 # an application" mechanically visible; intent is UAT-FIXTURE-INERT's job, not this one.
 if a98_have; then
@@ -43,6 +44,7 @@ else
 fi
 
 # --- ADOPT-FIXTURE-DROP: the fixture is never vendored into a target ---
+# --- [mut$ sed -i.bak 's|^KEEP=(|KEEP=(\n  tests|' scripts/vendor.sh $] ---
 T=$(a98_mk)
 [ -f "$A98_VENDOR" ] && bash "$A98_VENDOR" --apply "$T" >/dev/null 2>&1
 if [ -f "$A98_VENDOR" ] && [ ! -e "$T/$A98_FIX" ] && [ ! -e "$T/tests" ]; then
@@ -53,6 +55,7 @@ fi
 rm -rf "$T"
 
 # --- ADOPT-VENDOR-APPLY: the suite vendors onto the fixture with no manual step ---
+# --- [mut$ sed -i.bak 's|^copy_keep$|:|' scripts/vendor.sh $] ---
 A98_T=$(a98_vendored)
 if a98_have && [ -f "$A98_T/.claude/commands/align.md" ] && [ -f "$A98_T/$A98_SE" ] \
    && [ -f "$A98_T/$A98_NE" ]; then
@@ -62,6 +65,7 @@ else
 fi
 
 # --- ADOPT-SEED-PRESERVED: the fixture's authored files survive, .harness-new is written ---
+# --- [mut$ rm -f tests/fixtures/adopter/scripts/test.sh $] ---
 a98_seed_ok=1
 for a98_s in memory/stack/stack.md memory/north-star/north-star.md scripts/test.sh; do
   [ -f "$A98_FIX/$a98_s" ] || { a98_seed_ok=0; continue; }
@@ -75,6 +79,7 @@ else
 fi
 
 # --- ADOPT-CHARTER-PINS: exposure reports the fixture's own pins, not empty ---
+# --- [mut$ sed -i.bak 's|(?!GR.d)(\[A-Z\]{1,3}.d+)|(S\\\\d+)|' scripts/stack/engine.py $] ---
 # Expected count derived from the fixture (S9 Hedge), never written in here.
 # `GR` is excluded here for the same reason the engine excludes it: `### GR2 — n/a` is a
 # declination, not a pin, and counting it would make this check disagree with the gate it audits.
@@ -90,6 +95,7 @@ else
 fi
 
 # --- ADOPT-NS-VALID: the fixture's authored North Star validates (016's exit 3, inverted) ---
+# --- [mut$ sed -i.bak 's|"mission": "Turn[^"]*"|"mission": "TODO: one sentence — why this product exists"|' tests/fixtures/adopter/memory/north-star/north-star.md $] ---
 python3 "$A98_NE" schema-valid "$A98_T/memory/north-star/north-star.md" >/tmp/a98_ns 2>&1; a98_nsrc=$?
 if a98_have && [ "$a98_nsrc" -eq 0 ]; then
   _pass "ADOPT-NS-VALID: the fixture's filled North Star exits 0 in $A98_T (016 asserts the stub exits 3)"
@@ -106,6 +112,7 @@ a98_extra=$(comm -13 <(a98_ids_in "$A98_T/memory/stack/base/ground-rules.md") \
                      <(a98_ids_in "$A98_T/memory/stack/ground-rules.md") | head -1)
 
 # --- ADOPT-GR-COVERED: run from inside the target, every effective rule has a verdict ---
+# --- [mut$ sed -i.bak '/^- Answers:    GR4$/d' tests/fixtures/adopter/memory/stack/stack.md $] ---
 A98_GR_IN=$( cd "$A98_T" 2>/dev/null && python3 scripts/stack/engine.py ground-rules memory/stack/stack.md 2>&1 )
 a98_grin_rc=$?
 a98_n=$(printf '%s\n' "$A98_GR_IN" | grep -cE '^GR[0-9]+: ')
@@ -117,6 +124,7 @@ else
 fi
 
 # --- ADOPT-REL-RESOLUTION: companion files resolve from the artifact, not the process cwd ---
+# --- [mut$ sed -i.bak 's|^    roots, d = .*|    return [p for p in ["memory/stack/base/ground-rules.md"] if os.path.exists(p)]|' scripts/stack/engine.py $] ---
 # Found at /distill: the stack engine resolved the ground rule file against cwd while the North
 # Star engine resolves decisions/ against the artifact.
 #
@@ -140,6 +148,7 @@ fi
 rm -rf "$A98_N"
 
 # --- ADOPT-GUARD-BY-NAME: guards are executed as the string the engine emitted ---
+# --- [mut$ printf '\na98_gname=stdlib-only\n' >> tests/check_98_adoption.sh $] ---
 # The harness must not know what a guard checks. Proof: the guard's own name, read from the
 # fixture at runtime, must not appear anywhere in this file. The pattern's non-vacuity is
 # self-tested against the charter it came from, in the same criterion.
@@ -149,13 +158,14 @@ a98_ng=$(printf '%s\n' "$A98_GUARDS" | grep -c .)
 a98_selftest=0
 [ -n "${a98_gname:-}" ] && grep -qF "$a98_gname" "$A98_FIX/memory/stack/stack.md" 2>/dev/null && a98_selftest=1
 if a98_have && [ "$a98_ng" -ge 1 ] && [ "$a98_selftest" -eq 1 ] \
-   && ! grep -qF "$a98_gname" tests/check_98_adoption.sh; then
+   && ! grep -vE '^[[:space:]]*#' tests/check_98_adoption.sh | grep -qF "$a98_gname"; then
   _pass "ADOPT-GUARD-BY-NAME: $a98_ng guard(s) taken from the engine; no fixture guard name written into this check"
 else
   _fail "ADOPT-GUARD-BY-NAME: $a98_ng guard(s), self-test=$a98_selftest — a guard name is hardcoded here or the pattern is vacuous"
 fi
 
 # --- ADOPT-GUARD-CLEAN: every emitted guard exits 0 on the clean fixture ---
+# --- [mut$ sed -i.bak 's|^exit .bad$|exit 1|' tests/fixtures/adopter/scripts/guards/stdlib-only.sh $] ---
 a98_clean=1
 printf '%s\n' "$A98_GUARDS" | grep -q . || a98_clean=0
 while IFS= read -r a98_cmd; do
@@ -171,6 +181,7 @@ else
 fi
 
 # --- ADOPT-GUARD-FAILS: the same guards reject a tree that violates their stance ---
+# --- [mut$ printf 'exit 0\n' > tests/fixtures/adopter-violate.sh $] ---
 # The violation is authored by the fixture, not by this check: a guard that cannot fail
 # certifies nothing, and a harness that writes the violation itself is testing its own
 # knowledge of the fixture rather than the seam.
@@ -191,6 +202,7 @@ fi
 rm -rf "$A98_V"
 
 # --- ADOPT-NO-SILENT-EMPTY: no gate returns a result that names nothing the fixture owns ---
+# --- [mut$ sed -i.bak '/^- Guard: /d' tests/fixtures/adopter/memory/stack/stack.md $] ---
 # The generalisation of the pin-id defect: a gate that reports empty, or reports this
 # repository's own artifacts, on a target that is not this repository.
 a98_pillar=$(grep -oE '"id"[[:space:]]*:[[:space:]]*"[^"]+"' "$A98_FIX/memory/north-star/north-star.md" 2>/dev/null \
@@ -215,6 +227,7 @@ else
 fi
 
 # --- ADOPT-UNCOVERED-FIRES: the floor blocks on a foreign charter, naming the rule ---
+# --- [mut$ sed -i.bak 's|%s: uncovered|%s: unknown|' scripts/stack/engine.py $] ---
 A98_U=$(a98_vendored)
 a98_gr4=$(grep -B12 -E '^- Answers:.*GR4' "$A98_U/memory/stack/stack.md" 2>/dev/null \
           | grep -oE '^### [A-Z]{1,3}[0-9]+' | tail -1 | awk '{print $2}')
@@ -232,7 +245,10 @@ else
 fi
 rm -rf "$A98_U"
 
-# --- ADOPT-TESTCMD-INVOKED · ADOPT-TESTCMD-NOT-COUNTED: the seam, never the verdict ---
+# --- ADOPT-TESTCMD-INVOKED: the seam, never the verdict ---
+# --- [mut$ printf '#!/usr/bin/env bash\nexit 127\n' > tests/fixtures/adopter/scripts/test.sh $] ---
+# --- ADOPT-TESTCMD-NOT-COUNTED: and the fixture's result stays out of the harness count ---
+# --- [mut$ sed -i.bak 's|^  a98_p1=.PASSES; a98_f1=.FAILS|  _pass "leak"; a98_p1=$PASSES; a98_f1=$FAILS|' tests/check_98_adoption.sh $] ---
 # S7: the exit code is observed and reported, NOT required to be 0. Requiring it would make a
 # green tests/run.sh also claim the fixture works, which is exactly S7's falsifier.
 if ! command -v python3 >/dev/null 2>&1; then
@@ -256,6 +272,7 @@ fi
 rm -rf "$A98_T"
 
 # --- S2-HEDGE-98: the engine change stays behind the shell CLI ---
+# --- [mut$ printf '\nimport engine\n' >> scripts/stack/engine.py $] ---
 if grep -qE '^\s+ground-rules FILE' "$A98_SE" 2>/dev/null \
    && ! grep -qE '^\s*from\s+engine\s+import|^\s*import\s+engine' scripts/*.sh scripts/*/*.py tests/*.sh 2>/dev/null; then
   _pass "S2-HEDGE-98: ground-rules stays a documented subcommand, no importable caller"
@@ -264,12 +281,14 @@ else
 fi
 
 # --- HERMETIC-ENV-98: assembled at runtime so this scan cannot match its own line ---
+# --- [mut$ printf 'read x < /dev/tty\n' >> tests/check_98_adoption.sh $] ---
 _T98='/dev'; _T98="$_T98/t""ty"
-if ! grep -q "$_T98" tests/check_98_adoption.sh 2>/dev/null; then
+if ! grep -vE '^[[:space:]]*#' tests/check_98_adoption.sh | grep -q "$_T98"; then
   _pass "HERMETIC-ENV-98: this check assumes no terminal"
 else _fail "HERMETIC-ENV-98: this check reads a terminal"; fi
 
 # --- ADOPT-SANDBOX-CLEAN: the committed fixture is untouched by everything above ---
+# --- [mut$ sed -i.bak 's|^# --- ADOPT-VENDOR-APPLY:|echo tampered >> tests/fixtures/adopter/ledger.py\n# --- ADOPT-VENDOR-APPLY:|' tests/check_98_adoption.sh $] ---
 # Runs last on purpose. git checkout cannot restore an untracked file, so a leak here is not
 # recoverable by the usual means — it silently changes what every later run tests.
 A98_AFTER=$(a98_have && a98_digest "$A98_FIX")
