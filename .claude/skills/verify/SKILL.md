@@ -16,8 +16,18 @@ description: On-demand verification of a feature. Runs output + trajectory eval 
    lets a project's own stances be enforced without the harness prescribing any stack. A
    `Guard` that cannot fail on a violating tree is vacuous and counts as a FAIL, not a pass.
    No charter → no guards to run; that is not a failure, but say so rather than reporting green.
-4. **Trajectory eval:** score against `evals/rubric.md` (tool use, skipped steps,
+4. **Declared mutations (BUILD, cont.):** run `bash scripts/mutate.sh run --tests tests` and
+   require exit 0. Each criterion that declares a `[mut$ … $]` edit must FAIL under it; one that
+   survives is reported by name with the edit that failed to break it. This is `check-can-fail`
+   executed rather than asserted.
+
+   **Why here and not inside `tests/run.sh`:** the runner re-runs check files, and a check file
+   that invoked the runner would re-enter it once per mutation — through `check_96`, which already
+   re-runs the whole suite, the cost multiplies by the number of declarations. Mutations run where
+   `Guard`s run: at `/verify` and in CI.
+
+5. **Trajectory eval:** score against `evals/rubric.md` (tool use, skipped steps,
    hallucination). A flow that skipped verification is FAIL even if the build passes.
-5. Update the states in `coverage.md` (🔴→🟢) and complete the Verdict.
-6. If BUILD/TRAJECTORY fail → IMPLEMENTATION gap → go back to implement.
+6. Update the states in `coverage.md` (🔴→🟢) and complete the Verdict.
+7. If BUILD/TRAJECTORY fail → IMPLEMENTATION gap → go back to implement.
    Do NOT call UAT or closing non-deterministic evals from here.

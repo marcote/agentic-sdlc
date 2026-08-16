@@ -127,7 +127,15 @@ also carry per-pillar provenance.
 
 ## B8 — Semantic vacuity has now cost two features, and stays unmechanised
 
-**Status:** open · **Raised:** 2026-08-09 (016 `/uat`) · **Size:** unknown
+**Status: PARTLY CLOSED 2026-08-16 → `specs/020-executable-mutations/`.** The *narrow* family — an
+assertion whose input guarantees its own outcome — now has a mechanical form: a criterion declares
+the edit that must break it, and `scripts/mutate.sh` requires it to fail. 018's and 019's real
+instances are both caught in replay.
+
+**Semantic vacuity generally is NOT closed.** Declaring is opt-in, so nothing catches an assertion
+whose author never wrote a mutation for it. Two successors below.
+
+*Original entry retained.* · **Raised:** 2026-08-09 (016 `/uat`) · **Size:** unknown
 
 Two of 016's own assertions were vacuous and `nvc.sh` caught neither: one grepped `since`, an
 ordinary English word that appeared in a scoring rationale; one could not reach the code it claimed
@@ -253,6 +261,54 @@ sequenced anything the coverage matrix did not.
 `coverage.md` was the work-list. Two consecutive features under the same instruction to proceed
 unattended. That is a pattern worth measuring, not yet a conclusion — both were small features
 whose criteria were already sequenced by the RED state.
+
+## B15 — Who must declare a mutation?
+
+**Status:** open · **Raised:** 2026-08-16 (020 `/uat`) · **Size:** small
+
+`scripts/mutate.sh` runs every declared mutation. Nothing requires a criterion to declare one, so
+the mechanism catches only what its author already suspected.
+
+Two candidate triggers, both written down rather than guessed at:
+
+- **By diff.** Every criterion added or changed on the current branch must declare one. Proportional
+  and precise, but `git diff` against a branch ref is what 019 shipped and CI rejected — a shallow
+  detached-HEAD checkout has neither `main` nor `origin/main`.
+- **By shape.** `nvc.sh` flags a criterion whose assertion interpolates a value read from its own
+  subject, and a flagged criterion must declare one. Hermetic and self-selecting, but the two known
+  instances have *different* shapes, so one regex will not see both.
+
+Do not resolve this by requiring a mutation everywhere. The cost is about a second each, and
+several hundred criteria exist.
+
+## B16 — The by-hand mutation tables of 018 and 019 cannot be reproduced
+
+**Status:** open · **Raised:** 2026-08-16 (020 `/retro`) · **Size:** small
+
+018 recorded eleven mutations and 019 eight, each as a sentence in a verification report. 020's
+first run found that **six of its own fourteen** hand-written mutations broke nothing.
+
+The same rate would put several of those nineteen in the same state, and there is no way to check:
+they were written as prose, not as commands. The reports read as evidence and are weaker than they
+read.
+
+Cheapest honest fix is to re-declare them as `[mut$ … $]` against the criteria that still exist, and
+report how many survive. That is a measurement, not a rewrite of history.
+
+## B14 — Twenty-one `📋 case` rows point at no case file
+
+**Status:** open · **Raised:** 2026-08-16 · **Size:** small
+
+Across `specs/*/coverage.md` there are **32** rows marked `📋 case`. `evals/cases/` holds **8**
+files. Twenty-one rows cite no file at all, and one cites `evals/cases/reject-msg.yaml`, which does
+not exist.
+
+Nothing checks that a `📋 case` row points at anything. Same family as `B5` and `B11`: the failure
+looks exactly like the success, because a row that names nothing and a row whose case is merely
+unscored render identically in the matrix.
+
+Distinct from `B2`, which is about the cases never being **scored**. This is about not knowing how
+many there are to score.
 
 ## Dropped
 
