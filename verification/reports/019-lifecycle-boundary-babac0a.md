@@ -19,7 +19,7 @@ spec: `specs/019-lifecycle-boundary/spec.md` · date: 2026-08-16 · constitution
 | NS-ADOPTION-STAYS-IN-SCOPE | 🟢 3 adoption objectives clear every predicate |
 | NS-REJECTS-NOTHING-BUILT | 🟢 **101 objectives scored, 0 hits** |
 | NS-ADR-0005-COMPLETE | 🟢 4 non-empty protocol sections, next sequential number |
-| AMEND-LIFECYCLE-REFLEXIVE | 🟢 blocks without `0005`, passes with it, on the real diff |
+| AMEND-LIFECYCLE-REFLEXIVE | 🟢 blocks without `0005`, passes with it, on the reconstructed real diff |
 | AMEND-PROVENANCE-QUIET | 🟢 no provenance complaint on a scope-only amendment |
 
 **Task success: 488/488 = 100%.**
@@ -69,6 +69,22 @@ features of an adopting project"*, at 9 words.
 
 Recorded rather than quietly fixed. **Second consecutive feature where a self-satisfying assertion
 survived until mutation testing**, after 018's `ADOPT-REL-RESOLUTION`.
+
+### CI caught a defect the local run could not
+
+The first version of `AMEND-LIFECYCLE-REFLEXIVE` read the previous North Star with
+`git show main:…`. Green locally; **`changed=0` and both reflexive criteria FAIL on the PR**, because
+a shallow detached-HEAD checkout has neither `main` nor `origin/main`.
+
+That is precisely the `hermetic-env` `[given]` row this feature carries — *"a detached-HEAD,
+no-terminal, no-local-branch checkout"*. I wrote the row into `coverage.md` and then broke it.
+
+The before state is now **reconstructed** from the shipped artifact by removing the four predicates
+ADR `0005` says it added. Still this feature's real diff; touches no git ref. Verified against a
+detached-HEAD sandbox with no local branch: **493/0**.
+
+**Recorded as a second rework, not folded into the first.** Two defects reached a state where
+something else had to catch them: M2 caught one, CI caught the other.
 
 ## 3. Trajectory eval
 

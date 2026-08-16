@@ -34,9 +34,10 @@ closes: `specs/019-lifecycle-boundary/alignment.md` · `verification/reports/019
   than from imagining it.
 - **RED→GREEN discipline:** yes, with 2 documented exceptions `[deriv: coverage.md §"RED state (/contract)"]`.
   6 of 8 criteria failed at `/contract`, before the ADR and the diff existed.
-- **Rework post-`/verify`:** 1 · **post-`/uat`:** 0 `[deriv: verification/reports/019-lifecycle-boundary-babac0a.md §2]`.
+- **Rework post-`/verify`:** 2 · **post-`/uat`:** 0 `[deriv: verification/reports/019-lifecycle-boundary-babac0a.md §2]`.
   `NS-PREDICATE-REACHABLE`, rewritten after M2 showed it could not fail on the property it existed
-  to forbid.
+  to forbid. And `AMEND-LIFECYCLE-REFLEXIVE`, which read `git show main:…` — green locally, failing
+  in CI, because a shallow detached-HEAD checkout has neither ref.
 - **Escalations to the human:** 0 `[deriv: git log main..HEAD; the session ran unattended by request]`.
 - **Criteria that can fail, proved:** 8 mutations `[deriv$ grep -cE '^\| M[0-9]+ \|' verification/reports/019-lifecycle-boundary-babac0a.md $]`, one at a time, each reverted before the next.
 - **Friction from the WoW itself.** One thing, and it is the same thing as last feature.
@@ -49,6 +50,11 @@ closes: `specs/019-lifecycle-boundary/alignment.md` · `verification/reports/019
   That is now four vacuous assertions in five features, all caught, none by `nvc.sh`. `B8` has
   tracked this as unmechanised since 015. Two consecutive catches by the same manual technique is
   the strongest argument yet that the technique deserves tooling.
+
+- **The second one is worth more than the first.** I wrote the `hermetic-env` `[given]` row into
+  this feature's own `coverage.md` and then broke it in the same feature. The row did its job — CI
+  is where it is enforced, and CI is what caught it. A carried `[given]` row is not a reminder;
+  it is a check that runs somewhere I am not.
 
 ## Face C — Loop
 
