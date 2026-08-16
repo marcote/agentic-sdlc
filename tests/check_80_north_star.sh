@@ -183,6 +183,8 @@ elif sys.argv[2] == "count-out":
     print(len(out))
 elif sys.argv[2] == "count-in":
     print(len(d.get("scope", {}).get("in_scope", [])))
+elif sys.argv[2] == "all-out":
+    print("\n".join(out))
 elif sys.argv[2] == "pillars":
     print(",".join(sorted(p["id"] for p in d.get("pillars", []))))
 P19
@@ -209,22 +211,28 @@ else
   _fail "NS-BOUNDARY-BOUNDED: in_scope=$_in19 (want 6) out_of_scope=$_out19 (want 9) pillars=$_pil19"
 fi
 
-# --- NS-PREDICATE-REACHABLE: each new predicate can actually fire ---
-# scope-reject is a contiguous-phrase match, so a compound sentence would be a line only a human
-# can ever apply. Each predicate is fed an objective built from the predicate itself.
-_reach19=1; _nre19=0
+# --- NS-PREDICATE-REACHABLE: every predicate is short enough to fire, and does fire ---
+# scope-reject is a contiguous-phrase match, so a compound sentence is a line only a human can
+# ever apply. TWO halves, because the second alone is vacuous: an objective built FROM the
+# predicate contains it by construction and can never fail on length. Mutation M2 proved that —
+# an 18-word predicate passed the reachability half untouched.
+#
+# The cap is 10 words, derived from the five predicates that predate this feature rather than
+# invented: the longest is "application code or product features of an adopting project", at 9.
+_cap19=10; _long19=""; _reach19=1; _nre19=0
 while IFS= read -r _pr19; do
   [ -n "$_pr19" ] || continue
   _nre19=$((_nre19+1))
+  [ "$(printf '%s' "$_pr19" | wc -w | tr -d ' ')" -le "$_cap19" ] || _long19="$_long19 [$_pr19]"
   python3 "$ENG19" scope-reject --north-star "$NS19" "a gate for $_pr19 in every repo" >/dev/null 2>&1 \
     || _reach19=0
 done <<EOF
-$_lc19
+$(_p19 all-out 2>/dev/null)
 EOF
-if [ "$_nre19" -ge 4 ] && [ "$_reach19" -eq 1 ]; then
-  _pass "NS-PREDICATE-REACHABLE: all $_nre19 lifecycle predicates fire scope-reject on an objective that names them"
+if [ "$_nre19" -ge 9 ] && [ "$_reach19" -eq 1 ] && [ -z "$_long19" ]; then
+  _pass "NS-PREDICATE-REACHABLE: all $_nre19 out_of_scope predicates are <=$_cap19 words and fire scope-reject"
 else
-  _fail "NS-PREDICATE-REACHABLE: $_nre19 predicate(s) scored, reachable=$_reach19 — a predicate is dead text"
+  _fail "NS-PREDICATE-REACHABLE: $_nre19 scored, reachable=$_reach19, over the $_cap19-word cap:${_long19:- none}"
 fi
 
 # --- NS-ADOPTION-STAYS-IN-SCOPE: the harness's own delivery is not excluded ---
