@@ -223,7 +223,7 @@ A21_98=tests/check_98_adoption.sh
 # --- AUDIT-COVERAGE-COMPLETE: every criterion of 018 and 019 declares a mutation ---
 # 018 recorded 11 mutations against 16 criteria. Seven had none, and the report read as though
 # failability was established for the feature.
-# --- [mut$ sed -i.bak '0,/^# --- \[mut\$/{/^# --- \[mut\$/d;}' tests/check_98_adoption.sh $] ---
+# --- [mut$ sed -i.bak '/rm -f tests\/fixtures\/adopter\/scripts\/test.sh/d' tests/check_98_adoption.sh $] ---
 # The audited set is a historical fact -- which criteria features 018 and 019 shipped -- so it is
 # written out rather than derived. A derivation would drift as later features add criteria to the
 # same files, and then the audit would silently grow or shrink.
@@ -261,7 +261,7 @@ fi
 # --- MUT-MULTILABEL-REJECTED: a header naming two criteria is unbindable, and says so ---
 # nvc.sh reads both labels of such a header; mutate.sh read NEITHER, so both criteria were absent
 # from the coverage count and neither could carry a mutation. Silent omission.
-# --- [mut$ sed -i.bak 's|multi-label|multi_label_disabled|g' scripts/mutate.sh $] ---
+# --- [mut$ sed -i.bak '/multi-label criterion header/d' scripts/mutate.sh $] ---
 R=$(mrepo)
 cat > "$R/tests/check_ml.sh" <<'FIXTURE'
 # --- ONE · TWO: two criteria sharing one header ---
