@@ -21,7 +21,7 @@
 | `real-enforcement` | O4 a gate accepted and never run | R7 | COV-WIRED | project | idem | ✅ uat |
 | `frictionless-adoption` | O6 no toolchain | R8 | COV-DEPFREE | project | idem | ✅ uat |
 | `frictionless-adoption` | O6 the cost is measured | R8 | COV-COST-REPORTED | project | idem | ✅ uat |
-| `measurable-impact` | O4 did obliging catch one | — | JUDGE-OBLIGATION-CAUGHT-ONE | project | `/uat` judgment, next feature | 📋 case |
+| `measurable-impact` | O4 did obliging catch one | — | JUDGE-OBLIGATION-CAUGHT-ONE | project | `evals/cases/obligation-caught-one.md` | 📋 case |
 | `real-enforcement` | O2 | each rule has a negative | check-can-fail | `[given] base/non-vacuous-checks` | → the 13 declarations themselves | ✅ uat |
 | `real-enforcement` | O2 | rejection requires the named diagnostic | check-rejects-by-diagnostic | `[given] base/non-vacuous-checks` | → COV-UNRESOLVABLE-REPORTED | ✅ uat |
 | `real-enforcement` | O1 | the tool names the tree it read | check-names-its-tree | `[given] base/non-vacuous-checks` | → COV-ALL-REPORTS-DEBT | ✅ uat |

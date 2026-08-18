@@ -17,5 +17,10 @@ jobs:
       # what B15 says not to do. It still exits 2 on an unresolvable row, in either mode.
       - name: Mutation coverage (the standing debt, re-derived)
         run: bash scripts/mutate.sh coverage --tests tests --all
+      # Every 📋 case row names a case file that exists and names its criterion. Orphans reported
+      # in the same pass. A judged criterion whose case was never written renders exactly like one
+      # merely unscored — 021 shipped a dangling citation and 022 shipped a row naming nothing.
+      - name: Case resolution (a judged row names a real case)
+        run: bash scripts/cases.sh
       # Placeholder (agent-driven /verify in CI): posting the verification-report as a PR comment
       # is up to each project — depends on the stack and the eval runner.

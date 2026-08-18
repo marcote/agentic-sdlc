@@ -42,8 +42,19 @@ description: On-demand verification of a feature. Runs output + trajectory eval 
    is no baseline or exemption list — features from 018 on already sit at zero, so the forward-only
    line needs no record to maintain.
 
-6. **Trajectory eval:** score against `evals/rubric.md` (tool use, skipped steps,
+6. **Case resolution (BUILD, cont.):** run `bash scripts/cases.sh` and require exit 0. Every
+   `📋 case` row must name a file under `evals/cases/`, that file must exist, and it must name the
+   row's criterion. Exit 1 means a row names nothing or binds to a file that never mentions it;
+   exit 2 means a cited file is gone or a matrix header cannot be read.
+
+   A deferred judgment still gets a file — the trigger lives inside it, as `Not before:`. Writing it
+   is what makes the deferral auditable rather than a row that renders as pending forever.
+
+   The same run reports **orphans**: case files no row cites. Zero today, and the count is printed
+   either way, because a directory nobody points at is the same silence as a row pointing nowhere.
+
+7. **Trajectory eval:** score against `evals/rubric.md` (tool use, skipped steps,
    hallucination). A flow that skipped verification is FAIL even if the build passes.
-7. Update the states in `coverage.md` (🔴→🟢) and complete the Verdict.
-8. If BUILD/TRAJECTORY fail → IMPLEMENTATION gap → go back to implement.
+8. Update the states in `coverage.md` (🔴→🟢) and complete the Verdict.
+9. If BUILD/TRAJECTORY fail → IMPLEMENTATION gap → go back to implement.
    Do NOT call UAT or closing non-deterministic evals from here.

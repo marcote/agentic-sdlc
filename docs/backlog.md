@@ -319,9 +319,33 @@ read.
 Cheapest honest fix is to re-declare them as `[mut$ … $]` against the criteria that still exist, and
 report how many survive. That is a measurement, not a rewrite of history.
 
-## B14 — Twenty-one `📋 case` rows point at no case file
+## ~~B14~~ — `📋 case` rows that point at no case file
 
-**Status:** open · **Raised:** 2026-08-16 · **Size:** small
+**Status: DONE 2026-08-18 → `specs/023-case-resolution/`.** `scripts/cases.sh` resolves every row in
+both directions, and the numbers below are its output rather than a grep's.
+
+**This entry's own figures were wrong by 7×, and that is the finding it ends on.** It claimed *32
+rows, 21 pointing at no case file*. The true figures at the time were **14** and **1**. The 32 came
+from `grep -c '📋 case'` over the matrices, which counts the **status-legend line present in all 19
+files**. A count taken from a loose grep, inside the entry describing claims that point at nothing —
+`B10`'s family, in the place least able to afford it.
+
+Measured, then fixed:
+
+| | at `/distill` | after 023 |
+|---|---|---|
+| `📋 case` rows | 14 | 15 |
+| resolve | 11 | **15** |
+| cite a file that does not exist | 2 | 0 |
+| cite no path at all | 1 | 0 |
+| file does not name the row's criterion | 0 | 0 |
+| case files cited by no row | 0 | 0 |
+
+The three broken rows were `evals/cases/audit-worth-it.md` (named by 021, never written),
+`evals/cases/reject-msg.yaml` (`001-example`) and 022's `JUDGE-OBLIGATION-CAUGHT-ONE`, which named
+nothing. All four case files now exist, including this feature's own.
+
+*Original entry retained below.* · **Raised:** 2026-08-16 · **Size:** small
 
 Across `specs/*/coverage.md` there are **32** rows marked `📋 case`. `evals/cases/` holds **8**
 files. Twenty-one rows cite no file at all, and one cites `evals/cases/reject-msg.yaml`, which does
@@ -391,6 +415,29 @@ at 6s of 12s. It is not a doubling. `B7` should be read as the same finding take
 
 **Not acted on inside 022.** It is a pre-existing defect in a different subsystem, and chaining it
 into the feature that found it is the root cause this file exists to prevent.
+
+## B19 — Three tools now parse the coverage matrix, each with its own reader
+
+**Status:** open · **Raised:** 2026-08-18 (023 `/plan`) · **Size:** small
+
+`scripts/status.sh`, `scripts/mutate.sh coverage` and `scripts/cases.sh` all read
+`specs/*/coverage.md`. Only the third resolves columns by **header name**; the other two index by
+fixed position.
+
+**That is not a style objection, it is the `B11` failure with a measured instance.**
+`specs/001-example/coverage.md` has **six** columns, not seven. Split on the pipe it yields the same
+field count, so a fixed-index reader does not fail — **it reads the wrong column and reports
+confidently.** `mutate.sh coverage` currently lands safely on that file by luck: the cell it mistakes
+for the origin column happens not to contain the word `project`, so the row is excluded rather than
+mis-obliged.
+
+**Not fixed inside 023.** Retrofitting header-driven parsing into `mutate.sh` during a feature about
+case files is the chaining this file exists to prevent, and `B9` is the standing evidence that two
+readers of one artifact eventually disagree — with the reassuring answer being the wrong one.
+
+**The end state is one parser.** Whether it lives in a shared shell helper (like the `DEPFREE`
+helper 008 extracted) or in the 006 engine is the actual decision, and `S3` constrains it: shell and
+coreutils, no toolchain.
 
 ## Dropped
 
