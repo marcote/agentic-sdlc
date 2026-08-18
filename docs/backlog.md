@@ -425,9 +425,22 @@ at 6s of 12s. It is not a doubling. `B7` should be read as the same finding take
 **Not acted on inside 022.** It is a pre-existing defect in a different subsystem, and chaining it
 into the feature that found it is the root cause this file exists to prevent.
 
-## B19 — Three tools now parse the coverage matrix, each with its own reader
+## ~~B19~~ — Three tools now parse the coverage matrix, each with its own reader
 
-**Status:** open · **Raised:** 2026-08-18 (023 `/plan`) · **Size:** small
+**Status: DONE 2026-08-18 → `specs/026-matrix-parser/`.** One reader, `scripts/lib/matrix.sh`:
+columns located by header name, rows bounded by the coverage table's own range.
+
+**It was worse than this entry said.** Two defects were live, not latent:
+`status.sh 001-example` printed the **Origin** cell as the criterion name (wrong since **008**), and
+`status.sh 022-mutation-coverage` read the trailing **measurement table** as criteria and invented an
+unnamed orphan row. A third, older bug surfaced while porting: `idem` was matched as a *prefix* by
+both `mutate.sh` and `cases.sh`, and `specs/001-example` links `idempotency.feature`.
+
+`obliged` and `undeclared` are byte-identical across all 19 pre-026 matrices. `excluded` rose on 8 of
+them, and the old number was the wrong one — rows whose criterion is prose were dropped before being
+counted.
+
+*Original entry retained below.* · **Raised:** 2026-08-18 (023 `/plan`) · **Size:** small
 
 `scripts/status.sh`, `scripts/mutate.sh coverage` and `scripts/cases.sh` all read
 `specs/*/coverage.md`. Only the third resolves columns by **header name**; the other two index by
@@ -447,6 +460,66 @@ readers of one artifact eventually disagree — with the reassuring answer being
 **The end state is one parser.** Whether it lives in a shared shell helper (like the `DEPFREE`
 helper 008 extracted) or in the 006 engine is the actual decision, and `S3` constrains it: shell and
 coreutils, no toolchain.
+
+## B20 — Three tools are in neither `KEEP` nor `DROP`
+
+**Status:** open · **Raised:** 2026-08-18 (026 `/plan`) · **Size:** very small
+
+`scripts/status.sh`, `scripts/mutate.sh` and `scripts/cases.sh` appear in neither bucket in
+`scripts/vendor.sh`. Only `KEEP` is copied, so an adopter does not receive them — and because they
+are not in `DROP` either, the vendoring plan **never mentions them**. Neither shipped nor explicitly
+withheld.
+
+`DROP` exists precisely so a withheld file is *stated*: its comment reads *"DROP = harness-self
+content, never copied"*, and `vendor.sh` prints a `DROP` line per entry. Three tools fall through
+that.
+
+**The decision is not obvious**, which is why this is not a patch. `status.sh` derives an adopter's
+phase from their own artifacts and would plausibly be useful to them; `mutate.sh` and `cases.sh`
+encode this repository's `_pass`/`_fail` conventions and probably should not travel. Each needs its
+own answer, and whichever it is, it belongs in a bucket.
+
+## B21 — Mutations against embedded languages keep failing the same way
+
+**Status:** open · **Raised:** 2026-08-18 (026 `/retro`) · **Size:** unknown
+
+Measured across three features: **022 — 4 of 5 weak mutations were anchor errors · 023 — 1 of 3 ·
+026 — 7 of 9.** 026's were a single mistake repeated seven times: the logic lives in an `awk` program
+embedded in shell, and the edits anchored on shell syntax (`s|^_mx_crit=0$|…|`) against a line that
+reads `      _mx_crit=0; _mx_crit = idx("criterion")` — indented, inside a quoted block.
+
+**The runner caught all of them; reading them would have caught none.** That is the mechanism
+working, and it is also a standing tax: every such feature spends a cycle rewriting declarations.
+
+**Not written as a prose rule.** *"Anchor on the embedded language's text, not the host's"* is
+correct and this repository has measured three times that a rule of that shape does not stick. A
+mechanical form is not obvious — a declaration that matches nothing is already reported as
+`survived its own mutation`, which is the right diagnosis for the wrong reason. **One candidate:**
+`mutate.sh` could report *"the edit changed no bytes"* as a distinct outcome from *"the criterion
+still passed"*. Those are different failures and today they read identically.
+
+## B22 — A refactor silently invalidates the mutations of every criterion whose code it moves
+
+**Status:** open · **Raised:** 2026-08-18 (026, found by CI) · **Size:** small
+
+026 moved column resolution out of `scripts/cases.sh` and `scripts/mutate.sh` into
+`scripts/lib/matrix.sh`. Four declarations belonging to **022 and 023** still edited the old
+locations. `sed` matched nothing, the criteria kept passing, and **four previously-proved criteria
+became unfalsifiable without any of them changing a line.**
+
+This is the shape 021 named — *"the mutation did not decay because it was weak; the criterion changed
+underneath it"* — with the implementation moving instead of the criterion. `mutate.sh run` catches
+it, and it caught it. **CI caught it; I did not**, because once I began fixing declarations
+individually with `--only`, the last full local run predated the three ports.
+
+**Two candidates, and the first is nearly free.** `mutate.sh` already distinguishes three outcomes;
+a fourth — **"the edit changed no bytes"** — is a different failure from *"the criterion still
+passed"* and today they print the same line. A declaration that matches nothing is not a weak
+mutation, it is a **stale** one, and the diagnosis should say which. This is the same candidate
+`B21` arrived at from the other direction, and the two should probably be answered together.
+
+The second is procedural and therefore weaker: run the full set before pushing. That is a rule of
+the shape this repository has measured three times as not sticking.
 
 ## Dropped
 
