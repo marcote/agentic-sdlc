@@ -262,9 +262,23 @@ sequenced anything the coverage matrix did not.
 unattended. That is a pattern worth measuring, not yet a conclusion — both were small features
 whose criteria were already sequenced by the RED state.
 
-## B15 — Who must declare a mutation?
+## ~~B15~~ — Who must declare a mutation?
 
-**Status:** open · **Raised:** 2026-08-16 (020 `/uat`) · **Size:** small
+**Status: DONE 2026-08-16 → `specs/022-mutation-coverage/`.** The trigger is neither of the two
+candidates below. It is derived from the artifact that already names a feature's criteria: its
+`coverage.md`. A row is obliged when it is the feature's own, deterministic, and resolves to a check
+file that exists. `mutate.sh coverage --spec` gates the feature being verified; `--all` reports the
+standing debt without gating it.
+
+**The debt, now a figure instead of an impression: 137 undeclared criteria across twelve closed
+features.** Features from 018 on already sit at zero, so the forward-only boundary needed no
+baseline list — it fell out of the data.
+
+**What it does not prove** is recorded in that feature's report: the gate's verdict on its own
+feature is a tautology, and whether obliging catches anything is `pending-observation` until a
+feature closes under it. Sweep 2026-09-16.
+
+*Original entry retained below.* · **Raised:** 2026-08-16 (020 `/uat`) · **Size:** small
 
 `scripts/mutate.sh` runs every declared mutation. Nothing requires a criterion to declare one, so
 the mechanism catches only what its author already suspected.
@@ -319,6 +333,62 @@ unscored render identically in the matrix.
 
 Distinct from `B2`, which is about the cases never being **scored**. This is about not knowing how
 many there are to score.
+
+## B17 — A mutation run against untracked files reports the right verdict for the wrong reason
+
+**Status:** open · **Raised:** 2026-08-16 (022 `/retro`) · **Size:** very small
+
+`mutate.sh run` builds its sandbox from `git ls-files`. A check file that is not yet tracked never
+arrives, so every criterion in it reports `emitted no result under its mutation` — which reads as a
+broken check rather than an untracked one.
+
+**This is the second occurrence.** 020 shipped both replay fixtures broken this way and documented
+it at length; 022 hit it on its first run, two features later, with all fourteen declarations
+affected. Reading the report is not the same as having the failure in hand.
+
+**Not written as a prose rule**, because that is what failed. The mechanical form is cheap and in
+keeping with the runner's existing behaviour: name any untracked file under `--tests` and exit 2,
+the same *silence is not an outcome* move `run` already makes for an unapplied edit and an absent
+result.
+
+## B18 — The suite is green in 22s of work and 49 minutes of wall clock
+
+**Status:** open · **Raised:** 2026-08-17 (022 `/verify`) · **Size:** unknown
+
+`bash tests/run.sh` reported **TOTAL PASS=541 FAIL=0** after **2923.29s**. Timing every check inside
+one process with `NVC_INNER=1` sums to **~22s**, the largest single file being 4.78s. The verdict is
+correct; the wall clock is two orders of magnitude off the work.
+
+**Not caused by 022.** The same run on `main` had not finished after 10 minutes and was still at
+`check_90_retro.sh`. 022 adds 2.14s of real work (`check_97`), which is not the difference.
+
+**It is intermittent.** Earlier the same day, on the same branch, the full suite completed twice
+inside a 120s call. Whatever triggers the blow-up is state-dependent, and that is the part worth
+understanding before anything is changed.
+
+**Mechanism — a hypothesis with evidence, not a diagnosis.** The recursion guard is set in exactly
+one place and read in exactly one place, both inside `check_96_non_vacuous.sh`:
+
+```
+tests/check_96_non_vacuous.sh:58:  if [ "${NVC_INNER:-0}" = "1" ]; then
+tests/check_96_non_vacuous.sh:62:  ( NVC_INNER=1 bash tests/run.sh ) >/tmp/nvc_inner 2>&1
+```
+
+`scripts/amendment-gate.sh:61` also respawns the suite — `bash tests/run.sh` whenever no
+`--suite-cmd` is passed — and it sets no guard. A suite started down that path has `NVC_INNER`
+unset, so its own `check_96` spawns another, which can reach the gate again. That path is only taken
+when the gate finds a `pillars`/`scope` change to judge, which would explain why the cost depends on
+git state rather than on the tests.
+
+**Two further smells, unconfirmed:** `/tmp/nvc_inner` is a fixed path, so two overlapping runs
+clobber each other's evidence; and `check_96` reads a log to judge, which is exactly the
+self-subjection `D4` requires — so any fix has to keep the nested run rather than remove it.
+
+**Related, and this supersedes it in size:** `B7` recorded the nested run as a *doubling*, measured
+at 6s of 12s. It is not a doubling. `B7` should be read as the same finding taken before it grew.
+
+**Not acted on inside 022.** It is a pre-existing defect in a different subsystem, and chaining it
+into the feature that found it is the root cause this file exists to prevent.
 
 ## Dropped
 
