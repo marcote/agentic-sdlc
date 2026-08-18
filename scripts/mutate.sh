@@ -244,9 +244,32 @@ ROOT=$(pwd)
 # may itself invoke this runner, and the inner run then clobbers the outer run's captured output.
 # That happened, and it produced a WRONG diagnostic -- a criterion that passed under its mutation
 # was reported as "emitted no result", which reads like a broken check rather than a vacuous one.
+# PRE-FLIGHT. The sandbox is built from `git ls-files`, so an UNTRACKED check file never arrives
+# and every declaration in it reports `emitted no result` -- which reads as a broken check rather
+# than a missing one. That happened in 020 (both replay fixtures) and again in 022 (all fourteen
+# declarations). The failure is not about any single declaration, so it is one refusal here rather
+# than a wrong diagnosis repeated per line.
+MUT_PREFLIGHT=0
+if [ "$MUT_PREFLIGHT" -eq 0 ]; then
+  _mut_untracked=$( cd "$(pwd)" && git ls-files --others --exclude-standard -- "$TESTS" 2>/dev/null )
+  if [ -n "$_mut_untracked" ]; then
+    echo "mutate: untracked file(s) under $TESTS — the sandbox is built from git ls-files, so these" >&2
+    echo "        would never reach it and every declaration in them would be misreported:" >&2
+    printf '          %s\n' $_mut_untracked >&2
+    exit 2
+  fi
+fi
+
+# _mut_hash DIR : content digest of DIR, *.bak excluded.
+#
+# BY CONTENT, NOT BY TIMESTAMP: `sed -i.bak` rewrites its target and creates the backup EVEN WHEN
+# NOTHING MATCHES, so mtime moves for every declaration and would detect nothing. The backup is
+# excluded because its existence is an artifact of the edit tool, not of the edit.
+_mut_hash(){ ( cd "$1" && find . -type f ! -name '*.bak' -exec cksum {} + 2>/dev/null | sort | cksum ); }
+
 SCRATCH=$(mktemp -d 2>/dev/null || mktemp -d -t mutscratch)
 trap 'rm -rf "$SCRATCH"' EXIT
-FAILED=0; N=0
+FAILED=0; N=0; STALE=0
 T_ALL0=$(now)
 
 while IFS=$'\t' read -r file line label cmd; do
@@ -258,10 +281,21 @@ while IFS=$'\t' read -r file line label cmd; do
   # tracked files only, from the WORKING TREE — no .git, no branch ref, no untracked noise
   ( cd "$ROOT" && git ls-files -z 2>/dev/null | tar -cf - --null -T - 2>/dev/null ) | tar -xf - -C "$SB" 2>/dev/null
 
+  hash_before=$(_mut_hash "$SB")
+
   if ! ( cd "$SB" && eval "$cmd" ) >"$SCRATCH/apply" 2>&1; then
     echo "NOT PROVED  $label ($file:$line) — the mutation could not be applied: $cmd"
     echo "            $(head -1 "$SCRATCH/apply" 2>/dev/null)"
     FAILED=$((FAILED+1)); rm -rf "$SB"; continue
+  fi
+
+  # SUCCESSFUL AND INERT is not the same failure as a weak criterion. An edit that matched nothing
+  # means the criterion was NEVER TESTED -- more alarming than one that survived a real change, not
+  # less. Reported apart because the fix is different: a stale declaration points at code that moved
+  # or never existed; a weak one needs a better negative.
+  if [ "$(_mut_hash "$SB")" = "$hash_before" ]; then
+    echo "NOT PROVED  $label ($file:$line) — STALE: the edit changed no bytes: $cmd"
+    STALE=$((STALE+1)); FAILED=$((FAILED+1)); rm -rf "$SB"; continue
   fi
 
   ( cd "$SB" && bash -c ". tests/lib.sh; . $file" ) >"$SCRATCH/run" 2>&1
@@ -291,6 +325,10 @@ EOF
 
 T_ALL1=$(now)
 echo "---"
-echo "mutate: $N mutation(s) under $TESTS, $FAILED not proved, total elapsed $(elapsed "$T_ALL0" "$T_ALL1")"
+# Weak and stale are never added together: 021 established that mixing them is how an audit becomes
+# a rubber stamp. A refactor produces a whole file of stale ones, and the shape has to be legible
+# from the summary rather than by reading every line.
+MUT_SUMMARY="mutate: $N mutation(s) under $TESTS, $FAILED not proved, $STALE stale, total elapsed $(elapsed "$T_ALL0" "$T_ALL1")"
+echo "${MUT_SUMMARY:-}"
 [ "$FAILED" -eq 0 ] || exit 1
 exit 0

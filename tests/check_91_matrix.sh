@@ -153,12 +153,16 @@ else
 fi
 
 # --- MTX-CASES-UNCHANGED: same invariant for the case gate ---
-# 026 adds one 📋 case row of its own, so the count goes 15 -> 16. What must not move is the
-# resolution: every row still resolves and no case file becomes an orphan.
+# 026 adds one 📋 case row of its own, so the count goes 15 -> 16 -- and 027 made it 17. Asserting
+# the exact total was a design error: it breaks on every future feature, forever, for the one reason
+# that is never a regression. What must not move is the RESOLUTION: every row resolves, nothing is
+# orphaned, and the count never falls below the 15 recorded at the 1d506c2 baseline.
 # --- [mut$ sed -i.bak 's|link = idx("linked"); if (!link) link = idx("test/eval")|link = 0|' scripts/lib/matrix.sh $] ---
 bash scripts/cases.sh >"$M91/cs" 2>&1; _m91_crc=$?
-if [ "$_m91_crc" -eq 0 ] && grep -qE '16 case rows, 16 resolved, 0 unresolved, 0 missing, 0 orphan' "$M91/cs"; then
-  _pass "MTX-CASES-UNCHANGED: 16 rows (15 baseline + this feature's own), all resolved, 0 orphan"
+_m91_n=$(grep -oE '[0-9]+ case rows?' "$M91/cs" | head -1 | grep -oE '[0-9]+')
+if [ "$_m91_crc" -eq 0 ] && [ "${_m91_n:-0}" -ge 15 ] \
+   && grep -qE "$_m91_n case rows?, $_m91_n resolved, 0 unresolved, 0 missing, 0 orphan" "$M91/cs"; then
+  _pass "MTX-CASES-UNCHANGED: $_m91_n rows (>= the 15 at baseline), all resolved, 0 orphan"
 else
   _fail "MTX-CASES-UNCHANGED: rc=$_m91_crc — $(tail -1 "$M91/cs" 2>/dev/null)"
 fi
