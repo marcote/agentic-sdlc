@@ -81,6 +81,34 @@ without saying so; reject it by name.
 *Adopters inherit the pattern, not the runner.* A runner encodes a repository's own `_pass`/`_fail`
 conventions. The declaration grammar is the portable part.
 
+## The runner's outcomes, and what each one tells you to fix
+
+A criterion that does not come back `proved` has failed in one of four ways, and they are not
+interchangeable. Collapsing them is how a cycle gets spent reading the wrong thing.
+
+| outcome | what happened | what to fix |
+|---|---|---|
+| `survived its own mutation` | the tree changed and the criterion still passed | the **criterion** — it needs a real negative |
+| `STALE: the edit changed no bytes` | the edit ran, matched nothing, and the criterion was never tested | the **declaration** — it points at code that moved or never existed |
+| `emitted no result` | the criterion produced neither PASS nor FAIL | the **check** — it is broken, not vacuous |
+| `could not be applied` | the edit command itself failed | the **command** |
+
+**Stale is more alarming than weak, not less.** A weak mutation means the criterion survived a real
+change; a stale one means nothing was tested at all, while the report reads green.
+
+**Two ways a declaration goes stale, both measured here.** It never matched — the commonest cause is
+anchoring on the host language when the logic lives in an embedded one, awk inside shell being the
+instance this repository kept hitting. Or it matched once and then the code moved: a refactor
+relocates a function and every declaration editing the old location silently stops testing anything.
+Neither changes a line of the criterion, and neither is visible by reading.
+
+**Staleness is judged by content, never by timestamp.** `sed -i.bak` rewrites its target and creates
+the backup **even when nothing matches**, so mtime moves for every declaration and detects nothing.
+
+**An untracked file is a refusal, not an outcome.** A sandbox built from tracked files never receives
+an untracked check, and then *every* declaration in it reports `emitted no result` — a whole file of
+wrong diagnoses from one cause. Refuse once, naming the files, before the first sandbox.
+
 ## Who must declare — the obligation, not the capability
 
 - `[given]` a criterion the feature's own coverage matrix marks as **its own and deterministic**,

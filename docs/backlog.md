@@ -367,7 +367,15 @@ unscored render identically in the matrix.
 Distinct from `B2`, which is about the cases never being **scored**. This is about not knowing how
 many there are to score.
 
-## B17 — A mutation run against untracked files reports the right verdict for the wrong reason
+## ~~B17~~ — A mutation run against untracked files reports the right verdict for the wrong reason
+
+**Status: DONE 2026-08-18 → `specs/027-mutation-diagnostics/`.** All three were one defect seen from
+three sides: the runner's outcomes conflated *the criterion is weak* with *the declaration is stale*,
+and *the check is broken* with *its files never arrived*. `STALE` is now its own outcome, counted
+apart, and an untracked file under `--tests` refuses the run before the first sandbox. 026's real
+declaration is replayed unedited and reports `STALE`.
+
+*Original entry retained below.*
 
 **Status:** open · **Raised:** 2026-08-16 (022 `/retro`) · **Size:** very small
 
@@ -479,7 +487,15 @@ phase from their own artifacts and would plausibly be useful to them; `mutate.sh
 encode this repository's `_pass`/`_fail` conventions and probably should not travel. Each needs its
 own answer, and whichever it is, it belongs in a bucket.
 
-## B21 — Mutations against embedded languages keep failing the same way
+## ~~B21~~ — Mutations against embedded languages keep failing the same way
+
+**Status: DONE 2026-08-18 → `specs/027-mutation-diagnostics/`.** All three were one defect seen from
+three sides: the runner's outcomes conflated *the criterion is weak* with *the declaration is stale*,
+and *the check is broken* with *its files never arrived*. `STALE` is now its own outcome, counted
+apart, and an untracked file under `--tests` refuses the run before the first sandbox. 026's real
+declaration is replayed unedited and reports `STALE`.
+
+*Original entry retained below.*
 
 **Status:** open · **Raised:** 2026-08-18 (026 `/retro`) · **Size:** unknown
 
@@ -498,7 +514,15 @@ mechanical form is not obvious — a declaration that matches nothing is already
 `mutate.sh` could report *"the edit changed no bytes"* as a distinct outcome from *"the criterion
 still passed"*. Those are different failures and today they read identically.
 
-## B22 — A refactor silently invalidates the mutations of every criterion whose code it moves
+## ~~B22~~ — A refactor silently invalidates the mutations of every criterion whose code it moves
+
+**Status: DONE 2026-08-18 → `specs/027-mutation-diagnostics/`.** All three were one defect seen from
+three sides: the runner's outcomes conflated *the criterion is weak* with *the declaration is stale*,
+and *the check is broken* with *its files never arrived*. `STALE` is now its own outcome, counted
+apart, and an untracked file under `--tests` refuses the run before the first sandbox. 026's real
+declaration is replayed unedited and reports `STALE`.
+
+*Original entry retained below.*
 
 **Status:** open · **Raised:** 2026-08-18 (026, found by CI) · **Size:** small
 
