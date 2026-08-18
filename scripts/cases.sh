@@ -48,46 +48,10 @@ plural(){ [ "$1" = "1" ] && echo "row" || echo "rows"; }
 CASE_MISSING=2
 CASE_UNRESOLVED=1
 CASE_BADHEADER=2
-CASE_TABLE_ONLY='^[[:space:]]*\|'
-
-# header_cols FILE : echo "CRIT LINK STATUS" as 1-based field indices, or nothing if unreadable.
-# The header is the first table line followed by a |---|---| separator.
-header_cols(){
-  awk -F'|' '
-    prev != "" && /^[[:space:]]*\|[-|: \t]*\|[[:space:]]*$/ {
-      n = split(prev, h, "|")
-      crit = 0; link = 0; st = 0
-      for (i = 1; i <= n; i++) {
-        c = tolower(h[i]); gsub(/^[ \t]+|[ \t]+$/, "", c)
-        if (crit == 0 && c ~ /criterion/)            crit = i
-        if (link == 0 && (c ~ /linked/ || c ~ /test\/eval/)) link = i
-        if (st   == 0 && c ~ /status/)               st   = i
-      }
-      if (crit && st) print crit, (link ? link : crit + 1), st
-      exit
-    }
-    { prev = $0 }
-  ' "$1" 2>/dev/null
-}
-
-# case_rows FILE CRIT LINK STATUS : emit "LABEL<TAB>CELL" per 📋 case row, idem resolved.
-case_rows(){
-  grep -E "${CASE_TABLE_ONLY:-}" "$1" 2>/dev/null | awk -F'|' -v ci="$2" -v li="$3" -v si="$4" '
-    {
-      st = $si; gsub(/[ `]/, "", st)
-      cell = $li; gsub(/^[ \t]+|[ \t]+$/, "", cell)
-      if (cell ~ /idem/) cell = prev; else if (cell != "") prev = cell
-      if (st !~ /case/) next
-      # TRIM the label, never strip it. This harness names criteria UPPER-KEBAB with no spaces, so
-      # deleting every space looked equivalent -- until 001-example, whose criterion is the prose
-      # "message clarity". Its case file names it with the space, and the binding check reported
-      # UNBOUND against a file that was correct. No fixture caught it; the real matrix did.
-      l = $ci; gsub(/`/, "", l); gsub(/^[ \t]+|[ \t]+$/, "", l)
-      if (l == "" || l ~ /^-+$/) next
-      print l "\t" cell
-    }
-  '
-}
+# The matrix is read by the ONE reader (026). This file used to locate columns by header itself and
+# then grep every `|` line in the document, which meant a second table below the matrix was filtered
+# out by luck -- its status cell happened to be empty -- rather than being out of range.
+. "$(dirname "$0")/lib/matrix.sh"
 
 CITED="$(mktemp 2>/dev/null || mktemp -t cscited)"
 trap 'rm -f "$CITED"' EXIT
@@ -95,16 +59,14 @@ T0=$(python3 -c 'import time; print("%.2f" % time.time())' 2>/dev/null || echo 0
 ROWS=0; RESOLVED=0; UNRES=0; MISS=0; RC=0
 
 scan_matrix(){
-  local m="$1" cols crit link st lab cell p n=0 r=0
-  cols=$(header_cols "$m")
-  if [ -z "$cols" ]; then
+  local m="$1" lab org cell st pil n=0 r=0 p
+  if ! matrix_header "$m" >/dev/null 2>&1; then
     echo "UNREADABLE  $m — its header names no criterion or status column"
     RC=$CASE_BADHEADER; return
   fi
-  set -- $cols
-  CASE_COL_CRIT=$1; crit=$CASE_COL_CRIT; link=$2; st=$3
-  while IFS=$'\t' read -r lab cell; do
+  while IFS=$'\t' read -r lab org cell st pil; do
     [ -n "$lab" ] || continue
+    case "$st" in *case*) ;; *) continue ;; esac
     n=$((n+1)); ROWS=$((ROWS+1))
     p=$(printf '%s' "$cell" | tr -d '`' | grep -oE 'evals/cases/[A-Za-z0-9._-]+' | head -1)
     if [ -z "$p" ]; then
@@ -125,7 +87,7 @@ scan_matrix(){
     fi
     r=$((r+1)); RESOLVED=$((RESOLVED+1))
   done <<EOF
-$(case_rows "$m" "$crit" "$link" "$st")
+$(matrix_rows "$m")
 EOF
   [ -n "$MATRIX" ] || printf '%-46s %2d case %s, %2d resolved\n' "$m" "$n" "$(plural "$n")" "$r"
 }

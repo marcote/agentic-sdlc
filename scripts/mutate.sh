@@ -146,24 +146,11 @@ COV_GAP=1
 COV_UNRESOLVED=2
 COV_SH_FALLBACK='[.]sh'
 
-# cov_rows FILE : emit "STATE<TAB>LABEL<TAB>CELL" per criterion row, resolving `idem` to the row
-# above. STATE is `ex` for a row excluded by rule and `ok` for one that reaches resolution.
-#
-# Excluded rows are EMITTED, not filtered. The first form filtered them in awk and reported
-# `0 excluded` on a fixture holding three -- exclusion had become a silence, which is the family
-# this file exists to close. COV-NOT-OBLIGED-COUNTED caught it.
-#
-# The label pattern is spelled out rather than using {3,}: BSD awk silently ignores interval
-# quantifiers, so `{3,}` matches nothing on macOS and the sweep returns one row per file.
-cov_rows(){
-  awk -F'|' 'NF>6 {
-      t = $7; if (t ~ /idem/) t = prev; else prev = t
-      l = $5; gsub(/[ `]/, "", l)
-      if (l !~ /^[A-Za-z][A-Za-z0-9-][A-Za-z0-9-][A-Za-z0-9-]+$/) next
-      if ($6 !~ /project/ || $8 !~ /red|green|uat/) { print "ex\t" l "\t" t; next }
-      print "ok\t" l "\t" t
-    }' "$1" 2>/dev/null
-}
+# Rows come from the ONE reader (026). This file used to index columns by position and read every
+# `|` line in the document: on specs/001-example's six-column matrix it took the Origin cell for the
+# Status cell, and every row dropped out because that cell was empty. The answer was right and the
+# reason was a coincidence.
+.  "$(dirname "$0")/lib/matrix.sh"
 
 # cov_resolve CELL : echo the check file path, or "" if none is named, or "!TOKEN" if one is
 # named and unusable. Tried as written first (a cell may carry a real path), then under --tests.
@@ -182,10 +169,11 @@ cov_resolve(){
 
 # cov_one FILE : print findings; echo "obliged undeclared excluded unresolved" on the last line.
 cov_one(){
-  local cf="$1" st lab cell res ob=0 un=0 ex=0 nr=0
-  while IFS=$'\t' read -r st lab cell; do
+  local cf="$1" lab org cell status pil res ob=0 un=0 ex=0 nr=0
+  while IFS=$'\t' read -r lab org cell status pil; do
     [ -n "$lab" ] || continue
-    if [ "$st" = "ex" ]; then ex=$((ex+1)); continue; fi
+    case "$org" in *project*) ;; *) ex=$((ex+1)); continue ;; esac
+    case "$status" in *red*|*green*|*uat*) ;; *) ex=$((ex+1)); continue ;; esac
     res=$(cov_resolve "$cell")
     case "$res" in
       "")  ex=$((ex+1)) ;;
@@ -198,7 +186,7 @@ cov_one(){
            fi ;;
     esac
   done <<EOF
-$(cov_rows "$cf")
+$(matrix_rows "$cf")
 EOF
   echo "COUNTS $ob $un $ex $nr"
 }

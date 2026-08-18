@@ -34,9 +34,14 @@ filled(){
   [ -f "$1" ] || return 1
   ! sed 's/`[^`]*`//g' "$1" | grep -qE '_\([^)]*\)_'
 }
-# coverage data rows only (drop header + separator)
-# data rows only: drop the markdown separator (only pipes/dashes/colons/spaces) and the header
-covrows(){ grep '^|' "$D/coverage.md" 2>/dev/null | grep -vE '^[|:[:space:]-]+$' | grep -viE '\| *Pillar *\|'; }
+# The matrix is read by the ONE reader (026). What this replaced took EVERY line starting with a
+# pipe and indexed columns by position, which produced two wrong outputs on real files:
+#   · specs/001-example has six columns, so `$5` was the Origin cell and this tool printed
+#     "non-green: `[given] base/idempotency`" -- the origin, not the criterion. Wrong since 008.
+#   · specs/022-mutation-coverage ends with a measurement table, whose header has an empty first
+#     cell, so this tool reported "orphan row (no pillar):" for a row that does not exist.
+. "$(dirname "$0")/lib/matrix.sh"
+covrows(){ matrix_rows "$D/coverage.md" 2>/dev/null; }
 
 cmd_for(){ case "$1" in
   brief) echo "(write brief.md)";; align) echo "/align";; distill) echo "/distill";;
@@ -84,10 +89,13 @@ else
 fi
 
 # coverage gaps (non-green criteria + orphan rows)
-gaps=$(covrows | awk -F'|' '{
-  pil=$2; crit=$5; stat=$(NF-1);
-  gsub(/^[ \t]+|[ \t]+$/,"",pil); gsub(/^[ \t]+|[ \t]+$/,"",crit); gsub(/^[ \t]+|[ \t]+$/,"",stat);
-  if (pil=="") print "  orphan row (no pillar): " crit;
+# A matrix with NO pillar column cannot have an orphan-by-pillar row: matrix_header reports the
+# pillar index as 0, and specs/001-example is such a matrix. Testing `pillar == ""` without that
+# check would flag every one of its rows.
+_st_haspil=$(matrix_header "$D/coverage.md" 2>/dev/null | awk '{print $1+0}')
+gaps=$(covrows | awk -F'\t' -v haspil="${_st_haspil:-0}" '{
+  crit=$1; stat=$4; pil=$5;
+  if (haspil && pil=="") print "  orphan row (no pillar): " crit;
   else if (stat ~ /🔴|no contract/) print "  non-green: " crit " (" stat ")";
 }')
 if [ -n "$gaps" ]; then
