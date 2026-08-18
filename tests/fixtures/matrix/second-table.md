@@ -6,7 +6,10 @@
 
 ## The measurement this matrix is about
 
-| | before | after |
-|---|---|---|
-| obliged | 179 | 192 |
-| undeclared | 137 | 137 |
+> Deliberately as wide as the matrix: with a narrow second table the criterion column falls in an
+> empty cell and the row filter drops it, so the RANGE rule is never the thing under test.
+
+| metric | at /distill | after | delta | note | source | when |
+|---|---|---|---|---|---|---|
+| obliged | 179 | MTX-LEAKED | +13 | — | tool | 2026-08 |
+| undeclared | 137 | MTX-LEAKED-2 | 0 | — | tool | 2026-08 |

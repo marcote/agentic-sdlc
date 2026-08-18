@@ -38,7 +38,7 @@ fi
 # --- MTX-SIX-AND-SEVEN: layout does not change the answer ---
 # The whole defect class: both layouts split into the same field count, so only the header tells
 # them apart. Forcing the seven-column index is what status.sh does today.
-# --- [mut$ sed -i.bak 's|^_mx_crit=0$|_mx_crit=5|' scripts/lib/matrix.sh $] ---
+# --- [mut$ sed -i.bak 's|_mx_crit = idx("criterion")|_mx_crit = 5|' scripts/lib/matrix.sh $] ---
 mrun "matrix_rows $MFIX/six.md"
 cp "$M91/out" "$M91/six" 2>/dev/null
 mrun "matrix_rows $MFIX/seven.md"
@@ -52,9 +52,9 @@ fi
 # --- MTX-SECOND-TABLE-EXCLUDED: rows come from the coverage table, and stop where it stops ---
 # 022's coverage.md ends with a measurement table. status.sh read its header as a criterion row and
 # printed "orphan row (no pillar):" with no name. Out of RANGE, not filtered afterwards.
-# --- [mut$ sed -i.bak 's|^_mx_last=|_mx_last=999999; _mx_last_unused=|' scripts/lib/matrix.sh $] ---
+# --- [mut$ sed -i.bak 's|if (!_mx_last) _mx_last = total|_mx_last = total|' scripts/lib/matrix.sh $] ---
 mrun "matrix_rows $MFIX/second-table.md"
-if have_mlib && grep -q 'MTX-ALPHA' "$M91/out" && ! grep -qE 'obliged|undeclared' "$M91/out" \
+if have_mlib && grep -q 'MTX-ALPHA' "$M91/out" && ! grep -q 'MTX-LEAKED' "$M91/out" \
    && [ "$(grep -c . "$M91/out")" = "1" ]; then
   _pass "MTX-SECOND-TABLE-EXCLUDED: 1 row from $MFIX/second-table.md; the measurement table is out of range"
 else
@@ -73,7 +73,7 @@ fi
 # --- MTX-LABEL-TRIMMED: surrounding space and backticks go, internal spaces stay ---
 # 023 stripped every space because this harness names criteria UPPER-KEBAB. 001-example's criterion
 # is the prose "message clarity", and the binding check went red against a correct file.
-# --- [mut$ sed -i.bak 's|gsub(/\^\[ \\t\]+\|\[ \\t\]+\$/, "", l)|gsub(/[ \t]/, "", l)|' scripts/lib/matrix.sh $] ---
+# --- [mut$ sed -i.bak 's|return v }|gsub(/ /, "", v); return v }|' scripts/lib/matrix.sh $] ---
 mrun "matrix_rows $MFIX/spaced-label.md"
 if have_mlib && grep -q 'message clarity' "$M91/out" && ! grep -q 'messageclarity' "$M91/out"; then
   _pass "MTX-LABEL-TRIMMED: 'message clarity' kept its internal space"
@@ -82,7 +82,7 @@ else
 fi
 
 # --- MTX-IDEM-IN-RANGE: idem resolves within its own table, never across one ---
-# --- [mut$ sed -i.bak 's|_mx_prev=""|_mx_prev=_mx_prev|' scripts/lib/matrix.sh $] ---
+# --- [mut$ sed -i.bak 's|NR < lo \|\| NR > hi { next }|NR < lo { next }|' scripts/lib/matrix.sh $] ---
 mrun "matrix_rows $MFIX/idem-across-tables.md"
 if have_mlib && grep -q 'MTX-BETA.*check_x\.sh' "$M91/out" && ! grep -q 'MTX-LATER' "$M91/out"; then
   _pass "MTX-IDEM-IN-RANGE: MTX-BETA inherited within its table; MTX-LATER is in another one"
@@ -101,7 +101,7 @@ else
 fi
 
 # --- STATUS-NO-PHANTOM-ORPHAN: the measurement table is not a criterion row ---
-# --- [mut$ sed -i.bak 's|^covrows(){.*|covrows(){ grep "^|" "$D/coverage.md" 2>/dev/null | grep -vE "^[|:[:space:]-]+\$" | grep -viE "\\| *Pillar *\\|"; }|' scripts/status.sh $] ---
+# --- [mut$ sed -i.bak 's@covrows(){ matrix_rows@covrows(){ grep "^|" @' scripts/status.sh $] ---
 if ! bash scripts/status.sh 022-mutation-coverage 2>/dev/null | grep -q 'orphan row'; then
   _pass "STATUS-NO-PHANTOM-ORPHAN: no orphan row for 022; its measurement table is out of range"
 else
@@ -110,7 +110,7 @@ fi
 
 # --- MTX-SINGLE-READER: no consumer splits coverage.md on the pipe on its own ---
 # Comment lines are stripped: this criterion's own declaration names the tools it guards.
-# --- [mut$ sed -i.bak 's|. scripts/lib/matrix.sh|# unsourced|' scripts/cases.sh $] ---
+# --- [mut$ sed -i.bak 's|^\. "\$(dirname|# unsourced "$(dirname|' scripts/cases.sh $] ---
 _m91_src=0; _m91_own=0
 for _t in scripts/status.sh scripts/mutate.sh scripts/cases.sh; do
   grep -qE '^[[:space:]]*\.[[:space:]]+.*lib/matrix\.sh' "$_t" 2>/dev/null && _m91_src=$((_m91_src+1))
@@ -134,7 +134,7 @@ fi
 #
 # This is the one number this feature is allowed to move, and it is named here rather than
 # discovered in a diff. Everything else is asserted identical.
-# --- [mut$ sed -i.bak 's|^_mx_crit=0$|_mx_crit=5|' scripts/lib/matrix.sh $] ---
+# --- [mut$ sed -i.bak 's|org  = idx("origin")|org  = 0|' scripts/lib/matrix.sh $] ---
 _m91_base=tests/fixtures/matrix/baseline-coverage.txt
 bash scripts/mutate.sh coverage --tests tests --all 2>/dev/null | grep '^specs' >"$M91/cov"
 _m91_drift=0; _m91_seen=0; _m91_first=""
@@ -155,7 +155,7 @@ fi
 # --- MTX-CASES-UNCHANGED: same invariant for the case gate ---
 # 026 adds one 📋 case row of its own, so the count goes 15 -> 16. What must not move is the
 # resolution: every row still resolves and no case file becomes an orphan.
-# --- [mut$ sed -i.bak 's|^_mx_last=|_mx_last=999999; _mx_last_unused=|' scripts/lib/matrix.sh $] ---
+# --- [mut$ sed -i.bak 's|link = idx("linked"); if (!link) link = idx("test/eval")|link = 0|' scripts/lib/matrix.sh $] ---
 bash scripts/cases.sh >"$M91/cs" 2>&1; _m91_crc=$?
 if [ "$_m91_crc" -eq 0 ] && grep -qE '16 case rows, 16 resolved, 0 unresolved, 0 missing, 0 orphan' "$M91/cs"; then
   _pass "MTX-CASES-UNCHANGED: 16 rows (15 baseline + this feature's own), all resolved, 0 orphan"
@@ -168,10 +168,10 @@ fi
 assert_dep_free "$MLIB" "MTX-DEPFREE"
 
 # --- MTX-COST-REPORTED: the added cost is measured, not estimated ---
-# --- [mut$ sed -i.bak 's|## 2. Output eval|## 2. Output eval (cost section removed)|' verification/reports/026-matrix-parser-*.md $] ---
+# --- [mut$ sed -i.bak 's|\*\*1.84s\*\*|about two seconds|' verification/reports/026-matrix-parser-*.md $] ---
 _m91_rep=$(ls verification/reports/026-matrix-parser-*.md 2>/dev/null | head -1)
-if grep -qE 'elapsed|[0-9]+\.[0-9]+s' "${_m91_rep:-/dev/null}" 2>/dev/null; then
-  _pass "MTX-COST-REPORTED: ${_m91_rep} carries a measured figure"
+if grep -qE '\*\*[0-9]+\.[0-9]+s\*\*' "${_m91_rep:-/dev/null}" 2>/dev/null; then
+  _pass "MTX-COST-REPORTED: ${_m91_rep} carries the measured three-tool figure"
 else
   _fail "MTX-COST-REPORTED: no measured cost in ${_m91_rep:-verification/reports/026-*}"
 fi
