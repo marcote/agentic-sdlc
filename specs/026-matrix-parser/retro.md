@@ -54,4 +54,15 @@ closes: `specs/026-matrix-parser/alignment.md` ·
   fixture was too weak to isolate the guard under test**: widening the fixture's second table so its
   criterion column collides made the mutation break it immediately. Redundant protection is not the
   same as an untestable claim, and I called it wrong the first time.
+- **CI found what I stopped looking for, and it is 021's finding running live.** The refactor moved
+  column resolution out of `cases.sh` and `mutate.sh`, which **silently invalidated four mutations
+  belonging to 022 and 023** — their declarations edited code that no longer existed, so four
+  previously-proved criteria became unfalsifiable. 021 wrote the sentence for this exact shape:
+  *"the mutation did not decay because it was weak — the criterion changed underneath it."* Here the
+  implementation moved instead.
+
+  **It passed locally and failed in CI**, for one reason: once I started fixing declarations one at a
+  time with `--only`, I stopped running the full set. The last complete local run predated the three
+  ports. `B22`.
+
 - **Candidate amendments → North Star:** none. No `pillars`/`scope` change.

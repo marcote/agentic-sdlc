@@ -77,7 +77,9 @@ fi
 # 001-example has SIX columns. Split on the pipe it yields the same field count as seven, so a
 # fixed-index reader does not fail -- it reads the wrong column and reports confidently. Its label
 # column parsed as `project` while this feature was being measured.
-# --- [mut$ sed -i.bak 's|CASE_COL_CRIT=|CASE_COL_CRIT=5; CASE_COL_CRIT_UNUSED=|' scripts/cases.sh $] ---
+# 026 moved column resolution into scripts/lib/matrix.sh; this edit follows the logic there.
+# Forcing the SEVEN-column index is the defect: specs/001-example has six.
+# --- [mut$ sed -i.bak 's|_mx_crit = idx("criterion")|_mx_crit = 5|' scripts/lib/matrix.sh $] ---
 cs --matrix "$CFIX/six-col.md" --base "$CFIX"
 S6RC=${XRC:-9}; cp "$C93/out" "$C93/six" 2>/dev/null
 if have_cases && [ "$S6RC" -eq 0 ] && grep -qE '1 resolved' "$C93/six"; then
@@ -99,7 +101,11 @@ fi
 # This is the miscount that gave B14 its 32: `grep -c` over the matrices counted the legend line
 # present in all 19 of them. The fixture carries both traps -- a legend naming the marker outside
 # any table, and a 🟢 green row whose prose names it inside one.
-# --- [mut$ sed -i.bak 's|st = \$si;|st = $0;|' scripts/cases.sh $] ---
+# 026 moved row reading into scripts/lib/matrix.sh. What this criterion actually asserts is that
+# the marker is read from the STATUS COLUMN -- not from the line, and not from the legend. So the
+# edit makes the status cell come from the criterion column instead. Widening the row range does
+# NOT break it: this fixture's legend sits above the table, so the range never reaches it.
+# --- [mut$ sed -i.bak 's|link "\\t" cell(si)|link "\\t" cell(ci)|' scripts/lib/matrix.sh $] ---
 cs --matrix "$CFIX/seven-col.md" --base "$CFIX"
 if have_cases && grep -qE '1 case row' "$C93/out" && ! grep -qE '2 case row' "$C93/out"; then
   _pass "CASE-LEGEND-NOT-COUNTED: 1 case row in a matrix whose legend also names the marker"

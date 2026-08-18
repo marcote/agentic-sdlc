@@ -26,7 +26,9 @@ cov(){ if have_mut; then bash "$MUT" coverage --tests tests "$@" >"$M97/out" 2>&
 # --- COV-OBLIGED-PREDICATE: origin, status and a resolvable check file, all three ---
 # The mixed fixture carries one obliged+declared row, one obliged+bare row, and three that own no
 # assertion: a [given] inherited row, a case row scored by judgment, a deferred row.
-# --- [mut$ sed -i.bak 's|!~ /project/|!~ /projectNEVER/|' scripts/mutate.sh $] ---
+# 026 moved the row read into scripts/lib/matrix.sh; the origin TEST stayed in mutate.sh but is
+# now a shell case, not an awk condition. Breaking the origin column is what this asserts.
+# --- [mut$ sed -i.bak 's|org  = idx("origin")|org  = 0|' scripts/lib/matrix.sh $] ---
 cov --spec "$CFX/mixed.md"
 if have_mut && grep -qE '2 obliged' "$M97/out" \
    && ! grep -q 'check-can-fail' "$M97/out" && ! grep -q 'FIXTURE-JUDGE' "$M97/out"; then
@@ -47,7 +49,9 @@ fi
 # --- COV-IDEM-RESOLVED: an `idem` cell inherits the check file of the row above ---
 # FIXTURE-BARE is deliberately the idem row. It can only be reported at all if idem resolved --
 # an unresolved idem would drop it from the obligation, and the gate would read clean.
-# --- [mut$ sed -i.bak 's|/idem/|/idemNEVER/|' scripts/mutate.sh $] ---
+# 026 moved idem resolution into scripts/lib/matrix.sh, and made it an EXACT match -- the old
+# `~ /idem/` also swallowed specs/001-example's `idempotency.feature`.
+# --- [mut$ sed -i.bak 's|if (link == "idem")|if (link == "idemNEVER")|' scripts/lib/matrix.sh $] ---
 cov --spec "$CFX/mixed.md"
 if have_mut && grep -q 'FIXTURE-BARE' "$M97/out" && grep -qE '2 obliged' "$M97/out"; then
   _pass "COV-IDEM-RESOLVED: the idem row resolved to check_fixture.sh and stayed obliged"

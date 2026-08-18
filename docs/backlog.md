@@ -498,6 +498,29 @@ mechanical form is not obvious — a declaration that matches nothing is already
 `mutate.sh` could report *"the edit changed no bytes"* as a distinct outcome from *"the criterion
 still passed"*. Those are different failures and today they read identically.
 
+## B22 — A refactor silently invalidates the mutations of every criterion whose code it moves
+
+**Status:** open · **Raised:** 2026-08-18 (026, found by CI) · **Size:** small
+
+026 moved column resolution out of `scripts/cases.sh` and `scripts/mutate.sh` into
+`scripts/lib/matrix.sh`. Four declarations belonging to **022 and 023** still edited the old
+locations. `sed` matched nothing, the criteria kept passing, and **four previously-proved criteria
+became unfalsifiable without any of them changing a line.**
+
+This is the shape 021 named — *"the mutation did not decay because it was weak; the criterion changed
+underneath it"* — with the implementation moving instead of the criterion. `mutate.sh run` catches
+it, and it caught it. **CI caught it; I did not**, because once I began fixing declarations
+individually with `--only`, the last full local run predated the three ports.
+
+**Two candidates, and the first is nearly free.** `mutate.sh` already distinguishes three outcomes;
+a fourth — **"the edit changed no bytes"** — is a different failure from *"the criterion still
+passed"* and today they print the same line. A declaration that matches nothing is not a weak
+mutation, it is a **stale** one, and the diagnosis should say which. This is the same candidate
+`B21` arrived at from the other direction, and the two should probably be answered together.
+
+The second is procedural and therefore weaker: run the full set before pushing. That is a rule of
+the shape this repository has measured three times as not sticking.
+
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_
