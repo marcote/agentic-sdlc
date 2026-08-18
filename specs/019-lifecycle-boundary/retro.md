@@ -27,6 +27,26 @@ closes: `specs/019-lifecycle-boundary/alignment.md` · `verification/reports/019
     arrives and none does.
   - **Sweep by: 2026-09-08**, with 013, 014, 016 and 017.
 
+## Sweep — 2026-08-18 (deferred half renewed)
+
+**The immediate half stays `confirmed`. The deferred half has been consulted four times and has
+never changed a verdict.**
+
+020, 021, 022 and 023 each scored `scopeCompliance` against ADR `0005`'s four predicates, and each
+`alignment.md` records the reading — 020's says it is *"the first brief scored against the four
+lifecycle predicates"*. **All four say the same thing: no predicate is approached.** Four
+consultations, zero verdicts changed, and no `scope-reject` hit in fourteen features.
+
+**Same shape as 013's charter before this sweep: consulted, never binding.** A boundary that is read
+every time and never moves a score is documentation that a reader trusts more than documentation —
+which is worth something, and is not what *"changes a verdict"* claimed.
+
+### Stopping rule
+
+**2026-10-08.** If no `alignment.md` has by then scored a dimension *lower* because of a lifecycle
+predicate, the deferred half should be closed as **documentation confirmed, enforcement
+unobserved**, rather than renewed a third time.
+
 ## Face B — Method
 
 - **Gaps caught by `/distill`:** 8 edge cases `[deriv$ awk '/^## Edge cases/,/^## Non-goals/' specs/019-lifecycle-boundary/spec.md | grep -cE '^[0-9]+\. ' $]` plus 5 grilling decisions `[deriv$ grep -cE '^### G-' specs/019-lifecycle-boundary/spec.md $]`.

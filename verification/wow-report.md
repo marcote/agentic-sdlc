@@ -32,21 +32,38 @@ the known pin-id defect?* — and the answer was found at `/distill`.
 
 ## 2. Pending re-checks (worklist)
 
-| Feature | What is being observed | Trigger | Sweep by | State |
-|---|---|---|---|---|
-| 013 | the charter preventing stack-decision rework | a feature's `/plan` trips a pin, or reworks a decision no pin covered | 2026-09-08 | **partially answered** — 018's `/plan` returned `UNPINNED` and minted `S9`, the second run of the accretion loop |
-| 014 | ADR `0004`'s amended signal, and `UNCOVERED` stopping a later feature | (a) a mandatory step rejected for lacking a justification · (b) `UNCOVERED` stops a feature other than 014 | 2026-09-08 | open — (b) has now fired against a *foreign* charter in 018's suite, but not against a real feature of ours |
-| 016 | the provenance stamp changing a verdict | a `pending-observation` closed against a pillar whose `since` moved | 2026-09-08 | open |
-| 017 | an executable derivation going red on its own | a spec edited after close, or a wrong number in a future retro | 2026-09-08 | open |
+**Swept 2026-08-18**, three weeks before the scheduled date, because a trigger had already fired
+and nobody had noticed.
 
-| 019 | whether the boundary ever changes a verdict | an `alignment.md` cites a lifecycle predicate by name | 2026-09-08 | open |
+| Feature | What is being observed | State after the sweep |
+|---|---|---|
+| 013 | the charter preventing stack-decision rework | **CLOSED — `confirmed`.** 018's `/plan` returned `UNPINNED` and minted `S9`; its `S7` falsifier reading changed `ADOPT-TESTCMD-INVOKED`'s design before it was written. Limit recorded: **no pin has ever `TRIPPED`** in ten features |
+| 014 | ADR `0004`'s amended signal, and `UNCOVERED` stopping a later feature | renewed → **2026-10-08**. (a) fired weakly — 022 and 023 both *declined* to claim `frictionless-adoption` for a step they added. (b) has not fired and asks for rework this repo does not produce |
+| 016 | the provenance stamp changing a verdict | renewed → **next pillar-moving ADR, or 2026-10-08**. A retro consulted the stamps at this sweep; no pillar has moved since ADR `0004`, so there was no drift to catch |
+| 017 | an executable derivation going red on its own | renewed → **2026-10-08**. 14 derivations, zero red. This sweep edited five closed retros and the suite stayed green |
+| 019 | whether the lifecycle boundary ever changes a verdict | deferred half renewed → **2026-10-08**. Consulted by 020, 021, 022 and 023; **zero verdicts changed** |
+| 022 | whether obliging a mutation catches one nobody would have declared | open → 2026-09-16. **First data point is negative:** 023 closed under the gate at `0 undeclared` on the first run — one of the three consecutive zeroes its case file names as refuting |
+| 023 | whether `cases.sh` ever blocks a feature that did not know it was broken | open → 2026-09-18 |
 
-**None overdue.** One sweep, five verdicts, on 2026-09-08.
+### The finding this sweep produced, which is not about any one feature
 
-**Worth flagging for that sweep:** 014's trigger (b) is now half-met in a way its author did not
-foresee. `ADOPT-UNCOVERED-FIRES` shows `UNCOVERED` blocking on someone else's charter every time
-the suite runs. That is the mechanism working, but it is not the same evidence as a real feature of
-ours being stopped, and the sweep should not accept it as such.
+**Four of these five triggers ask to observe a failure, in a system engineered not to fail.**
+
+- 014(b) needs a stop that *prevents rework*. Rework across the corpus, derived from Face B of every
+  retro: **2 instances in 17 features**.
+- 016 needs a pillar's `since` to move. None has moved since ADR `0004`.
+- 017 needs a number to rot. Every number here is derived at write time, so they do not.
+- 019 needs a predicate to lower a score. Fourteen features, zero `scope-reject` hits.
+
+They are not stalled for lack of attention. **They are waiting for events this repository's own
+discipline prevents**, which makes them unfalsifiable rather than unresolved. Every one now carries a
+**stopping rule** so the third renewal is not an option: at 2026-10-08 an unfired trigger is closed
+as *unobservable here*, said plainly, rather than carried as a permanently open row.
+
+**The failure this sweep actually caught** is that 013's evidence arrived on 2026-08-09 and this
+report already recorded it as *"partially answered"* — while `specs/013-stack-charter/retro.md`, the
+artifact that owns the verdict, still read `pending-observation` nine days and five features later.
+Two trackers, and the stale one holds the verdict. `B9`'s family.
 
 ## 3. Method — does the WoW add value? (N=12, small sample, no statistics)
 

@@ -24,10 +24,34 @@ be counting the motivating case twice.
   was **generous**: it predicted a real but bounded gain, and the bound turned out tighter than the
   brief assumed. Three of nine retros could be migrated, not nine. A 4 that rests on a scope the
   artifacts cannot support is a 3.
-- **Mission verdict:** pending-observation
+- **Mission verdict:** pending-observation — **renewed at the 2026-08-18 sweep, see below.** 14
+  derivations exist and none has gone red on its own.
   - **re-check trigger:** the first derivation that goes red on its own, without being mutated —
     either a spec edited after close, or a number written wrong in a future retro.
   - **Sweep by: 2026-09-08**, with 013, 014 and 016.
+
+## Sweep — 2026-08-18 (renewed, not closed)
+
+**Verdict: `pending-observation` renewed. 14 executable derivations across the corpus; zero have
+gone red.**
+
+The claim is that a `[deriv$ … $]` catches a number that stops being true — a spec edited after
+close, or a figure written wrong in a later retro. Neither has happened. The suite reports
+**557 PASS / 0 FAIL**, and every derivation in it still reproduces.
+
+**This sweep is itself a live test of the mechanism.** It edits four closed retros. If any of the 14
+derivations read a file this sweep touched and the number no longer reproduced, the trigger would
+have fired here. The suite was run after the edits and stayed green — so the derivations survived
+an edit to closed artifacts, which is weak positive evidence for their robustness and no evidence at
+all for their usefulness.
+
+### Stopping rule
+
+**2026-10-08.** A mechanism that has never fired in two months and 14 instances is either protecting
+something that does not happen or is not sensitive enough to notice. If it has still not fired, the
+honest reading is the first — the numbers in this repository are derived at write time, so they do
+not rot — and the derivation's value is that it **forced** the derivation, not that it later caught
+one. That is a smaller claim than the retro made, and it should replace it rather than wait longer.
 
 ## Face B — Method — DERIVED from artifacts
 
