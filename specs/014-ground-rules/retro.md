@@ -38,7 +38,8 @@ is whether the replacement can ever say *no*.
   edge. 013's retro recorded that I ignored *"when in doubt prefer the lower"*; applying it here
   is that lesson landing. `missionAdvancement: 3` also held: two of four pillars came back
   pending, which is what a 3 predicts. `pillarFit: 4` was, if anything, mildly generous.
-- **Mission verdict:** pending-observation
+- **Mission verdict:** pending-observation — **renewed at the 2026-08-18 sweep with a stopping
+  rule, see below.** Nine features have passed and neither half has fired.
   - **re-check trigger:** two distinct events, and the feature is not vindicated until both
     occur. **(a)** A proposed mandatory step is **rejected** — or forced to state a
     justification it lacked — under the amended `frictionless-adoption` signal. That is when
@@ -47,6 +48,41 @@ is whether the replacement can ever say *no*.
     rework that would otherwise have happened. That is when `measurable-impact` moves. The same
     trigger closes the two `📋` eval rows (`JUDGE-GR-ANSWERED`, `JUDGE-NA-HONEST`), left open
     because scoring them here would be the authoring model grading its own output.
+
+## Sweep — 2026-08-18 (renewed, not closed)
+
+**Verdict: `pending-observation` renewed. Nine features since; neither half fired.**
+
+### (a) — fired in a weaker form than written, and that is not enough
+
+No mandatory step has ever been **rejected** for lacking a justification. But the amended signal did
+change how two features scored themselves: 022 added a `/verify` step and its `alignment.md`
+declines to claim `frictionless-adoption` — *"claiming this pillar as advanced would be
+backwards"* — and 023 marks that pillar `⏳ not yet observable` for the same reason. **The signal
+made two features decline a pillar they could have claimed.** That is the amendment biting, but it
+is self-restraint, not rejection, and this trigger asked for rejection.
+
+### (b) — has not fired, and the trigger asks for something this repository does not produce
+
+No feature has been stopped by `UNCOVERED`. `ground-rules` returns exit 0 in every `/plan`. 018's
+`ADOPT-UNCOVERED-FIRES` shows `UNCOVERED` blocking on a **foreign** charter every suite run, which
+the previous `wow-report` already warned must not be accepted as this evidence.
+
+**The deeper problem is the trigger's second clause.** It requires the stop to *prevent rework that
+would otherwise have happened*. Rework across the whole corpus, derived from Face B: **2 instances
+in 17 features** (`003` and `009`, one each). A trigger predicated on rework cannot fire in a
+repository that produces almost none.
+
+**Not rewritten to be easier.** Weakening a criterion because it will not pass is the move 021
+named — reaching for *"the test was too strict"* instead of diagnosing. The clause is the actual
+claim and it stays.
+
+### Stopping rule, so this is not deferred forever
+
+**Next sweep: 2026-10-08.** If (b) has still not fired, the honest verdict is **not `confirmed` and
+not `refuted` but unobservable here** — ground rules may well prevent rework in a repository that
+makes stack decisions under pressure, and this one does not. That will be said plainly rather than
+carried as a fourth open row.
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
 

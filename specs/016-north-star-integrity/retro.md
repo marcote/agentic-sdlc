@@ -26,13 +26,39 @@ half B, and it is not. Half A moved three other pillars on its own evidence.
   and it survived `/uat`: nothing was named, nothing was prescribed, both halves removed ambiguity
   from an existing contract. `missionAdvancement: 4` was correct to hold below 5 for exactly the
   reason given — half B's payoff is deferred, and it stayed deferred.
-- **Mission verdict:** pending-observation
+- **Mission verdict:** pending-observation — **renewed at the 2026-08-18 sweep, see below.** The
+  stamps were consulted; no pillar has moved, so there was no drift to catch.
   - **re-check trigger:** the **2026-09-08 sweep**. If a `pending-observation` is closed against a
     pillar whose `since` differs from the one stamped in its `alignment.md`, and the retro says so,
     half B is confirmed. If the sweep passes and no retro consults a stamp, it is decoration and
     should be said plainly. Same date as 013's and 014's sweep, deliberately: one sweep, three
     verdicts.
   - **Sweep by: 2026-09-08.**
+
+## Sweep — 2026-08-18 (renewed, not closed)
+
+**Verdict: `pending-observation` renewed. The stamp was exercised and found nothing, because
+nothing has moved.**
+
+The trigger said: *if a `pending-observation` is closed against a pillar whose `since` differs from
+the one stamped in its `alignment.md`, half B is confirmed; if the sweep passes and no retro
+consults a stamp, it is decoration and should be said plainly.*
+
+**A retro did consult a stamp — this one.** 017's `alignment.md` stamps `real-enforcement 0001`,
+`agnostic-portability 0001`, `measurable-impact 0002`, `frictionless-adoption 0004`. Today's
+`north-star.md` carries exactly those four. **No drift, because no pillar has moved since ADR
+`0004`.** ADR `0005` changed `scope.out_of_scope`, which carries no `since`.
+
+So the mechanism is not decoration — it was read, at the moment it was designed to be read — but it
+cannot be confirmed, because confirming it requires a pillar to move and none has. 013's
+`alignment.md` has no stamp at all: it predates this feature, which is why the closure above could
+not be the test either.
+
+### Stopping rule
+
+**The next ADR that moves a pillar's `statement`, whenever it lands** — or **2026-10-08**, whichever
+comes first. If a pillar moves and no retro notices the changed `since`, that is a refutation and
+not another renewal.
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
 

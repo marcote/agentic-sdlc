@@ -24,14 +24,48 @@ Source: `specs/013-stack-charter/alignment.md` (objective→pillar mapping) + `n
   measurable only when a `Falsifier` trips… a sparse measurement") was correct, and I did not
   follow it down to the score. The rubric's own instruction — *when in doubt prefer the lower*
   — existed precisely for this and I did not apply it.
-- **Mission verdict:** pending-observation
-  - **re-check trigger:** the first feature (014+) whose `/plan` gate emits a real `UNPINNED` or
+- **Mission verdict:** confirmed — **closed at the 2026-08-18 sweep, see below.** The trigger fired
+  at 018 and sat unclosed for nine days while five further features shipped.
+  - **original re-check trigger:** the first feature (014+) whose `/plan` gate emits a real `UNPINNED` or
     `TRIPPED` verdict against a pin that existed *before* that feature started, or whose
     `/stack` run produces a real coherence objection. That is the first moment the charter can
     be observed preventing rework rather than merely recording decisions. The same trigger
     closes the three `📋` eval rows (`JUDGE-TRIPPED`, `JUDGE-COHERENCE`, `JUDGE-HEDGE-COST`),
     deliberately left open because scoring them here would be the authoring model grading
     itself.
+
+## Sweep — 2026-08-18 (closes this retro)
+
+**Verdict: `confirmed`, with a stated limit.**
+
+### The trigger fired at 018, on 2026-08-09
+
+`specs/018-adoption-fixture/plan.md` § Stack gate: **`Verdict: UNPINNED, then PASS`.** The charter
+had no pin for *how this repository proves portability*; the decision was load-bearing under the
+inclusion test, and `S9` was minted with its price. Charter went from 9 pins to **10 pins · 8
+PINNED · 2 PROVISIONAL**.
+
+### The stronger evidence is not the `UNPINNED`
+
+Same file, the `Falsifier` readings: `S7` was *"the closest call… not tripped, but one edit away
+from tripping"*, and `ADOPT-TESTCMD-INVOKED` was designed to assert **the seam rather than the
+verdict** because of that reading. **A pin changed a criterion's design before the criterion was
+written.** That is the charter preventing rework rather than recording decisions, which is what this
+verdict was waiting for — and it is a better instance than the one the trigger asked for.
+
+### The limit, stated because the verdict would otherwise overclaim
+
+**No pin has ever `TRIPPED`.** Ten features have run `/plan` fail-closed against the charter and
+every one returned `PASS` on every decision. So the charter is observed catching a decision *no pin
+covered*; it has never been observed catching a decision *going bad*. `JUDGE-TRIPPED`,
+`JUDGE-COHERENCE` and `JUDGE-HEDGE-COST` stay `📋 case` — this sweep does not score them.
+
+### Why it took nine days
+
+`verification/wow-report.md` §2 already recorded 018's `UNPINNED` as *"partially answered"*. **The
+observation artifact knew; the retro that owns the verdict did not.** Two trackers and the stale one
+holds the verdict — `B9`'s family, and the reason this sweep is itself an artifact rather than a
+glance.
 
 ## Face B — Method (validates the WoW) — DERIVED from artifacts, not drafted
 
