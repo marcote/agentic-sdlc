@@ -166,7 +166,10 @@ rm -rf "$R"
 assert_dep_free "$MUT" "MUT-DIAG-DEPFREE"
 
 # --- MUT-DIAG-COST: the added cost is measured against the 2% predicted at /align ---
-# --- [mut$ sed -i.bak 's|## 2.1|## 2.1 (cost removed)|' verification/reports/027-mutation-diagnostics-*.md $] ---
+# Renaming the HEADING left every figure the criterion reads untouched -- inert, like 026's.
+# The report names the figure in two places and the criterion accepts either, so the edit must
+# remove every literal occurrence -- one of them is not enough.
+# --- [mut$ sed -i.bak 's|2%|two percent|g' verification/reports/027-mutation-diagnostics-*.md $] ---
 _m89_rep=$(ls verification/reports/027-mutation-diagnostics-*.md 2>/dev/null | head -1)
 if grep -qE 'predicted.*2%|2% predicted' "${_m89_rep:-/dev/null}" 2>/dev/null \
    && grep -qE '[0-9]+\.[0-9]+s' "${_m89_rep:-/dev/null}" 2>/dev/null; then

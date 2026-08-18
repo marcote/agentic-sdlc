@@ -159,7 +159,8 @@ fi
 # orphaned, and the count never falls below the 15 recorded at the 1d506c2 baseline.
 # --- [mut$ sed -i.bak 's|link = idx("linked"); if (!link) link = idx("test/eval")|link = 0|' scripts/lib/matrix.sh $] ---
 bash scripts/cases.sh >"$M91/cs" 2>&1; _m91_crc=$?
-_m91_n=$(grep -oE '[0-9]+ case rows?' "$M91/cs" | head -1 | grep -oE '[0-9]+')
+# the TOTAL line, not the first per-feature line -- specs/_template reports 0 and would win a head -1
+_m91_n=$(grep -E '^cases:' "$M91/cs" | grep -oE '[0-9]+ case rows?' | grep -oE '[0-9]+')
 if [ "$_m91_crc" -eq 0 ] && [ "${_m91_n:-0}" -ge 15 ] \
    && grep -qE "$_m91_n case rows?, $_m91_n resolved, 0 unresolved, 0 missing, 0 orphan" "$M91/cs"; then
   _pass "MTX-CASES-UNCHANGED: $_m91_n rows (>= the 15 at baseline), all resolved, 0 orphan"
