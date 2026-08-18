@@ -362,9 +362,11 @@ correct; the wall clock is two orders of magnitude off the work.
 **Not caused by 022.** The same run on `main` had not finished after 10 minutes and was still at
 `check_90_retro.sh`. 022 adds 2.14s of real work (`check_97`), which is not the difference.
 
-**It is intermittent.** Earlier the same day, on the same branch, the full suite completed twice
-inside a 120s call. Whatever triggers the blow-up is state-dependent, and that is the part worth
-understanding before anything is changed.
+**It is intermittent, and CI is fine.** Earlier the same day, on the same branch, the full suite
+completed twice inside a 120s call. The `self-verify` job for this very tree ran in **2m29s** on a
+clean GitHub runner. So the blow-up is not inherent to the suite — it is state-dependent, and the
+state is local. That is the part worth understanding before anything is changed, and it is also why
+this is not urgent: the gate that actually blocks a merge is not affected.
 
 **Mechanism — a hypothesis with evidence, not a diagnosis.** The recursion guard is set in exactly
 one place and read in exactly one place, both inside `check_96_non_vacuous.sh`:
