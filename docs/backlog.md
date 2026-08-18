@@ -55,9 +55,14 @@ honestly deferred today. They become decoration if they stay open indefinitely.
 
 **Unblocks on:** an independent judge — a separate model, or a human pass.
 
-## B3 — A North Star stub with `TODO:` placeholders passes `schema-valid`
+## ~~B3~~ — A North Star stub with `TODO:` placeholders passes `schema-valid`
 
-**Status:** open · **Raised:** 2026-08-09 · **Size:** very small
+**Status: DONE 2026-08-09 → `specs/016-north-star-integrity/`** — see the closing entry below, which
+carries the outcome. **This heading read `open` for nine days after the work shipped**, so a reader
+scanning for open items found a duplicate that said the opposite of the truth. Found on 2026-08-18
+while listing what was left.
+
+*Original entry retained below.* · **Raised:** 2026-08-09 · **Size:** very small
 
 The North Star seeded by `scripts/vendor.sh` contains `"TODO: ..."` strings and is nonetheless
 `schema-valid`, so `/align` will run against a placeholder and produce a verdict that means
@@ -109,7 +114,11 @@ other direction — the constitution override that stops injecting two `[given]`
 
 ## B7 — The nested suite run scales linearly
 
-**Status:** open · **Raised:** 2026-08-09 (measured) · **Size:** small
+**Status:** open, **superseded in scope by `B18`** · **Raised:** 2026-08-09 (measured) · **Size:** small
+
+> **`B18` is this finding taken after it grew.** This entry measured the nested run as a *doubling*,
+> 6s of 12s. The suite now reports green after **2923s** of wall clock against ~22s of check work.
+> Read `B18` first; fixing this one without that measurement would optimise the wrong half.
 
 The suite takes **12s**; **6s** of that is `check_96` running the whole suite again to obtain a
 real log. Fine today, and free of cost to adopters (`tests/` is DROP), but it doubles forever and
