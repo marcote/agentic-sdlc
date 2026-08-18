@@ -26,8 +26,24 @@ description: On-demand verification of a feature. Runs output + trajectory eval 
    re-runs the whole suite, the cost multiplies by the number of declarations. Mutations run where
    `Guard`s run: at `/verify` and in CI.
 
-5. **Trajectory eval:** score against `evals/rubric.md` (tool use, skipped steps,
+5. **Mutation coverage (BUILD, cont.):** run
+   `bash scripts/mutate.sh coverage --tests tests --spec specs/<feature>` and require exit 0. Every
+   criterion the feature's own `coverage.md` obliges — origin `project`, a deterministic status, and
+   a linked test that resolves — must carry a `[mut$ … $]` declaration. Exit 1 names the criteria
+   that carry none; exit 2 means a row names a check file that cannot be resolved, which is a defect
+   in the matrix rather than a missing mutation.
+
+   Then run `bash scripts/mutate.sh coverage --tests tests --all` and **record its TOTAL line in the
+   report**. That is the standing debt across every closed feature, re-derived at this ref rather
+   than read from a stored figure — a snapshot written into a report goes stale as features are
+   added, and a stale number is worse than none.
+
+   **Scope:** the gate binds the feature being verified. It does not gate closed features, and there
+   is no baseline or exemption list — features from 018 on already sit at zero, so the forward-only
+   line needs no record to maintain.
+
+6. **Trajectory eval:** score against `evals/rubric.md` (tool use, skipped steps,
    hallucination). A flow that skipped verification is FAIL even if the build passes.
-6. Update the states in `coverage.md` (🔴→🟢) and complete the Verdict.
-7. If BUILD/TRAJECTORY fail → IMPLEMENTATION gap → go back to implement.
+7. Update the states in `coverage.md` (🔴→🟢) and complete the Verdict.
+8. If BUILD/TRAJECTORY fail → IMPLEMENTATION gap → go back to implement.
    Do NOT call UAT or closing non-deterministic evals from here.

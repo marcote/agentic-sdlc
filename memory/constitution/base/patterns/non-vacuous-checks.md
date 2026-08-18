@@ -81,6 +81,37 @@ without saying so; reject it by name.
 *Adopters inherit the pattern, not the runner.* A runner encodes a repository's own `_pass`/`_fail`
 conventions. The declaration grammar is the portable part.
 
+## Who must declare — the obligation, not the capability
+
+- `[given]` a criterion the feature's own coverage matrix marks as **its own and deterministic**,
+  and which resolves to a check file, **declares a mutation**. A criterion may be absent from that
+  obligation only by a rule, never by omission.
+
+An opt-in mechanism proves what its author already suspected. Measured on the first two features
+audited: eighteen of nineteen recorded mutations reproduced, so the mutations were fine — but seven
+of one feature's sixteen criteria had **never declared one at all**, and the report presented
+failability as established for the feature. **The gap was coverage, and it was found by counting,
+not by suspecting.** That is why the trigger is *a criterion without a declaration* rather than
+*a criterion that looks suspect*: the two known vacuous instances had different shapes, so no single
+pattern sees both.
+
+**The obligation is derived from the artifact, never from a branch ref.** The coverage matrix
+already names a feature's criteria. `git diff` against `main` is the tempting trigger and it does
+not survive CI: a shallow detached-HEAD checkout has neither `main` nor `origin/main`.
+
+**Three conditions, each removing a row that owns no assertion to break:** the row is the feature's
+own rather than inherited; its status is a deterministic state rather than judged or deferred; and
+its linked test resolves to a check file that exists.
+
+**A row that cannot be resolved is reported, never dropped.** This is the condition that decides
+whether the rule means anything. A predicate discarding what it cannot parse reports a smaller,
+cleaner, wrong number — measured directly: requiring a canonical path counted 47 undeclared
+criteria where the true figure was 137, because matrices written months apart are not uniform. The
+failure renders identically to the success, which is the family this whole pattern exists to close.
+
+**Existence is not quality.** A declaration reading `[mut$ true $]` satisfies this rule and fails
+the runner. The pair closes the loophole; neither half does alone.
+
 ## What this pattern does not cover
 
 **Semantic vacuity stays a review concern.** Whether an assertion's pattern is satisfied by text

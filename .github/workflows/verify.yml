@@ -12,5 +12,10 @@ jobs:
         run: bash tests/run.sh
       - name: Declared mutations (check-can-fail, executed)
         run: bash scripts/mutate.sh run --tests tests
+      # The standing debt across every closed feature, re-derived at this ref. A report, not a
+      # gate: `--all` exits 0 at 137 undeclared, because blocking on twelve closed features is
+      # what B15 says not to do. It still exits 2 on an unresolvable row, in either mode.
+      - name: Mutation coverage (the standing debt, re-derived)
+        run: bash scripts/mutate.sh coverage --tests tests --all
       # Placeholder (agent-driven /verify in CI): posting the verification-report as a PR comment
       # is up to each project — depends on the stack and the eval runner.
