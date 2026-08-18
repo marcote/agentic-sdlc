@@ -1,0 +1,46 @@
+# Eval case — message clarity
+#
+# Feature: 001-example ("Save card with 1-tap") — the template's worked example.
+#
+# This is the ONLY case in this directory that judges a PRODUCT criterion. The other eight judge
+# the harness itself, which is what an adopter copying this repository would find: no example of a
+# case for their own software. evals/README.md advertises a `.yaml` form and nothing demonstrated
+# it, so this file is both the example's missing artifact and that gap.
+#
+# The feature it belongs to is deliberately half-finished (two criteria still open) to show a
+# matrix with mixed statuses. A case file exists anyway: evals/README.md puts case creation at
+# /contract, BEFORE implementing. An unfinished feature is a reason for the case to exist, not to
+# be missing.
+
+criterion: message clarity
+feature: 001-example
+scored_by: an independent judge, or a human pass
+not_before: implementation of the rejection path
+
+question: >
+  When a card payment is rejected, does the message tell the person what to do next,
+  or does it only report that something failed?
+
+inputs:
+  - id: insufficient-funds
+    response: "Payment declined."
+  - id: expired-card
+    response: "Your card ending 4242 expired in 03/25. Add a new card to finish paying."
+  - id: network-timeout
+    response: "Error 500."
+
+expected:
+  - id: insufficient-funds
+    verdict: fail
+    why: accurate and useless — names no cause and offers no next step.
+  - id: expired-card
+    verdict: pass
+    why: names the card, the cause, and the one action that resolves it.
+  - id: network-timeout
+    verdict: fail
+    why: exposes an internal status code to someone who cannot act on it.
+
+trap: >
+  Do not score politeness. "We're sorry, your payment could not be processed at this time"
+  is warmer than every example above and tells the person nothing. Apology is not clarity,
+  and a judge rewarding tone will pass the worst message in the set.
