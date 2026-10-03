@@ -12,4 +12,4 @@ Goal: a spec the owner can approve at gate H1 without a second meeting.
 3. Run `uv run scripts/spec.py page specs/<slice>/spec.md`. Fix every finding, then run it again.
 4. Optional: draw the main scenarios with interfig as SVG, and reference them in the spec.
 5. Show the owner `spec.html`. This is gate H1. Apply what the owner rejects, and render again.
-6. After approval: commit, then run `uv run scripts/build.py specs/<slice>`.
+6. After approval: commit with the subject `spec(<slice>): approved at H1`, then run `uv run scripts/build.py specs/<slice>`.
