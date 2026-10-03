@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -25,7 +26,7 @@ def run(*args, cwd=None, env=None, check=False):
 
 
 def spec_cmd(*args, cwd=None):
-    return run("uv", "run", "-q", str(HARNESS / "scripts/spec.py"), *args, cwd=cwd)
+    return run(sys.executable, str(HARNESS / "scripts/spec.py"), *args, cwd=cwd)
 
 
 @pytest.fixture
@@ -87,10 +88,10 @@ class Slice:
         return [json.loads(l) for l in self.log.read_text().splitlines()]
 
     def build(self, *args):
-        return run("uv", "run", "-q", str(HARNESS / "scripts/build.py"), str(self.dir), *args, cwd=self.root, env=self.env())
+        return run(sys.executable, str(HARNESS / "scripts/build.py"), str(self.dir), *args, cwd=self.root, env=self.env())
 
     def accept(self, *args):
-        return run("uv", "run", "-q", str(HARNESS / "scripts/accept.py"), str(self.dir), *args, cwd=self.root, env=self.env())
+        return run(sys.executable, str(HARNESS / "scripts/accept.py"), str(self.dir), *args, cwd=self.root, env=self.env())
 
     def report(self):
         return json.loads((self.dir / "build-report.json").read_text())
@@ -115,7 +116,7 @@ def slice_repo(tmp_path):
     cfg = cfg.replace('reviewer = "claude-ro"', 'reviewer = "fake"')
     cfg = cfg.replace('reflector = "claude-ro"', 'reflector = "fake"')
     cfg = cfg.replace('judge = "claude-ro"', 'judge = "fake-judge"')
-    cfg = cfg.replace(" && bash tests/run.sh", "")
+    cfg = cfg.replace(" && bash tests/run.sh", "").replace("suite_seconds = 45\n", "")
     (root / "harness.toml").write_text(cfg)
     (root / ".gitignore").write_text(".fake_log\n.fake_plan\n__pycache__/\n.pytest_cache/\n")
     run("git", "init", "-q", "-b", "main", cwd=root, check=True)

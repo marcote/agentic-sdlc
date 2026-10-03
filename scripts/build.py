@@ -16,6 +16,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
@@ -61,7 +62,7 @@ def call(cfg, role, prompt, report):
     with tempfile.TemporaryDirectory() as tmp:
         out = Path(tmp) / "out.json"
         subs = {"{role}": role, "{schema}": str(schema_path), "{schema_json}": schema_path.read_text(), "{out}": str(out)}
-        argv = [subs.get(a, a).replace("{harness}", str(HARNESS)) for a in cli["cmd"]]
+        argv = [subs.get(a, a).replace("{harness}", str(HARNESS)).replace("{python}", sys.executable) for a in cli["cmd"]]
         secs = cfg["limits"]["call_seconds"]
         try:  # ponytail: kills the CLI only, not its children; use a process group if a tool outlives it
             p = subprocess.run(argv, input=prompt, capture_output=True, text=True, timeout=secs)
@@ -96,6 +97,8 @@ def revert():
     git("checkout", "--", ".")
     git("reset", "-q", "--hard")  # also drops what `git add -A` staged before a reviewer call
     git("clean", "-fdq", "-e", ".fake_*")
+    # a reverted source rewritten in the same second with the same size would reuse its stale .pyc
+    git("clean", "-fdXq", "--", ":(glob)**/__pycache__")
 
 
 def done_on_branch(slice_name):
@@ -117,13 +120,23 @@ def examples_of(task, s):
     return ids
 
 
+TEST_TIME = [0.0]  # seconds spent in the task check during this process
+
+
 def run_checks(cfg, examples):
+    code, out = run_raw(cfg, examples)
+    return code, out[-1500:]
+
+
+def run_raw(cfg, examples):
     if not examples:
         return 0, "no examples selected"
     selector = " or ".join(f"{e.lower()}_" for e in examples) or "no_examples_selected"
     cmd = cfg["checks"]["task"].replace("{examples}", selector)
+    t0 = time.monotonic()
     p = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    return p.returncode, (p.stdout + p.stderr)[-1500:]
+    TEST_TIME[0] += time.monotonic() - t0
+    return p.returncode, p.stdout + p.stderr
 
 
 def section(title, body):
@@ -228,14 +241,15 @@ def contract(s, cfg, report, ids):
         res, fail = call(cfg, "implementer", prompt_for("implementer", t0, s, cfg, feedback), report)
         if res:
             report["trace"].append("T0:checks")
+            code, out = run_raw(cfg, ids)  # one run; each example's result is read from the FAILED/ERROR lines
             for e in ids:
-                code, out = run_checks(cfg, [e])
-                if code == 0:
+                got = re.search(rf"^(PASSED|FAILED|ERROR) \S*test_{e.lower()}_", out, re.M)
+                if got and got[1] == "PASSED":
                     report["escalations"].append({"task": "T0", "reason": f"vacuous: {e} passes before implementation"})
                     revert()
                     return False
-                if code != cfg["checks"]["red_exit"]:
-                    fail = f"{e}: no failing test (exit {code})\n{out}"
+                if not got:
+                    fail = f"{e}: no failing test (exit {code})\n{out[-1500:]}"
                     break
         if not fail:
             report["trace"].append("T0:reviewer")
@@ -266,7 +280,7 @@ def build(spec_dir, cfg):
     try:
         old = json.loads((spec_dir / "build-report.json").read_text())
         earlier = old.get("runs") or [old]  # a report from before "runs" is one run
-        earlier = [{k: r.get(k) for k in ("started", "tokens", "escalations")} for r in earlier]
+        earlier = [{k: r.get(k) for k in ("started", "tokens", "escalations", "test_seconds")} for r in earlier]
     except (OSError, ValueError, AttributeError):
         earlier = []
     try:
@@ -298,7 +312,8 @@ def build(spec_dir, cfg):
         report["escalations"].append({"task": "crash", "reason": f"{type(e).__name__}: {e} {getattr(e, 'stderr', '') or ''}".strip()})
         revert()
     finally:
-        report["runs"] = earlier + [{k: report[k] for k in ("started", "tokens", "escalations")}]
+        report["test_seconds"] = round(TEST_TIME[0], 1)
+        report["runs"] = earlier + [{k: report[k] for k in ("started", "tokens", "escalations", "test_seconds")}]
         (spec_dir / "build-report.json").write_text(json.dumps(report, indent=2))
     return report
 

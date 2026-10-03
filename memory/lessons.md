@@ -18,3 +18,4 @@ One row per lesson. `learned`: its check exists. `captured`: judgment only, no c
 | L12 | A negative example on code that exists must call the new behavior by name. Otherwise its test passes before implementation. | none: judgment | 034-lesson-curation | 0 | 0 | captured |
 | L13 | When a source states the same limit twice with different values, the check reports the conflict. It does not silently keep the last value. | none: judgment | 034-lesson-curation | 0 | 0 | captured |
 | L14 | Declare the test runner and its dependencies in the repo. Otherwise each implementer guesses the `uv run --with` list, and runs can differ. | none: judgment | 034-lesson-curation | 0 | 0 | captured |
+| L15 | A resumed build run that does no work must not overwrite the slice totals. Here top-level test_seconds reads 0.0, while the suite took 40.4 s. | none: judgment | 035-fast-tests | 0 | 0 | captured |

@@ -14,6 +14,7 @@ import html
 import json
 import subprocess
 import sys
+import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -23,8 +24,10 @@ import lessons  # noqa: E402
 import spec as speclib  # noqa: E402
 
 
-def suite(cfg):
+def suite(cfg, report):
+    t0 = time.monotonic()
     p = subprocess.run(cfg["checks"]["suite"], shell=True, capture_output=True, text=True)
+    report["suite_seconds"] = round(time.monotonic() - t0, 1)
     return p.returncode, (p.stdout + p.stderr)[-1500:]
 
 
@@ -62,8 +65,11 @@ def judge(spec_dir, s, cfg, report, branch):
 
 
 def failures(spec_dir, s, cfg, report, branch):
-    code, out = suite(cfg)
+    code, out = suite(cfg, report)
     found = [] if code == 0 else [f"suite failed:\n{out}"]
+    budget = cfg["limits"].get("suite_seconds")
+    if budget is not None and report["suite_seconds"] > budget:
+        found.append(f"suite took {report['suite_seconds']:g} s, budget {budget:g} s")
     return found + map_findings(cfg) + judge(spec_dir, s, cfg, report, branch)
 
 
@@ -141,6 +147,8 @@ def result_page(spec_dir, report):
         ("Reused",", ".join(report["reused"]) or "none"),
         ("New", ", ".join(report["new"]) or "none"),
         ("Assumptions", "; ".join(f"{a['task']}: {a['text']}" for a in report["assumptions"]) or "none"),
+        ("Suite", f"{report.get('suite_seconds', 0):g} s"),
+        ("Test time", ", ".join(f"{r.get('test_seconds') or 0:g} s" for r in runs)),
         ("Tokens", f"{tokens} ({len(runs)} build run{'s' * (len(runs) != 1)})"),
     ]
     body = "".join(f"<tr><th>{k}</th><td>{html.escape(v)}</td></tr>" for k, v in rows)

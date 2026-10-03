@@ -1,0 +1,51 @@
+{
+  "tokens": 0,
+  "tasks": {
+    "T0": {
+      "status": "done",
+      "attempts": 0
+    },
+    "T1": {
+      "status": "done",
+      "attempts": 0
+    },
+    "T2": {
+      "status": "done",
+      "attempts": 0
+    },
+    "T3": {
+      "status": "done",
+      "attempts": 0
+    },
+    "T4": {
+      "status": "done",
+      "attempts": 0
+    },
+    "T5": {
+      "status": "done",
+      "attempts": 0
+    }
+  },
+  "trace": [],
+  "assumptions": [],
+  "escalations": [],
+  "reused": [],
+  "new": [],
+  "findings": [],
+  "started": "2026-10-03T14:41:38.492076+00:00",
+  "test_seconds": 0.0,
+  "runs": [
+    {
+      "started": "2026-10-03T14:22:14.722164+00:00",
+      "tokens": 473271,
+      "escalations": [],
+      "test_seconds": null
+    },
+    {
+      "started": "2026-10-03T14:41:38.492076+00:00",
+      "tokens": 0,
+      "escalations": [],
+      "test_seconds": 0.0
+    }
+  ]
+}

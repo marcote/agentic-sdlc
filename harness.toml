@@ -1,5 +1,5 @@
 # harness.toml — which agent CLI fills each role, and how build and accept check the work.
-# Placeholders in cmd: {role} {schema} {schema_json} {out} {harness}. The prompt goes on stdin.
+# Placeholders in cmd: {role} {schema} {schema_json} {out} {harness} {python}.The prompt goes on stdin.
 
 [roles]
 implementer = "claude"
@@ -11,12 +11,14 @@ judge = "claude-ro"      # A7: the judge's model (family) must differ from the i
 attempts = 3
 budget_tokens = 3_000_000
 call_seconds = 1800
+suite_seconds = 45
 
 [checks]
 # {examples} expands to a pytest -k selector such as "e1_ or e2_".
+# task must print one PASSED, FAILED or ERROR line per test (pytest -rA): T0 reads each example from them.
 # task must run only the selected tests. No stack-neutral command can, so other stacks replace it.
-task = "uv run --python 3.12 --with pytest pytest tests -q -k '{examples}'"
-suite = "uv run --python 3.12 --with pytest pytest tests -q && bash tests/run.sh"
+task = "uv run --python 3.12 --with pytest --with jsonschema --with markdown pytest tests -q -rA -k '{examples}'"
+suite = "uv run --python 3.12 --with pytest --with jsonschema --with markdown --with pytest-xdist pytest tests -q -n auto && bash tests/run.sh"
 red_exit = 1
 
 [paths]
@@ -56,12 +58,12 @@ tokens = []
 
 [cli.fake]
 family = "fake"
-cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}"]
+cmd = ["{python}", "{harness}/scripts/fake_agent.py", "{role}"]
 payload = "result"
 tokens = ["tokens"]
 
 [cli.fake-judge]
 family = "fake-2"
-cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}"]
+cmd = ["{python}", "{harness}/scripts/fake_agent.py", "{role}"]
 payload = "result"
 tokens = ["tokens"]
