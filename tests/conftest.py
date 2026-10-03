@@ -5,6 +5,8 @@ import pytest
 
 HARNESS = Path(__file__).resolve().parent.parent
 
+collect_ignore = ["fixtures"]
+
 NS = """# North Star
 | term | meaning |
 | --- | --- |
