@@ -117,7 +117,14 @@ def slice_repo(tmp_path):
     cfg = cfg.replace('reflector = "claude-ro"', 'reflector = "fake"')
     cfg = cfg.replace('judge = "claude-ro"', 'judge = "fake-judge"')
     cfg = cfg.replace('curator = "claude-ro"', 'curator = "fake"')
-    cfg = cfg.replace(" && bash tests/run.sh", "").replace("suite_seconds = 45\n", "")
+    cfg = cfg.replace(" && bash tests/run.sh", "").replace("suite_seconds = 25\n", "")
+    py = sys.executable
+    cfg = "".join(
+        f"task = \"{py} -m pytest tests -q -rA -k '{{examples}}'\"\n" if l.startswith("task = ")
+        else f"suite = \"{py} -m pytest tests -q\"\n" if l.startswith("suite = ")
+        else l
+        for l in cfg.splitlines(keepends=True)
+    )
     (root / "harness.toml").write_text(cfg)
     (root / ".gitignore").write_text(".fake_log\n.fake_plan\n__pycache__/\n.pytest_cache/\n")
     run("git", "init", "-q", "-b", "main", cwd=root, check=True)
