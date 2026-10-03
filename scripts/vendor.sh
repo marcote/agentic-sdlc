@@ -38,7 +38,7 @@ KEEP=(
 SEED=( CLAUDE.md harness.toml memory/constitution/constitution.md memory/north-star/north-star.md \
   memory/stack/stack.md docs/modules.md scripts/test.sh )
 DROP=( "specs/0*-* (except _template)" memory/north-star/decisions verification \
-  docs/superpowers evals README.md tests scripts/vendor.sh docs/vendoring.md docs/backlog.md \
+  docs/superpowers README.md tests scripts/vendor.sh docs/vendoring.md docs/backlog.md \
   bootstrap.sh )
 
 # --- Stack detection -> default test command ---
@@ -70,7 +70,7 @@ claude_stub(){ cat <<'EOF'
 # <Your Project> — Agentic SDLC Harness (vendored)
 
 Governance harness vendored via `scripts/vendor.sh`. Fill in your stack below,
-then run `/constitution` and seed your North Star before your first `/brief`.
+then seed your North Star before your first `/brief`.
 
 ## Stack
 Your load-bearing technical decisions live in `memory/stack/stack.md` (the **charter**),
@@ -78,7 +78,7 @@ not here. Run `/stack` to elicit them — it asks what this harness would otherw
 in silence. Your test command lives in `scripts/test.sh`.
 
 ## Workflow
-`/constitution` → seed North Star → `/stack` → `/brief` → `/spec` (gate H1) → `/build` → `/accept`.
+seed North Star → `/stack` → `/brief` → `/spec` (gate H1) → `/build` → `/accept`.
 See `docs/workflow.md`.
 
 ## Hard rules
@@ -219,4 +219,4 @@ if [ "${#NEWFILES[@]}" -gt 0 ]; then
   echo "  ${#NEWFILES[@]} file(s) need merge (.harness-new):"
   for f in "${NEWFILES[@]}"; do echo "    - $f"; done
 fi
-echo "  next: /constitution → seed your North Star → /stack → first feature (see docs/vendoring.md)"
+echo "  next: seed your North Star → /stack → first feature (see docs/vendoring.md)"

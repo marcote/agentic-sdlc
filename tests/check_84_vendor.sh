@@ -139,8 +139,8 @@ have && assert_dep_free "$VENDOR" "DEPFREE"   # labelled so the result ties to t
 # --- HANDOFF: docs/vendoring.md documents buckets, plugs, first step ---
 DOC=docs/vendoring.md
 if [ -f "$DOC" ] && grep -qiE 'KEEP' "$DOC" && grep -qiE 'SEED' "$DOC" && grep -qiE 'DROP' "$DOC" \
-   && grep -qE '/constitution' "$DOC"; then
-  _pass "HANDOFF: docs/vendoring.md documents buckets + /constitution first step"
+   && grep -qE '^2\. Edit .memory/constitution/constitution\.md' "$DOC"; then
+  _pass "HANDOFF: docs/vendoring.md documents buckets + constitution first step"
 else
   _fail "HANDOFF: docs/vendoring.md missing or incomplete"
 fi

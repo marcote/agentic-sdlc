@@ -28,11 +28,11 @@ curl -fsSL https://raw.githubusercontent.com/marcote/agentic-sdlc/main/bootstrap
 ```
 
 With no terminal and no `--yes`, it aborts rather than writing blind. After it applies, merge any
-`.harness-new` files and run `/constitution` → seed your North Star → `/stack` → first `/brief`. Already have
+`.harness-new` files, seed your North Star → `/stack` → first `/brief`. Already have
 the harness cloned? Use `scripts/vendor.sh` directly (see `docs/vendoring.md`).
 
 ## The loop at a glance
-Setup, once: `/constitution` → seed your North Star → `/stack`.
+Setup, once: seed your North Star → `/stack`.
 
 `/brief` → `/spec` (gate H1, the owner approves) → `/build` → `/accept`
 
@@ -70,7 +70,7 @@ must differ from the implementer's.
   `decisions/` (amendment ADRs).
 - `specs/_template/` — slice template (`brief.md`, `spec.md`).
 - `scripts/` — `spec.py`, `build.py`, `accept.py`, `status.sh`.
-- `.claude/` — the commands (`/brief`, `/spec`, `/build`, `/accept`, `/stack`, `/constitution`).
+- `.claude/` — the commands (`/brief`, `/spec`, `/build`, `/accept`, `/stack`).
 - `docs/` — `workflow.md`, `factory-model.md`, `modules.md` and `backlog.md`.
 
 ## Starting a slice
