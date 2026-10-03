@@ -51,7 +51,8 @@ def finding(r, ids):
     if r["status"] == "promoted":
         path, _, name = r["check"].partition("::")
         f = Path(path)
-        if not (f.is_file() and name in f.read_text()):
+        found = re.compile(rf"^\s*def {re.escape(name)}\b" if f.suffix == ".py" else rf"^#+ .*{re.escape(name)}", re.M)
+        if not (f.is_file() and found.search(f.read_text())):
             return f"check not found: {r['check']}"
     if r["status"] == "merged" and not set(re.findall(r"L\d+", r["check"])) & ids:
         return "merged into a lesson that does not exist"
