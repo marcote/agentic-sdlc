@@ -131,8 +131,8 @@ def test_e11_page_lists_proposed_lessons(tmp_path):
     assert "Proposed lessons" in html and "UNIQUE_PROPOSED_TEXT" in html
 
 
-def test_e12_prompt_has_captured_and_learned(slice_repo):
-    rows = [row("L1", "learned", 1), row("L2", "captured"), row("L3", "proposed"), row("L4", "retired")]
+def test_e12_prompt_has_active_only(slice_repo):
+    rows = [row("L1", "active", 1), row("L2", "active"), row("L3", "proposed"), row("L4", "merged")]
     put(slice_repo.root, LESSONS, table(rows))
     slice_repo.git("add", "-A")
     slice_repo.git("commit", "-q", "-m", "lessons")
@@ -152,10 +152,12 @@ def test_e13_reflector_failure_still_merges(slice_repo):
 
 
 def test_e14_page_counts_lessons(slice_repo):
-    rows = [row(f"L{i}", "learned", 1) for i in range(1, 5)] + [row(f"L{i}", "captured") for i in (5, 6)]
+    rows = [row(f"L{i}", "active", 1) for i in range(1, 5)] + [row(f"L{i}", "proposed") for i in (5, 6)]
     with_reflector(slice_repo, rows)
     assert slice_repo.accept().returncode == 0
-    assert "Lessons 4 learned / 6" in (slice_repo.dir / "result.html").read_text()
+    html = (slice_repo.dir / "result.html").read_text()
+    assert "<th>Lessons</th><td>4 active (" in html
+    assert "bytes), 2 proposed, 0 promoted, 0 merged</td>" in html
 
 
 def prose_check(tmp_path):

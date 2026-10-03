@@ -118,7 +118,7 @@ def write_back(spec_dir, cfg):
     ns.write_text(text)
 
 
-def result_page(spec_dir, report):
+def result_page(spec_dir, report, cfg):
     def when(*args):
         out = build.git("log", "--format=%cI", *args).split()
         return datetime.fromisoformat(out[0]) if out else None
@@ -137,7 +137,8 @@ def result_page(spec_dir, report):
     answers = build.git("log", "--basic-regexp", "--grep", f"^spec({spec_dir.name}): answer escalation", "--format=%H").split()
     runs = report.get("runs") or [report]  # a report from before "runs" is one run
     tokens = sum(r.get("tokens") or 0 for r in runs)
-    kept = lessons.with_status("captured", "learned")
+    count = {s: lessons.with_status(s) for s in ("active", "proposed", "promoted", "merged")}
+    used = sum(len(r["lesson"].encode()) for r in count["active"])
     rows = [
         ("Lead time", hours(start, now) + ("" if brief else " (from first commit)")),
         ("Brief → H1", hours(brief, h1)),
@@ -149,13 +150,15 @@ def result_page(spec_dir, report):
         ("Assumptions", "; ".join(f"{a['task']}: {a['text']}" for a in report["assumptions"]) or "none"),
         ("Suite", f"{report.get('suite_seconds', 0):g} s"),
         ("Test time", ", ".join(f"{r.get('test_seconds') or 0:g} s" for r in runs)),
+        ("Lessons", f"{len(count['active'])} active ({used} of {cfg['limits'].get('lessons_bytes', 25_000)} bytes), "
+                    + ", ".join(f"{len(count[s])} {s}" for s in ("proposed", "promoted", "merged"))),
         ("Tokens", f"{tokens} ({len(runs)} build run{'s' * (len(runs) != 1)})"),
     ]
     body = "".join(f"<tr><th>{k}</th><td>{html.escape(v)}</td></tr>" for k, v in rows)
     (spec_dir / "result.html").write_text(
         f"<!doctype html><meta charset='utf-8'><title>Result {spec_dir.name}</title>"
         f"<style>body{{font:15px system-ui;max-width:720px;margin:2em auto;padding:0 16px}}"
-        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table><p>Lessons {sum(r['status'] == 'learned' for r in kept)} learned / {len(kept)}</p>")
+        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table>")
 
 
 def main():
@@ -205,7 +208,7 @@ def main():
         print("\n".join(f"- {e['task']}: {e['reason']}" for e in report["escalations"]))
         return 1
     reflect(report, cfg)
-    result_page(a.spec_dir, report)
+    result_page(a.spec_dir, report, cfg)
     build.git("add", str(a.spec_dir / "result.html"), *([lessons.LESSONS] if Path(lessons.LESSONS).is_file() else []), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): verified")
     build.git("checkout", "-q", "main")
