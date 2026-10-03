@@ -1,0 +1,360 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec 037 — Verify last</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1c2321;--mut:#5b6662;--rule:#d7ddd9;--acc:#0f5f6e;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#121615;--fg:#e4e9e6;--mut:#9aa6a1;--rule:#2d3533;--acc:#6cc3d1;--warn:#f0b65a;color-scheme:dark}}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:24px 16px}
+h1,h2,h3{text-wrap:balance} h2{border-top:1px solid var(--rule);padding-top:12px}
+#amendments{color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%}
+</style>
+<h1 id="spec-037-verify-last">Spec 037 — Verify last</h1>
+<p>Status: draft for gate H1. Labels: decided, hypothesis, open, reported.</p>
+<p>Accept runs the suite, then writes lessons and the north star, then merges. Slices 035 and 036 both merged a red <code>main</code> this way. The rule the state of the art follows is simple: merge exactly the tree that passed the tests (<code>research.md</code> §1). This slice moves every write that can change a test result before the suite. It also closes the three open items of slice 036: the curator compares lessons with each other, a promoted check must exist as a check, and the suite gets fast again.</p>
+<p><img alt="Verify last" src="figures/verify-last.svg" /></p>
+<h2 id="1-glossary">1. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>verified commit</strong></td>
+<td>The commit on which accept last ran the suite and every check passed.</td>
+</tr>
+<tr>
+<td><strong>memory write</strong></td>
+<td>A change accept makes to <code>memory/lessons.md</code> or to the north star: reflector deltas, curator conflicts, and the results write-back.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-requirements">2. Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>requirement</th>
+<th>kind</th>
+<th>anchor</th>
+<th>examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V1</td>
+<td>When accept runs, accept shall commit every <strong>memory write</strong> on the slice branch before it runs the suite.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>V2</td>
+<td>When accept merges, the files that differ between the <strong>verified commit</strong> and <code>main</code> shall all be in the slice directory.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E2</td>
+</tr>
+<tr>
+<td>V3</td>
+<td>The test of the 036 migration shall check only the lessons that the migration table names.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E3</td>
+</tr>
+<tr>
+<td>V4</td>
+<td>If the curator names a conflict between two active lessons, then accept shall mark the lesson it names <code>proposed</code>, with the other lesson as the clause.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E4</td>
+</tr>
+<tr>
+<td>V5</td>
+<td>If a promoted check names a Python file, then the lessons check shall find a <code>def</code> of that name; if it names another file with a name, it shall find a heading that holds the name.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E5, E6</td>
+</tr>
+<tr>
+<td>V6</td>
+<td>The slice repos that the tests build shall run their task and suite commands with the Python that runs the tests, not through <code>uv run</code>.</td>
+<td>mechanical</td>
+<td>measurable-impact</td>
+<td>E7</td>
+</tr>
+<tr>
+<td>V7</td>
+<td>The suite budget shall be 25 seconds.</td>
+<td>mechanical</td>
+<td>measurable-impact</td>
+<td>E8</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-examples">3. Examples</h2>
+<p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>given</th>
+<th>when</th>
+<th>then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>a slice repo whose test asserts that <code>memory/lessons.md</code> has no lesson rows, and a fake reflector that adds one lesson</td>
+<td>accept runs</td>
+<td>exit 1; the escalation names that test; <code>main</code> is unchanged</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>a slice that accept merges</td>
+<td>the test compares the <strong>verified commit</strong> in the build report with <code>main</code></td>
+<td>every changed path starts with <code>specs/001-add/</code></td>
+</tr>
+<tr>
+<td>E3</td>
+<td>the real <code>memory/lessons.md</code>, which also holds L20–L24</td>
+<td>the test of the 036 migration runs</td>
+<td>it passes, and it still fails when a lesson the table names has another status</td>
+</tr>
+<tr>
+<td>E4</td>
+<td>active lessons <code>L3</code> and <code>L5</code>, and a fake curator that answers the conflict <code>L3</code> with <code>L5</code></td>
+<td>accept merges</td>
+<td>on <code>main</code>, <code>L3</code> is proposed and its check starts with <code>conflict with L5:</code>; the curator prompt says a lesson can conflict with another active lesson</td>
+</tr>
+<tr>
+<td>E5</td>
+<td>a promoted lesson whose check is <code>tests/test_x.py::test_a</code>, and the file names <code>test_a</code> only in a comment</td>
+<td>the lessons check runs</td>
+<td>exit 1; the finding <code>L1: check not found: tests/test_x.py::test_a</code></td>
+</tr>
+<tr>
+<td>E6</td>
+<td>a promoted lesson whose check is <code>memory/constitution/constitution.md::D7</code>, and the file names <code>D7</code> only in body text</td>
+<td>the lessons check runs</td>
+<td>exit 1; with the heading <code>### D7 — A semantic question goes to a model</code> it exits 0</td>
+</tr>
+<tr>
+<td>E7</td>
+<td>the <code>slice_repo</code> fixture</td>
+<td>the test reads the slice repo's <code>harness.toml</code></td>
+<td>its <code>task</code> and <code>suite</code> commands hold no <code>uv run</code> and start with the running Python</td>
+</tr>
+<tr>
+<td>E8</td>
+<td><code>harness.toml</code></td>
+<td>the test reads <code>limits.suite_seconds</code></td>
+<td>it is 25</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-tests">4. Tests</h2>
+<p>Four kinds. Write no other kind.</p>
+<ul>
+<li>example: section 3, one test per example.</li>
+<li>invariant: <code>main</code> only moves to a tree that passed the suite (V1, V2). Accept checks it on every slice.</li>
+<li>reconciliation: the suite took 38.2 s on 2026-10-03 before this slice, and 15.7 s in the experiment of <code>research.md</code> §2.</li>
+<li>e2e run: accept on this slice runs its own reflector and curator before the suite, and merges green.</li>
+</ul>
+<h2 id="5-plan">5. Plan</h2>
+<table>
+<thead>
+<tr>
+<th>task</th>
+<th>does</th>
+<th>requirements</th>
+<th>needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>accept runs the reflector, the curator and the write-back first, and commits them; then it runs the suite and the checks; it records the <strong>verified commit</strong> in the build report; after the suite it writes only the result page and the build report. Fix the 036 migration test to check only the rows the table names.</td>
+<td>V1, V2, V3</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>the curator prompt also asks for conflicts between two active lessons, with the other lesson id in <code>with</code>. The lessons check finds a <code>def</code> in a Python file and a heading in any other file.</td>
+<td>V4, V5</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>the <code>slice_repo</code> fixture runs the task and suite commands with <code>sys.executable -m pytest</code>. <code>limits.suite_seconds</code> becomes 25.</td>
+<td>V6, V7</td>
+<td>T1</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>No new module and no new library.</p>
+<h2 id="amendments">6. Amendments</h2>
+<p>None.</p>
+<h2 id="7-assumptions-and-open-items">7. Assumptions and open items</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The suite runs in about 16 s after T3, as in the experiment.</td>
+<td>hypothesis</td>
+</tr>
+<tr>
+<td>A memory write that breaks a test goes to the existing return to build (one FIX task), then escalates. It never merges.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>When accept escalates after its memory writes, the writes stay committed on the branch. A re-run of accept may add more lessons; the reflector prompt already says to add nothing the lessons say.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>L24 asks to restore the lint test of the closed spec 029. CI now lints only open specs, so it waits in the backlog.</td>
+<td>decided</td>
+</tr>
+</tbody>
+</table>
+<h2 id="memory-applied">Memory applied</h2>
+<table>
+<thead>
+<tr>
+<th>lesson</th>
+<th>applies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L3</td>
+<td>yes: the suite numbers come from runs on the real repo (<code>research.md</code> §2)</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>no: no table parser changes</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>yes: only the pending items of 036 are here; L24 goes to the backlog</td>
+</tr>
+<tr>
+<td>L6</td>
+<td>yes: accept code moves inside <code>main()</code>; accept always runs the full suite</td>
+</tr>
+<tr>
+<td>L7</td>
+<td>yes: every number comes from a command in <code>research.md</code> §2</td>
+</tr>
+<tr>
+<td>L9</td>
+<td>yes: a promoted check that is not found is a finding, never a pass</td>
+</tr>
+<tr>
+<td>L10</td>
+<td>no: the prose joiner does not change</td>
+</tr>
+<tr>
+<td>L12</td>
+<td>yes: E5 and E6 use a mention the current check accepts, so their tests fail before T2</td>
+</tr>
+<tr>
+<td>L14</td>
+<td>yes: V6 uses the Python the test runner already declares</td>
+</tr>
+<tr>
+<td>L15</td>
+<td>no: build totals do not change</td>
+</tr>
+<tr>
+<td>L18</td>
+<td>no: no CI step reads TOML in a new way</td>
+</tr>
+<tr>
+<td>L20</td>
+<td>yes: E3 keeps the migration test strong: it still fails on a wrong status</td>
+</tr>
+<tr>
+<td>L21</td>
+<td>yes: T2 changes the promoted check; the promoted rows already have checks that pass it</td>
+</tr>
+<tr>
+<td>L22</td>
+<td>yes: V5 is this lesson</td>
+</tr>
+<tr>
+<td>L23</td>
+<td>yes: E1 and E2 run in a temporary slice repo, not the real one</td>
+</tr>
+<tr>
+<td>L24</td>
+<td>yes: it goes to the backlog (section 7)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sources">Sources</h2>
+<table>
+<thead>
+<tr>
+<th>practice</th>
+<th>source</th>
+<th>implies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A branch always passes its whole suite</td>
+<td>NRSROSE, bors (<code>research.md</code> §1)</td>
+<td>merge the <strong>verified commit</strong></td>
+</tr>
+<tr>
+<td>Test the exact combination that lands</td>
+<td>GitHub merge queue docs (<code>research.md</code> §1)</td>
+<td>memory writes come before the suite</td>
+</tr>
+<tr>
+<td>uv locks an environment while it installs</td>
+<td>uv cache docs (<code>research.md</code> §2)</td>
+<td>slice repos call pytest directly</td>
+</tr>
+<tr>
+<td>Find slow tests with <code>--durations</code></td>
+<td>pytest docs (<code>research.md</code> §2)</td>
+<td>the measurements in <code>research.md</code> §2</td>
+</tr>
+<tr>
+<td>A new memory is compared with existing memories</td>
+<td>Mem0 (<code>research.md</code> §3)</td>
+<td>the curator compares lessons with each other</td>
+</tr>
+<tr>
+<td>A test is judged by whether it can fail</td>
+<td>mutation testing (<code>research.md</code> §4)</td>
+<td>a promoted check must exist as a check</td>
+</tr>
+</tbody>
+</table>
