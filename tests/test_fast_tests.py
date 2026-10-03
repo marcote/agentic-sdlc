@@ -2,7 +2,7 @@ import json
 import re
 import tomllib
 
-from conftest import HARNESS
+from conftest import HARNESS, OK
 from test_accept import ready
 from test_build import T0
 
@@ -60,3 +60,24 @@ def test_e4_t0_runs_examples_in_one_run(slice_repo):
 def test_e5_suite_runs_in_parallel():
     suite = tomllib.loads((HARNESS / "harness.toml").read_text())["checks"]["suite"]
     assert "-n auto" in suite
+
+
+def test_e6_ci_runs_the_suite_command_of_harness_toml():
+    text = (HARNESS / ".github/workflows/verify.yml").read_text()
+    runs = [l.split("run:", 1)[1].strip() for l in text.splitlines() if "run:" in l]
+    assert not [r for r in runs if "pytest" in r]
+    assert any("suite" in r and "harness.toml" in r for r in runs), runs
+
+
+def test_e7_workers_and_durations_do_not_make_failures_differ(slice_repo):
+    cfg = (slice_repo.root / "harness.toml").read_text()
+    task = re.search(r'^task = "(.*)"$', cfg, re.M).group(1)
+    noise = "echo x >> .cnt; n=$(wc -l < .cnt | tr -d ' '); echo [gw$n] took $n.5s; exit $rc"
+    noisy = task + "; rc=$?; " + noise
+    (slice_repo.root / "harness.toml").write_text(cfg.replace(f'task = "{task}"', f'task = "{noisy}"'))
+    (slice_repo.root / ".gitignore").write_text((slice_repo.root / ".gitignore").read_text() + ".cnt\n")
+    slice_repo.git("add", "-A")
+    slice_repo.git("commit", "-qm", "noisy task")
+    slice_repo.script([T0, OK])  # T1 writes nothing; the same test fails each time
+    slice_repo.build()
+    assert slice_repo.report()["tasks"]["T1"] == {"status": "escalated", "attempts": 2}

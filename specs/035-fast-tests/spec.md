@@ -21,6 +21,8 @@ The pytest suite takes 78 s for 116 tests. A day earlier it had 19 tests. Most o
 | S4 | When T0 checks its tests, build shall run them in one test run and read each example's result. | measurable-impact | E4 |
 | S5 | The suite command shall run the pytest tests in parallel. | measurable-impact | E5 |
 | S6 | The test `test_revert_drops_staged_code_of_escalated_task` shall not depend on timing or test order. | real-enforcement | judged, rubric R1 |
+| S7 | The CI workflow shall run the `[checks] suite` command of `harness.toml`, not a command of its own. | real-enforcement | E6 |
+| S8 | When build compares two failures of a task, build shall compare their failed test names, not the raw output. | measurable-impact | E7 |
 
 Rubric R1 (for S6): the fix names the root cause in a code comment at the fix. It adds no sleep, retry or skip.
 
@@ -35,6 +37,8 @@ Each example becomes a test named `test_<id>_<words>`.
 | E3 | `harness.toml` and `tests/conftest.py` | the test reads them | the `fake` and `fake-judge` commands and the script helpers in `conftest.py` contain no `uv run` |
 | E4 | a slice with examples E1 and E2, and a task command that appends one line to `.runs` each time it starts | build runs T0 | `.runs` has 1 line after T0 |
 | E5 | `harness.toml` | the test reads `[checks] suite` | it contains `-n auto` |
+| E6 | `.github/workflows/verify.yml`, whose step `Harness tests` today runs its own `uv run … pytest tests -q` | the test reads every `run:` line | no `run:` line holds `pytest`; one `run:` line reads `suite` from `harness.toml` |
+| E7 | two failure outputs of the same test, one with `[gw0]` and one with `[gw3]`, and different durations | build compares them | it reports them as the same failure |
 
 ## 4. Tests
 
@@ -54,6 +58,7 @@ Four kinds. Write no other kind.
 | T3 | the suite runs pytest with `-n auto`; tests that share a path or a port are made safe to run in parallel | S5 | T1 |
 | T4 | accept measures the suite time and fails over `limits.suite_seconds = 30`; build records test time per run; the page shows both | S1, S2 | T3 |
 | T5 | remove the root cause of the flaky revert test | S6 | T3 |
+| T6 | `verify.yml` runs the suite command from `harness.toml`; build compares failures by their `FAILED <test>` lines; add the lesson: CI runs the same suite command as accept | S7, S8 | T5 |
 
 | item | justification |
 | --- | --- |
@@ -74,3 +79,5 @@ Four kinds. Write no other kind.
 | The flaky test fails from shared state or timing; T5 finds which. | hypothesis |
 | Escalation from accept, answered by the owner: the suite took 39.8 s, down from 78 s. The 20 s hypothesis is refuted. The budget becomes 45 s; profiling the remaining time goes to the backlog. | decided |
 | Escalation from accept, answered by the owner: build writes commit messages, so R1 now asks for a code comment at the fix. Putting the implementer's summary in the commit body goes to the backlog. | decided |
+| Escalation from CI on PR #43, answered by the owner: CI lacked `markdown` because `verify.yml` had its own command, and xdist worker ids made two equal failures look different. T6 fixes both. | decided |
+| Escalation T0, answered by the owner: T0 read every `test_e6_…` in `tests/`, and older slices use the same ids, so it saw a pass. T0 itself had to change, so the loop could not fix it. The agent fixed `contract()` outside the loop: only the test files T0 wrote count. A reviewer subagent approved it, with a test that fails without the fix. Slice-scoped test names go to the backlog. | decided |

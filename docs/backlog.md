@@ -594,3 +594,4 @@ _(none yet — an item dropped here keeps its reason)_
 - 035: profile which tests take the remaining ~40 s of the suite.
 - 035: build puts the implementer's summary in each task commit body, so every commit says why.
 - 035: the result page shows a missing test time as `0 s`. It must show `not measured`, per lesson L9.
+- 035: name tests per slice (test_035_e6_…) so example ids never collide across slices.
