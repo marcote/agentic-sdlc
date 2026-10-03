@@ -33,6 +33,11 @@ def test_e26_schema_violation(slice_repo):
     assert out["payload"] is None and out["why"] == "schema: status"
 
 
+def test_call_non_numeric_tokens_count_zero(slice_repo):
+    out = call_once(slice_repo, {**OK, "tokens": "many"})
+    assert out["why"] == "" and out["tokens"] == 0
+
+
 def test_call_agent_crash(slice_repo):
     out = call_once(slice_repo, {"_crash": True})
     assert out["payload"] is None and out["why"].startswith("agent: exit 7")
@@ -131,7 +136,19 @@ def test_e14_structural_blocks_and_others_continue(slice_repo):
     p = slice_repo.build()
     r = slice_repo.report()
     assert r["tasks"]["T1"]["status"] == "blocked" and r["tasks"]["T2"]["status"] == "done"
-    assert p.stdout.count("ESCALATIONS (1)") == 1 and "which date counts?" in p.stdout
+    # one blocked, none skipped: T2 does not need T1
+    assert p.stdout.count("ESCALATIONS (1)") == 1 and "which date counts?" in p.stdout and "skipped" not in p.stdout
+
+
+def test_skipped_task_joins_the_escalation_list(slice_repo):
+    spec = slice_repo.dir / "spec.md"
+    spec.write_text(spec.read_text().replace("UNIQUE_T2_TEXT | R2 | |", "UNIQUE_T2_TEXT | R2 | T1 |"))
+    slice_repo.git("commit", "-qam", "T2 needs T1")
+    blocked = {**OK, "status": "blocked", "assumptions": [{"text": "which date counts?", "severity": "structural"}]}
+    slice_repo.script([T0, blocked])
+    p = slice_repo.build()
+    assert p.returncode == 3 and "ESCALATIONS (2)" in p.stdout
+    assert {"task": "T2", "reason": "skipped: needs T1"} in slice_repo.report()["escalations"]
 
 
 def test_e15_budget(slice_repo):
@@ -179,11 +196,36 @@ def test_build_refuses_dirty_tree(slice_repo):
     assert p.returncode == 2 and "dirty" in p.stderr and (slice_repo.root / "stray.txt").exists()
 
 
-def test_build_reruns_after_escalation(slice_repo):
-    slice_repo.script([T0, OK])
+def rerun(slice_repo, first, second):
+    """Run build twice; return the second run and the implementer prompts it sent."""
+    slice_repo.script(first)
     assert slice_repo.build().returncode == 3
-    slice_repo.script([T1, T2])
-    assert slice_repo.build().returncode != 2  # the left-over build-report.json is not "dirty"
+    slice_repo.log.unlink()
+    slice_repo.script(second)
+    p = slice_repo.build()  # the left-over build-report.json is not "dirty"
+    return p, [c["prompt"] for c in slice_repo.calls() if c["role"] == "implementer"]
+
+
+def test_build_rerun_finishes_after_escalation(slice_repo):
+    p, prompts = rerun(slice_repo, [T0, T1, OK], [T2])
+    assert p.returncode == 0, p.stdout + p.stderr
+    assert {k: v["status"] for k, v in slice_repo.report()["tasks"].items()} == {"T0": "done", "T1": "done", "T2": "done"}
+    assert not any("## Task T0" in x for x in prompts) and not any("## Task T1" in x for x in prompts)
+
+
+def test_build_rerun_after_first_task_escalates(slice_repo):
+    p, prompts = rerun(slice_repo, [T0, OK], [T1, T2])
+    assert p.returncode == 0, p.stdout + p.stderr
+    assert not any("## Task T0" in x for x in prompts)
+
+
+def test_frozen_set_holds_only_tests(slice_repo):
+    t0 = {**T0, "_write": {**T0["_write"], "setup.cfg": "[x]\na = 1\n"}}
+    t1 = {**T1, "_write": {**T1["_write"], "setup.cfg": "[x]\na = 2\n"}}
+    slice_repo.script([t0, t1, T2])
+    p = slice_repo.build()
+    assert p.returncode == 0, p.stdout + p.stderr
+    assert slice_repo.report()["tasks"]["T1"]["attempts"] == 1
 
 
 def test_build_refuses_main(slice_repo):
@@ -220,3 +262,14 @@ def test_task_with_only_judged_examples_reaches_reviewer(slice_repo):
     p = slice_repo.build()
     assert p.returncode in (0, 3), p.stdout + p.stderr
     assert slice_repo.report()["tasks"]["T1"]["status"] == "done"
+
+
+def test_crash_still_writes_report(slice_repo):
+    hook = slice_repo.root / ".git/hooks/pre-commit"
+    hook.write_text("#!/bin/sh\nexit 1\n")
+    hook.chmod(0o755)
+    slice_repo.script([T0, T1, T2])
+    p = slice_repo.build()
+    assert p.returncode == 3, p.stdout + p.stderr
+    assert any(e["task"] == "crash" for e in slice_repo.report()["escalations"])
+    assert only_report(slice_repo)

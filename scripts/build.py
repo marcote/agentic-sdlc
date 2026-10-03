@@ -70,7 +70,8 @@ def call(cfg, role, prompt, report):
         doc = json.loads(raw)
     except json.JSONDecodeError:
         return None, "agent: no JSON"
-    report["tokens"] = report.get("tokens", 0) + sum(dig(doc, k) or 0 for k in cli.get("tokens", []))
+    counts = [dig(doc, k) for k in cli.get("tokens", [])]
+    report["tokens"] = report.get("tokens", 0) + sum(int(n) for n in counts if isinstance(n, (int, float)))
     if report["tokens"] > cfg["limits"]["budget_tokens"]:
         raise Budget(f"budget exceeded: {report['tokens']} > {cfg['limits']['budget_tokens']} tokens")
     payload = doc if cli["payload"] in ("", "@out") else dig(doc, cli["payload"])
@@ -91,6 +92,17 @@ def revert():
     git("checkout", "--", ".")
     git("reset", "-q", "--hard")  # also drops what `git add -A` staged before a reviewer call
     git("clean", "-fdq", "-e", ".fake_*")
+
+
+def done_on_branch(slice_name):
+    """The frozen test files of the latest T0 commit (None if there is none), and the tasks already committed."""
+    t0 = git("log", "--format=%H", "--grep", f"^build({slice_name}): T0 ", "-n", "1").strip()
+    if not t0:
+        return None, set()
+    files = git("show", "--name-only", "--format=", t0).split()
+    frozen = {f for f in files if re.search(r"(^|/)tests/|test_e\d+", f)}
+    done = set(re.findall(rf"^build\({re.escape(slice_name)}\): (T\d+) ", git("log", "--format=%s"), re.M))
+    return frozen, done
 
 
 def examples_of(task, s):
@@ -176,7 +188,7 @@ def run_task(task, s, cfg, report, frozen, done_examples):
                 report["reused"] += res["reused"]
                 report["new"] += res["new_deps"]
                 git("add", "-A")
-                git("commit", "-q", "--allow-empty", "-m", f"build({s['slice']}): {tid}{task['does'][:60]}")
+                git("commit", "-q", "--allow-empty", "-m", f"build({s['slice']}): {tid} {task['does'][:60]}")
                 entry["status"] = "done"
                 return "done"
         if norm(fail) == last or attempt == cfg["limits"]["attempts"]:
@@ -207,7 +219,7 @@ def contract(s, cfg, report):
                 if code == 0:
                     report["escalations"].append({"task": "T0", "reason": f"vacuous: {e} passes before implementation"})
                     revert()
-                    return None
+                    return False
                 if code != cfg["checks"]["red_exit"]:
                     fail = f"{e}: no failing test (exit {code})\n{out}"
                     break
@@ -219,11 +231,11 @@ def contract(s, cfg, report):
         if not fail:
             git("commit", "-q", "-m", f"build({s['slice']}): T0 tests for {', '.join(ids)}")
             entry["status"] = "done"
-            return set(git("show", "--name-only", "--format=", "HEAD").split())
+            return True
         feedback = fail
     report["escalations"].append({"task": "T0", "reason": fail})
     revert()
-    return None
+    return False
 
 
 def needs_of(task, tasks, i):
@@ -238,20 +250,32 @@ def build(spec_dir, cfg):
     report = {"tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [],
               "reused": [], "new": [], "started": datetime.now(timezone.utc).isoformat()}
     try:
-        frozen = contract(s, cfg, report)
+        frozen, done = done_on_branch(s["slice"])  # a re-run keeps what an earlier run committed
+        if frozen is None and contract(s, cfg, report):
+            frozen, done = done_on_branch(s["slice"])
         if frozen is not None:
             done_examples = []
+            for t in sorted(done):
+                report["tasks"].setdefault(t, {"status": "done", "attempts": 0})
             for i, task in enumerate(s["tasks"]):
+                if task["task"] in done:
+                    done_examples += examples_of(task, s)
+                    continue
                 waiting = [n for n in needs_of(task, s["tasks"], i) if report["tasks"].get(n, {}).get("status") != "done"]
                 if waiting:
                     report["tasks"][task["task"]] = {"status": "skipped", "attempts": 0}
+                    report["escalations"].append({"task": task["task"], "reason": "skipped: needs " + ", ".join(waiting)})
                     continue
                 if run_task(task, s, cfg, report, frozen, done_examples) == "done":
                     done_examples += examples_of(task, s)
     except Budget as b:
         report["escalations"].append({"task": "budget", "reason": str(b)})
         revert()
-    (spec_dir / "build-report.json").write_text(json.dumps(report, indent=2))
+    except Exception as e:  # e.g. a pre-commit hook rejects the commit
+        report["escalations"].append({"task": "crash", "reason": f"{type(e).__name__}: {e} {getattr(e, 'stderr', '') or ''}".strip()})
+        revert()
+    finally:
+        (spec_dir / "build-report.json").write_text(json.dumps(report, indent=2))
     return report
 
 

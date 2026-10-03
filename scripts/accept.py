@@ -124,8 +124,7 @@ def main():
         if bad:  # A3: return to build once, with the failures as feedback
             fix = {"task": "FIX", "requirements": ", ".join(s["reqs"]),
                    "does": "Make accept pass. Failures:\n" + "\n".join(bad)}
-            t0 = build.git("log", "--format=%H", "--grep", f"^build({s['slice']}): T0 ", "-n", "1").strip()
-            frozen = set(build.git("show", "--name-only", "--format=", t0).split()) if t0 else set()  # B2 holds on the return
+            frozen = build.done_on_branch(s["slice"])[0] or set()  # B2 holds on the return
             build.run_task(fix, s, cfg, report, frozen, [])
             bad = failures(a.spec_dir, s, cfg, report, branch)
     except SystemExit as e:
