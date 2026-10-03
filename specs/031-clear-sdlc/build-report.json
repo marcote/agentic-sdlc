@@ -1,9 +1,9 @@
 {
-  "tokens": 112742,
+  "tokens": 71347,
   "tasks": {
     "T0": {
       "status": "done",
-      "attempts": 1
+      "attempts": 0
     },
     "T1": {
       "status": "done",
@@ -26,24 +26,30 @@
       "attempts": 0
     },
     "T6": {
-      "status": "blocked",
+      "status": "done",
       "attempts": 1
     }
   },
   "trace": [
-    "T0:implementer",
-    "T0:checks",
-    "T0:reviewer",
-    "T6:implementer"
+    "T6:implementer",
+    "T6:checks",
+    "T6:reviewer"
   ],
-  "assumptions": [],
-  "escalations": [
+  "assumptions": [
     {
       "task": "T6",
-      "reason": "Dropping S1's Guard line alone leaves an invalid [stance] pin. The options are: retag S1 as [substrate] and drop its Injects line, or keep Guard and exempt the stale-name check from it. This changes how the charter reads and what the engine accepts, so I stopped and left stack.md unchanged."
+      "text": "/accept is the correct replacement for /verify in the guard-running text."
+    },
+    {
+      "task": "T6",
+      "text": "E13 needed no code change because tests/stale_names.py already scans memory/stack/stack.md."
     }
   ],
-  "reused": [],
+  "escalations": [],
+  "reused": [
+    "tests/stale_names.py",
+    "scripts/vendor.sh seed_file sed pipeline"
+  ],
   "new": [],
-  "started": "2026-10-03T11:27:52.990812+00:00"
+  "started": "2026-10-03T11:35:51.959777+00:00"
 }
