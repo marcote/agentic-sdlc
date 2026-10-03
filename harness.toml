@@ -1,0 +1,54 @@
+# harness.toml — which agent CLI fills each role, and how build and accept check the work.
+# Placeholders in cmd: {prompt} {role} {schema} {schema_json} {out} {harness}
+
+[roles]
+implementer = "claude"
+reviewer = "claude-ro"
+judge = "codex"          # A7: the judge's family must differ from the implementer's
+
+[limits]
+attempts = 3
+budget_tokens = 3_000_000
+
+[checks]
+# {examples} expands to a pytest -k selector such as "e1_ or e2_"
+task = "uv run --python 3.12 --with pytest pytest tests -q -k '{examples}'"
+suite = "uv run --python 3.12 --with pytest pytest tests -q && bash tests/run.sh"
+red_exit = 1
+
+[paths]
+north_star = "memory/north-star/north-star.md"
+charter = "memory/stack/stack.md"
+module_map = "docs/modules.md"
+module_root = "src"
+
+[cli.claude]
+family = "anthropic"
+cmd = ["claude", "-p", "{prompt}", "--output-format", "json", "--json-schema", "{schema_json}",
+       "--permission-mode", "acceptEdits", "--allowedTools", "Read", "Edit", "Write", "Bash(uv run:*)"]
+payload = "structured_output"
+tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens", "usage.cache_read_input_tokens"]
+
+[cli.claude-ro]
+family = "anthropic"
+cmd = ["claude", "-p", "{prompt}", "--output-format", "json", "--json-schema", "{schema_json}", "--permission-mode", "plan"]
+payload = "structured_output"
+tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens", "usage.cache_read_input_tokens"]
+
+[cli.codex]
+family = "openai"
+cmd = ["codex", "exec", "--full-auto", "--output-schema", "{schema}", "--output-last-message", "{out}", "{prompt}"]
+payload = "@out"
+tokens = []
+
+[cli.fake]
+family = "fake"
+cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}", "{prompt}"]
+payload = ""
+tokens = ["tokens"]
+
+[cli.fake-judge]
+family = "fake-2"
+cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}", "{prompt}"]
+payload = ""
+tokens = ["tokens"]
