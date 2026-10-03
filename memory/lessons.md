@@ -12,3 +12,4 @@ One row per lesson. `learned`: its check exists. `captured`: judgment only, no c
 | L6 | After you move code between files, run the full suite. Do not run only the changed part. | none: judgment | refactor-orphans-mutations | 0 | 0 | captured |
 | L7 | Write a number only after a command computed it. Do not write it from memory. | none: judgment | writing-terse | 0 | 0 | captured |
 | L8 | Write one idea per sentence, at most 35 words. | tests/test_clear_sdlc.py::test_e6_workflow_prose_has_no_long_sentence | writing-terse | 0 | 0 | learned |
+| L9 | A check that cannot read its input must fail, not pass. | tests/test_repo_memory.py::test_e17_prose_check_counts_across_line_breaks | 033-repo-memory | 0 | 0 | learned |

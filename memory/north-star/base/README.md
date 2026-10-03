@@ -6,8 +6,8 @@ extends: base
 
 - `base/` is a **vendored** shared asset: copied with the harness template,
   just like `memory/constitution/base/`.
-- The project's `north-star.md` declares `extends: base` in its YAML frontmatter and
-  adds the project's own mission, pillars, and scope — the product governance analogue
+- The project's `north-star.md` declares `extends: base` in its YAML frontmatter.
+  It adds the project's own mission, pillars, and scope. This is the product governance analogue
   of how `constitution.md` declares `extends: base` and adds its deltas.
 - `base/schema.md` is the **checkable shared shape** that every project's North Star
   must satisfy. Editing scope/pillars is a governed change: an ADR in the same PR
@@ -15,12 +15,12 @@ extends: base
   a project's delta is its mission, pillars, and scope only, never the rules for
   validating/scoring/amending them.
 - **Contract in the template, engine per-stack.** `base/` specifies the shape, the
-  rubric, and the protocol; the deterministic executable engine (validate schema,
-  `scopeReject`, `alignVerdict`, `requiresAdr`/`hasAdrFor`) is provided by each
-  adopting repo in its own stack — just as the harness leaves the eval-runner to the
-  adopter (`evals/README.md`). Reference implementation:
+  rubric, and the protocol. Each adopting repo provides the deterministic executable engine
+  (validate schema, `scopeReject`, `alignVerdict`, `requiresAdr`/`hasAdrFor`) in its own stack.
+  The harness leaves the eval-runner to the
+  adopter in the same way (`evals/README.md`). Reference implementation:
   `poirot-fe scripts/north-star/{schema,align,amendment}.mjs` (Node, already built and
   unit-tested there).
-- To update `base/`: edit it here, follow the same discipline as
-  `memory/constitution/update-checklist.md` (review the change and re-copy it to every
-  project that inherits it — explicit synchronization, no submodules).
+- To update `base/`: edit it here. Follow the same discipline as
+  `memory/constitution/update-checklist.md`. Review the change and re-copy it to every
+  project that inherits it: explicit synchronization, no submodules.

@@ -19,7 +19,7 @@ GLOBS = ["AGENTS.md", "memory/**/*.md", "harness/prompts/*.md", "harness/steps/*
 
 
 def main():
-    files = sorted({f for g in GLOBS for f in Path().glob(g)})
+    files = sorted({f for g in GLOBS for f in Path().glob(g) if not str(f).startswith(spec.HISTORY)})
     found = [f"{f}: {m}" for f in files for m in spec.prose(f.read_text())]
     print("\n".join(found))
     sys.exit(1 if found else 0)

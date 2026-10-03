@@ -75,18 +75,28 @@ def ids_in(cell):
 
 
 def prose(text):
-    out, fenced = [], False
-    for n, line in enumerate(text.splitlines(), 1):
-        if line.lstrip().startswith("```"):
-            fenced = not fenced
-            continue
-        if fenced or line.startswith(("|", ">", "#")):
-            continue
-        s = re.sub(r"`[^`]*`", "X", line)
+    out, fenced, para, start = [], False, [], 0
+
+    def flush():
+        s = re.sub(r"`[^`]*`", "X", " ".join(para))
         for part in re.split(r"(?<=[.:;!?])\s+", s):
             k = len(part.split())
             if k > MAX_WORDS:
-                out.append(f"line {n}: {k} words: {part.strip()[:50]}…")
+                out.append(f"line {start}: {k} words: {part.strip()[:50]}…")
+        para.clear()
+
+    for n, line in enumerate(text.splitlines() + [""], 1):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            flush()
+        elif fenced or not line.strip() or line.startswith(("|", ">", "#")):
+            flush()
+        else:
+            if re.match(r"\s*([-*+]|\d+[.)])\s", line):
+                flush()
+            if not para:
+                start = n
+            para.append(line.strip())
     return out
 
 

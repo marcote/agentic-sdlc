@@ -35,7 +35,7 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
 ### S1 — Impose no answers: mechanism and a floor of questions, never answers   [stance]
 - Confidence: PINNED
 - Because:    the North Star names "imposing or naming a mandatory execution runtime" as an
-              out-of-scope predicate, and `agnostic-portability` is measured by the contract
+              out-of-scope predicate. Also, `agnostic-portability` is measured by the contract
               surviving a vendoring onto an arbitrary repo and stack. *Wording sharpened by
               feature 014, which ships six mandatory ground rules: the original text said
               "never opinions", which no longer described the harness. Not marked SUPERSEDED —
@@ -66,9 +66,9 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
               the intake gate scores the hosting against the out-of-scope runtime predicate.
 - Answers:    GR4
 - Hedge:      every engine is reachable only through a documented shell-level CLI contract
-              (subcommands, exit codes, stdout payload) with no importable API, so a
+              (subcommands, exit codes, stdout payload) with no importable API. So a
               reimplementation in another stack is drop-in and no caller has to change. This
-              costs nothing today — it is already how both engines are invoked.
+              costs nothing today. It is already how both engines are invoked.
 
 ### S3 — Baseline: shell, coreutils and uv with inline script dependencies [substrate]
 - Confidence: PINNED
@@ -81,7 +81,7 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
 
 ### S4 — Charter format: one line-oriented markdown file            [substrate]
 - Confidence: PINNED
-- Because:    the charter has three readers that must all work without tooling — a
+- Because:    the charter has three readers that must all work without tooling: a
               shell-level engine, the gates, and a human editing it by hand in a review diff.
               Minted by the `UNPINNED` verdict on feature 013's own plan (decision D1), which
               is the first run of the accretion loop.
@@ -96,11 +96,11 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
 - Confidence: PINNED
 - Because:    answering GR1 and GR3 together, because vendoring settles both. The harness
               reaches its users by being **copied into their repository** (`vendor.sh`,
-              `bootstrap.sh`) and runs there — on a developer machine and in that repo's CI.
-              It is not installed, not hosted, and not a service; there is no instance count
-              because there is no deployment, only as many copies as there are clones. The
-              engines are reachable as shell commands and the skills are prose that calls
-              them, so the core is separable from the way it is reached.
+              `bootstrap.sh`) and runs there, on a developer machine and in that repo's CI.
+              It is not installed, not hosted, and not a service. There is no instance count
+              because there is no deployment, only as many copies as there are clones.
+              The engines are reachable as shell commands. The skills are prose that calls
+              them. So the core is separable from the way it is reached.
 - Buys:       adoption with nothing to install; each repo owns its copy and can diverge; the
               engines stay usable without the agent.
 - Forecloses: pushing an update to existing adopters — copy-once means they re-vendor
@@ -127,20 +127,20 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
 ### S7 — Green proves this repository's harness, never an adopting project's product   [substrate]
 - Confidence: PINNED
 - Because:    answering GR5. `tests/run.sh` exercises this repository's **own** governance
-              artifacts — that files and contracts exist, that the engines behave on fixtures,
-              that gates block what they claim to block. *Wording sharpened on 2026-08-09: the
+              artifacts. It checks that files and contracts exist, that the engines behave on fixtures,
+              and that gates block what they claim to block. *Wording sharpened on 2026-08-09: the
               title read "never a product", which contradicted its own body. The harness IS this
               repository's product, so an absolute reading made every check here a violation. Not
               marked SUPERSEDED — the decision did not change, it was under-specified, the same
               correction S1 took in feature 014.*
-- Buys:       a green that means **one** thing. Whatever else lands in this repository — a sample
-              application, a fixture with real behaviour — its own suite stays separate, so a
+- Buys:       a green that means **one** thing. Whatever else lands in this repository (a sample
+              application, a fixture with real behaviour), its own suite stays separate. A
               passing `tests/run.sh` never silently also claims that something else works.
 - Forecloses: using this suite as evidence that any product works, including a sample shipped
               here. That evidence belongs to that product's own `scripts/test.sh`. Conflating them
               is the unstated-meaning failure GR5 exists to prevent.
 - Falsifier:  a check in `tests/run.sh` starts asserting the behaviour of an application rather
-              than of the harness's own machinery — so that green means two things at once.
+              than of the harness's own machinery. Then green means two things at once.
               *The previous wording ("asserts something about product code rather than about the
               harness") could not discriminate, because the harness is product code.*
 - Answers:    GR5
@@ -165,11 +165,11 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
               arbitrary repo and stack. Until feature 018 that was tested by checking which files
               landed. Running the gates needs a target that exists, and a target costs authorship.
               Minted by the `UNPINNED` verdict on 018's own plan.
-- Buys:       the real gates run against someone else's artifacts on every suite run, for the
-              price of one small repository a reader can hold in their head.
+- Buys:       the real gates run against someone else's artifacts on every suite run. The
+              price is one small repository a reader can hold in their head.
 - Forecloses: any blind spot specific to a stack the fixture does not use. A gate that breaks
               only on a project with no manifest, or with a compiled toolchain, stays invisible
-              here — and the suite will look green while it does.
+              here. The suite will look green while it does.
 - Falsifier:  an adopter reports a gate failing on their stack in a way one fixture could not
               have shown; or a second fixture is added, which retires the "one" in this pin.
 - Hedge:      the check reads the fixture's path, pin ids and guard commands **from the fixture

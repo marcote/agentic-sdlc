@@ -12,7 +12,7 @@
 ## Why this store exists
 
 A workflow that never asks decides by omission. Nobody is asked where the work deploys, how
-many processes write at once, or whether the terminal is the only consumer — so the agent picks
+many processes write at once, or whether the terminal is the only consumer. So the agent picks
 something reasonable and moves on. Nothing turns red, coverage closes, the feature ships. The
 bill arrives three features later as rework.
 
@@ -63,15 +63,15 @@ label**: the interview asks about the world rather than asking you to classify y
 - If it breaks, do you re-run it — or does state get corrupted?
 
 The underlying axis is **blast radius**: who is harmed when it breaks, and whether it is
-re-runnable. `S0` carries a `Falsifier` like any other pin, so a rising tier is *announced* —
-the personal script that starts running on a schedule somewhere does not catch you off guard.
+re-runnable. `S0` carries a `Falsifier` like any other pin. So a rising tier is *announced*.
+The personal script that starts running on a schedule somewhere does not catch you off guard.
 
 ## What `S0` scales — and what it does not
 
 `S0` scales **scope**: how many pins are elicited and how many acceptance criteria a feature
-produces. At a low tier, three criteria instead of fifteen. Hedging is also rarer there — at low
-blast radius the honest move is usually to pin firmly and accept the reversal cost, since
-rework on a disposable artifact is cheap by definition.
+produces. At a low tier, three criteria instead of fifteen. Hedging is also rarer there. At low
+blast radius the honest move is usually to pin firmly and accept the reversal cost.
+Rework on a disposable artifact is cheap by definition.
 
 `S0` does **not** scale the rules. Over whatever criteria exist:
 
@@ -116,7 +116,7 @@ ask for it.
 
 ## Amendment
 
-Changing a pin is not silent, and it is not gated in CI — productivity comes first, and a
+Changing a pin is not silent. It is not gated in CI. Productivity comes first, and a
 technical pin is feature throughput, unlike a change to product governance. The superseded pin
 keeps its id, gains a `SUPERSEDED` marker, and records the date, the reason, and what tripped
 it. History stays in the same file; there is no separate decision directory to maintain.

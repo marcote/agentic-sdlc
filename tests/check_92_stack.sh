@@ -29,7 +29,7 @@ for step in "S0" "Draft" "Price" "Grill" "know" "oheren" "rite"; do
   assert_contains .claude/skills/stack/SKILL.md "$step"
 done
 assert_contains docs/workflow.md '/stack'
-assert_contains CLAUDE.md '/stack'
+assert_contains AGENTS.md '/stack'
 
 # --- PIN-SHAPE ------------------------------------------------------------------
 assert_file "$SBASE/pin-template.md"
@@ -265,10 +265,10 @@ if bash scripts/vendor.sh --apply "$_vt" >/dev/null 2>&1; then
   else
     _fail "VENDOR-STACK: seeded charter leaked harness pins (or is missing)"
   fi
-  if [ -f "$_vt/CLAUDE.md" ] && grep -qE 'memory/stack' "$_vt/CLAUDE.md"; then
-    _pass "VENDOR-STACK: generated CLAUDE.md ## Stack points at the charter"
+  if [ -f "$_vt/AGENTS.md" ] && grep -qE 'memory/stack' "$_vt/AGENTS.md"; then
+    _pass "VENDOR-STACK: generated AGENTS.md points at the charter"
   else
-    _fail "VENDOR-STACK: generated CLAUDE.md ## Stack is still a dead stub"
+    _fail "VENDOR-STACK: generated AGENTS.md does not point at the charter"
   fi
 else
   _fail "VENDOR-STACK: vendor.sh --apply failed"
