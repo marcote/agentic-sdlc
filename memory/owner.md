@@ -11,3 +11,4 @@ How the owner works with agents.
 - Use one branch per feature, named `NNN-slug`. Merge to `main` at the end. Do not push or merge unless asked.
 - Be precise, not eloquent. One idea per sentence. Bold only what changes a decision.
 - Do not claim a decision the owner did not make.
+- Design from process, not intuition: a sourced review, the mechanical and semantic split, and a dry run.

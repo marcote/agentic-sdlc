@@ -65,5 +65,9 @@ The reviewer checks the rest.
 `harness/prompts/implementer.md` holds the ladder. The reviewer enforces it with rubric R1.
 An official SDK beats a hand-made client. A new library is a charter amendment at gate H1.
 
+### D7 — A semantic question goes to a model
+
+A model answers a semantic question, and the owner resolves what the model flags. A parser never answers it. A model never blocks alone.
+
 ## Inner loop budget (tuneable)
 - Escalate to human after **2 identical failures** or **3 total attempts** per task.
