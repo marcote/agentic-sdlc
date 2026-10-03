@@ -123,7 +123,7 @@ def test_e10_rule_lesson_is_proposed(slice_repo):
 
 def test_e11_page_lists_proposed_lessons(tmp_path):
     put(tmp_path, "north-star.md", NS)
-    put(tmp_path, "specs/099-x/spec.md", SLICE_SPEC)
+    put(tmp_path, "specs/099-x/spec.md", "# Spec\n\n## Sources\n\n| practice | source | implies |\n| --- | --- | --- |\n| p | s | i |\n")
     put(tmp_path, LESSONS, table([row("L1", "proposed", text="UNIQUE_PROPOSED_TEXT")]))
     p = spec_cmd("page", "specs/099-x/spec.md", "--north-star", "north-star.md", cwd=tmp_path)
     assert p.returncode == 0, p.stdout + p.stderr

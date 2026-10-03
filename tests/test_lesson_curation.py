@@ -1,6 +1,6 @@
 from conftest import HARNESS
 from test_repo_memory import LESSONS, parse_table
-from test_spec import EX_HEAD, REQ_HEAD, TASK_HEAD, lint
+from test_spec import EX_HEAD, REQ_HEAD, SOURCES, TASK_HEAD, lint
 
 
 def real_rows():
@@ -45,8 +45,8 @@ def test_e6_l4_l6_and_id_collision_have_existing_checks():
 
 
 def test_e7_requirement_columns_read_by_header(tmp_path, ns_file):
-    head = "| id | anchor | examples | requirement |\n| --- | --- | --- | --- |\n"
-    body = (head + "| S1 | real-enforcement | E1 | When it runs, the lint shall pass. |\n\n" + EX_HEAD
-            + "\n" + TASK_HEAD + "| T1 | do it | S1 |\n")
+    head = "| id | kind | anchor | examples | requirement |\n| --- | --- | --- | --- | --- |\n"
+    body = (head + "| S1 | mechanical | real-enforcement | E1 | When it runs, the lint shall pass. |\n\n" + EX_HEAD
+            + "\n" + TASK_HEAD + "| T1 | do it | S1 |\n" + SOURCES)
     p = lint(tmp_path, ns_file, body)
     assert "not EARS" not in p.stdout and p.returncode == 0, p.stdout

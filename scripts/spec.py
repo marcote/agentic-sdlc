@@ -52,7 +52,7 @@ def tables(text):
 
 
 def parse(text):
-    out = {"reqs": {}, "examples": {}, "tasks": [], "glossary": {}, "new": []}
+    out = {"reqs": {}, "examples": {}, "tasks": [], "glossary": {}, "new": [], "applied": None, "sources": None}
     for _, head, rows in tables(text):
         if {"id", "requirement", "anchor", "examples"} <= set(head):
             out["reqs"].update({r["id"]: r for r in rows})
@@ -64,6 +64,10 @@ def parse(text):
             out["glossary"].update({r["term"].strip("*").lower(): r["meaning"] for r in rows})
         elif head[:2] == ["item", "justification"]:
             out["new"] += rows
+        elif head[:2] == ["lesson", "applies"]:
+            out["applied"] = {r["lesson"] for r in rows}
+        elif head[:3] == ["practice", "source", "implies"]:
+            out["sources"] = rows
     return out
 
 
@@ -134,6 +138,10 @@ def lint(spec_text, ns_text, root=Path(".")):
             out.append(f"{rid}: no anchor")
         elif anchor not in ns_text:  # ponytail: verbatim presence, not a parsed anchor list
             out.append(f"{rid}: anchor '{anchor}' not in north star")
+        if not r.get("kind"):
+            out.append(f"{rid}: no kind")
+        elif r["kind"] == "semantic" and "judged" not in r["examples"]:
+            out.append(f"{rid}: semantic requirement needs a judge")
         if "judged" in r["examples"]:
             continue
         ex = re.findall(r"E\d+", r["examples"])
@@ -148,6 +156,10 @@ def lint(spec_text, ns_text, root=Path(".")):
     for r in s["new"]:
         if not r["justification"]:
             out.append(f"{r['item'].split(':', 1)[-1].strip()}: no justification")
+    out += [f"{r['id']}: not in Memory applied" for r in lessons.with_status("active") if r["id"] not in (s["applied"] or ())]
+    if s["sources"] is None:
+        out.append("no Sources table")
+    out += [f"Sources: row {i} names no source" for i, r in enumerate(s["sources"] or [], 1) if not r["source"]]
     return out + referrers(spec_text, root)
 
 
