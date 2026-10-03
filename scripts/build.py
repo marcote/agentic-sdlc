@@ -112,7 +112,7 @@ def examples_of(task, s):
     ids = []
     for r in speclib.ids_in(task["requirements"]):
         if r in s["reqs"]:
-            ids += [e for e in re.findall(r"E\d+", s["reqs"][r]["examples"]) if e in s["examples"]]
+            ids += [e for e in re.findall(r"E\d+", s["reqs"][r]["examples"]) if e in s["examples"] and e in task.get("only", [e])]
     return ids
 
 
@@ -202,10 +202,16 @@ def run_task(task, s, cfg, report, frozen, done_examples):
     return "escalated"
 
 
-def contract(s, cfg, report):
-    """Task 0: turn every example into a failing test, then freeze those test files."""
-    ids = list(s["examples"])
-    t0 = {"task": "T0", "requirements": ", ".join(s["reqs"]),
+def late_examples(s, frozen):
+    """Examples that no frozen test names."""
+    text = "\n".join(f + "\n" + (Path(f).read_text() if Path(f).is_file() else "") for f in frozen).lower()
+    return [e for e in s["examples"] if f"test_{e.lower()}_" not in text]
+
+
+def contract(s, cfg, report, ids):
+    """Task 0: turn the given examples into failing tests, then freeze those test files."""
+    reqs = [r for r in s["reqs"] if set(re.findall(r"E\d+", s["reqs"][r]["examples"])) & set(ids)]
+    t0 = {"task": "T0", "requirements": ", ".join(reqs), "only": ids,
           "does": "Write one test per example below, named test_<example id>_<words>, e.g. test_e1_add. "
                   "Each test must fail now, and fail as a test: a missing module must not crash the runner. "
                   "Do not implement the feature."}
@@ -254,8 +260,11 @@ def build(spec_dir, cfg):
               "reused": [], "new": [], "started": datetime.now(timezone.utc).isoformat()}
     try:
         frozen, done = done_on_branch(s["slice"])  # a re-run keeps what an earlier run committed
-        if frozen is None and contract(s, cfg, report):
+        late = list(s["examples"]) if frozen is None else late_examples(s, frozen)
+        if late and contract(s, cfg, report, late):
             frozen, done = done_on_branch(s["slice"])
+        elif late:
+            frozen = None  # T0 escalated: run no task
         if frozen is not None:
             done_examples = []
             for t in sorted(done):
