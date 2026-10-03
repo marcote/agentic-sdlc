@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["conflicts"],
+  "properties": {
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "with", "why"],
+        "properties": {
+          "id": {"type": "string"},
+          "with": {"type": "string"},
+          "why": {"type": "string"}
+        }
+      }
+    }
+  }
+}

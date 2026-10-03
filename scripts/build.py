@@ -29,7 +29,7 @@ import spec as speclib
 
 HARNESS = Path(__file__).resolve().parent.parent
 SCHEMAS = HARNESS / "harness/schemas"
-SCHEMA_OF = {"implementer": "implementer", "reviewer": "reviewer", "judge": "reviewer", "reflector": "reflector"}
+SCHEMA_OF = {"implementer": "implementer", "reviewer": "reviewer", "judge": "reviewer", "reflector": "reflector", "curator": "curator"}
 
 
 class Budget(Exception):
@@ -158,7 +158,7 @@ def prompt_for(role, task, s, cfg, feedback="", diff="", frozen=()):
         + section("Examples", "\n".join(f"- {e['id']}: given {e['given']}; when {e['when']}; then {e['then']}" for e in exs))
         + section("Frozen tests", "\n".join(f"- {f}" for f in sorted(frozen)))
         + section("Glossary", "\n".join(f"- {t}: {m}" for t, m in terms.items()))
-        + section("Lessons", "\n".join(f"- {r['id']}: {r['lesson']}" for r in lessons.with_status("captured", "learned")))
+        + section("Lessons", "\n".join(f"- {r['id']}: {r['lesson']}" for r in lessons.with_status("active")))
         + section("Module map", read(paths["module_map"]))
         + section("Charter", read(paths["charter"]))
         + section("Feedback from the last attempt", feedback)

@@ -2,7 +2,7 @@
 
 Goal: a spec the owner can approve at gate H1 without a second meeting.
 
-1. Read `brief.md`, the north star, the charter, and `docs/modules.md`.
+1. Read `brief.md`, `research.md`, the north star, the charter, the constitution, `memory/lessons.md`, `memory/owner.md`, and `docs/modules.md`.
 2. Copy `specs/_template/spec.md` beside the brief. Fill every section.
    - Use only terms from the glossary. Add a new term to the spec glossary.
    - Write each requirement in EARS form, with one anchor in the north star.
