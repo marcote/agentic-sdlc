@@ -178,3 +178,17 @@ def test_e15_prose_check_covers_owner_file(tmp_path):
 def test_e16_prose_check_skips_docs(tmp_path):
     p = prose_check(tmp_path)
     assert "memory/owner.md" in p.stdout and "docs/workflow.md" not in p.stdout
+
+
+def test_e17_prose_check_counts_across_line_breaks(tmp_path):
+    words = ["word"] * 30
+    wrapped = "\n".join(" ".join(words[i : i + 10]) for i in range(0, 30, 10)) + ".\n"
+    put(tmp_path, "memory/owner.md", wrapped)
+    p = run("uv", "run", "-q", str(HARNESS / "scripts/prose.py"), cwd=tmp_path)
+    assert "memory/owner.md" in p.stdout and "30 words" in p.stdout
+
+
+def test_e18_prose_check_skips_history_paths(tmp_path):
+    put(tmp_path, "memory/north-star/decisions/0004-x.md", " ".join(["word"] * 40) + ".\n")
+    p = run("uv", "run", "-q", str(HARNESS / "scripts/prose.py"), cwd=tmp_path)
+    assert "0004-x.md" not in p.stdout
