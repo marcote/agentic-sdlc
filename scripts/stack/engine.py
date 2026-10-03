@@ -13,7 +13,7 @@ Deterministic capabilities over a project's stack charter (memory/stack/stack.md
                      overridable with repeatable --rules): one line per
                      rule, "GR<n>: pin <id>" / "n/a" / "uncovered". A SUPERSEDED pin does
                      not count -- history is not a rationale.
-  guards FILE        one Guard command per line, for /verify to execute. ANY pin kind may
+  guards FILE        one Guard command per line, for /accept to execute. ANY pin kind may
                      declare one: whether a pin injects a per-feature coverage row (stance
                      only) is orthogonal to whether it can be checked by a command (both).
                      A substrate choice such as a dependency tool is often the more
