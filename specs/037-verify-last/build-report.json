@@ -1,0 +1,92 @@
+{
+  "tokens": 386597,
+  "tasks": {
+    "T0": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T1": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T2": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T3": {
+      "status": "done",
+      "attempts": 1
+    }
+  },
+  "trace": [
+    "T0:implementer",
+    "T0:checks",
+    "T0:reviewer",
+    "T1:implementer",
+    "T1:checks",
+    "T1:reviewer",
+    "T2:implementer",
+    "T2:checks",
+    "T2:reviewer",
+    "T3:implementer",
+    "T3:checks",
+    "T3:reviewer"
+  ],
+  "assumptions": [
+    {
+      "task": "T1",
+      "text": "A bad or missing results.json is now caught before any memory write, and then no FIX return to build runs. Before, it was checked after the suite."
+    },
+    {
+      "task": "T1",
+      "text": "Re-running accept after an escalation repeats reflect and write_back on the slice branch. The north star can get duplicate Reported lines. I added no dedupe guard."
+    },
+    {
+      "task": "T1",
+      "text": "The verified commit is HEAD after the last passing suite and checks. This includes the FIX commit if build made one."
+    },
+    {
+      "task": "T2",
+      "text": "The heading match is any markdown heading line (leading #) that contains the name, so a heading like '### D7 \u2014 ...' matches."
+    },
+    {
+      "task": "T2",
+      "text": "The def match allows leading indentation, so it also finds methods."
+    },
+    {
+      "task": "T3",
+      "text": "The slice repo's suite command is `pytest tests -q`, with no xdist and no `bash tests/run.sh`. The `-n auto` flag needs pytest-xdist, which the running Python may not have."
+    },
+    {
+      "task": "T3",
+      "text": "The fixture assumes the Python running the tests has pytest installed. If it doesn't, the task and suite commands in the slice repo will fail."
+    }
+  ],
+  "escalations": [],
+  "reused": [
+    "build.git",
+    "lessons.apply",
+    "write_back",
+    "reflect",
+    "curate",
+    "result_page",
+    "lessons.apply propose op in scripts/lessons.py",
+    "curate in scripts/accept.py",
+    "re from stdlib",
+    "tests/conftest.py slice_repo fixture"
+  ],
+  "new": [],
+  "findings": [],
+  "started": "2026-10-03T18:59:23.745527+00:00",
+  "test_seconds": 95.1,
+  "runs": [
+    {
+      "started": "2026-10-03T18:59:23.745527+00:00",
+      "tokens": 333135,
+      "escalations": [],
+      "test_seconds": 95.1
+    }
+  ],
+  "suite_seconds": 14.8,
+  "verified": "19c149d62a1fd956bafca90813a4251845451315"
+}

@@ -6,6 +6,8 @@ A conflict is a lesson that allows what a constitution clause forbids, or forbid
 
 Return `conflicts`: for each lesson or case that conflicts, give `id`, `with` (the clause id, or `rule` for a case) and `why` (one sentence).
 
+Also, a lesson can conflict with another active lesson. Then `with` is the other lesson id.
+
 A difference of wording is not a conflict. When nothing conflicts, return no conflicts.
 
 Answer only with the JSON object your schema asks for.
