@@ -53,83 +53,17 @@ inherit this delta (their UAT is against their product objective, per the base U
 *This is a project delta, not a base principle:* it presumes the deliverable is tooling over the
 workflow itself, which is unique to this harness-as-product.
 
-### D4 — Gate bootstrap: a feature that introduces a gate is exempt from it, on four conditions
+### D5 — About 80% of ASD-STE100
 
-A gate cannot judge the feature that builds it — there is nothing to read and nothing to run at
-that point in the loop. This has now happened three times (`002` `/align`, `013` the `/plan`
-charter guard, `014` the `UNCOVERED` verdict) and was **negotiated case by case each time**. The
-exemption is real; leaving it unwritten is what makes it look like a convenient skip.
+One word has one meaning: use the glossary. A sentence has 25 words or fewer; a procedure
+sentence has 20 or fewer. Use the active voice. Give one instruction in one sentence. Tables,
+fenced blocks and quotes are data and are exempt. `scripts/spec.py lint` checks the length.
+The reviewer checks the rest.
 
-The exemption is **from being blocked, never from being run**, and it holds only with all four:
+### D6 — Implementation follows the ponytail ladder, library-first
 
-1. **Declared in `plan.md` before implementation**, as a named gate note — never a silent skip,
-   and never discovered at `/verify`.
-2. **The gate runs retroactively against the feature's own artifacts before close, and must emit a
-   real verdict.** A trivial `PASS` because the inputs never touch proves nothing and does not
-   discharge this condition. (`013` emitted `UNPINNED` against its own charter; `014`'s
-   `UNCOVERED` forced four pins into `memory/stack/stack.md`.)
-3. **Task ordering brings the feature into compliance with its own gate before the final verify**
-   — the feature ends subject to the gate it shipped, even though it started exempt.
-4. **The gate note states that every subsequent feature is subject, without exception.**
-
-**Why this fits the constitution rather than eroding it:** condition 2 is D3 (reflexive dogfood)
-made non-optional for this case, and conditions 1 and 4 keep the exemption a bounded, recorded
-event instead of a precedent. Under the amended `frictionless-adoption` signal (ADR `0004`) an
-exemption without a recorded justification is exactly the defect being measured.
-
-*This is a project delta, not a base principle:* it presumes the deliverable is a gate over the
-workflow itself, which is unique to this harness-as-product.
-
-### D5 — One sentence, one idea: 35 words
-
-No sentence in artifact prose runs past **35 words**. Enforced by `scripts/prose.sh`, run in the
-suite. Tables, fenced blocks and blockquotes are exempt: they are data and citations.
-
-**Why.** The artifacts drifted into sentences that carry three claims joined by dashes. The worst
-ran **73 words**. A reader cannot hold that, and neither can a reviewer looking for the one clause
-that matters. Compressing 17 offenders removed no evidence — every `[deriv:]` locator, verdict and
-count survived. The fat was connective tissue, not content.
-
-**What it does not enforce.** Word choice, paragraph length, repetition, or whether the point was
-worth making. A short sentence can still be padding. Those stay with review.
-
-**Why 35 and not less.** Measured before choosing: 40 words left 10 offenders, 35 left 17, 30 left
-32. Thirty-five is the tightest cap the existing corpus could reach in one pass without cutting
-evidence. Lower it when the corpus supports it, not before.
-
-*Project delta, not a base principle:* an adopter's prose conventions are their own. They inherit
-the harness's artifacts, not its style.
-
-## Inherited pattern overrides
-
-### `base/patterns/non-vacuous-checks.md` — two of five rows discharged by a gate, not per feature
-
-**Overridden here only:** `check-traceable` and `check-no-self-match` are **not** injected as
-per-feature `[given]` rows in this repository. The other three (`check-can-fail`,
-`check-rejects-by-diagnostic`, `check-names-its-tree`) are injected exactly as before.
-
-**Justification.** `tests/check_96_non_vacuous.sh` runs `scripts/nvc.sh` on **every** invocation of
-the suite and fails it when any declared criterion does not emit a result in its own section, or
-when a self-including scan uses an inline literal without a self-test. That is strictly stronger
-than a coverage row: it covers every check in the repository on every run, including checks from
-features closed months ago, rather than only the checks a feature happens to touch. It found
-fifteen instances the per-feature rows never would have.
-
-Under the amended `frictionless-adoption` signal (ADR `0004`) a mandatory step whose harm is
-**already prevented by a gate** is friction without a justification — the defect the amendment
-made measurable. Carrying both is bookkeeping, and the coverage row is the weaker of the two.
-
-**Why the base pattern is unchanged.** An adopter inherits the pattern but **not** the enforcement:
-`tests/` is DROP and `scripts/nvc.sh` is DROP, because both encode this repository's own test
-conventions (`_pass`/`_fail`, criterion labels) rather than anything portable. For an adopter the
-two rows are the only thing standing there, so removing them from `base/` would delete the rule for
-everyone who cannot mechanise it. **This override is valid precisely because it is scoped to the
-one repository that runs the gate**, and it stops being valid the day `nvc.sh` stops running.
-
-*Reversal condition, stated so this cannot rot silently:* if `check_96` is removed, disabled, or
-stops covering the whole `tests/` tree, this override lapses and the two rows return to per-feature
-injection. `tests/check_10_constitution.sh` asserts the pairing, so the override cannot outlive the
-gate it depends on.
+`harness/prompts/implementer.md` holds the ladder. The reviewer enforces it with rubric R1.
+An official SDK beats a hand-made client. A new library is a charter amendment at gate H1.
 
 ## Inner loop budget (tuneable)
 - Escalate to human after **2 identical failures** or **3 total attempts** per task.

@@ -1,15 +1,10 @@
-# Brief — <feature>
+# Brief — <slice>
 
-> ORIGIN of the development. Describes the OBJECTIVE and the WHY, not the solution.
+## Objective
+What the owner wants, and why. One paragraph.
 
-## Product objective
-_(what business/user problem we are solving)_
+## Done means
+What the owner will see when this works.
 
-## Why / motivation
-_(why now, what happens if we do not do it)_
-
-## Success metrics
-_(measurable: e.g. "↑ mobile conversion 5%", "p95 latency < 300ms")_
-
-## Out of scope
-_(what it explicitly does NOT do)_
+## Out of this slice
+What waits for a later slice.

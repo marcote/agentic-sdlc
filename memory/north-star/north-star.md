@@ -20,12 +20,12 @@ extends: base
 
 ## Mission
 
-A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spec-driven, test-first, evidence-verified) on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.
+A reusable, stack-agnostic harness that enforces a disciplined, autonomous agentic SDLC (spec-driven, test-first, evidence-verified), where the owner defines done and agents deliver it, on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.
 
 ## Pillars
 
 - **`real-enforcement`** — Discipline is enforced by deterministic gates, not good intentions.
-  Its `signal`: gates block closure when a condition is missing and violations are caught before merge; the harness proves this by **dogfooding itself** (the retro ledger and `wow-report` are the evidence). Self-validation is not a separate pillar: it is the measurable proxy of *this one*.
+  Its `signal`: gates block closure when a condition is missing and violations are caught before merge; the evidence is the lint, build and accept gates, and the owner approves only at gate H1. Self-validation is not a separate pillar: it is the measurable proxy of *this one*.
 - **`agnostic-portability`** — Runs on any stack or project without imposing technology or runtime.
   Its `signal`: the contract (schema, gates, artifacts) remains intact when vendored onto an arbitrary repo/stack.
 - **`frictionless-adoption`** — Incorporating the harness into a new repo costs little, and
@@ -36,13 +36,28 @@ A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spe
   nothing, and would put this pillar at war with the mission's word *enforces* (see
   `decisions/0004-*`).
 - **`measurable-impact`** — The discipline the harness imposes must translate into better software, not gates that fire for the sake of firing.
-  Its `signal`: gaps caught early (grilling/`/contract`) and late rework avoided (post-`/verify`/`/uat`), aggregated per feature in the "Method" section of the `wow-report`. Distinguishes *enforcing* (`real-enforcement`) from *enforcement that works* — the same anti-theater line from retro, elevated to the harness level.
+  Its `signal`: lead time, interventions, and reused against new modules, per slice. Distinguishes *enforcing* (`real-enforcement`) from *enforcement that works* — the same anti-theater line from retro, elevated to the harness level.
 
 ## Scope
 
-**In scope:** commands, gates, and skills of the governance workflow; product governance (constitution and North Star); feature templates, coverage, and criterion state machine; evals, verification, and UAT of the method; adoption tooling (install, vendoring, inheritance); WoW self-validation (retro, wow-report) and method documentation.
+**In scope:** commands, gates, and skills of the governance workflow; product governance (constitution and North Star); feature templates, glossary, and module map; evals, verification, and UAT of the method; adoption tooling (install, vendoring, inheritance); the autonomous build loop, its metrics, and method documentation.
 
-**Out of scope** (the hard-rejection predicates that `/align` uses): application code or product features of an adopting project; the stack-specific deterministic engine (provided by the adopter — "contract in the template, engine per-stack"); imposing or naming a mandatory execution runtime; blocking commit hooks; runtime dependencies or frameworks (the harness is dependency-free).
+**Out of scope** (the hard-rejection predicates that `/align` uses): application code or product features of an adopting project; the stack-specific deterministic engine (provided by the adopter — "contract in the template, engine per-stack"); imposing a mandatory agent CLI, model or product stack; blocking commit hooks; dependencies beyond `uv` and inline script dependencies.
+
+## Glossary
+
+Every term here has one meaning. Specs use these terms, and only gate H1 changes them.
+
+| term | meaning |
+| --- | --- |
+| **slice** | One feature, from brief to merge. |
+| **gate H1** | The one approval the owner gives: the spec page. |
+| **build** | The step that implements the plan without the owner. A script controls it. |
+| **accept** | The step that verifies the result by machine and merges it. |
+| **escalation** | A stop that asks the owner for a decision. |
+
+Every statement in this file carries one label: decided, hypothesis, open or reported.
+Accept appends results under `## Reported`.
 
 ## Alignment
 
@@ -58,12 +73,12 @@ The block below is the single source of truth, read by the deterministic validat
 
 ```json
 {
-  "mission": "A reusable, stack-agnostic harness that enforces a disciplined agentic SDLC (spec-driven, test-first, evidence-verified) on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.",
+  "mission": "A reusable, stack-agnostic harness that enforces a disciplined, autonomous agentic SDLC (spec-driven, test-first, evidence-verified), where the owner defines done and agents deliver it, on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.",
   "pillars": [
     {
       "id": "real-enforcement",
       "statement": "Discipline is enforced by deterministic gates, not good intentions.",
-      "signal": "Gates block closure when a condition is missing; violations are caught before merge (and the harness proves this by dogfooding itself: retro ledger / wow-report).", "since": "0001"
+      "signal": "Gates block closure when a condition is missing; violations are caught before merge (the evidence is the lint, build and accept gates; the owner approves only at gate H1).", "since": "0001"
     },
     {
       "id": "agnostic-portability",
@@ -78,24 +93,24 @@ The block below is the single source of truth, read by the deterministic validat
     {
       "id": "measurable-impact",
       "statement": "The discipline the harness imposes must translate into better software: less rework and gaps caught before production, not gates that fire for the sake of firing.",
-      "signal": "Gaps caught early (grilling/contract) and late rework avoided (post-verify/uat), aggregated per feature in the Method section of the wow-report; high = discipline prevents, not just bureaucratizes.", "since": "0002"
+      "signal": "Lead time, interventions, and reused against new modules, per slice; these are the success criteria of spec 029.", "since": "0002"
     }
   ],
   "scope": {
     "in_scope": [
       "commands, gates, and skills of the governance workflow",
       "product governance: constitution and North Star",
-      "feature templates, coverage, and criterion state machine",
+      "feature templates, glossary, and module map",
       "evals, verification, and UAT of the method",
       "adoption tooling: install, vendoring, and harness inheritance",
-      "WoW self-validation (retro, wow-report) and method documentation"
+      "the autonomous build loop, its metrics, and method documentation"
     ],
     "out_of_scope": [
       "application code or product features of an adopting project",
       "stack-specific deterministic engine (provided by the adopter)",
-      "imposing or naming a mandatory execution runtime",
+      "imposing a mandatory agent CLI, model or product stack",
       "blocking commit hooks",
-      "runtime dependencies or frameworks",
+      "dependencies beyond `uv` and inline script dependencies",
       "product discovery and demand validation",
       "prioritisation, roadmapping or estimation across features",
       "release, deployment or rollout of the software being built",
