@@ -162,8 +162,8 @@ The owner can read the result page. The owner does not approve it. (decided)
 
 | id | requirement | anchor | examples |
 | --- | --- | --- | --- |
-| T1 | The spec template shall define four test kinds: example, invariant, reconciliation and e2e run. | measurable-impact | E24 |
-| T2 | The spec template shall not ask for one test per requirement or per function. | measurable-impact | E24 |
+| Q1 | The spec template shall define four test kinds: example, invariant, reconciliation and e2e run. | measurable-impact | E24 |
+| Q2 | The spec template shall not ask for one test per requirement or per function. | measurable-impact | E24 |
 
 A test may use recorded real data. A test shall not mock the project's own code. (decided)
 
@@ -176,6 +176,12 @@ A test may use recorded real data. A test shall not mock the project's own code.
 | D3 | The adapters for `claude`, `codex` and `fake` shall run the same role prompts. | agnostic-portability | E27 |
 | D4 | The instructions for the brief, spec and accept steps shall have one source for Claude Code and for Codex. | agnostic-portability | E28 |
 | D5 | The harness scripts shall run with `uv run` and declare their dependencies inline. | frictionless-adoption | E29 |
+
+### 5.6 Prune
+
+| id | requirement | anchor | examples |
+| --- | --- | --- | --- |
+| P1 | When the new steps pass their tests, the harness shall not contain the files that section 8 marks delete. | frictionless-adoption | E30 |
 
 ## 6. Examples
 
@@ -213,6 +219,7 @@ No example needs a real model, except E27.
 | E27 | one toy task: add a function `add(a, b)` with its test | build runs once with `claude`, and once with `codex` | both runs return schema-valid JSON and a passing test |
 | E28 | the spec step instructions | the owner opens Claude Code, then Codex | both read the same file |
 | E29 | a clean machine with `uv` | the owner runs `uv run scripts/build.py --help` | the command exits 0 with no manual install |
+| E30 | the harness after task T6 | the owner lists `scripts/mutate.sh` and `scripts/nvc.sh`, and runs the test suite | both files are absent; the suite passes |
 
 ## 7. Amendments
 
@@ -267,8 +274,8 @@ The implementation plan is a separate document. The tasks follow this order. (de
 | T2 | adapter spike: `claude`, `codex` and `fake` return valid JSON | D1–D3, D5 |
 | T3 | `build.py` with the loop | B1–B10 |
 | T4 | accept, the module map check and the north-star write-back | A1–A7 |
-| T5 | templates, one-source instructions, constitution and north-star amendments | T1, T2, D4 |
-| T6 | delete what section 8 lists | section 8 |
+| T5 | templates, one-source instructions, constitution and north-star amendments | Q1, Q2, D4 |
+| T6 | delete what section 8 lists | P1 |
 
 ## 10. Assumptions and open items
 

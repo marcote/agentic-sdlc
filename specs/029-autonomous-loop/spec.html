@@ -289,8 +289,8 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 <h3>5.4 Tests pattern</h3>
 <div class="tbl"><table>
 <tr><th>id</th><th>requirement</th><th>anchor</th><th>examples</th></tr>
-<tr><td class="id">T1</td><td class="ears">The spec template <b>shall</b> define four test kinds: example, invariant, reconciliation and e2e run.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E24">E24</a></td></tr>
-<tr><td class="id">T2</td><td class="ears">The spec template <b>shall</b> not ask for one test per requirement or per function.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E24">E24</a></td></tr>
+<tr><td class="id">Q1</td><td class="ears">The spec template <b>shall</b> define four test kinds: example, invariant, reconciliation and e2e run.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E24">E24</a></td></tr>
+<tr><td class="id">Q2</td><td class="ears">The spec template <b>shall</b> not ask for one test per requirement or per function.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E24">E24</a></td></tr>
 </table></div>
 <p>A test may use recorded real data. A test shall not mock the project’s own code. <span class="chip c-decided">decided</span></p>
 
@@ -302,6 +302,12 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 <tr><td class="id">D3</td><td class="ears">The adapters for <code>claude</code>, <code>codex</code> and <code>fake</code> <b>shall</b> run the same role prompts.</td><td class="anc">agnostic-portability</td><td class="ex"><a href="#E27">E27</a></td></tr>
 <tr><td class="id">D4</td><td class="ears">The instructions for the brief, spec and accept steps <b>shall</b> have one source for Claude Code and for Codex.</td><td class="anc">agnostic-portability</td><td class="ex"><a href="#E28">E28</a></td></tr>
 <tr><td class="id">D5</td><td class="ears">The harness scripts <b>shall</b> run with <code>uv run</code> and declare their dependencies inline.</td><td class="anc">frictionless-adoption</td><td class="ex"><a href="#E29">E29</a></td></tr>
+</table></div>
+
+<h3>5.6 Prune</h3>
+<div class="tbl"><table>
+<tr><th>id</th><th>requirement</th><th>anchor</th><th>examples</th></tr>
+<tr><td class="id">P1</td><td class="ears"><b>When</b> the new steps pass their tests, the harness <b>shall</b> not contain the files that section 8 marks delete.</td><td class="anc">frictionless-adoption</td><td class="ex"><a href="#E30">E30</a></td></tr>
 </table></div>
 
 <h2 id="examples"><span class="n">6</span>Examples</h2>
@@ -337,6 +343,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 <tr id="E27"><td class="id">E27</td><td>one toy task: add a function <code>add(a, b)</code> with its test</td><td>build runs once with <code>claude</code>, and once with <code>codex</code></td><td>both runs return schema-valid JSON and a passing test</td></tr>
 <tr id="E28"><td class="id">E28</td><td>the spec step instructions</td><td>the owner opens Claude Code, then Codex</td><td>both read the same file</td></tr>
 <tr id="E29"><td class="id">E29</td><td>a clean machine with <code>uv</code></td><td>the owner runs <code>uv run scripts/build.py --help</code></td><td>the command exits 0 with no manual install</td></tr>
+<tr id="E30"><td class="id">E30</td><td>the harness after task T6</td><td>the owner lists <code>scripts/mutate.sh</code> and <code>scripts/nvc.sh</code>, and runs the test suite</td><td>both files are absent; the suite passes</td></tr>
 </table></div>
 
 <h2 id="amend"><span class="n">7</span>Amendments</h2>
@@ -390,8 +397,8 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 <tr><td class="id">T2</td><td>adapter spike: <code>claude</code>, <code>codex</code> and <code>fake</code> return valid JSON</td><td class="anc">D1–D3, D5</td></tr>
 <tr><td class="id">T3</td><td><code>build.py</code> with the loop</td><td class="anc">B1–B10</td></tr>
 <tr><td class="id">T4</td><td>accept, the module map check and the north-star write-back</td><td class="anc">A1–A7</td></tr>
-<tr><td class="id">T5</td><td>templates, one-source instructions, constitution and north-star amendments</td><td class="anc">T1, T2, D4</td></tr>
-<tr><td class="id">T6</td><td>delete what section 8 lists</td><td class="anc">section 8</td></tr>
+<tr><td class="id">T5</td><td>templates, one-source instructions, constitution and north-star amendments</td><td class="anc">Q1, Q2, D4</td></tr>
+<tr><td class="id">T6</td><td>delete what section 8 lists</td><td class="anc">P1</td></tr>
 </table></div>
 
 <h2 id="open"><span class="n">10</span>Assumptions and open items</h2>
