@@ -275,7 +275,7 @@ The implementation plan is a separate document. The tasks follow this order. (de
 | item | label |
 | --- | --- |
 | `claude -p --output-format json` and `codex exec --output-schema` give schema-valid JSON. T2 tests it. | hypothesis |
-| The spec page uses plain HTML. `interfig` draws scenario figures when the product has a React toolchain. | decided |
+| The spec page uses plain HTML. `interfig` draws its scenarios as animated SVG, with no runtime in the page. | decided |
 | The thresholds of section 2. | hypothesis |
 | Tasks run one at a time. Parallel tasks wait until sequential build is too slow. | decided |
 | Accept merges into the local `main`. It does not push. | decided |

@@ -85,6 +85,14 @@ del { color: var(--muted) }
 ins { text-decoration: none; background: var(--decided-soft); color: var(--ink) }
 
 pre.flow { background: var(--sheet); border: 1px solid var(--rule); padding: 16px; overflow-x: auto; font: 13px/1.5 var(--f-mono); margin: 12px 0 }
+.scen { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 }
+.scen input { position: absolute; opacity: 0; pointer-events: none }
+.scen label { font: 600 12px var(--f-mono); padding: 7px 11px; border: 1px solid var(--rule); background: var(--sheet); color: var(--muted); cursor: pointer }
+.scen input:checked + label { color: var(--accent); border-color: var(--accent); background: var(--accent-soft) }
+.scen input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px }
+.scen .fig { display: none; flex-basis: 100%; overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule) }
+.scen .fig img { display: block; width: 100%; min-width: 760px; height: auto }
+#sc1:checked ~ .f1, #sc2:checked ~ .f2, #sc3:checked ~ .f3, #sc4:checked ~ .f4 { display: block }
 ol.ladder { padding-left: 22px; max-width: 68ch }
 ol.ladder li { padding: 2px 0 }
 ol.ladder li.lib { background: var(--accent-soft); margin-left: -8px; padding-left: 8px }
@@ -184,6 +192,18 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 </table></div>
 
 <h2 id="flow"><span class="n">4</span>Flow <span class="chip c-decided">decided</span></h2>
+<p>Four scenarios on one running example: slice 001 of the trading repo, the S&amp;P 500 universe on each date. Each figure plays in a loop.</p>
+<div class="scen">
+  <input type="radio" name="scen" id="sc1" checked><label for="sc1">Happy path</label>
+  <input type="radio" name="scen" id="sc2"><label for="sc2">Reviewer catches a hand-made client</label>
+  <input type="radio" name="scen" id="sc3"><label for="sc3">Ambiguity escalates once</label>
+  <input type="radio" name="scen" id="sc4"><label for="sc4">Accept fails, then escalates</label>
+  <div class="fig f1"><img src="loop-happy.svg" alt="Happy path: brief, spec, gate H1, build, accept, merge"></div>
+  <div class="fig f2"><img src="loop-library.svg" alt="The reviewer rejects a hand-made EDGAR client and attempt 2 uses edgartools"></div>
+  <div class="fig f3"><img src="loop-ambiguity.svg" alt="A structural assumption blocks T1, T2 continues, one escalation at the end"></div>
+  <div class="fig f4"><img src="loop-accept-fail.svg" alt="The e2e run fails twice and accept escalates"></div>
+</div>
+<p class="meta">Drawn with interfig. The same steps as text:</p>
 <pre class="flow">setup, once    north star (with glossary and labels) · charter · module map
    ↓
 1. brief       the owner writes it; the agent asks what is missing
@@ -378,7 +398,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
 <div class="tbl"><table>
 <tr><th>item</th><th>label</th></tr>
 <tr><td><code>claude -p --output-format json</code> and <code>codex exec --output-schema</code> give schema-valid JSON. T2 tests it.</td><td><span class="chip c-hyp">hypothesis</span></td></tr>
-<tr><td>The spec page uses plain HTML. <code>interfig</code> draws scenario figures when the product has a React toolchain.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td>The spec page uses plain HTML. <code>interfig</code> draws its scenarios as animated SVG, with no runtime in the page.</td><td><span class="chip c-decided">decided</span></td></tr>
 <tr><td>The thresholds of section 2.</td><td><span class="chip c-hyp">hypothesis</span></td></tr>
 <tr><td>Tasks run one at a time. Parallel tasks wait until sequential build is too slow.</td><td><span class="chip c-decided">decided</span></td></tr>
 <tr><td>Accept merges into the local <code>main</code>. It does not push.</td><td><span class="chip c-decided">decided</span></td></tr>
