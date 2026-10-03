@@ -1,26 +1,81 @@
 {
-  "tokens": 46585,
+  "tokens": 287949,
   "tasks": {
     "T0": {
-      "status": "escalated",
+      "status": "done",
+      "attempts": 1
+    },
+    "T1": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T2": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T3": {
+      "status": "done",
       "attempts": 1
     }
   },
   "trace": [
     "T0:implementer",
-    "T0:checks"
+    "T0:checks",
+    "T0:reviewer",
+    "T1:implementer",
+    "T1:checks",
+    "T1:reviewer",
+    "T2:implementer",
+    "T2:checks",
+    "T2:reviewer",
+    "T3:implementer",
+    "T3:checks",
+    "T3:reviewer"
   ],
-  "assumptions": [],
-  "escalations": [
+  "assumptions": [
     {
-      "task": "T0",
-      "reason": "vacuous: E2 passes before implementation"
+      "task": "T1",
+      "text": "The examples, tasks and glossary tables are still matched by fixed header position. Only the requirements table was changed, as C6 asks."
+    },
+    {
+      "task": "T2",
+      "text": "L12 is `captured` with check `none: judgment`, because no test for it exists."
+    },
+    {
+      "task": "T2",
+      "text": "L2's check cell reads `none: retired into L9`, and its text is `Merged into L9.`"
+    },
+    {
+      "task": "T2",
+      "text": "The new ids are L11 for the id collision and L12 for the negative-example lesson."
+    },
+    {
+      "task": "T3",
+      "text": "A 'stated limit' is any `N unit` (digits, a space, a lowercase word) in the lesson. It is compared with `N unit` pairs in the constitution, matched by unit. If the constitution repeats a unit with different numbers, the last one wins."
+    },
+    {
+      "task": "T3",
+      "text": "If memory/constitution/constitution.md is missing, the limit check is skipped instead of failing."
+    },
+    {
+      "task": "T3",
+      "text": "The frozen tests were run with `uv run --with pytest --with markdown --with jsonschema pytest`. The repo has no declared pytest runner."
     }
   ],
-  "reused": [],
+  "escalations": [],
+  "reused": [
+    "scripts/spec.py parse() and lint()",
+    "memory/lessons.md table format",
+    "tests/test_lesson_curation.py::test_e7_requirement_columns_read_by_header",
+    "tests/test_lesson_curation.py::test_e3_id_both_requirement_and_task",
+    "tests/test_accept.py::test_e19_fails_twice_then_escalates",
+    "rows()",
+    "finding()",
+    "Path-based CLI structure of scripts/lessons.py"
+  ],
   "new": [],
   "findings": [],
-  "started": "2026-10-03T14:03:38.832129+00:00",
+  "started": "2026-10-03T14:09:34.063464+00:00",
   "runs": [
     {
       "started": "2026-10-03T14:03:38.832129+00:00",
@@ -31,6 +86,11 @@
           "reason": "vacuous: E2 passes before implementation"
         }
       ]
+    },
+    {
+      "started": "2026-10-03T14:09:34.063464+00:00",
+      "tokens": 287949,
+      "escalations": []
     }
   ]
 }

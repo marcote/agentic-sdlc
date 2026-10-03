@@ -16,3 +16,5 @@ One row per lesson. `learned`: its check exists. `captured`: judgment only, no c
 | L10 | A prose joiner that merges wrapped lines must start a new paragraph at each list bullet. Otherwise bullets without periods merge into one long false sentence. | none: judgment | 033-repo-memory | 0 | 0 | captured |
 | L11 | A requirement id must not also be a task id in the same spec. The lint rejects it. | tests/test_lesson_curation.py::test_e3_id_both_requirement_and_task | 034-lesson-curation | 0 | 0 | learned |
 | L12 | A negative example on code that exists must call the new behavior by name. Otherwise its test passes before implementation. | none: judgment | 034-lesson-curation | 0 | 0 | captured |
+| L13 | When a source states the same limit twice with different values, the check reports the conflict. It does not silently keep the last value. | none: judgment | 034-lesson-curation | 0 | 0 | captured |
+| L14 | Declare the test runner and its dependencies in the repo. Otherwise each implementer guesses the `uv run --with` list, and runs can differ. | none: judgment | 034-lesson-curation | 0 | 0 | captured |
