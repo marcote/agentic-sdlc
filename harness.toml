@@ -11,6 +11,7 @@ judge = "claude-ro"      # A7: the judge's model (family) must differ from the i
 attempts = 3
 budget_tokens = 3_000_000
 call_seconds = 1800
+suite_seconds = 30
 
 [checks]
 # {examples} expands to a pytest -k selector such as "e1_ or e2_".

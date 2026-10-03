@@ -16,6 +16,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
@@ -117,6 +118,9 @@ def examples_of(task, s):
     return ids
 
 
+TEST_TIME = [0.0]  # seconds spent in the task check during this process
+
+
 def run_checks(cfg, examples):
     code, out = run_raw(cfg, examples)
     return code, out[-1500:]
@@ -127,7 +131,9 @@ def run_raw(cfg, examples):
         return 0, "no examples selected"
     selector = " or ".join(f"{e.lower()}_" for e in examples) or "no_examples_selected"
     cmd = cfg["checks"]["task"].replace("{examples}", selector)
+    t0 = time.monotonic()
     p = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    TEST_TIME[0] += time.monotonic() - t0
     return p.returncode, p.stdout + p.stderr
 
 
@@ -272,7 +278,7 @@ def build(spec_dir, cfg):
     try:
         old = json.loads((spec_dir / "build-report.json").read_text())
         earlier = old.get("runs") or [old]  # a report from before "runs" is one run
-        earlier = [{k: r.get(k) for k in ("started", "tokens", "escalations")} for r in earlier]
+        earlier = [{k: r.get(k) for k in ("started", "tokens", "escalations", "test_seconds")} for r in earlier]
     except (OSError, ValueError, AttributeError):
         earlier = []
     try:
@@ -304,7 +310,8 @@ def build(spec_dir, cfg):
         report["escalations"].append({"task": "crash", "reason": f"{type(e).__name__}: {e} {getattr(e, 'stderr', '') or ''}".strip()})
         revert()
     finally:
-        report["runs"] = earlier + [{k: report[k] for k in ("started", "tokens", "escalations")}]
+        report["test_seconds"] = round(TEST_TIME[0], 1)
+        report["runs"] = earlier + [{k: report[k] for k in ("started", "tokens", "escalations", "test_seconds")}]
         (spec_dir / "build-report.json").write_text(json.dumps(report, indent=2))
     return report
 
