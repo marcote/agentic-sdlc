@@ -39,6 +39,11 @@ def apply(text, deltas):
     return text[:text.index(head)] + "\n".join(body) + "\n"
 
 
+def with_status(*statuses):
+    f = Path(LESSONS)
+    return [r for r in rows(f.read_text()) if r["status"] in statuses] if f.is_file() else []
+
+
 def finding(r):
     if r["status"] != "learned":
         return None

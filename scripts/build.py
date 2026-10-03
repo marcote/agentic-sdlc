@@ -23,6 +23,7 @@ from pathlib import Path
 import jsonschema
 
 sys.path.insert(0, str(Path(__file__).parent))
+import lessons
 import spec as speclib
 
 HARNESS = Path(__file__).resolve().parent.parent
@@ -144,6 +145,7 @@ def prompt_for(role, task, s, cfg, feedback="", diff="", frozen=()):
         + section("Examples", "\n".join(f"- {e['id']}: given {e['given']}; when {e['when']}; then {e['then']}" for e in exs))
         + section("Frozen tests", "\n".join(f"- {f}" for f in sorted(frozen)))
         + section("Glossary", "\n".join(f"- {t}: {m}" for t, m in terms.items()))
+        + section("Lessons", "\n".join(f"- {r['id']}: {r['lesson']}" for r in lessons.with_status("captured", "learned")))
         + section("Module map", read(paths["module_map"]))
         + section("Charter", read(paths["charter"]))
         + section("Feedback from the last attempt", feedback)

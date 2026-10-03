@@ -131,13 +131,14 @@ def result_page(spec_dir, report):
     answers = build.git("log", "--basic-regexp", "--grep", f"^spec({spec_dir.name}): answer escalation", "--format=%H").split()
     runs = report.get("runs") or [report]  # a report from before "runs" is one run
     tokens = sum(r.get("tokens") or 0 for r in runs)
+    kept = lessons.with_status("captured", "learned")
     rows = [
         ("Lead time", hours(start, now) + ("" if brief else " (from first commit)")),
         ("Brief → H1", hours(brief, h1)),
         ("H1 → build", hours(h1, built)),
         ("Build → accept", hours(built, now)),
         ("Interventions", str(1 + len(answers))),
-        ("Reused", ", ".join(report["reused"]) or "none"),
+        ("Reused",", ".join(report["reused"]) or "none"),
         ("New", ", ".join(report["new"]) or "none"),
         ("Assumptions", "; ".join(f"{a['task']}: {a['text']}" for a in report["assumptions"]) or "none"),
         ("Tokens", f"{tokens} ({len(runs)} build run{'s' * (len(runs) != 1)})"),
@@ -146,7 +147,7 @@ def result_page(spec_dir, report):
     (spec_dir / "result.html").write_text(
         f"<!doctype html><meta charset='utf-8'><title>Result {spec_dir.name}</title>"
         f"<style>body{{font:15px system-ui;max-width:720px;margin:2em auto;padding:0 16px}}"
-        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table>")
+        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table><p>Lessons {sum(r['status'] == 'learned' for r in kept)} learned / {len(kept)}</p>")
 
 
 def main():
