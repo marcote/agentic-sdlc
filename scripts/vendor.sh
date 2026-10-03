@@ -39,7 +39,7 @@ SEED=( CLAUDE.md harness.toml memory/constitution/constitution.md memory/north-s
   memory/stack/stack.md docs/modules.md scripts/test.sh )
 DROP=( "specs/0*-* (except _template)" memory/north-star/decisions verification \
   docs/superpowers evals README.md tests scripts/vendor.sh docs/vendoring.md docs/backlog.md \
-  bootstrap.sh scripts/setup-branch-protection.sh )
+  bootstrap.sh )
 
 # --- Stack detection -> default test command ---
 detect_testcmd(){

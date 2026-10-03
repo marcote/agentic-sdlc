@@ -39,8 +39,7 @@ The harness's own product content, which you do not want:
 `specs/0*-*` (except `_template`), `memory/north-star/decisions`, `verification`,
 `docs/superpowers`, `evals`, `README.md`, `tests/` (harness self-validation — your runtime is
 `scripts/test.sh`), `docs/backlog.md` (the harness's own parked findings), and the vendoring
-tooling itself (`scripts/vendor.sh`, `docs/vendoring.md`, `bootstrap.sh`,
-`scripts/setup-branch-protection.sh`).
+tooling itself (`scripts/vendor.sh`, `docs/vendoring.md` and `bootstrap.sh`).
 
 ## Stack plug (what vendoring cannot fill for you)
 

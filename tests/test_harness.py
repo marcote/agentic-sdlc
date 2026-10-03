@@ -31,6 +31,7 @@ DELETED = [
     ".claude/commands/retro.md", ".claude/commands/wow-report.md", ".claude/commands/distill.md",
     ".claude/skills/align", ".claude/skills/distill", ".claude/skills/verify", ".claude/skills/uat",
     ".claude/skills/retro", ".claude/skills/wow-report",
+    "specs/028-suite-hermeticity", "scripts/setup-branch-protection.sh",
 ]
 
 
