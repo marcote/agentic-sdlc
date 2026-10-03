@@ -1,5 +1,5 @@
 {
-  "tokens": 36168,
+  "tokens": 35942,
   "tasks": {
     "T0": {
       "status": "escalated",
@@ -20,7 +20,7 @@
   "reused": [],
   "new": [],
   "findings": [],
-  "started": "2026-10-03T14:48:25.023807+00:00",
+  "started": "2026-10-03T14:49:12.942706+00:00",
   "test_seconds": 6.3,
   "runs": [
     {
@@ -38,6 +38,17 @@
     {
       "started": "2026-10-03T14:48:25.023807+00:00",
       "tokens": 36168,
+      "escalations": [
+        {
+          "task": "T0",
+          "reason": "vacuous: E6 passes before implementation"
+        }
+      ],
+      "test_seconds": 6.3
+    },
+    {
+      "started": "2026-10-03T14:49:12.942706+00:00",
+      "tokens": 35942,
       "escalations": [
         {
           "task": "T0",

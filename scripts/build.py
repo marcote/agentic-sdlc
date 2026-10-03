@@ -242,8 +242,12 @@ def contract(s, cfg, report, ids):
         if res:
             report["trace"].append("T0:checks")
             code, out = run_raw(cfg, ids)  # one run; each example's result is read from the FAILED/ERROR lines
+            # Only the test files T0 wrote count: other slices reuse the same example ids (test_e6_…).
+            own = {f for f in changed_files() if re.search(r"(^|/)tests/|test_e\d+", f)}
             for e in ids:
-                got = re.search(rf"^(PASSED|FAILED|ERROR) \S*test_{e.lower()}_", out, re.M)
+                hits = [m for m in re.finditer(rf"^(PASSED|FAILED|ERROR) (\S+?)::\S*test_{e.lower()}_", out, re.M)
+                        if m[2] in own]
+                got = next((m for m in hits if m[1] == "PASSED"), hits[0] if hits else None)  # any own PASSED is vacuous
                 if got and got[1] == "PASSED":
                     report["escalations"].append({"task": "T0", "reason": f"vacuous: {e} passes before implementation"})
                     revert()
