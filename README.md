@@ -36,8 +36,10 @@ Setup, once: `/constitution` → seed your North Star → `/stack`.
 
 `/brief` → `/spec` (gate H1, the owner approves) → `/build` → `/accept`
 
+![The workflow](docs/figures/workflow.svg)
+
 The owner approves once, at the spec page. Build and accept run as scripts without the owner,
-except for escalations. Roles and CLIs live in `harness.toml`. See `docs/workflow.md`.
+except for escalations. Roles and CLIs live in `harness.toml`. See [docs/workflow.md](docs/workflow.md).
 
 ---
 

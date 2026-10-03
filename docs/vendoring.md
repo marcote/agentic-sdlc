@@ -24,7 +24,7 @@ Always dry-run first — it prints exactly what each path will become before tou
 The layer you do not edit; re-running refreshes it (idempotent, authoritative):
 `.claude/{commands,skills,hooks,settings.json}`, `AGENTS.md`, `harness/`,
 `memory/constitution/base` + `update-checklist.md`, `memory/north-star/base`, `memory/stack/base`,
-`specs/_template`, `docs/workflow.md`, the scripts `spec.py`, `build.py`, `accept.py`,
+`specs/_template`, `docs/workflow.md`, `docs/figures`, the scripts `spec.py`, `build.py`, `accept.py`,
 `fake_agent.py`, `status.sh`, `north-star/engine.py`, `stack/engine.py` and `guards/`.
 
 ### SEED — customizable layer, stub if absent, **never clobbered**

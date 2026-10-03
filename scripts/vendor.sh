@@ -31,7 +31,7 @@ KEEP=(
   memory/constitution/base memory/constitution/update-checklist.md
   memory/north-star/base memory/stack/base
   specs/_template
-  docs/workflow.md
+  docs/workflow.md docs/figures
   scripts/spec.py scripts/build.py scripts/accept.py scripts/fake_agent.py
   scripts/north-star/engine.py scripts/stack/engine.py scripts/guards scripts/status.sh
 )
