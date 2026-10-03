@@ -98,8 +98,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tr>
 <td>E2</td>
 <td>a lesson that says <code>at most 25 words</code>, and the same constitution</td>
-<td>the lessons check runs</td>
-<td>no finding</td>
+<td>the test calls the stated-limit function <code>stated_limits</code> by name</td>
+<td>it returns no finding</td>
 </tr>
 <tr>
 <td>E3</td>
@@ -160,7 +160,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>T2</td>
-<td>curate <code>memory/lessons.md</code>: L8 says 25 words; merge L2 into L9; L4 names the test for C6, L6 names <code>tests/test_accept.py::test_e19_fails_twice_then_escalates</code>; add the id-collision lesson with the test for C2</td>
+<td>curate <code>memory/lessons.md</code>: L8 says 25 words; merge L2 into L9; L4 names the test for C6, L6 names <code>tests/test_accept.py::test_e19_fails_twice_then_escalates</code>; add the id-collision lesson with the test for C2; add the lesson: a negative example on code that exists must call the new behavior by name, or its test passes before implementation</td>
 <td>C3, C4, C5</td>
 <td>T1</td>
 </tr>
@@ -205,6 +205,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tr>
 <td>L6 counts as learned because accept always runs the whole suite.</td>
 <td>open</td>
+</tr>
+<tr>
+<td>Escalation T0, answered by the owner: E2's test must call <code>stated_limits</code> by name, so it fails before T3 builds it.</td>
+<td>decided</td>
 </tr>
 </tbody>
 </table>
