@@ -78,6 +78,11 @@ T1 = {**OK, "_write": {"calc.py": CALC_ADD}}
 T2 = {**OK, "_write": {"calc.py": CALC_BOTH}}
 
 
+def only_report(s):
+    lines = s.git("status", "--porcelain").splitlines()
+    return [l[3:] for l in lines] == ["specs/001-add/build-report.json"]
+
+
 def test_build_happy_path(slice_repo):
     slice_repo.script([T0, T1, T2])
     p = slice_repo.build()
@@ -137,6 +142,7 @@ def test_e15_budget(slice_repo):
     p = slice_repo.build()
     assert p.returncode == 3
     assert len(slice_repo.calls()) == 2
+    assert only_report(slice_repo)
     assert "budget exceeded" in slice_repo.report()["escalations"][-1]["reason"]
 
 
@@ -184,3 +190,33 @@ def test_build_refuses_main(slice_repo):
     slice_repo.git("checkout", "-q", "main")
     p = slice_repo.build()
     assert p.returncode == 2 and "main" in p.stderr
+
+
+def test_revert_drops_staged_code_of_escalated_task(slice_repo):
+    fix = {"verdict": "fix", "findings": ["R1 scope"], "tokens": 10}
+    t2_alone = {**OK, "_write": {"calc.py": "def sub(a, b):\n    return a - b\n"}}
+    slice_repo.script([T0, T1, T1, t2_alone], [PASS, fix, fix, PASS])
+    slice_repo.build()
+    r = slice_repo.report()
+    assert r["tasks"]["T1"]["status"] == "escalated" and r["tasks"]["T2"]["status"] == "done"
+    assert "def add" not in slice_repo.git("show", "HEAD:calc.py")
+    assert only_report(slice_repo)
+
+
+def test_blocked_new_deps_are_reported(slice_repo):
+    blocked = {**OK, "status": "blocked", "new_deps": ["edgartools"]}
+    slice_repo.script([T0, blocked, T2])
+    slice_repo.build()
+    r = slice_repo.report()
+    assert any(e["task"] == "T1" and "edgartools" in e["reason"] for e in r["escalations"])
+    assert r["new"] == ["edgartools"]
+
+
+def test_task_with_only_judged_examples_reaches_reviewer(slice_repo):
+    spec = slice_repo.dir / "spec.md"
+    spec.write_text(spec.read_text().replace("| real-enforcement | E1 |", "| real-enforcement | judged, rubric R1 |"))
+    slice_repo.git("commit", "-qam", "judged")
+    slice_repo.script([T0, OK, T2])
+    p = slice_repo.build()
+    assert p.returncode in (0, 3), p.stdout + p.stderr
+    assert slice_repo.report()["tasks"]["T1"]["status"] == "done"

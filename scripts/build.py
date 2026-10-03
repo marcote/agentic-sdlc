@@ -89,6 +89,7 @@ def changed_files():
 
 def revert():
     git("checkout", "--", ".")
+    git("reset", "-q", "--hard")  # also drops what `git add -A` staged before a reviewer call
     git("clean", "-fdq", "-e", ".fake_*")
 
 
@@ -101,6 +102,8 @@ def examples_of(task, s):
 
 
 def run_checks(cfg, examples):
+    if not examples:
+        return 0, "no examples selected"
     selector = " or ".join(f"{e.lower()}_" for e in examples) or "no_examples_selected"
     cmd = cfg["checks"]["task"].replace("{examples}", selector)
     p = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -147,6 +150,9 @@ def run_task(task, s, cfg, report, frozen, done_examples):
             structural = [a for a in res["assumptions"] if a["severity"] == "structural"]
             if res["status"] == "blocked" or structural:
                 reason = "; ".join(a["text"] for a in structural) or res["summary"] or "blocked"
+                if res["new_deps"]:
+                    reason += "; new dependency: " + ", ".join(res["new_deps"])
+                    report["new"] += res["new_deps"]
                 report["escalations"].append({"task": tid, "reason": reason})
                 entry["status"] = "blocked"
                 revert()
@@ -170,7 +176,7 @@ def run_task(task, s, cfg, report, frozen, done_examples):
                 report["reused"] += res["reused"]
                 report["new"] += res["new_deps"]
                 git("add", "-A")
-                git("commit", "-q", "-m", f"build({s['slice']}): {tid} {task['does'][:60]}")
+                git("commit", "-q", "--allow-empty", "-m", f"build({s['slice']}): {tid}{task['does'][:60]}")
                 entry["status"] = "done"
                 return "done"
         if norm(fail) == last or attempt == cfg["limits"]["attempts"]:
