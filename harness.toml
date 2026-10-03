@@ -14,8 +14,9 @@ call_seconds = 1800
 
 [checks]
 # {examples} expands to a pytest -k selector such as "e1_ or e2_".
+# task must print one PASSED, FAILED or ERROR line per test (pytest -rA): T0 reads each example from them.
 # task must run only the selected tests. No stack-neutral command can, so other stacks replace it.
-task = "uv run --python 3.12 --with pytest --with jsonschema --with markdown pytest tests -q -k '{examples}'"
+task = "uv run --python 3.12 --with pytest --with jsonschema --with markdown pytest tests -q -rA -k '{examples}'"
 suite = "uv run --python 3.12 --with pytest --with jsonschema --with markdown pytest tests -q && bash tests/run.sh"
 red_exit = 1
 

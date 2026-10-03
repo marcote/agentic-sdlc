@@ -118,12 +118,17 @@ def examples_of(task, s):
 
 
 def run_checks(cfg, examples):
+    code, out = run_raw(cfg, examples)
+    return code, out[-1500:]
+
+
+def run_raw(cfg, examples):
     if not examples:
         return 0, "no examples selected"
     selector = " or ".join(f"{e.lower()}_" for e in examples) or "no_examples_selected"
     cmd = cfg["checks"]["task"].replace("{examples}", selector)
     p = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    return p.returncode, (p.stdout + p.stderr)[-1500:]
+    return p.returncode, p.stdout + p.stderr
 
 
 def section(title, body):
@@ -228,14 +233,15 @@ def contract(s, cfg, report, ids):
         res, fail = call(cfg, "implementer", prompt_for("implementer", t0, s, cfg, feedback), report)
         if res:
             report["trace"].append("T0:checks")
+            code, out = run_raw(cfg, ids)  # one run; each example's result is read from the FAILED/ERROR lines
             for e in ids:
-                code, out = run_checks(cfg, [e])
-                if code == 0:
+                got = re.search(rf"^(PASSED|FAILED|ERROR) \S*test_{e.lower()}_", out, re.M)
+                if got and got[1] == "PASSED":
                     report["escalations"].append({"task": "T0", "reason": f"vacuous: {e} passes before implementation"})
                     revert()
                     return False
-                if code != cfg["checks"]["red_exit"]:
-                    fail = f"{e}: no failing test (exit {code})\n{out}"
+                if not got:
+                    fail = f"{e}: no failing test (exit {code})\n{out[-1500:]}"
                     break
         if not fail:
             report["trace"].append("T0:reviewer")
