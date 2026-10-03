@@ -20,3 +20,5 @@ One row per lesson. `learned`: its check exists. `captured`: judgment only, no c
 | L14 | Declare the test runner and its dependencies in the repo. Otherwise each implementer guesses the `uv run --with` list, and runs can differ. | none: judgment | 034-lesson-curation | 0 | 0 | captured |
 | L15 | A resumed build run that does no work must not overwrite the slice totals. Here top-level test_seconds reads 0.0, while the suite took 40.4 s. | none: judgment | 035-fast-tests | 0 | 0 | captured |
 | L16 | CI runs the same suite command as accept: the `[checks] suite` of `harness.toml`. CI has no test command of its own. | tests/test_fast_tests.py::test_e6_ci_runs_the_suite_command_of_harness_toml | 035-fast-tests | 0 | 0 | learned |
+| L17 | The vacuity check judges only the tests its task wrote. A test of other existing behavior that already passes is not vacuous, and it must not escalate. | none: judgment | 035-fast-tests | 0 | 0 | proposed |
+| L18 | A CI step that reads TOML with the runner's system python3 depends on Python 3.11 or later for tomllib. Pin the Python version, or run the step through uv. | none: judgment | 035-fast-tests | 0 | 0 | captured |
