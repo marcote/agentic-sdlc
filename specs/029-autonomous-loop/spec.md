@@ -287,4 +287,4 @@ The implementation plan is a separate document. The tasks follow this order. (de
 | Tasks run one at a time. Parallel tasks wait until sequential build is too slow. | decided |
 | Accept merges into the local `main`. It does not push. | decided |
 | The Claude Code Workflow tool is not used. It is not agnostic. | decided |
-| Which models fill which roles by default. | open |
+| Default roles: implementer on Claude Sonnet; reviewer and judge on Claude Opus. Codex is supported, not used. | decided |

@@ -4,7 +4,7 @@
 [roles]
 implementer = "claude"
 reviewer = "claude-ro"
-judge = "codex-ro"       # A7: the judge's family must differ from the implementer's
+judge = "claude-ro"      # A7: the judge's model (family) must differ from the implementer's
 
 [limits]
 attempts = 3
@@ -26,19 +26,19 @@ module_root = "src"
 
 # ponytail: cache reads (~1/10 the input price) are left out, so tokens are a raw count; weight them by price if the budget misfires.
 [cli.claude]
-family = "anthropic"
-cmd = ["claude", "-p", "--output-format", "json", "--json-schema", "{schema_json}",
+family = "claude-sonnet"
+cmd = ["claude", "-p", "--model", "sonnet", "--output-format", "json", "--json-schema", "{schema_json}",
        "--permission-mode", "acceptEdits", "--allowedTools", "Read", "Edit", "Write", "Bash(uv run:*)"]
 payload = "structured_output"
 tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens"]
 
 [cli.claude-ro]
-family = "anthropic"
-cmd = ["claude", "-p", "--output-format", "json", "--json-schema", "{schema_json}", "--permission-mode", "plan"]
+family = "claude-opus"
+cmd = ["claude", "-p", "--model", "opus", "--output-format", "json", "--json-schema", "{schema_json}", "--permission-mode", "plan"]
 payload = "structured_output"
 tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens"]
 
-# codex reports no token usage in its last message, so the budget cannot see it; build warns.
+# Supported, not used by default. codex reports no token usage in its last message, so the budget cannot see it; build warns.
 [cli.codex]
 family = "openai"
 cmd = ["codex", "exec", "--full-auto", "--output-schema", "{schema}", "--output-last-message", "{out}", "-"]
