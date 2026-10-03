@@ -1,0 +1,235 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec 035 — Fast tests</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1c2321;--mut:#5b6662;--rule:#d7ddd9;--acc:#0f5f6e;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#121615;--fg:#e4e9e6;--mut:#9aa6a1;--rule:#2d3533;--acc:#6cc3d1;--warn:#f0b65a;color-scheme:dark}}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:24px 16px}
+h1,h2,h3{text-wrap:balance} h2{border-top:1px solid var(--rule);padding-top:12px}
+#amendments{color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%}
+</style>
+<h1 id="spec-035-fast-tests">Spec 035 — Fast tests</h1>
+<p>Status: draft for gate H1. Labels: decided, hypothesis, open, reported.</p>
+<p>The pytest suite takes 78 s for 116 tests. A day earlier it had 19 tests. Most of the cost is process start: each script and each fake agent call starts through <code>uv run</code>, and T0 starts pytest once per example. Build runs tests many times per slice, so this cost grows with every slice. This slice measures test time, sets a budget, and cuts the start cost.</p>
+<h2 id="1-glossary">1. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>suite time</strong></td>
+<td>The seconds that the <code>[checks] suite</code> command takes in one accept run.</td>
+</tr>
+<tr>
+<td><strong>suite budget</strong></td>
+<td>The value <code>limits.suite_seconds</code> in <code>harness.toml</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-requirements">2. Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>requirement</th>
+<th>anchor</th>
+<th>examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>When accept writes the result page, the page shall show the <strong>suite time</strong> and the test time of each build run.</td>
+<td>measurable-impact</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>If the suite time is over the <strong>suite budget</strong>, then accept shall fail and name both numbers.</td>
+<td>measurable-impact</td>
+<td>E2</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>The tests and the fake adapter shall start scripts with the Python that runs them, not through <code>uv run</code>.</td>
+<td>measurable-impact</td>
+<td>E3</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>When T0 checks its tests, build shall run them in one test run and read each example's result.</td>
+<td>measurable-impact</td>
+<td>E4</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>The suite command shall run the pytest tests in parallel.</td>
+<td>measurable-impact</td>
+<td>E5</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>The test <code>test_revert_drops_staged_code_of_escalated_task</code> shall not depend on timing or test order.</td>
+<td>real-enforcement</td>
+<td>judged, rubric R1</td>
+</tr>
+</tbody>
+</table>
+<p>Rubric R1 (for S6): the fix names the root cause in its commit message. It adds no sleep, retry or skip.</p>
+<h2 id="3-examples">3. Examples</h2>
+<p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>given</th>
+<th>when</th>
+<th>then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>a slice whose build report has two runs with test times 12 s and 4 s</td>
+<td>accept writes the page</td>
+<td>the page has a <code>Suite</code> row with seconds, and a <code>Test time</code> row with <code>12 s, 4 s</code></td>
+</tr>
+<tr>
+<td>E2</td>
+<td><code>suite_seconds = 1</code>, and a suite with one test that sleeps 2 s</td>
+<td>accept runs</td>
+<td>exit 1; the output names <code>suite took</code> and <code>budget 1 s</code>; <code>main</code> is unchanged</td>
+</tr>
+<tr>
+<td>E3</td>
+<td><code>harness.toml</code> and <code>tests/conftest.py</code></td>
+<td>the test reads them</td>
+<td>the <code>fake</code> and <code>fake-judge</code> commands and the script helpers in <code>conftest.py</code> contain no <code>uv run</code></td>
+</tr>
+<tr>
+<td>E4</td>
+<td>a slice with examples E1 and E2, and a task command that appends one line to <code>.runs</code> each time it starts</td>
+<td>build runs T0</td>
+<td><code>.runs</code> has 1 line after T0</td>
+</tr>
+<tr>
+<td>E5</td>
+<td><code>harness.toml</code></td>
+<td>the test reads <code>[checks] suite</code></td>
+<td>it contains <code>-n auto</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-tests">4. Tests</h2>
+<p>Four kinds. Write no other kind.</p>
+<ul>
+<li>example: section 3, one test per example.</li>
+<li>invariant: the suite time stays under the suite budget. Accept checks it on every slice (S2).</li>
+<li>reconciliation: the suite time before this slice was 78 s for 116 tests, measured on 2026-10-03.</li>
+<li>e2e run: accept on this slice reports its own suite time.</li>
+</ul>
+<h2 id="5-plan">5. Plan</h2>
+<table>
+<thead>
+<tr>
+<th>task</th>
+<th>does</th>
+<th>requirements</th>
+<th>needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>tests and the fake adapter start scripts with the running Python (a <code>{python}</code> placeholder in <code>harness.toml</code>)</td>
+<td>S3</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>T0 runs all example tests in one run and reads each result from the runner output</td>
+<td>S4</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>the suite runs pytest with <code>-n auto</code>; tests that share a path or a port are made safe to run in parallel</td>
+<td>S5</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>accept measures the suite time and fails over <code>limits.suite_seconds = 30</code>; build records test time per run; the page shows both</td>
+<td>S1, S2</td>
+<td>T3</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>remove the root cause of the flaky revert test</td>
+<td>S6</td>
+<td>T3</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dep: pytest-xdist</td>
+<td>parallel test runs; the standard pytest plugin for it; no code of our own to keep</td>
+</tr>
+</tbody>
+</table>
+<h2 id="amendments">6. Amendments</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>target</th>
+<th>change</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>K1</td>
+<td>charter</td>
+<td>pin S3 allows <code>pytest-xdist</code> as a test-time dependency, through <code>uv run --with</code></td>
+<td>parallel runs cut suite time; tests only, never at runtime</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-assumptions-and-open-items">7. Assumptions and open items</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The suite runs in 20 s or less after this slice.</td>
+<td>hypothesis</td>
+</tr>
+<tr>
+<td>A budget of 30 s leaves room for growth and still fails fast.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>The flaky test fails from shared state or timing; T5 finds which.</td>
+<td>hypothesis</td>
+</tr>
+</tbody>
+</table>
