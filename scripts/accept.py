@@ -109,6 +109,10 @@ def main():
     if branch in ("main", "master"):
         print("accept: run it on the slice branch", file=sys.stderr)
         return 2
+    own = str((a.spec_dir / "build-report.json").resolve().relative_to(Path.cwd().resolve()))
+    if build.changed_files() - {".fake_log", ".fake_plan", own}:
+        print("accept: working tree is dirty; commit or stash first", file=sys.stderr)
+        return 2
     cfg = build.load_config(a.config)
     s = speclib.parse((a.spec_dir / "spec.md").read_text())
     s["slice"] = a.spec_dir.name
@@ -120,21 +124,24 @@ def main():
         if bad:  # A3: return to build once, with the failures as feedback
             fix = {"task": "FIX", "requirements": ", ".join(s["reqs"]),
                    "does": "Make accept pass. Failures:\n" + "\n".join(bad)}
-            build.run_task(fix, s, cfg, report, set(), [])
+            t0 = build.git("log", "--format=%H", "--grep", f"^build({s['slice']}): T0 ", "-n", "1").strip()
+            frozen = set(build.git("show", "--name-only", "--format=", t0).split()) if t0 else set()  # B2 holds on the return
+            build.run_task(fix, s, cfg, report, frozen, [])
             bad = failures(a.spec_dir, s, cfg, report, branch)
     except SystemExit as e:
         print(e, file=sys.stderr)
         return 2
     except build.Budget as b:
+        build.revert()
         bad = [str(b)]
     if bad:
         report["escalations"] += [{"task": "accept", "reason": x} for x in bad]
         rfile.write_text(json.dumps(report, indent=2))
-        print(f"ESCALATIONS ({len(bad)})")
-        print("\n".join(f"- {x}" for x in bad))
+        print(f"ESCALATIONS ({len(report['escalations'])})")  # includes what the return to build escalated
+        print("\n".join(f"- {e['task']}: {e['reason']}" for e in report["escalations"]))
         return 1
     result_page(a.spec_dir, report)
-    build.git("add", "-A")
+    build.git("add", str(a.spec_dir / "result.html"), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): verified")
     build.git("checkout", "-q", "main")
     m = subprocess.run(["git", "merge", "--no-ff", "-q", "-m", f"accept({a.spec_dir.name}): merge", branch],
@@ -145,7 +152,7 @@ def main():
         print(f"ESCALATIONS (1)\n- merge conflict: {m.stdout.strip() or m.stderr.strip()}")
         return 1
     write_back(a.spec_dir, cfg)
-    build.git("add", "-A")
+    build.git("add", cfg["paths"]["north_star"])
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): results reported")
     print(f"accept: merged {branch} into main")
     return 0

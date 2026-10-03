@@ -96,3 +96,47 @@ def test_accept_merge_conflict(slice_repo):
     assert p.returncode == 1 and "merge conflict" in p.stdout
     assert slice_repo.git("rev-parse", "main") == main_before
     assert slice_repo.git("status", "--porcelain") == ""
+
+
+FAIL_E1 = "def test_e1_add():\n    assert False\n"
+DONE = {"status": "done", "summary": "", "assumptions": [], "reused": [], "new_deps": []}
+
+
+def test_accept_budget_stop_reverts(slice_repo):
+    ready(slice_repo, test_body=FAIL_E1)
+    cfg = (slice_repo.root / "harness.toml").read_text().replace("budget_tokens = 3_000_000", "budget_tokens = 5")
+    (slice_repo.root / "harness.toml").write_text(cfg)
+    slice_repo.git("add", "-A")
+    slice_repo.git("commit", "-q", "-m", "budget")
+    slice_repo.script([{**DONE, "tokens": 10, "_write": {"calc.py": "x = 2\n"}}])
+    p = slice_repo.accept()
+    assert p.returncode == 1, p.stdout + p.stderr
+    assert slice_repo.git("status", "--porcelain").split() == ["M", "specs/001-add/build-report.json"]
+    assert slice_repo.git("branch", "--show-current").strip() == "001-add"
+
+
+def test_accept_dirty_tree_refused(slice_repo):
+    ready(slice_repo)
+    (slice_repo.root / "stray.txt").write_text("x")
+    assert slice_repo.accept().returncode == 2
+    assert (slice_repo.root / "stray.txt").exists()
+
+
+def test_accept_green_leaves_clean_tree(slice_repo):
+    ready(slice_repo)
+    assert slice_repo.accept().returncode == 0
+    assert slice_repo.git("status", "--porcelain") == ""
+
+
+def test_accept_fix_cannot_change_frozen_test(slice_repo):
+    ready(slice_repo, test_body=FAIL_E1)
+    slice_repo.git("reset", "-q", "--soft", "HEAD~1")  # split ready()'s commit into T0 (the test) and T1
+    slice_repo.git("reset", "-q")
+    slice_repo.git("add", "tests/test_e1_add.py")
+    slice_repo.git("commit", "-q", "-m", "build(001-add): T0 contract")
+    slice_repo.git("add", "-A")
+    slice_repo.git("commit", "-q", "-m", "build(001-add): T1 add")
+    slice_repo.script([{**DONE, "_write": {"tests/test_e1_add.py": "def test_e1_add():\n    pass\n"}}])
+    p = slice_repo.accept()
+    assert p.returncode == 1
+    assert "frozen test changed" in p.stdout
