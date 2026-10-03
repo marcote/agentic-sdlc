@@ -36,7 +36,7 @@ rm -rf "$T"
 # --- KEEP-COPIED: governance copied verbatim (incl. the 006 engine) ---
 T=$(mk)
 have && bash "$VENDOR" --apply "$T" >/tmp/v_out 2>&1
-if have && [ -f "$T/.claude/commands/align.md" ] && [ -f "$T/scripts/north-star/engine.py" ] \
+if have && [ -f "$T/.claude/commands/spec.md" ] && [ -f "$T/scripts/north-star/engine.py" ] \
    && [ -f "$T/memory/constitution/base/principles.md" ]; then
   _pass "KEEP-COPIED: .claude/commands + engine.py + constitution/base present"
 else
@@ -48,10 +48,10 @@ rm -rf "$T"
 T=$(mk)
 if have; then
   bash "$VENDOR" --apply "$T" >/dev/null 2>&1
-  echo "TAMPERED" > "$T/.claude/commands/align.md"
+  echo "TAMPERED" > "$T/.claude/commands/spec.md"
   bash "$VENDOR" --apply "$T" >/dev/null 2>&1
 fi
-if have && [ -f "$T/.claude/commands/align.md" ] && ! grep -q "TAMPERED" "$T/.claude/commands/align.md"; then
+if have && [ -f "$T/.claude/commands/spec.md" ] && ! grep -q "TAMPERED" "$T/.claude/commands/spec.md"; then
   _pass "KEEP-OVERWRITE: re-apply restores governance (idempotent, authoritative)"
 else
   _fail "KEEP-OVERWRITE: modified KEEP file not overwritten"

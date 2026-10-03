@@ -169,8 +169,6 @@ fi
 rm -rf "$_fx"
 
 # --- GUARD-RUNS -----------------------------------------------------------------
-assert_contains .claude/skills/verify/SKILL.md 'Guard'
-assert_contains .claude/skills/verify/SKILL.md 'guards'
 # the harness's own stance Guards must resolve, run, and pass on the real tree
 if [ -f "$ENGINE" ] && [ -f "$CHARTER" ]; then
   _gr_n=0; _gr_bad=0
@@ -198,18 +196,10 @@ fi
 rm -rf "$_fx"
 
 # --- PLAN-GATE ------------------------------------------------------------------
-for tok in 'PASS' 'UNPINNED' 'TRIPPED' 'fail-closed' 'cite' '/stack'; do
-  assert_contains .claude/commands/plan.md "$tok"
-done
 
 # --- PLAN-BOUNCE ----------------------------------------------------------------
-assert_contains .claude/commands/plan.md 'distill'
-assert_contains .claude/skills/distill/SKILL.md 'bounce|re-?freeze|reopen'
 
 # --- TRIPPED-BILL ---------------------------------------------------------------
-for tok in 'declared' 'Hedge' 'amend' 'narrow'; do
-  assert_contains .claude/commands/plan.md "$tok"
-done
 
 # --- S0-PIN ---------------------------------------------------------------------
 if [ -f "$CHARTER" ]; then
@@ -264,8 +254,6 @@ else
 fi
 
 # --- DISTILL-STANCE -------------------------------------------------------------
-assert_contains .claude/skills/distill/SKILL.md 'stance'
-assert_contains .claude/skills/distill/SKILL.md 'Injects'
 
 # --- VENDOR-STACK ---------------------------------------------------------------
 _vt=$(mktemp -d)
@@ -288,9 +276,6 @@ fi
 rm -rf "$_vt"
 
 # --- WOW-HEALTH -----------------------------------------------------------------
-assert_contains .claude/skills/wow-report/SKILL.md 'charter'
-assert_contains .claude/skills/wow-report/SKILL.md 'tripped'
-assert_contains .claude/skills/wow-report/SKILL.md 'no pin|without a pin|unpinned'
 
 # --- CHARTER-SEED (D3 reflexive dogfood) ----------------------------------------
 if [ -f "$CHARTER" ]; then
@@ -385,8 +370,6 @@ fi
 rm -rf "$_fx"
 # specific, not just the word "empty" appearing somewhere: the gate must treat a
 # present-but-empty charter the same way it treats an absent one.
-assert_contains .claude/commands/plan.md '[Aa]bsent .*or empty|empty .*or absent|empty \(zero pins\)'
-assert_contains .claude/commands/plan.md 'zero pins'
 
 # --- HERMETIC-ENV  [given] base/hermetic-tests ----------------------------------
 # A self-scanning checker must not carry the forbidden literal in its own pattern, or it

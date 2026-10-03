@@ -13,6 +13,13 @@ it is **dropped with a reason**. Silence is not a disposition.
 
 ---
 
+## ~~B19-028~~ — Suite hermeticity (`specs/028-suite-hermeticity`)
+
+**Status: DROPPED 2026-10-02.** Spec 029 deletes the suite that 028 would isolate. The surviving
+shell checks and the new pytest suite build their evidence inside `tmp_path`.
+
+---
+
 ## ~~B1~~ — A mechanical meta-check for vacuous assertions
 
 **Status: PROMOTED 2026-08-09 → `specs/015-non-vacuous-checks/`** · Raised: 013 + 014 retros,
