@@ -97,6 +97,8 @@ def revert():
     git("checkout", "--", ".")
     git("reset", "-q", "--hard")  # also drops what `git add -A` staged before a reviewer call
     git("clean", "-fdq", "-e", ".fake_*")
+    # a reverted source rewritten in the same second with the same size would reuse its stale .pyc
+    git("clean", "-fdXq", "--", ":(glob)**/__pycache__")
 
 
 def done_on_branch(slice_name):
