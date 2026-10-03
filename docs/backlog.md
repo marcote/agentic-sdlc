@@ -552,6 +552,38 @@ mutation, it is a **stale** one, and the diagnosis should say which. This is the
 The second is procedural and therefore weaker: run the full set before pushing. That is a rule of
 the shape this repository has measured three times as not sticking.
 
+## B23 — 029 deferred minors
+
+**Status:** open · **Raised:** 2026-10-03 (029 final review) · **Size:** small each
+
+The final review of 029 found these. None blocks a slice. Each is one line here, and one fix later.
+
+- `spec.py`: the anchor check matches a substring, not a whole north-star item.
+- `spec.py`: the malformed-row check covers only requirement rows.
+- `spec.py`: `tables()` resets the current heading inside code fences.
+- `build.py`: `{harness}` was replaced in prompt text too; I4 moved the prompt to stdin, so only argv is substituted now.
+- `build.py`, `accept.py`: unused imports.
+- `contract()` lacks the blocked rule and the same-failure rule that `run_task()` has.
+- `main()` crashes on `ValueError` or `CalledProcessError` instead of exiting 2.
+- `revert()` acts only on the current subdirectory when build runs below the repo root.
+- `git status --porcelain` is read without `-z`, so quoted paths break.
+- Test-config files (`pytest.ini`, `conftest.py` outside `tests/`) bypass the frozen check.
+- The frozen-test restore reads the index, not HEAD.
+- `master` passes the branch guard, but accept hardcodes `main`.
+- After a FIX task escalates, accept pays the judge a second time.
+- Lead time raises `ValueError` when `started` is empty.
+- `test_accept.py` has gaps: judge fail path, write-back with no north star, re-run after escalation.
+- `accept.py` computes its own report path with `relative_to(cwd)`, which fails outside the repo root.
+- The E24 test checks words in the template, not the structure.
+- `check_92` passes with empty headers.
+- The north-star mission prose has sentence fragments.
+- Interventions are undercounted across build re-runs.
+- Accept does not re-run the suite on the merge result.
+- Runtime code exempts `.fake_*` files that only tests create.
+- `status.sh` marks build ✓ after an escalated run.
+- A1: nothing checks that the suite holds all four test kinds.
+- A6: accept writes the result page only when it merges, not when it escalates. This deviates from the spec.
+
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_
