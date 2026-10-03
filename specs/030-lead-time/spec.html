@@ -1,0 +1,257 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec 030 — Lead time by phase</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1c2321;--mut:#5b6662;--rule:#d7ddd9;--acc:#0f5f6e;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#121615;--fg:#e4e9e6;--mut:#9aa6a1;--rule:#2d3533;--acc:#6cc3d1;--warn:#f0b65a;color-scheme:dark}}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:24px 16px}
+h1,h2,h3{text-wrap:balance} h2{border-top:1px solid var(--rule);padding-top:12px}
+#amendments{color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%}
+</style>
+<h1 id="spec-030-lead-time-by-phase">Spec 030 — Lead time by phase</h1>
+<p>Status: draft for gate H1. Labels: decided, hypothesis, open, reported.</p>
+<p>The result page of spec 029 said 1.7 h. It counted from the first spec commit, so it missed the design talk. It also mixed the owner's time with the agents' time. This slice measures from the brief to the merge, by phase, from git alone.</p>
+<p>It also closes two B23 minors that can silently break build re-runs.</p>
+<p><img alt="The phases of a slice" src="lead-time.svg" /></p>
+<h2 id="1-glossary">1. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>lead time</strong></td>
+<td>The time from the commit that adds the slice's <code>brief.md</code> to the accept run.</td>
+</tr>
+<tr>
+<td><strong>phase</strong></td>
+<td>One part of the lead time between two marker commits: brief to gate H1, gate H1 to build, build to accept.</td>
+</tr>
+<tr>
+<td><strong>H1 marker</strong></td>
+<td>The commit with subject <code>spec(&lt;slice&gt;): approved at H1</code>. The spec step makes it when the owner approves.</td>
+</tr>
+<tr>
+<td><strong>late example</strong></td>
+<td>An example in <code>spec.md</code> that no frozen test names.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-requirements">2. Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>requirement</th>
+<th>anchor</th>
+<th>examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>When accept writes the result page, accept shall measure the <strong>lead time</strong> from the commit that adds the slice's brief.</td>
+<td>measurable-impact</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>When accept writes the result page, the page shall show the duration of each <strong>phase</strong>.</td>
+<td>measurable-impact</td>
+<td>E2</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>If a phase has no marker commit, then the page shall show that phase as unknown and keep the others.</td>
+<td>measurable-impact</td>
+<td>E3</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>If the slice has no brief commit, then accept shall measure from the first branch commit and say so.</td>
+<td>measurable-impact</td>
+<td>E4</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>When the owner approves the spec page, the spec step shall commit the <strong>H1 marker</strong>.</td>
+<td>measurable-impact</td>
+<td>E5</td>
+</tr>
+<tr>
+<td>G1</td>
+<td>While git sets <code>grep.patternType=extended</code>, build shall still find the slice's T0 commits.</td>
+<td>real-enforcement</td>
+<td>E6</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>When build runs and the spec has a <strong>late example</strong>, build shall write a failing test for it before any task runs.</td>
+<td>real-enforcement</td>
+<td>E7</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>When build commits tests for a late example, build shall freeze them together with the earlier frozen tests.</td>
+<td>real-enforcement</td>
+<td>E8</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-examples">3. Examples</h2>
+<p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>. Times are committer dates.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>given</th>
+<th>when</th>
+<th>then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>the brief commit is dated 3 hours before accept runs</td>
+<td>accept writes the page</td>
+<td>the page shows <code>Lead time 3.0 h</code></td>
+</tr>
+<tr>
+<td>E2</td>
+<td>brief commit at 2026-10-02T10:00:00Z, H1 marker at 11:00:00Z, last build commit at 13:30:00Z</td>
+<td>accept writes the page</td>
+<td>the page shows <code>Brief → H1 1.0 h</code> and <code>H1 → build 2.5 h</code>, and a <code>Build → accept</code> row</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>brief commit and build commits, and no H1 marker</td>
+<td>accept writes the page</td>
+<td><code>Brief → H1 unknown</code> and <code>H1 → build unknown</code>; <code>Lead time</code> still shows hours</td>
+</tr>
+<tr>
+<td>E4</td>
+<td>no brief commit; the first branch commit is dated 2 hours before accept runs</td>
+<td>accept writes the page</td>
+<td>the page shows <code>Lead time 2.0 h (from first commit)</code></td>
+</tr>
+<tr>
+<td>E5</td>
+<td>the file <code>harness/steps/spec.md</code></td>
+<td>the owner reads its approval step</td>
+<td>it names the commit subject <code>spec(&lt;slice&gt;): approved at H1</code></td>
+</tr>
+<tr>
+<td>E6</td>
+<td><code>git config grep.patternType extended</code>; T0 committed; T1 escalated in run 1</td>
+<td>build runs again</td>
+<td>no T0 implementer call is made, and T1 is done</td>
+</tr>
+<tr>
+<td>E7</td>
+<td>T0 committed tests for E1; then <code>spec.md</code> gains E2, committed</td>
+<td>build runs again</td>
+<td>one T0 implementer call names only E2; <code>test_e2_</code> fails before T2 runs; a commit <code>build(&lt;slice&gt;): T0 tests for E2</code> exists</td>
+</tr>
+<tr>
+<td>E8</td>
+<td>the run of E7 finished</td>
+<td>a later task changes <code>tests/test_e2_sub.py</code></td>
+<td>build rejects it with <code>frozen test changed: tests/test_e2_sub.py</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-tests">4. Tests</h2>
+<p>Four kinds. Write no other kind.</p>
+<ul>
+<li>example: section 3, one test per example.</li>
+<li>invariant: build never runs a task while a late example has no failing test. E7 checks it on every re-run path.</li>
+<li>reconciliation: none. No published value exists for a lead time.</li>
+<li>e2e run: the fake-agent build and accept tests in <code>tests/test_build.py</code> and <code>tests/test_accept.py</code>.</li>
+</ul>
+<p>A test may use recorded real data. A test does not mock the project's own code.</p>
+<h2 id="5-plan">5. Plan</h2>
+<table>
+<thead>
+<tr>
+<th>task</th>
+<th>does</th>
+<th>requirements</th>
+<th>needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td><code>done_on_branch</code> in <code>scripts/build.py</code>: pass <code>--basic-regexp</code>, and take the frozen set from every T0 commit of the slice</td>
+<td>G1</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>build finds late examples from the frozen test files, and runs task 0 for them alone before any task</td>
+<td>G2, G3</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T3</td>
+<td><code>result_page</code> in <code>scripts/accept.py</code>: lead time from the brief commit, and one row per phase</td>
+<td>L1, L2, L3, L4</td>
+<td></td>
+</tr>
+<tr>
+<td>T4</td>
+<td><code>harness/steps/spec.md</code> step 6: commit the H1 marker after approval</td>
+<td>L5</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>No new module and no new library.</p>
+<h2 id="amendments">6. Amendments</h2>
+<p>None.</p>
+<h2 id="7-assumptions-and-open-items">7. Assumptions and open items</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase times come from committer dates, so a rebase moves them.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>The build phase ends at the last <code>build(&lt;slice&gt;):</code> commit.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>A frozen test names its example as <code>test_&lt;id&gt;_</code> in the file text.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>This is the first slice built with real agents. The token budget of 3,000,000 may trip.</td>
+<td>hypothesis</td>
+</tr>
+</tbody>
+</table>
