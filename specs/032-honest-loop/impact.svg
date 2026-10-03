@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1046" height="449" viewBox="0 0 1046 449" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<metadata id="figure-spec"><![CDATA[{"props":{"speed":2200,"layout":{"gap":44,"children":[{"id":"spec","label":"spec.md","sub":"removes table","shape":"store","width":220,"lines":2},{"id":"lint","label":"Lint","sub":"git grep each removed path","width":210,"lines":2},{"id":"live","label":"Repo","direction":"column","gap":18,"children":[{"id":"stack","label":"memory/stack/stack.md","sub":"pin S1 · Guard","shape":"store","width":230,"lines":1},{"id":"hist","label":"specs/015-…","sub":"history: ignored","shape":"store","width":230,"lines":1}]},{"id":"h1","label":"Gate H1","shape":"decision"}]},"edges":[{"id":"read","from":"spec","to":"lint","label":"removes"},{"id":"g1","from":"lint","to":"stack","label":"grep"},{"id":"g2","from":"lint","to":"hist","label":"grep","quiet":true},{"id":"page","from":"lint","to":"h1","label":"spec page","around":"below","quiet":true}],"steps":[{"label":"Slice 031, checked by machine","flow":[{"edges":[{"edge":"read","data":"scripts/guards/no-prescribe.sh"}],"show":{"spec":[{"tag":"removes","tone":"orange","text":"scripts/guards/no-prescribe.sh"}]},"say":"Spec 031 deleted pin S1's guard. Its delete list came from reading, not from tracing."},{"edges":[{"edge":"g1","data":"no-prescribe"}],"show":{"stack":[{"tag":"refers","tone":"orange","text":"Guard: bash scripts/guards/no-prescribe.sh"}]},"say":"The lint greps every live file for the path and for its last segment."},{"edges":[{"edge":"g2","data":"no-prescribe"}],"show":{"hist":[{"text":"history","meta":"not counted"}]},"say":"History paths do not count. They come from the same list the stale-name check uses."},{"show":{"lint":[{"tag":"finding","tone":"orange","text":"referred by memory/stack/stack.md","mark":"✗"}]},"say":"The spec does not name stack.md, so the lint fails. The page for gate H1 is never written."}]},{"label":"The spec names the referrer","flow":[{"edges":[{"edge":"read","data":"removes + stack.md: keep Guard"}],"show":{"spec":[{"tag":"names","tone":"green","text":"memory/stack/stack.md: S1 keeps its guard"}]},"say":"The author decides about each referrer, in the spec, before the owner reads it."},{"edges":["g1",{"edge":"page","data":"spec.html"}],"show":{"lint":[{"text":"clean","mark":"✓"}]},"say":"Now the owner approves a delete list the machine built, not one the agent remembered."}]}]}}]]></metadata>
+<style>
+svg { --accent:#0074d9; --fg:#1c1e21; --muted:#606770; --bg:#ffffff; --surface:#f5f7fa; --border:#d0d7de; --card-on:#eef5fd; }
+@media (prefers-color-scheme: dark) { svg { --accent:#3396e8; --fg:#e3e3e3; --muted:#9aa0a6; --bg:#1b1b1d; --surface:#242526; --border:#3a3b3c; --card-on:#1d2733; } }
+.label { fill: var(--fg); font-size: 14px; font-weight: 500; text-anchor: middle; }
+.sub { fill: var(--muted); font-size: 12px; text-anchor: middle; }
+.frame { fill: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+.edgelabel { fill: var(--muted); font-size: 11px; text-anchor: middle; font-family: ui-monospace, Menlo, monospace; }
+.row { fill: var(--fg); font-size: 11px; }
+.row.mono { font-size: 10.5px; font-family: ui-monospace, Menlo, monospace; }
+.muted { fill: var(--muted); }
+.tag { font-size: 9px; font-weight: 600; letter-spacing: .03em; text-anchor: middle; }
+.mark { fill: var(--accent); font-size: 11px; font-weight: 600; text-anchor: end; }
+.chip { fill: #fff; font-size: 11.5px; text-anchor: middle; }
+.steplabel { fill: var(--fg); font-size: 13px; font-weight: 600; text-anchor: middle; font-family: ui-monospace, Menlo, monospace; }
+.caption { fill: var(--muted); font-size: 13.5px; text-anchor: middle; }
+@keyframes a0 { 0%,11.1% { stroke: var(--accent) } 11.1%,22.2% { stroke: var(--accent) } 22.2%,33.3% { stroke: var(--accent) } 33.3%,61.1% { stroke: var(--accent) } 61.1%,72.2% { stroke: var(--accent) } 72.2%,100% { stroke: var(--accent) } }
+.a0 { animation: a0 15.8s infinite step-end; }
+@keyframes a1 { 0%,11.1% { stroke: var(--accent); fill: var(--card-on) } 11.1%,22.2% { stroke: var(--accent); fill: var(--card-on) } 22.2%,33.3% { stroke: var(--accent); fill: var(--card-on) } 33.3%,61.1% { stroke: var(--accent); fill: var(--card-on) } 61.1%,72.2% { stroke: var(--accent); fill: var(--card-on) } 72.2%,100% { stroke: var(--accent); fill: var(--card-on) } }
+.a1 { animation: a1 15.8s infinite step-end; }
+@keyframes a2 { 0%,11.1% { opacity: 1 } 11.1%,22.2% { opacity: 1 } 22.2%,33.3% { opacity: 1 } 33.3%,61.1% { opacity: 1 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a2 { animation: a2 15.8s infinite step-end; }
+@keyframes a3 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 1 } 72.2%,100% { opacity: 1 } }
+.a3 { animation: a3 15.8s infinite step-end; }
+@keyframes a4 { 0%,11.1% { stroke: var(--border); fill: var(--surface) } 11.1%,22.2% { stroke: var(--border); fill: var(--surface) } 22.2%,33.3% { stroke: var(--border); fill: var(--surface) } 33.3%,61.1% { stroke: var(--accent); fill: var(--card-on) } 61.1%,72.2% { stroke: var(--border); fill: var(--surface) } 72.2%,100% { stroke: var(--accent); fill: var(--card-on) } }
+.a4 { animation: a4 15.8s infinite step-end; }
+@keyframes a5 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 1 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a5 { animation: a5 15.8s infinite step-end; }
+@keyframes a6 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 1 } }
+.a6 { animation: a6 15.8s infinite step-end; }
+@keyframes a7 { 0%,11.1% { opacity: 1 } 11.1%,22.2% { opacity: 1 } 22.2%,33.3% { opacity: 1 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 1 } 72.2%,100% { opacity: 0 } }
+.a7 { animation: a7 15.8s infinite step-end; }
+@keyframes a8 { 0%,11.1% { stroke: var(--border) } 11.1%,22.2% { stroke: var(--accent) } 22.2%,33.3% { stroke: var(--accent) } 33.3%,61.1% { stroke: var(--accent) } 61.1%,72.2% { stroke: var(--border) } 72.2%,100% { stroke: var(--accent) } }
+.a8 { animation: a8 15.8s infinite step-end; }
+@keyframes a9 { 0%,11.1% { stroke: var(--border); fill: var(--surface) } 11.1%,22.2% { stroke: var(--accent); fill: var(--card-on) } 22.2%,33.3% { stroke: var(--accent); fill: var(--card-on) } 33.3%,61.1% { stroke: var(--accent); fill: var(--card-on) } 61.1%,72.2% { stroke: var(--border); fill: var(--surface) } 72.2%,100% { stroke: var(--border); fill: var(--surface) } }
+.a9 { animation: a9 15.8s infinite step-end; }
+@keyframes a10 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 1 } 22.2%,33.3% { opacity: 1 } 33.3%,61.1% { opacity: 1 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a10 { animation: a10 15.8s infinite step-end; }
+@keyframes a11 { 0%,11.1% { opacity: 1 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 1 } 72.2%,100% { opacity: 1 } }
+.a11 { animation: a11 15.8s infinite step-end; }
+@keyframes a12 { 0%,11.1% { stroke: var(--border) } 11.1%,22.2% { stroke: var(--border) } 22.2%,33.3% { stroke: var(--accent) } 33.3%,61.1% { stroke: var(--accent) } 61.1%,72.2% { stroke: var(--border) } 72.2%,100% { stroke: var(--border) } }
+.a12 { animation: a12 15.8s infinite step-end; }
+@keyframes a13 { 0%,11.1% { stroke: var(--border); fill: var(--surface) } 11.1%,22.2% { stroke: var(--border); fill: var(--surface) } 22.2%,33.3% { stroke: var(--accent); fill: var(--card-on) } 33.3%,61.1% { stroke: var(--accent); fill: var(--card-on) } 61.1%,72.2% { stroke: var(--border); fill: var(--surface) } 72.2%,100% { stroke: var(--border); fill: var(--surface) } }
+.a13 { animation: a13 15.8s infinite step-end; }
+@keyframes a14 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 1 } 33.3%,61.1% { opacity: 1 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a14 { animation: a14 15.8s infinite step-end; }
+@keyframes a15 { 0%,11.1% { opacity: 1 } 11.1%,22.2% { opacity: 1 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 1 } 72.2%,100% { opacity: 1 } }
+.a15 { animation: a15 15.8s infinite step-end; }
+@keyframes a16 { 0%,11.1% { stroke: var(--border) } 11.1%,22.2% { stroke: var(--border) } 22.2%,33.3% { stroke: var(--border) } 33.3%,61.1% { stroke: var(--border) } 61.1%,72.2% { stroke: var(--border) } 72.2%,100% { stroke: var(--accent) } }
+.a16 { animation: a16 15.8s infinite step-end; }
+@keyframes a17 { 0%,11.1% { stroke: var(--accent); stroke-width: 2 } 11.1%,22.2% { stroke: var(--accent); stroke-width: 2 } 22.2%,33.3% { stroke: var(--accent); stroke-width: 2 } 33.3%,61.1% { stroke: var(--accent); stroke-width: 2 } 61.1%,72.2% { stroke: var(--accent); stroke-width: 2 } 72.2%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a17 { animation: a17 15.8s infinite step-end; }
+@keyframes a18 { 0%,11.1% { fill: var(--accent); stroke: var(--accent) } 11.1%,22.2% { fill: var(--accent); stroke: var(--accent) } 22.2%,33.3% { fill: var(--accent); stroke: var(--accent) } 33.3%,61.1% { fill: var(--accent); stroke: var(--accent) } 61.1%,72.2% { fill: var(--accent); stroke: var(--accent) } 72.2%,100% { fill: var(--accent); stroke: var(--accent) } }
+.a18 { animation: a18 15.8s infinite step-end; }
+@keyframes a19 { 0%,11.1% { fill: #fff } 11.1%,22.2% { fill: #fff } 22.2%,33.3% { fill: #fff } 33.3%,61.1% { fill: #fff } 61.1%,72.2% { fill: #fff } 72.2%,100% { fill: #fff } }
+.a19 { animation: a19 15.8s infinite step-end; }
+@keyframes a20 { 0%,11.1% { stroke: var(--muted); stroke-width: 1.25 } 11.1%,22.2% { stroke: var(--accent); stroke-width: 2 } 22.2%,33.3% { stroke: var(--accent); stroke-width: 2 } 33.3%,61.1% { stroke: var(--accent); stroke-width: 2 } 61.1%,72.2% { stroke: var(--muted); stroke-width: 1.25 } 72.2%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a20 { animation: a20 15.8s infinite step-end; }
+@keyframes a21 { 0%,11.1% { fill: var(--bg); stroke: var(--border) } 11.1%,22.2% { fill: var(--accent); stroke: var(--accent) } 22.2%,33.3% { fill: var(--accent); stroke: var(--accent) } 33.3%,61.1% { fill: var(--accent); stroke: var(--accent) } 61.1%,72.2% { fill: var(--bg); stroke: var(--border) } 72.2%,100% { fill: var(--accent); stroke: var(--accent) } }
+.a21 { animation: a21 15.8s infinite step-end; }
+@keyframes a22 { 0%,11.1% { fill: var(--muted) } 11.1%,22.2% { fill: #fff } 22.2%,33.3% { fill: #fff } 33.3%,61.1% { fill: #fff } 61.1%,72.2% { fill: var(--muted) } 72.2%,100% { fill: #fff } }
+.a22 { animation: a22 15.8s infinite step-end; }
+@keyframes a23 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 1 } 33.3%,61.1% { opacity: 1 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a23 { animation: a23 15.8s infinite step-end; }
+@keyframes a24 { 0%,11.1% { stroke: var(--muted); stroke-width: 1.25 } 11.1%,22.2% { stroke: var(--muted); stroke-width: 1.25 } 22.2%,33.3% { stroke: var(--accent); stroke-width: 2 } 33.3%,61.1% { stroke: var(--accent); stroke-width: 2 } 61.1%,72.2% { stroke: var(--muted); stroke-width: 1.25 } 72.2%,100% { stroke: var(--muted); stroke-width: 1.25 } }
+.a24 { animation: a24 15.8s infinite step-end; }
+@keyframes a25 { 0%,11.1% { fill: var(--bg); stroke: var(--border) } 11.1%,22.2% { fill: var(--bg); stroke: var(--border) } 22.2%,33.3% { fill: var(--accent); stroke: var(--accent) } 33.3%,61.1% { fill: var(--accent); stroke: var(--accent) } 61.1%,72.2% { fill: var(--bg); stroke: var(--border) } 72.2%,100% { fill: var(--bg); stroke: var(--border) } }
+.a25 { animation: a25 15.8s infinite step-end; }
+@keyframes a26 { 0%,11.1% { fill: var(--muted) } 11.1%,22.2% { fill: var(--muted) } 22.2%,33.3% { fill: #fff } 33.3%,61.1% { fill: #fff } 61.1%,72.2% { fill: var(--muted) } 72.2%,100% { fill: var(--muted) } }
+.a26 { animation: a26 15.8s infinite step-end; }
+@keyframes a27 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 1 } }
+.a27 { animation: a27 15.8s infinite step-end; }
+@keyframes a28 { 0%,11.1% { stroke: var(--muted); stroke-width: 1.25 } 11.1%,22.2% { stroke: var(--muted); stroke-width: 1.25 } 22.2%,33.3% { stroke: var(--muted); stroke-width: 1.25 } 33.3%,61.1% { stroke: var(--muted); stroke-width: 1.25 } 61.1%,72.2% { stroke: var(--muted); stroke-width: 1.25 } 72.2%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a28 { animation: a28 15.8s infinite step-end; }
+@keyframes a29 { 0%,11.1% { fill: var(--bg); stroke: var(--border) } 11.1%,22.2% { fill: var(--bg); stroke: var(--border) } 22.2%,33.3% { fill: var(--bg); stroke: var(--border) } 33.3%,61.1% { fill: var(--bg); stroke: var(--border) } 61.1%,72.2% { fill: var(--bg); stroke: var(--border) } 72.2%,100% { fill: var(--accent); stroke: var(--accent) } }
+.a29 { animation: a29 15.8s infinite step-end; }
+@keyframes a30 { 0%,11.1% { fill: var(--muted) } 11.1%,22.2% { fill: var(--muted) } 22.2%,33.3% { fill: var(--muted) } 33.3%,61.1% { fill: var(--muted) } 61.1%,72.2% { fill: var(--muted) } 72.2%,100% { fill: #fff } }
+.a30 { animation: a30 15.8s infinite step-end; }
+@keyframes p0 { 0%,0% { opacity: 0 } 0%,11.1% { opacity: 1 } 11.1%,100% { opacity: 0 } }
+.p0 { animation: p0 15.8s infinite step-end; }
+@keyframes p1 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 1 } 22.2%,100% { opacity: 0 } }
+.p1 { animation: p1 15.8s infinite step-end; }
+@keyframes p2 { 0%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 1 } 33.3%,100% { opacity: 0 } }
+.p2 { animation: p2 15.8s infinite step-end; }
+@keyframes p3 { 0%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 1 } 72.2%,100% { opacity: 0 } }
+.p3 { animation: p3 15.8s infinite step-end; }
+@keyframes p4 { 0%,72.2% { opacity: 0 } 72.2%,83.3% { opacity: 1 } 83.3%,100% { opacity: 0 } }
+.p4 { animation: p4 15.8s infinite step-end; }
+@keyframes p5 { 0%,72.2% { opacity: 0 } 72.2%,83.3% { opacity: 1 } 83.3%,100% { opacity: 0 } }
+.p5 { animation: p5 15.8s infinite step-end; }
+@keyframes a31 { 0%,11.1% { opacity: 1 } 11.1%,22.2% { opacity: 1 } 22.2%,33.3% { opacity: 1 } 33.3%,61.1% { opacity: 1 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a31 { animation: a31 15.8s infinite step-end; }
+@keyframes a32 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 1 } 72.2%,100% { opacity: 1 } }
+.a32 { animation: a32 15.8s infinite step-end; }
+@keyframes a33 { 0%,11.1% { opacity: 1 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a33 { animation: a33 15.8s infinite step-end; }
+@keyframes a34 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 1 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a34 { animation: a34 15.8s infinite step-end; }
+@keyframes a35 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 1 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a35 { animation: a35 15.8s infinite step-end; }
+@keyframes a36 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 1 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 0 } }
+.a36 { animation: a36 15.8s infinite step-end; }
+@keyframes a37 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 1 } 72.2%,100% { opacity: 0 } }
+.a37 { animation: a37 15.8s infinite step-end; }
+@keyframes a38 { 0%,11.1% { opacity: 0 } 11.1%,22.2% { opacity: 0 } 22.2%,33.3% { opacity: 0 } 33.3%,61.1% { opacity: 0 } 61.1%,72.2% { opacity: 0 } 72.2%,100% { opacity: 1 } }
+.a38 { animation: a38 15.8s infinite step-end; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--muted)"/></marker></defs>
+<rect width="100%" height="100%" fill="var(--bg)"/>
+<g transform="translate(0 44)">
+<path d="M24 123.5 a 110 12 0 0 1 220 0 v 108 a 110 12 0 0 1 -220 0 z" fill="var(--bg)" stroke="var(--border)" class="a0"/><path d="M24 123.5 a 110 12 0 0 0 220 0" fill="none" stroke="var(--border)" class="a0"/><text x="134" y="148.5" class="label">spec.md</text><text x="134" y="163.5" class="sub">removes table</text><rect x="34" y="176.5" width="200" height="57" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a1"/><g opacity="0" class="a2"><rect x="42" y="183.5" width="41.4" height="14" rx="4" fill="#f59e0b" fill-opacity="0.15"/><text x="62.7" y="194" class="tag" fill="#f59e0b">REMOVES</text><text x="42" y="208.5" class="row">scripts/guards/no-prescribe.sh</text></g><g opacity="0" class="a3"><rect x="42" y="183.5" width="31.9" height="14" rx="4" fill="#10b981" fill-opacity="0.15"/><text x="57.9" y="194" class="tag" fill="#10b981">NAMES</text><text x="42" y="208.5" class="row">memory/stack/stack.md: S1 keeps</text><text x="42" y="223.5" class="row">its guard</text></g>
+<rect x="288" y="118.5" width="210" height="118" rx="10" fill="var(--bg)" stroke="var(--border)" class="a0"/><text x="393" y="141.5" class="label">Lint</text><text x="393" y="156.5" class="sub">git grep each removed path</text><rect x="298" y="169.5" width="190" height="57" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a4"/><g opacity="0" class="a5"><rect x="306" y="176.5" width="41.4" height="14" rx="4" fill="#f59e0b" fill-opacity="0.15"/><text x="326.7" y="187" class="tag" fill="#f59e0b">FINDING</text><text x="480" y="186.5" class="mark">✗</text><text x="306" y="201.5" class="row">referred by</text><text x="306" y="216.5" class="row">memory/stack/stack.md</text></g><g opacity="0" class="a6"><text x="480" y="186.5" class="mark">✓</text><text x="306" y="186.5" class="row">clean</text></g><text x="306" y="186.5" opacity="0" class="row muted a7">—</text>
+<rect x="542" y="24" width="266" height="307" rx="14" fill="var(--surface)" stroke="var(--border)"/><text x="560" y="44" class="frame">REPO</text>
+<path d="M560 73 a 115 12 0 0 1 230 0 v 108 a 115 12 0 0 1 -230 0 z" fill="var(--bg)" stroke="var(--border)" class="a8"/><path d="M560 73 a 115 12 0 0 0 230 0" fill="none" stroke="var(--border)" class="a8"/><text x="675" y="98" class="label">memory/stack/stack.md</text><text x="675" y="113" class="sub">pin S1 · Guard</text><rect x="570" y="126" width="210" height="57" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a9"/><g opacity="0" class="a10"><rect x="578" y="133" width="36.6" height="14" rx="4" fill="#f59e0b" fill-opacity="0.15"/><text x="596.3" y="143.5" class="tag" fill="#f59e0b">REFERS</text><text x="578" y="158" class="row">Guard: bash</text><text x="578" y="173" class="row">scripts/guards/no-prescribe.sh</text></g><text x="578" y="143" opacity="0" class="row muted a11">—</text>
+<path d="M560 223 a 115 12 0 0 1 230 0 v 78 a 115 12 0 0 1 -230 0 z" fill="var(--bg)" stroke="var(--border)" class="a12"/><path d="M560 223 a 115 12 0 0 0 230 0" fill="none" stroke="var(--border)" class="a12"/><text x="675" y="248" class="label">specs/015-…</text><text x="675" y="263" class="sub">history: ignored</text><rect x="570" y="276" width="210" height="27" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a13"/><g opacity="0" class="a14"><text x="578" y="293" class="row">history · not counted</text></g><text x="578" y="293" opacity="0" class="row muted a15">—</text>
+<polygon points="937,146.5 1022,177.5 937,208.5 852,177.5" fill="var(--bg)" stroke="var(--border)" class="a16"/><text x="937" y="182.5" class="label">Gate H1</text>
+<path id="p-read" d="M 244 177.5 C 266 177.5, 266 177.5, 288 177.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a17"/><rect x="238.6" y="168.5" width="54.8" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a18"/><text x="266" y="181.5" class="edgelabel a19">removes</text>
+<path id="p-g1" d="M 498 157.83333333333331 C 529 157.83333333333331, 529 127, 560 127" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a20"/><rect x="510.3" y="133.4" width="37.3" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a21"/><text x="529" y="146.4" class="edgelabel a22">grep</text>
+<g opacity="0" class="a23"><path id="p-g2" d="M 498 197.16666666666666 C 529 197.16666666666666, 529 262, 560 262" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a24"/><rect x="510.3" y="220.6" width="37.3" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a25"/><text x="529" y="233.6" class="edgelabel a26">grep</text></g>
+<g opacity="0" class="a27"><path id="p-page" d="M 393 236.5 C 393 286.5, 937 286.5, 937 208.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a28"/><rect x="631.8" y="261.5" width="66.5" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a29"/><text x="665" y="274.5" class="edgelabel a30">spec page</text></g>
+<g class="p0" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-100.4" y="-35" width="200.9" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">scripts/guards/no-prescribe.sh</text><animateMotion dur="15.8s" repeatCount="indefinite" keyTimes="0;0;0.1;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-read" xlink:href="#p-read"/></animateMotion></g>
+<g class="p1" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-45.6" y="-35" width="91.1" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">no-prescribe</text><animateMotion dur="15.8s" repeatCount="indefinite" keyTimes="0;0.1;0.2;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-g1" xlink:href="#p-g1"/></animateMotion></g>
+<g class="p2" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-45.6" y="-35" width="91.1" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">no-prescribe</text><animateMotion dur="15.8s" repeatCount="indefinite" keyTimes="0;0.2;0.3;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-g2" xlink:href="#p-g2"/></animateMotion></g>
+<g class="p3" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-100.4" y="-35" width="200.9" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">removes + stack.md: keep Guard</text><animateMotion dur="15.8s" repeatCount="indefinite" keyTimes="0;0.6;0.7;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-read" xlink:href="#p-read"/></animateMotion></g>
+<g class="p4" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="15.8s" repeatCount="indefinite" keyTimes="0;0.7;0.8;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-g1" xlink:href="#p-g1"/></animateMotion></g>
+<g class="p5" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-36.4" y="-35" width="72.9" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">spec.html</text><animateMotion dur="15.8s" repeatCount="indefinite" keyTimes="0;0.7;0.8;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-page" xlink:href="#p-page"/></animateMotion></g>
+</g>
+<text x="523" y="415" opacity="0" class="steplabel a31">Slice 031, checked by machine</text>
+<text x="523" y="415" opacity="0" class="steplabel a32">The spec names the referrer</text>
+<g opacity="0" class="a33"><text x="523" y="441" class="caption">Spec 031 deleted pin S1's guard. Its delete list came from reading, not from tracing.</text></g>
+<g opacity="0" class="a34"><text x="523" y="441" class="caption">The lint greps every live file for the path and for its last segment.</text></g>
+<g opacity="0" class="a35"><text x="523" y="441" class="caption">History paths do not count. They come from the same list the stale-name check uses.</text></g>
+<g opacity="0" class="a36"><text x="523" y="441" class="caption">The spec does not name stack.md, so the lint fails. The page for gate H1 is never written.</text></g>
+<g opacity="0" class="a37"><text x="523" y="441" class="caption">The author decides about each referrer, in the spec, before the owner reads it.</text></g>
+<g opacity="0" class="a38"><text x="523" y="441" class="caption">Now the owner approves a delete list the machine built, not one the agent remembered.</text></g>
+</svg>
