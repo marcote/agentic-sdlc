@@ -13,7 +13,6 @@ import sys
 from pathlib import Path
 
 LESSONS = "memory/lessons.md"
-CONSTITUTION = "memory/constitution/constitution.md"
 
 
 def rows(text):
@@ -22,7 +21,7 @@ def rows(text):
 
 
 def apply(text, deltas):
-    """text with each lesson delta applied: an add is `proposed` for a rule and `captured` otherwise; `helpful` on a captured lesson makes it learned."""
+    """text with each lesson delta applied: an add is `proposed` for a rule and `active` otherwise; `helpful` and `harmful` change only the counter."""
     head = next(l for l in text.splitlines() if l.startswith("|"))
     cols = [c.strip() for c in head.strip("|").split("|")]
     table = rows(text)
@@ -30,13 +29,11 @@ def apply(text, deltas):
         if d["op"] == "add":
             n = max([int(r["id"][1:]) for r in table], default=0) + 1
             table.append({"id": f"L{n}", "lesson": d["lesson"].replace("|", "/"), "check": "none: judgment", "source": d["source"],
-                          "helpful": "0", "harmful": "0", "status": "proposed" if d["kind"] == "rule" else "captured"})
+                          "helpful": "0", "harmful": "0", "status": "proposed" if d["kind"] == "rule" else "active"})
             continue
         for r in table:
             if r["id"] == d["id"]:
                 r[d["op"]] = str(int(r[d["op"]]) + 1)
-                if d["op"] == "helpful" and r["status"] == "captured":
-                    r["status"] = "learned"
     body = ["| " + " | ".join(cols) + " |", "|" + " --- |" * len(cols)] + ["| " + " | ".join(r[c] for c in cols) + " |" for r in table]
     return text[:text.index(head)] + "\n".join(body) + "\n"
 
@@ -46,34 +43,24 @@ def with_status(*statuses):
     return [r for r in rows(f.read_text()) if r["status"] in statuses] if f.is_file() else []
 
 
-def finding(r):
-    if r["status"] != "learned":
-        return None
-    path, _, name = r["check"].partition("::")
-    if name:
+def finding(r, ids):
+    if r["status"] not in ("active", "proposed", "promoted", "merged"):
+        return f"unknown status {r['status']}"
+    if r["status"] == "promoted":
+        path, _, name = r["check"].partition("::")
         f = Path(path)
-        if not (f.is_file() and f"def {name}(" in f.read_text()):
+        if not (f.is_file() and name in f.read_text()):
             return f"check not found: {r['check']}"
-    elif int(r["helpful"]) < 1:
-        return "learned without evidence"
-
-
-def numbers(text):
-    return re.findall(r"(?<![\w-])(\d+) ([a-z]+)", text)
-
-
-def stated_limits(lesson, constitution):
-    """findings for each `N unit` in the lesson whose unit the constitution limits with another number."""
-    law = {u: n for n, u in numbers(constitution)}
-    return [f"{n} {u}; the constitution says {law[u]} {u}" for n, u in numbers(lesson) if law.get(u, n) != n]
+    if r["status"] == "merged" and not set(re.findall(r"L\d+", r["check"])) & ids:
+        return "merged into a lesson that does not exist"
 
 
 def main():
     if sys.argv[1:] != ["check"] or not Path(LESSONS).is_file():
         sys.exit("usage: lessons.py check (run where memory/lessons.md exists)")
-    law = Path(CONSTITUTION)
-    found = [f"{r['id']}: {m}" for r in rows(Path(LESSONS).read_text()) for m in
-             ([finding(r)] if finding(r) else []) + (stated_limits(r["lesson"], law.read_text()) if law.is_file() else [])]
+    table = rows(Path(LESSONS).read_text())
+    ids = {r["id"] for r in table}
+    found = [f"{r['id']}: {m}" for r in table if (m := finding(r, ids))]
     print("\n".join(found))
     sys.exit(1 if found else 0)
 

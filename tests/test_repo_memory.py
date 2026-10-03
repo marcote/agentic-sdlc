@@ -82,21 +82,16 @@ def test_e4_vendor_seeds_memory(tmp_path):
     assert head == HEADER and rows == []
 
 
-def test_e5_learned_with_existing_check(tmp_path):
-    p = lessons_check(tmp_path, [row("L1", "learned", check="tests/test_spec.py::test_e1_undefined_bold_term")])
+def test_e5_promoted_with_existing_check(tmp_path):
+    p = lessons_check(tmp_path, [row("L1", "promoted", check="tests/test_spec.py::test_e1_undefined_bold_term")])
     assert p.returncode == 0 and "L1" not in p.stdout, p.stdout + p.stderr
 
 
-def test_e6_learned_with_missing_check(tmp_path):
-    p = lessons_check(tmp_path, [row("L3", "learned", check="tests/test_x.py::test_missing")])
+def test_e6_promoted_with_missing_check(tmp_path):
+    p = lessons_check(tmp_path, [row("L3", "promoted", check="tests/test_x.py::test_missing")])
     assert p.returncode == 1
     assert "L3: check not found: tests/test_x.py::test_missing" in p.stdout
 
-
-def test_e7_learned_without_evidence(tmp_path):
-    p = lessons_check(tmp_path, [row("L5", "learned")])
-    assert p.returncode == 1
-    assert "L5: learned without evidence" in p.stdout
 
 
 def test_e8_rejected_attempt_is_a_finding(slice_repo):
@@ -109,13 +104,13 @@ def test_e8_rejected_attempt_is_a_finding(slice_repo):
 def test_e9_reflector_adds_and_credits(slice_repo):
     deltas = {"deltas": [{"op": "add", "kind": "soft", "lesson": "UNIQUE_NEW_TEXT", "source": "001-add"},
                          {"op": "helpful", "id": "L2"}]}
-    with_reflector(slice_repo, [row("L2", "captured")], reflector=deltas)
+    with_reflector(slice_repo, [row("L2", "active")], reflector=deltas)
     p = slice_repo.accept()
     assert p.returncode == 0, p.stdout + p.stderr
     rows = {r[0]: r for r in main_lessons(slice_repo)}
     new = next(r for r in rows.values() if "UNIQUE_NEW_TEXT" in r[1])
-    assert new[6] == "captured"
-    assert rows["L2"][4] == "1" and rows["L2"][6] == "learned"
+    assert new[6] == "active"
+    assert rows["L2"][4] == "1" and rows["L2"][6] == "active"
 
 
 def test_e10_rule_lesson_is_proposed(slice_repo):

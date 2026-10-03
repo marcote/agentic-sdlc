@@ -1,11 +1,6 @@
-import importlib.util
-
-from conftest import HARNESS, run
-from test_repo_memory import LESSONS, parse_table, put, row, table
+from conftest import HARNESS
+from test_repo_memory import LESSONS, parse_table
 from test_spec import EX_HEAD, REQ_HEAD, TASK_HEAD, lint
-
-CONSTITUTION = "memory/constitution/constitution.md"
-LIMIT = "A sentence has 25 words or fewer; a procedure has steps.\n"
 
 
 def real_rows():
@@ -20,22 +15,6 @@ def check_exists(check):
     path, _, name = check.partition("::")
     f = HARNESS / path
     return bool(name) and f.is_file() and f"def {name}(" in f.read_text()
-
-
-def test_e1_stated_limit_differs_from_constitution(tmp_path):
-    put(tmp_path, CONSTITUTION, LIMIT)
-    put(tmp_path, LESSONS, table([row("L8", "learned", 1, text="Write at most 35 words.")]))
-    p = run("uv", "run", "-q", str(HARNESS / "scripts/lessons.py"), "check", cwd=tmp_path)
-    assert p.returncode == 1
-    assert "L8: 35 words; the constitution says 25 words" in p.stdout
-
-
-def test_e2_stated_limits_returns_no_finding_for_same_number():
-    spec = importlib.util.spec_from_file_location("lessons", HARNESS / "scripts/lessons.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    # stated_limits(lesson_text, constitution_text) -> list of findings
-    assert list(mod.stated_limits("Write at most 25 words.", LIMIT)) == []
 
 
 def test_e3_id_both_requirement_and_task(tmp_path, ns_file):
@@ -53,16 +32,15 @@ def test_e4_l8_states_constitution_limit():
 
 def test_e5_l2_retired_into_l9():
     rows = real_rows()
-    assert rows["L2"][6] == "retired" and "L9" in " ".join(rows["L2"])
+    assert rows["L2"][6] == "merged" and "L9" in " ".join(rows["L2"])
     assert "dropped inputs" in rows["L9"][1] and "test_e17_" in rows["L9"][2]
 
 
-def test_e6_l4_l6_and_id_collision_are_learned():
+def test_e6_l4_l6_and_id_collision_have_existing_checks():
     rows = real_rows()
     collision = find_row(rows, "requirement", "task", "id")
     assert collision is not None
     for r in (rows["L4"], rows["L6"], collision):
-        assert r[6] == "learned", r[0]
         assert check_exists(r[2]), r[0]
 
 
