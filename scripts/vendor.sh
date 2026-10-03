@@ -199,6 +199,8 @@ seed_file "memory/constitution/constitution.md" "$(constitution_stub)"
 seed_file "memory/north-star/north-star.md" "$(northstar_stub)"
 seed_file "memory/stack/stack.md" "$(stack_stub)"
 seed_file "scripts/test.sh" "$(testsh_stub)"
+seed_file "harness.toml" "$(sed 's|^suite = .*|suite = "bash scripts/test.sh"|' "$SRC/harness.toml")"
+seed_file "docs/modules.md" "$(cat "$SRC/docs/modules.md")"
 
 {
   echo "# Harness vendoring provenance"

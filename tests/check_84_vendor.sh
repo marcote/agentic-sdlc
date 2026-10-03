@@ -81,6 +81,17 @@ else
 fi
 rm -rf "$T"
 
+# --- SEED-CONFIG: harness.toml + docs/modules.md seeded; suite runs scripts/test.sh, not tests/run.sh ---
+T=$(mk)
+have && bash "$VENDOR" --apply "$T" >/dev/null 2>&1
+if have && [ -f "$T/harness.toml" ] && [ -f "$T/docs/modules.md" ] \
+   && grep -q '^suite = "bash scripts/test.sh"' "$T/harness.toml" && ! grep -q 'tests/run.sh' "$T/harness.toml"; then
+  _pass "SEED-CONFIG: harness.toml (suite = scripts/test.sh) + docs/modules.md seeded"
+else
+  _fail "SEED-CONFIG: harness.toml or docs/modules.md not seeded, or suite still names tests/run.sh"
+fi
+rm -rf "$T"
+
 # --- SEED-NOCLOBBER: existing SEED file preserved; .harness-new written ---
 T=$(mk); printf 'MINE\n' > "$T/CLAUDE.md"
 have && bash "$VENDOR" --apply "$T" >/tmp/v_out 2>&1
