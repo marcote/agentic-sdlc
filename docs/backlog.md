@@ -583,6 +583,10 @@ The final review of 029 found these. None blocks a slice. Each is one line here,
 - `status.sh` marks build ✓ after an escalated run.
 - A1: nothing checks that the suite holds all four test kinds.
 - A6: accept writes the result page only when it merges, not when it escalates. This deviates from the spec.
+- `build.py` T0 lookup relies on git's basic regex; `grep.patternType=extended` disables resume and the FIX frozen set. Pass `--basic-regexp`.
+- `call()` reads `limits.call_seconds` with no default; an older `harness.toml` crashes the first call. Use `.get(..., 1800)`.
+- After T0, examples the owner adds to `spec.md` never get a RED test: resume skips `contract()`.
+- The frozen-set filter knows only Python layouts (`tests/`, `test_e\d+`); Go, JS and `__tests__/` stacks freeze nothing.
 
 ## Dropped
 
