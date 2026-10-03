@@ -1,0 +1,730 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec 036 — Memory by process</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1c2321;--mut:#5b6662;--rule:#d7ddd9;--acc:#0f5f6e;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#121615;--fg:#e4e9e6;--mut:#9aa6a1;--rule:#2d3533;--acc:#6cc3d1;--warn:#f0b65a;color-scheme:dark}}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:24px 16px}
+h1,h2,h3{text-wrap:balance} h2{border-top:1px solid var(--rule);padding-top:12px}
+#amendments{color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%}
+</style>
+<h1 id="spec-036-memory-by-process">Spec 036 — Memory by process</h1>
+<p>Status: draft for gate H1. Labels: decided, hypothesis, open, reported.</p>
+<p>Slice 034 answered a semantic question with a parser. The regex <code>stated_limits</code> compares a number and a unit in a lesson with the constitution. It flagged L18 ("3.11 or later") against D5 ("20 or fewer"), and <code>main</code> is red. No system in the state of the art uses a parser for this; a model judges meaning, and code keeps ids, counts and status (<code>research.md</code>). This slice deletes the regex and gives the semantic work to a model that never blocks. It also replaces the lesson statuses with a lifecycle that keeps every row, and makes each spec state its sources and its use of memory.</p>
+<p><img alt="Lesson lifecycle" src="figures/lifecycle.svg" /></p>
+<h2 id="1-glossary">1. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>active</strong></td>
+<td>A lesson status: every build prompt holds the lesson. This is tier L1.</td>
+</tr>
+<tr>
+<td><strong>proposed</strong></td>
+<td>A lesson status: the lesson waits for the owner at the next gate H1. Its check cell says why.</td>
+</tr>
+<tr>
+<td><strong>promoted</strong></td>
+<td>A lesson status: a test, a check or a constitution clause enforces the lesson. Its check cell names it. This is tier L0.</td>
+</tr>
+<tr>
+<td><strong>merged</strong></td>
+<td>A lesson status: another lesson says the same thing. Its check cell names that lesson.</td>
+</tr>
+<tr>
+<td><strong>curator</strong></td>
+<td>The role that reads the active lessons and the constitution, and names each conflict with the clause it breaks.</td>
+</tr>
+<tr>
+<td><strong>labeled case</strong></td>
+<td>A row of <code>harness/curator-cases.md</code>: a lesson, a rule, and the owner's label <code>conflict</code> or <code>clean</code>.</td>
+</tr>
+<tr>
+<td><strong>L1 cap</strong></td>
+<td>The value <code>limits.lessons_bytes</code> in <code>harness.toml</code>: the most bytes of active lessons a prompt holds.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-requirements">2. Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>requirement</th>
+<th>kind</th>
+<th>anchor</th>
+<th>examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td>The lessons check shall not compare the numbers in a lesson with the numbers in the constitution.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>If a lesson has a status other than <strong>active</strong>, <strong>proposed</strong>, <strong>promoted</strong> or <strong>merged</strong>, then the lessons check shall report it.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E2</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>If a lesson is <strong>promoted</strong>, then the lessons check shall report it when its check cell names a file or a name that does not exist.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E3, E4</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>If a lesson is <strong>merged</strong>, then the lessons check shall report it when its check cell names no lesson that exists.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E5</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>The file <code>memory/lessons.md</code> shall hold the statuses of the migration table in section 8.</td>
+<td>mechanical</td>
+<td>measurable-impact</td>
+<td>E6</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>When accept applies a reflector delta, accept shall add a new lesson as <strong>active</strong>, or as <strong>proposed</strong> when its kind is <code>rule</code>, and a <code>helpful</code> or <code>harmful</code> delta shall change only its counter.</td>
+<td>mechanical</td>
+<td>measurable-impact</td>
+<td>E7</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>When build writes a prompt, build shall put in it every <strong>active</strong> lesson and no lesson of another status.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E8</td>
+</tr>
+<tr>
+<td>M8</td>
+<td>When accept has applied the reflector deltas, accept shall give the <strong>curator</strong> the constitution, the <strong>active</strong> lessons and each <strong>labeled case</strong>.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E9</td>
+</tr>
+<tr>
+<td>M9</td>
+<td>If the <strong>curator</strong> names a conflict for an <strong>active</strong> lesson, then accept shall mark it <strong>proposed</strong> with the clause and the reason, and accept shall still merge.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E9, E10</td>
+</tr>
+<tr>
+<td>M10</td>
+<td>When accept writes the result page, the page shall show the conflicts the <strong>curator</strong> found and missed on each <strong>labeled case</strong>, and its false alarms.</td>
+<td>mechanical</td>
+<td>measurable-impact</td>
+<td>E11</td>
+</tr>
+<tr>
+<td>M11</td>
+<td>When accept writes the result page, the page shall show the lessons per status, and the bytes of <strong>active</strong> lessons against the <strong>L1 cap</strong>.</td>
+<td>mechanical</td>
+<td>measurable-impact</td>
+<td>E12</td>
+</tr>
+<tr>
+<td>M12</td>
+<td>If a requirement has no kind, or a <code>semantic</code> requirement is not judged, then the spec lint shall report it.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E13, E14</td>
+</tr>
+<tr>
+<td>M13</td>
+<td>If an <strong>active</strong> lesson is not in the Memory applied table of a spec, then the spec lint shall report it.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E15</td>
+</tr>
+<tr>
+<td>M14</td>
+<td>If a spec has no Sources table, or a Sources row names no source, then the spec lint shall report it.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E16</td>
+</tr>
+<tr>
+<td>M15</td>
+<td>The brief step shall ask for a sourced review in <code>research.md</code>, and the spec step shall read the whole memory.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E17</td>
+</tr>
+<tr>
+<td>M16</td>
+<td>The CI lint step shall lint only the specs that have no result page.</td>
+<td>mechanical</td>
+<td>real-enforcement</td>
+<td>E18</td>
+</tr>
+</tbody>
+</table>
+<p>No requirement in this slice is semantic. The curator is semantic, but it never blocks: a false alarm costs the owner one look at H1. M10 measures it on every accept.</p>
+<h2 id="3-examples">3. Examples</h2>
+<p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>given</th>
+<th>when</th>
+<th>then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>the real L18 row and the real constitution</td>
+<td>the lessons check runs</td>
+<td>exit 0; the module <code>lessons</code> has no attribute <code>stated_limits</code></td>
+</tr>
+<tr>
+<td>E2</td>
+<td>a lesson <code>L1</code> with status <code>learned</code></td>
+<td>the lessons check runs</td>
+<td>exit 1; the finding <code>L1: unknown status learned</code></td>
+</tr>
+<tr>
+<td>E3</td>
+<td>a <strong>promoted</strong> lesson <code>L1</code> whose check is <code>tests/test_x.py::test_missing</code>, and the file has no <code>test_missing</code></td>
+<td>the lessons check runs</td>
+<td>exit 1; the finding <code>L1: check not found: tests/test_x.py::test_missing</code></td>
+</tr>
+<tr>
+<td>E4</td>
+<td>a <strong>promoted</strong> lesson <code>L1</code> whose check is <code>memory/constitution/constitution.md::D7</code>, and the file holds <code>D7</code></td>
+<td>the lessons check runs</td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td>E5</td>
+<td>a <strong>merged</strong> lesson <code>L2</code> whose check is <code>merged into L99</code>, and no <code>L99</code></td>
+<td>the lessons check runs</td>
+<td>exit 1; the finding <code>L2: merged into a lesson that does not exist</code></td>
+</tr>
+<tr>
+<td>E6</td>
+<td>the real <code>memory/lessons.md</code></td>
+<td>the test reads each row</td>
+<td>each status equals the migration table in section 8, and no row has another status</td>
+</tr>
+<tr>
+<td>E7</td>
+<td>an <strong>active</strong> lesson <code>L2</code>, and reflector deltas: add with kind <code>soft</code>, and <code>helpful</code> for <code>L2</code></td>
+<td>accept merges</td>
+<td>the new row is <strong>active</strong>; <code>L2</code> has helpful 1 and is still <strong>active</strong></td>
+</tr>
+<tr>
+<td>E8</td>
+<td>lessons <code>L1</code> <strong>active</strong>, <code>L2</code> <strong>proposed</strong>, <code>L3</code> <strong>promoted</strong>, <code>L4</code> <strong>merged</strong>, each with a unique text</td>
+<td>build writes the implementer prompt</td>
+<td>the prompt holds the text of <code>L1</code> only</td>
+</tr>
+<tr>
+<td>E9</td>
+<td>an <strong>active</strong> lesson <code>L2</code>, and a fake curator that answers the conflict <code>L2</code> with <code>D5</code></td>
+<td>accept merges</td>
+<td>exit 0; the curator prompt holds the constitution, <code>L2</code> and the labeled cases; on <code>main</code>, <code>L2</code> is <strong>proposed</strong> and its check starts with <code>conflict with D5:</code></td>
+</tr>
+<tr>
+<td>E10</td>
+<td>a fake curator that crashes</td>
+<td>accept runs</td>
+<td>exit 0; the output holds <code>curator: agent: exit 7</code>; the lessons are unchanged</td>
+</tr>
+<tr>
+<td>E11</td>
+<td>labeled cases <code>X1</code>–<code>X4</code> labeled conflict and <code>X5</code>–<code>X8</code> labeled clean, and a curator that answers conflicts for <code>X1</code>, <code>X2</code> and <code>X5</code></td>
+<td>accept writes the result page</td>
+<td>the page has the row <code>Curator</code> with <code>2 of 4 found, 2 missed, 1 false alarm</code></td>
+</tr>
+<tr>
+<td>E12</td>
+<td><code>lessons_bytes = 100</code>, two <strong>active</strong> lessons of 150 bytes in all, one <strong>promoted</strong>, one <strong>merged</strong></td>
+<td>accept writes the result page</td>
+<td>the page has the row <code>Lessons</code> with <code>2 active (150 of 100 bytes), 0 proposed, 1 promoted, 1 merged</code></td>
+</tr>
+<tr>
+<td>E13</td>
+<td>a spec whose requirement <code>S1</code> has the kind <code>semantic</code> and the examples <code>E1</code></td>
+<td>the lint runs</td>
+<td>exit 1; the finding <code>S1: semantic requirement needs a judge</code></td>
+</tr>
+<tr>
+<td>E14</td>
+<td>a spec whose requirements table has no <code>kind</code> column</td>
+<td>the lint runs</td>
+<td>exit 1; the finding <code>S1: no kind</code></td>
+</tr>
+<tr>
+<td>E15</td>
+<td><strong>active</strong> lessons <code>L1</code> and <code>L3</code>, and a spec whose Memory applied table names <code>L1</code> only</td>
+<td>the lint runs</td>
+<td>exit 1; the finding <code>L3: not in Memory applied</code></td>
+</tr>
+<tr>
+<td>E16</td>
+<td>a spec with no Sources table</td>
+<td>the lint runs</td>
+<td>exit 1; the finding <code>no Sources table</code></td>
+</tr>
+<tr>
+<td>E17</td>
+<td><code>harness/steps/brief.md</code>, <code>harness/steps/spec.md</code> and <code>memory/owner.md</code></td>
+<td>the test reads them</td>
+<td>the brief step names <code>research.md</code>; the spec step names <code>memory/lessons.md</code>, <code>memory/owner.md</code> and the constitution; the owner file says <code>not intuition</code></td>
+</tr>
+<tr>
+<td>E18</td>
+<td><code>.github/workflows/verify.yml</code></td>
+<td>the test reads the lint step</td>
+<td>it skips a spec directory that holds <code>result.html</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-tests">4. Tests</h2>
+<p>Four kinds. Write no other kind.</p>
+<ul>
+<li>example: section 3, one test per example.</li>
+<li>invariant: no parser judges what a lesson means (M1). The lessons check runs on every suite run.</li>
+<li>reconciliation: the curator's result on the labeled cases (M10), compared with the owner's labels.</li>
+<li>e2e run: accept on this slice runs the real curator on the real lessons and the labeled cases, and its result page shows both.</li>
+</ul>
+<p>A test may use recorded real data. A test does not mock the project's own code.</p>
+<h2 id="5-plan">5. Plan</h2>
+<table>
+<thead>
+<tr>
+<th>task</th>
+<th>does</th>
+<th>requirements</th>
+<th>needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td><code>scripts/lessons.py</code>: delete <code>stated_limits</code> and <code>numbers</code>; check the four statuses, a promoted check (a <code>path::name</code> exists when the file holds the name), and a merged target; <code>apply</code> adds active or proposed and changes counters only. Migrate <code>memory/lessons.md</code> by section 8. Update the old tests that assert <code>learned</code>, <code>captured</code>, <code>retired</code> or <code>stated_limits</code>, and the comment in <code>tests/check_94_lessons.sh</code>.</td>
+<td>M1, M2, M3, M4, M5, M6</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>build prompts hold the active lessons only. The result page shows the lessons per status and the active bytes against <code>limits.lessons_bytes = 25_000</code>.</td>
+<td>M7, M11</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>add the role <code>curator</code>: <code>harness/prompts/curator.md</code>, <code>harness/schemas/curator.json</code> (<code>conflicts</code>: id, with, why), <code>harness/curator-cases.md</code> with the cases of section 9, and <code>curator = "claude-ro"</code> in <code>harness.toml</code>. Accept calls it once after the reflector, marks each conflicted active lesson proposed, never blocks on it, and shows the case counts on the result page. The reflector prompt also gets the constitution.</td>
+<td>M8, M9, M10</td>
+<td>T2</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>the spec lint checks the <code>kind</code> column, the Memory applied table and the Sources table. The template gets the column and both sections. The CI lint step skips specs with <code>result.html</code>.</td>
+<td>M12, M13, M14, M16</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>the brief step asks for a sourced review in <code>research.md</code>; the spec step reads <code>memory/lessons.md</code>, <code>memory/owner.md</code> and the constitution. Add to <code>memory/owner.md</code>: design from process, not intuition. Apply amendment K1.</td>
+<td>M15</td>
+<td>T4</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>role: curator</td>
+<td>ACE, Mem0 and Zep give the semantic check to a model, apart from the role that writes lessons (<code>research.md</code> §1, §3)</td>
+</tr>
+<tr>
+<td>file: harness/curator-cases.md</td>
+<td>a judge is trusted only after it is measured on labeled data (<code>research.md</code> §5)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="amendments">6. Amendments</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>target</th>
+<th>change</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>K1</td>
+<td>constitution</td>
+<td>add D7: a semantic question goes to a model, and the owner resolves what the model flags; a parser never answers it, and a model never blocks alone</td>
+<td>the 034 regex; every system in <code>research.md</code> §3 uses a model for meaning</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-assumptions-and-open-items">7. Assumptions and open items</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The curator finds at least 3 of the 4 labeled conflicts, with at most 1 false alarm.</td>
+<td>hypothesis</td>
+</tr>
+<tr>
+<td>An L1 cap of 25,000 bytes keeps prompts useful. Claude Code loads 25 KB of its memory index.</td>
+<td>hypothesis</td>
+</tr>
+<tr>
+<td>L2 on-demand lessons wait until the active lessons cross the L1 cap.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>A re-run of the lessons check after the reflector, as planned before, would never fail: <code>apply</code> cannot write an invalid row. The curator covers the real failure, a lesson whose meaning conflicts.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td><code>helpful</code> and <code>harmful</code> stay as counters. They change no status; a later L2 slice may use them to move lessons between tiers.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>A model review of the spec before H1 goes to the backlog.</td>
+<td>decided</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-migration">8. Migration</h2>
+<p>The owner approves each row at H1. A lesson is promoted only when its check enforces the whole lesson, not one case of it.</p>
+<table>
+<thead>
+<tr>
+<th>lesson</th>
+<th>now</th>
+<th>becomes</th>
+<th>check, and why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>learned</td>
+<td>promoted</td>
+<td><code>tests/test_honest_loop.py::test_e4_lint_reports_unnamed_referrer</code>: the lint scans all tracked files for each removed path</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>retired</td>
+<td>merged</td>
+<td><code>merged into L9</code></td>
+</tr>
+<tr>
+<td>L3</td>
+<td>captured</td>
+<td>active</td>
+<td>text grows: "…and measure its false alarms before it may block." The 034 regex broke this lesson.</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>learned</td>
+<td>active</td>
+<td>the test covers one parser, not every parser</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>captured</td>
+<td>active</td>
+<td>judgment</td>
+</tr>
+<tr>
+<td>L6</td>
+<td>learned</td>
+<td>active</td>
+<td>test e19 does not check that the full suite ran after a move</td>
+</tr>
+<tr>
+<td>L7</td>
+<td>captured</td>
+<td>active</td>
+<td>judgment</td>
+</tr>
+<tr>
+<td>L8</td>
+<td>learned</td>
+<td>promoted</td>
+<td><code>tests/check_96_prose.sh</code>: the prose check runs on every agent-facing file</td>
+</tr>
+<tr>
+<td>L9</td>
+<td>learned</td>
+<td>active</td>
+<td>the test covers one check, not every check</td>
+</tr>
+<tr>
+<td>L10</td>
+<td>captured</td>
+<td>active</td>
+<td>no test covers bullets</td>
+</tr>
+<tr>
+<td>L11</td>
+<td>learned</td>
+<td>promoted</td>
+<td><code>tests/test_lesson_curation.py::test_e3_id_both_requirement_and_task</code></td>
+</tr>
+<tr>
+<td>L12</td>
+<td>captured</td>
+<td>active</td>
+<td>judgment</td>
+</tr>
+<tr>
+<td>L13</td>
+<td>captured</td>
+<td>merged</td>
+<td><code>merged into L9</code>: keeping the last of two values drops an input</td>
+</tr>
+<tr>
+<td>L14</td>
+<td>captured</td>
+<td>active</td>
+<td>judgment</td>
+</tr>
+<tr>
+<td>L15</td>
+<td>captured</td>
+<td>active</td>
+<td>an open defect; also a backlog item (L5)</td>
+</tr>
+<tr>
+<td>L16</td>
+<td>learned</td>
+<td>promoted</td>
+<td><code>tests/test_fast_tests.py::test_e6_ci_runs_the_suite_command_of_harness_toml</code></td>
+</tr>
+<tr>
+<td>L17</td>
+<td>proposed</td>
+<td>promoted</td>
+<td><code>tests/test_build.py::test_t0_ignores_same_named_tests_of_other_slices</code>; the owner approved this fix in slice 035</td>
+</tr>
+<tr>
+<td>L18</td>
+<td>captured</td>
+<td>active</td>
+<td>judgment</td>
+</tr>
+<tr>
+<td>L19</td>
+<td>new</td>
+<td>promoted</td>
+<td><code>memory/constitution/constitution.md::D7</code>. Text: "A semantic question goes to a model, and the owner resolves what it flags. A parser never answers it."</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-labeled-cases">9. Labeled cases</h2>
+<p>The owner labels each case at H1. The curator sees the lesson and the rule, never the label.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>lesson</th>
+<th>rule</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X1</td>
+<td>Write one idea per sentence, at most 35 words.</td>
+<td>A sentence has 25 words or fewer.</td>
+<td>conflict</td>
+</tr>
+<tr>
+<td>X2</td>
+<td>Escalate to the owner after 5 identical failures.</td>
+<td>Escalate after 2 identical failures or 3 total attempts per task.</td>
+<td>conflict</td>
+</tr>
+<tr>
+<td>X3</td>
+<td>Write specs and memory in Spanish, the owner's language.</td>
+<td>All repo artifacts are written in English.</td>
+<td>conflict</td>
+</tr>
+<tr>
+<td>X4</td>
+<td>After a refactor, run only the tests of the changed module.</td>
+<td>After you move code between files, run the full suite.</td>
+<td>conflict</td>
+</tr>
+<tr>
+<td>X5</td>
+<td>A CI step that reads TOML with system python3 needs Python 3.11 or later.</td>
+<td>A procedure sentence has 20 words or fewer.</td>
+<td>clean</td>
+</tr>
+<tr>
+<td>X6</td>
+<td>Write one idea per sentence, at most 25 words.</td>
+<td>A sentence has 25 words or fewer.</td>
+<td>clean</td>
+</tr>
+<tr>
+<td>X7</td>
+<td>A step file sentence has 15 words or fewer.</td>
+<td>A procedure sentence has 20 words or fewer.</td>
+<td>clean</td>
+</tr>
+<tr>
+<td>X8</td>
+<td>Give the reviewer the full diff, not a summary.</td>
+<td>Use the active voice.</td>
+<td>clean</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-memory-applied">10. Memory applied</h2>
+<table>
+<thead>
+<tr>
+<th>lesson</th>
+<th>applies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L3</td>
+<td>yes: the curator is measured on labeled cases (M10), and its first real run is this slice's accept</td>
+</tr>
+<tr>
+<td>L4</td>
+<td>yes: the lint reads the new <code>kind</code> column by its header</td>
+</tr>
+<tr>
+<td>L5</td>
+<td>yes: the spec review by a model goes to the backlog, not into this slice</td>
+</tr>
+<tr>
+<td>L6</td>
+<td>no: this slice moves no code between files</td>
+</tr>
+<tr>
+<td>L7</td>
+<td>yes: every number in this spec comes from <code>research.md</code> or from a command</td>
+</tr>
+<tr>
+<td>L9</td>
+<td>yes: an unknown status, a missing check and a missing merge target are findings, not skips</td>
+</tr>
+<tr>
+<td>L10</td>
+<td>no: the prose joiner does not change</td>
+</tr>
+<tr>
+<td>L12</td>
+<td>yes: E1 calls <code>stated_limits</code> by name; E2 uses a status the old check accepts</td>
+</tr>
+<tr>
+<td>L14</td>
+<td>no: the test runner does not change</td>
+</tr>
+<tr>
+<td>L15</td>
+<td>no: build totals do not change</td>
+</tr>
+<tr>
+<td>L18</td>
+<td>yes: E18 reads <code>verify.yml</code>, and the lint step keeps its Python</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-sources">11. Sources</h2>
+<table>
+<thead>
+<tr>
+<th>practice</th>
+<th>source</th>
+<th>implies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code keeps ids, counts and status; a model judges meaning</td>
+<td>ACE, Mem0, Zep (<code>research.md</code> §1)</td>
+<td>delete <code>stated_limits</code>; add the curator</td>
+</tr>
+<tr>
+<td>Itemized delta updates, never a full rewrite</td>
+<td>ACE; Dynamic Cheatsheet collapse (<code>research.md</code> §2)</td>
+<td>the reflector still emits row operations</td>
+</tr>
+<tr>
+<td>Invalidate or version, never delete</td>
+<td>Zep, Voyager (<code>research.md</code> §1)</td>
+<td><code>merged</code> and <code>promoted</code> keep every row</td>
+</tr>
+<tr>
+<td>A judge flags, a human resolves</td>
+<td>Claude Code prompt-audit, Devin (<code>research.md</code> §3)</td>
+<td>a conflict makes a lesson proposed for H1</td>
+</tr>
+<tr>
+<td>Conflict detection is 87–91% F1, and models stay silent</td>
+<td>ConInstruct (<code>research.md</code> §3)</td>
+<td>the curator must name the clause; we measure it</td>
+</tr>
+<tr>
+<td>Always-loaded memory has a cap</td>
+<td>Claude Code, Codex, Cursor, Chroma (<code>research.md</code> §2)</td>
+<td>the L1 cap; promotion moves a lesson to L0</td>
+</tr>
+<tr>
+<td>A must-hold rule goes to a check, not a prompt</td>
+<td>Claude Code memory docs, OpenAI harness (<code>research.md</code> §4)</td>
+<td><code>promoted</code> is the end of a lesson's life</td>
+</tr>
+<tr>
+<td>Validate a check on labeled data before trust</td>
+<td>Anthropic evals, Husain, Shankar (<code>research.md</code> §5)</td>
+<td>the labeled cases</td>
+</tr>
+<tr>
+<td>No source tracks captured versus used</td>
+<td><code>research.md</code> §4</td>
+<td>drop <code>learned</code> and <code>captured</code></td>
+</tr>
+</tbody>
+</table><h2>Proposed lessons</h2><ul><li>L17: The vacuity check judges only the tests its task wrote. A test of other existing behavior that already passes is not vacuous, and it must not escalate.</li></ul>

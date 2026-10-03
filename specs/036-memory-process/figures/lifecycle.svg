@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="858" height="603" viewBox="0 0 858 603" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<metadata id="figure-spec"><![CDATA[{"props":{"speed":2200,"layout":{"gap":44,"children":[{"id":"acc","label":"accept","direction":"column","gap":20,"children":[{"id":"refl","label":"Reflector","sub":"returns row deltas","width":200,"lines":2},{"id":"cur","label":"Curator","sub":"a model · names the clause","width":200,"lines":2}]},{"id":"mem","label":"memory/lessons.md","direction":"column","gap":20,"children":[{"id":"l1","label":"L1 · active","sub":"every prompt · cap 25 KB","shape":"store","width":230,"lines":3},{"id":"prop","label":"proposed","sub":"waits for H1","shape":"store","width":230,"lines":2},{"id":"l0","label":"L0 · promoted / merged","sub":"a check enforces it · row kept","shape":"store","width":230,"lines":2}]},{"id":"h1","label":"Owner at H1","shape":"decision","width":150}]},"edges":[{"id":"add","from":"refl","to":"l1","label":"add"},{"id":"read","from":"l1","to":"cur","label":"active + constitution + cases","around":"above","quiet":true},{"id":"flag","from":"cur","to":"prop","label":"conflict"},{"id":"ask","from":"prop","to":"h1","label":"owner looks"},{"id":"keep","from":"h1","to":"l1","label":"active","around":"above"},{"id":"enf","from":"h1","to":"l0","label":"promote / merge","around":"below"}],"steps":[{"label":"A lesson lands","flow":[{"edges":[{"edge":"add","data":"L18"}],"show":{"l1":[{"tag":"L18","tone":"blue","text":"tomllib needs Python 3.11 or later","meta":"active"}]},"say":"The reflector adds a lesson as one row. It never rewrites the table."}]},{"label":"A model judges meaning","flow":[{"edges":[{"edge":"read","data":"11 active · D1–D7 · X1–X8"}],"light":["cur"],"say":"The curator reads the active lessons, the constitution and the labeled cases. No regex compares numbers."},{"show":{"cur":[{"tag":"X1–X8","tone":"green","text":"found · missed · false alarms","meta":"on the result page"}]},"say":"The labeled cases measure the curator on every accept. The owner sees the numbers."},{"edges":[{"edge":"flag","data":"L2 vs D5"}],"show":{"prop":[{"tag":"L2","tone":"orange","text":"conflict with D5: 35 words","meta":"proposed"}]},"say":"A conflict names the clause. The lesson waits as proposed, and main stays green."}]},{"label":"The owner resolves at H1","flow":[{"edges":[{"edge":"ask","data":"L2"}],"say":"The next spec page lists it. The owner decides with gate H1, no extra stop."},{"edges":[{"edge":"enf","data":"promoted → check"}],"show":{"l0":[{"tag":"L8","tone":"purple","text":"25 words","meta":"promoted → check_96_prose.sh"}]},"say":"A lesson a check enforces leaves the prompt. The row stays, with its lineage."},{"edges":[{"edge":"keep","data":"active"}],"say":"A false alarm goes back to active. It cost one look, not a red main."}]}]}}]]></metadata>
+<style>
+svg { --accent:#0074d9; --fg:#1c1e21; --muted:#606770; --bg:#ffffff; --surface:#f5f7fa; --border:#d0d7de; --card-on:#eef5fd; }
+@media (prefers-color-scheme: dark) { svg { --accent:#3396e8; --fg:#e3e3e3; --muted:#9aa0a6; --bg:#1b1b1d; --surface:#242526; --border:#3a3b3c; --card-on:#1d2733; } }
+.label { fill: var(--fg); font-size: 14px; font-weight: 500; text-anchor: middle; }
+.sub { fill: var(--muted); font-size: 12px; text-anchor: middle; }
+.frame { fill: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+.edgelabel { fill: var(--muted); font-size: 11px; text-anchor: middle; font-family: ui-monospace, Menlo, monospace; }
+.row { fill: var(--fg); font-size: 11px; }
+.row.mono { font-size: 10.5px; font-family: ui-monospace, Menlo, monospace; }
+.muted { fill: var(--muted); }
+.tag { font-size: 9px; font-weight: 600; letter-spacing: .03em; text-anchor: middle; }
+.mark { fill: var(--accent); font-size: 11px; font-weight: 600; text-anchor: end; }
+.chip { fill: #fff; font-size: 11.5px; text-anchor: middle; }
+.steplabel { fill: var(--fg); font-size: 13px; font-weight: 600; text-anchor: middle; font-family: ui-monospace, Menlo, monospace; }
+.caption { fill: var(--muted); font-size: 13.5px; text-anchor: middle; }
+@keyframes a0 { 0%,21.7% { stroke: var(--accent) } 21.7%,30.4% { stroke: var(--border) } 30.4%,39.1% { stroke: var(--border) } 39.1%,60.9% { stroke: var(--border) } 60.9%,69.6% { stroke: var(--border) } 69.6%,78.3% { stroke: var(--border) } 78.3%,100% { stroke: var(--border) } }
+.a0 { animation: a0 20.2s infinite step-end; }
+@keyframes a1 { 0%,21.7% { stroke: var(--border) } 21.7%,30.4% { stroke: var(--accent) } 30.4%,39.1% { stroke: var(--accent) } 39.1%,60.9% { stroke: var(--accent) } 60.9%,69.6% { stroke: var(--border) } 69.6%,78.3% { stroke: var(--border) } 78.3%,100% { stroke: var(--border) } }
+.a1 { animation: a1 20.2s infinite step-end; }
+@keyframes a2 { 0%,21.7% { stroke: var(--border); fill: var(--surface) } 21.7%,30.4% { stroke: var(--border); fill: var(--surface) } 30.4%,39.1% { stroke: var(--accent); fill: var(--card-on) } 39.1%,60.9% { stroke: var(--accent); fill: var(--card-on) } 60.9%,69.6% { stroke: var(--border); fill: var(--surface) } 69.6%,78.3% { stroke: var(--border); fill: var(--surface) } 78.3%,100% { stroke: var(--border); fill: var(--surface) } }
+.a2 { animation: a2 20.2s infinite step-end; }
+@keyframes a3 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 1 } 39.1%,60.9% { opacity: 1 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a3 { animation: a3 20.2s infinite step-end; }
+@keyframes a4 { 0%,21.7% { opacity: 1 } 21.7%,30.4% { opacity: 1 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 1 } 69.6%,78.3% { opacity: 1 } 78.3%,100% { opacity: 1 } }
+.a4 { animation: a4 20.2s infinite step-end; }
+@keyframes a5 { 0%,21.7% { stroke: var(--accent) } 21.7%,30.4% { stroke: var(--accent) } 30.4%,39.1% { stroke: var(--accent) } 39.1%,60.9% { stroke: var(--accent) } 60.9%,69.6% { stroke: var(--border) } 69.6%,78.3% { stroke: var(--border) } 78.3%,100% { stroke: var(--accent) } }
+.a5 { animation: a5 20.2s infinite step-end; }
+@keyframes a6 { 0%,21.7% { stroke: var(--accent); fill: var(--card-on) } 21.7%,30.4% { stroke: var(--border); fill: var(--surface) } 30.4%,39.1% { stroke: var(--border); fill: var(--surface) } 39.1%,60.9% { stroke: var(--border); fill: var(--surface) } 60.9%,69.6% { stroke: var(--border); fill: var(--surface) } 69.6%,78.3% { stroke: var(--border); fill: var(--surface) } 78.3%,100% { stroke: var(--border); fill: var(--surface) } }
+.a6 { animation: a6 20.2s infinite step-end; }
+@keyframes a7 { 0%,21.7% { opacity: 1 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a7 { animation: a7 20.2s infinite step-end; }
+@keyframes a8 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 1 } 30.4%,39.1% { opacity: 1 } 39.1%,60.9% { opacity: 1 } 60.9%,69.6% { opacity: 1 } 69.6%,78.3% { opacity: 1 } 78.3%,100% { opacity: 1 } }
+.a8 { animation: a8 20.2s infinite step-end; }
+@keyframes a9 { 0%,21.7% { stroke: var(--border) } 21.7%,30.4% { stroke: var(--border) } 30.4%,39.1% { stroke: var(--border) } 39.1%,60.9% { stroke: var(--accent) } 60.9%,69.6% { stroke: var(--accent) } 69.6%,78.3% { stroke: var(--accent) } 78.3%,100% { stroke: var(--accent) } }
+.a9 { animation: a9 20.2s infinite step-end; }
+@keyframes a10 { 0%,21.7% { stroke: var(--border); fill: var(--surface) } 21.7%,30.4% { stroke: var(--border); fill: var(--surface) } 30.4%,39.1% { stroke: var(--border); fill: var(--surface) } 39.1%,60.9% { stroke: var(--accent); fill: var(--card-on) } 60.9%,69.6% { stroke: var(--border); fill: var(--surface) } 69.6%,78.3% { stroke: var(--border); fill: var(--surface) } 78.3%,100% { stroke: var(--border); fill: var(--surface) } }
+.a10 { animation: a10 20.2s infinite step-end; }
+@keyframes a11 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 1 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a11 { animation: a11 20.2s infinite step-end; }
+@keyframes a12 { 0%,21.7% { opacity: 1 } 21.7%,30.4% { opacity: 1 } 30.4%,39.1% { opacity: 1 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 1 } 69.6%,78.3% { opacity: 1 } 78.3%,100% { opacity: 1 } }
+.a12 { animation: a12 20.2s infinite step-end; }
+@keyframes a13 { 0%,21.7% { stroke: var(--border) } 21.7%,30.4% { stroke: var(--border) } 30.4%,39.1% { stroke: var(--border) } 39.1%,60.9% { stroke: var(--border) } 60.9%,69.6% { stroke: var(--border) } 69.6%,78.3% { stroke: var(--accent) } 78.3%,100% { stroke: var(--accent) } }
+.a13 { animation: a13 20.2s infinite step-end; }
+@keyframes a14 { 0%,21.7% { stroke: var(--border); fill: var(--surface) } 21.7%,30.4% { stroke: var(--border); fill: var(--surface) } 30.4%,39.1% { stroke: var(--border); fill: var(--surface) } 39.1%,60.9% { stroke: var(--border); fill: var(--surface) } 60.9%,69.6% { stroke: var(--border); fill: var(--surface) } 69.6%,78.3% { stroke: var(--accent); fill: var(--card-on) } 78.3%,100% { stroke: var(--accent); fill: var(--card-on) } }
+.a14 { animation: a14 20.2s infinite step-end; }
+@keyframes a15 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 1 } 78.3%,100% { opacity: 1 } }
+.a15 { animation: a15 20.2s infinite step-end; }
+@keyframes a16 { 0%,21.7% { opacity: 1 } 21.7%,30.4% { opacity: 1 } 30.4%,39.1% { opacity: 1 } 39.1%,60.9% { opacity: 1 } 60.9%,69.6% { opacity: 1 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a16 { animation: a16 20.2s infinite step-end; }
+@keyframes a17 { 0%,21.7% { stroke: var(--border) } 21.7%,30.4% { stroke: var(--border) } 30.4%,39.1% { stroke: var(--border) } 39.1%,60.9% { stroke: var(--border) } 60.9%,69.6% { stroke: var(--accent) } 69.6%,78.3% { stroke: var(--accent) } 78.3%,100% { stroke: var(--accent) } }
+.a17 { animation: a17 20.2s infinite step-end; }
+@keyframes a18 { 0%,21.7% { stroke: var(--accent); stroke-width: 2 } 21.7%,30.4% { stroke: var(--muted); stroke-width: 1.25 } 30.4%,39.1% { stroke: var(--muted); stroke-width: 1.25 } 39.1%,60.9% { stroke: var(--muted); stroke-width: 1.25 } 60.9%,69.6% { stroke: var(--muted); stroke-width: 1.25 } 69.6%,78.3% { stroke: var(--muted); stroke-width: 1.25 } 78.3%,100% { stroke: var(--muted); stroke-width: 1.25 } }
+.a18 { animation: a18 20.2s infinite step-end; }
+@keyframes a19 { 0%,21.7% { fill: var(--accent); stroke: var(--accent) } 21.7%,30.4% { fill: var(--bg); stroke: var(--border) } 30.4%,39.1% { fill: var(--bg); stroke: var(--border) } 39.1%,60.9% { fill: var(--bg); stroke: var(--border) } 60.9%,69.6% { fill: var(--bg); stroke: var(--border) } 69.6%,78.3% { fill: var(--bg); stroke: var(--border) } 78.3%,100% { fill: var(--bg); stroke: var(--border) } }
+.a19 { animation: a19 20.2s infinite step-end; }
+@keyframes a20 { 0%,21.7% { fill: #fff } 21.7%,30.4% { fill: var(--muted) } 30.4%,39.1% { fill: var(--muted) } 39.1%,60.9% { fill: var(--muted) } 60.9%,69.6% { fill: var(--muted) } 69.6%,78.3% { fill: var(--muted) } 78.3%,100% { fill: var(--muted) } }
+.a20 { animation: a20 20.2s infinite step-end; }
+@keyframes a21 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 1 } 30.4%,39.1% { opacity: 1 } 39.1%,60.9% { opacity: 1 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a21 { animation: a21 20.2s infinite step-end; }
+@keyframes a22 { 0%,21.7% { stroke: var(--muted); stroke-width: 1.25 } 21.7%,30.4% { stroke: var(--accent); stroke-width: 2 } 30.4%,39.1% { stroke: var(--accent); stroke-width: 2 } 39.1%,60.9% { stroke: var(--accent); stroke-width: 2 } 60.9%,69.6% { stroke: var(--muted); stroke-width: 1.25 } 69.6%,78.3% { stroke: var(--muted); stroke-width: 1.25 } 78.3%,100% { stroke: var(--muted); stroke-width: 1.25 } }
+.a22 { animation: a22 20.2s infinite step-end; }
+@keyframes a23 { 0%,21.7% { fill: var(--bg); stroke: var(--border) } 21.7%,30.4% { fill: var(--accent); stroke: var(--accent) } 30.4%,39.1% { fill: var(--accent); stroke: var(--accent) } 39.1%,60.9% { fill: var(--accent); stroke: var(--accent) } 60.9%,69.6% { fill: var(--bg); stroke: var(--border) } 69.6%,78.3% { fill: var(--bg); stroke: var(--border) } 78.3%,100% { fill: var(--bg); stroke: var(--border) } }
+.a23 { animation: a23 20.2s infinite step-end; }
+@keyframes a24 { 0%,21.7% { fill: var(--muted) } 21.7%,30.4% { fill: #fff } 30.4%,39.1% { fill: #fff } 39.1%,60.9% { fill: #fff } 60.9%,69.6% { fill: var(--muted) } 69.6%,78.3% { fill: var(--muted) } 78.3%,100% { fill: var(--muted) } }
+.a24 { animation: a24 20.2s infinite step-end; }
+@keyframes a25 { 0%,21.7% { stroke: var(--muted); stroke-width: 1.25 } 21.7%,30.4% { stroke: var(--muted); stroke-width: 1.25 } 30.4%,39.1% { stroke: var(--muted); stroke-width: 1.25 } 39.1%,60.9% { stroke: var(--accent); stroke-width: 2 } 60.9%,69.6% { stroke: var(--muted); stroke-width: 1.25 } 69.6%,78.3% { stroke: var(--muted); stroke-width: 1.25 } 78.3%,100% { stroke: var(--muted); stroke-width: 1.25 } }
+.a25 { animation: a25 20.2s infinite step-end; }
+@keyframes a26 { 0%,21.7% { fill: var(--bg); stroke: var(--border) } 21.7%,30.4% { fill: var(--bg); stroke: var(--border) } 30.4%,39.1% { fill: var(--bg); stroke: var(--border) } 39.1%,60.9% { fill: var(--accent); stroke: var(--accent) } 60.9%,69.6% { fill: var(--bg); stroke: var(--border) } 69.6%,78.3% { fill: var(--bg); stroke: var(--border) } 78.3%,100% { fill: var(--bg); stroke: var(--border) } }
+.a26 { animation: a26 20.2s infinite step-end; }
+@keyframes a27 { 0%,21.7% { fill: var(--muted) } 21.7%,30.4% { fill: var(--muted) } 30.4%,39.1% { fill: var(--muted) } 39.1%,60.9% { fill: #fff } 60.9%,69.6% { fill: var(--muted) } 69.6%,78.3% { fill: var(--muted) } 78.3%,100% { fill: var(--muted) } }
+.a27 { animation: a27 20.2s infinite step-end; }
+@keyframes a28 { 0%,21.7% { stroke: var(--muted); stroke-width: 1.25 } 21.7%,30.4% { stroke: var(--muted); stroke-width: 1.25 } 30.4%,39.1% { stroke: var(--muted); stroke-width: 1.25 } 39.1%,60.9% { stroke: var(--muted); stroke-width: 1.25 } 60.9%,69.6% { stroke: var(--accent); stroke-width: 2 } 69.6%,78.3% { stroke: var(--accent); stroke-width: 2 } 78.3%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a28 { animation: a28 20.2s infinite step-end; }
+@keyframes a29 { 0%,21.7% { fill: var(--bg); stroke: var(--border) } 21.7%,30.4% { fill: var(--bg); stroke: var(--border) } 30.4%,39.1% { fill: var(--bg); stroke: var(--border) } 39.1%,60.9% { fill: var(--bg); stroke: var(--border) } 60.9%,69.6% { fill: var(--accent); stroke: var(--accent) } 69.6%,78.3% { fill: var(--accent); stroke: var(--accent) } 78.3%,100% { fill: var(--accent); stroke: var(--accent) } }
+.a29 { animation: a29 20.2s infinite step-end; }
+@keyframes a30 { 0%,21.7% { fill: var(--muted) } 21.7%,30.4% { fill: var(--muted) } 30.4%,39.1% { fill: var(--muted) } 39.1%,60.9% { fill: var(--muted) } 60.9%,69.6% { fill: #fff } 69.6%,78.3% { fill: #fff } 78.3%,100% { fill: #fff } }
+.a30 { animation: a30 20.2s infinite step-end; }
+@keyframes a31 { 0%,21.7% { stroke: var(--muted); stroke-width: 1.25 } 21.7%,30.4% { stroke: var(--muted); stroke-width: 1.25 } 30.4%,39.1% { stroke: var(--muted); stroke-width: 1.25 } 39.1%,60.9% { stroke: var(--muted); stroke-width: 1.25 } 60.9%,69.6% { stroke: var(--muted); stroke-width: 1.25 } 69.6%,78.3% { stroke: var(--muted); stroke-width: 1.25 } 78.3%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a31 { animation: a31 20.2s infinite step-end; }
+@keyframes a32 { 0%,21.7% { fill: var(--bg); stroke: var(--border) } 21.7%,30.4% { fill: var(--bg); stroke: var(--border) } 30.4%,39.1% { fill: var(--bg); stroke: var(--border) } 39.1%,60.9% { fill: var(--bg); stroke: var(--border) } 60.9%,69.6% { fill: var(--bg); stroke: var(--border) } 69.6%,78.3% { fill: var(--bg); stroke: var(--border) } 78.3%,100% { fill: var(--accent); stroke: var(--accent) } }
+.a32 { animation: a32 20.2s infinite step-end; }
+@keyframes a33 { 0%,21.7% { fill: var(--muted) } 21.7%,30.4% { fill: var(--muted) } 30.4%,39.1% { fill: var(--muted) } 39.1%,60.9% { fill: var(--muted) } 60.9%,69.6% { fill: var(--muted) } 69.6%,78.3% { fill: var(--muted) } 78.3%,100% { fill: #fff } }
+.a33 { animation: a33 20.2s infinite step-end; }
+@keyframes a34 { 0%,21.7% { stroke: var(--muted); stroke-width: 1.25 } 21.7%,30.4% { stroke: var(--muted); stroke-width: 1.25 } 30.4%,39.1% { stroke: var(--muted); stroke-width: 1.25 } 39.1%,60.9% { stroke: var(--muted); stroke-width: 1.25 } 60.9%,69.6% { stroke: var(--muted); stroke-width: 1.25 } 69.6%,78.3% { stroke: var(--accent); stroke-width: 2 } 78.3%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a34 { animation: a34 20.2s infinite step-end; }
+@keyframes a35 { 0%,21.7% { fill: var(--bg); stroke: var(--border) } 21.7%,30.4% { fill: var(--bg); stroke: var(--border) } 30.4%,39.1% { fill: var(--bg); stroke: var(--border) } 39.1%,60.9% { fill: var(--bg); stroke: var(--border) } 60.9%,69.6% { fill: var(--bg); stroke: var(--border) } 69.6%,78.3% { fill: var(--accent); stroke: var(--accent) } 78.3%,100% { fill: var(--accent); stroke: var(--accent) } }
+.a35 { animation: a35 20.2s infinite step-end; }
+@keyframes a36 { 0%,21.7% { fill: var(--muted) } 21.7%,30.4% { fill: var(--muted) } 30.4%,39.1% { fill: var(--muted) } 39.1%,60.9% { fill: var(--muted) } 60.9%,69.6% { fill: var(--muted) } 69.6%,78.3% { fill: #fff } 78.3%,100% { fill: #fff } }
+.a36 { animation: a36 20.2s infinite step-end; }
+@keyframes p0 { 0%,0% { opacity: 0 } 0%,8.7% { opacity: 1 } 8.7%,100% { opacity: 0 } }
+.p0 { animation: p0 20.2s infinite step-end; }
+@keyframes p1 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 1 } 30.4%,100% { opacity: 0 } }
+.p1 { animation: p1 20.2s infinite step-end; }
+@keyframes p2 { 0%,39.1% { opacity: 0 } 39.1%,47.8% { opacity: 1 } 47.8%,100% { opacity: 0 } }
+.p2 { animation: p2 20.2s infinite step-end; }
+@keyframes p3 { 0%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 1 } 69.6%,100% { opacity: 0 } }
+.p3 { animation: p3 20.2s infinite step-end; }
+@keyframes p4 { 0%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 1 } 78.3%,100% { opacity: 0 } }
+.p4 { animation: p4 20.2s infinite step-end; }
+@keyframes p5 { 0%,78.3% { opacity: 0 } 78.3%,86.9% { opacity: 1 } 87%,100% { opacity: 0 } }
+.p5 { animation: p5 20.2s infinite step-end; }
+@keyframes a37 { 0%,21.7% { opacity: 1 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a37 { animation: a37 20.2s infinite step-end; }
+@keyframes a38 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 1 } 30.4%,39.1% { opacity: 1 } 39.1%,60.9% { opacity: 1 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a38 { animation: a38 20.2s infinite step-end; }
+@keyframes a39 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 1 } 69.6%,78.3% { opacity: 1 } 78.3%,100% { opacity: 1 } }
+.a39 { animation: a39 20.2s infinite step-end; }
+@keyframes a40 { 0%,21.7% { opacity: 1 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a40 { animation: a40 20.2s infinite step-end; }
+@keyframes a41 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 1 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a41 { animation: a41 20.2s infinite step-end; }
+@keyframes a42 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 1 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a42 { animation: a42 20.2s infinite step-end; }
+@keyframes a43 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 1 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a43 { animation: a43 20.2s infinite step-end; }
+@keyframes a44 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 1 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 0 } }
+.a44 { animation: a44 20.2s infinite step-end; }
+@keyframes a45 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 1 } 78.3%,100% { opacity: 0 } }
+.a45 { animation: a45 20.2s infinite step-end; }
+@keyframes a46 { 0%,21.7% { opacity: 0 } 21.7%,30.4% { opacity: 0 } 30.4%,39.1% { opacity: 0 } 39.1%,60.9% { opacity: 0 } 60.9%,69.6% { opacity: 0 } 69.6%,78.3% { opacity: 0 } 78.3%,100% { opacity: 1 } }
+.a46 { animation: a46 20.2s infinite step-end; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--muted)"/></marker></defs>
+<rect width="100%" height="100%" fill="var(--bg)"/>
+<g transform="translate(0 44)">
+<rect x="24" y="131.5" width="236" height="246" rx="14" fill="var(--surface)" stroke="var(--border)"/><text x="42" y="151.5" class="frame">ACCEPT</text>
+<rect x="42" y="168.5" width="200" height="53" rx="10" fill="var(--bg)" stroke="var(--border)" class="a0"/><text x="142" y="193" class="label">Reflector</text><text x="142" y="208" class="sub">returns row deltas</text>
+<rect x="42" y="241.5" width="200" height="118" rx="10" fill="var(--bg)" stroke="var(--border)" class="a1"/><text x="142" y="264.5" class="label">Curator</text><text x="142" y="279.5" class="sub">a model · names the clause</text><rect x="52" y="292.5" width="180" height="57" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a2"/><g opacity="0" class="a3"><rect x="60" y="299.5" width="31.9" height="14" rx="4" fill="#10b981" fill-opacity="0.15"/><text x="75.9" y="310" class="tag" fill="#10b981">X1–X8</text><text x="60" y="324.5" class="row">found · missed · false</text><text x="60" y="339.5" class="row">alarms · on the result page</text></g><text x="60" y="309.5" opacity="0" class="row muted a4">—</text>
+<rect x="304" y="24" width="266" height="461" rx="14" fill="var(--surface)" stroke="var(--border)"/><text x="322" y="44" class="frame">MEMORY/LESSONS.MD</text>
+<path d="M322 73 a 115 12 0 0 1 230 0 v 108 a 115 12 0 0 1 -230 0 z" fill="var(--bg)" stroke="var(--border)" class="a5"/><path d="M322 73 a 115 12 0 0 0 230 0" fill="none" stroke="var(--border)" class="a5"/><text x="437" y="98" class="label">L1 · active</text><text x="437" y="113" class="sub">every prompt · cap 25 KB</text><rect x="332" y="126" width="210" height="57" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a6"/><g opacity="0" class="a7"><rect x="340" y="133" width="22.3" height="14" rx="4" fill="#3b82f6" fill-opacity="0.15"/><text x="351.2" y="143.5" class="tag" fill="#3b82f6">L18</text><text x="340" y="158" class="row">tomllib needs Python 3.11 or</text><text x="340" y="173" class="row">later · active</text></g><text x="340" y="143" opacity="0" class="row muted a8">—</text>
+<path d="M322 225 a 115 12 0 0 1 230 0 v 93 a 115 12 0 0 1 -230 0 z" fill="var(--bg)" stroke="var(--border)" class="a9"/><path d="M322 225 a 115 12 0 0 0 230 0" fill="none" stroke="var(--border)" class="a9"/><text x="437" y="250" class="label">proposed</text><text x="437" y="265" class="sub">waits for H1</text><rect x="332" y="278" width="210" height="42" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a10"/><g opacity="0" class="a11"><rect x="340" y="285" width="17.5" height="14" rx="4" fill="#f59e0b" fill-opacity="0.15"/><text x="348.8" y="295.5" class="tag" fill="#f59e0b">L2</text><text x="362.5" y="295" class="row">conflict with D5: 35 words ·</text><text x="340" y="310" class="row">proposed</text></g><text x="340" y="295" opacity="0" class="row muted a12">—</text>
+<path d="M322 362 a 115 12 0 0 1 230 0 v 93 a 115 12 0 0 1 -230 0 z" fill="var(--bg)" stroke="var(--border)" class="a13"/><path d="M322 362 a 115 12 0 0 0 230 0" fill="none" stroke="var(--border)" class="a13"/><text x="437" y="387" class="label">L0 · promoted / merged</text><text x="437" y="402" class="sub">a check enforces it · row kept</text><rect x="332" y="415" width="210" height="42" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a14"/><g opacity="0" class="a15"><rect x="340" y="422" width="17.5" height="14" rx="4" fill="#8b5cf6" fill-opacity="0.15"/><text x="348.8" y="432.5" class="tag" fill="#8b5cf6">L8</text><text x="362.5" y="432" class="row">25 words · promoted →</text><text x="340" y="447" class="row">check_96_prose.sh</text></g><text x="340" y="432" opacity="0" class="row muted a16">—</text>
+<polygon points="724,223.5 834,254.5 724,285.5 614,254.5" fill="var(--bg)" stroke="var(--border)" class="a17"/><text x="724" y="259.5" class="label">Owner at H1</text>
+<path id="p-add" d="M 242 195 C 282 195, 282 127, 322 127" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a18"/><rect x="266.3" y="152" width="31.5" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a19"/><text x="282" y="165" class="edgelabel a20">add</text>
+<g opacity="0" class="a21"><path id="p-read" d="M 398.66666666666663 61 C 398.66666666666663 11, 142 11, 142 241.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a22"/><rect x="178.8" y="37.1" width="183.1" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a23"/><text x="270.3" y="50.1" class="edgelabel a24">active + constitution + cases</text></g>
+<path id="p-flag" d="M 242 300.5 C 282 300.5, 282 271.5, 322 271.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a25"/><rect x="251.7" y="277" width="60.6" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a26"/><text x="282" y="290" class="edgelabel a27">conflict</text>
+<path id="p-ask" d="M 552 271.5 C 583 271.5, 583 254.5, 614 254.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a28"/><rect x="543.9" y="254" width="78.1" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a29"/><text x="583" y="267" class="edgelabel a30">owner looks</text>
+<path id="p-keep" d="M 724 223.5 C 724 11, 475.3333333333333 11, 475.3333333333333 61" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a31"/><rect x="575.2" y="34.8" width="49" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a32"/><text x="599.7" y="47.8" class="edgelabel a33">active</text>
+<path id="p-enf" d="M 724 285.5 C 724 517, 437 517, 437 467" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a34"/><rect x="529.8" y="472.8" width="101.5" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a35"/><text x="580.5" y="485.8" class="edgelabel a36">promote / merge</text>
+<g class="p0" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-18.1" y="-35" width="36.3" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">L18</text><animateMotion dur="20.2s" repeatCount="indefinite" keyTimes="0;0;0.1;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-add" xlink:href="#p-add"/></animateMotion></g>
+<g class="p1" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-85.2" y="-35" width="170.4" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">11 active · D1–D7 · X1–X8</text><animateMotion dur="20.2s" repeatCount="indefinite" keyTimes="0;0.2;0.3;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-read" xlink:href="#p-read"/></animateMotion></g>
+<g class="p2" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-33.4" y="-35" width="66.8" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">L2 vs D5</text><animateMotion dur="20.2s" repeatCount="indefinite" keyTimes="0;0.4;0.5;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-flag" xlink:href="#p-flag"/></animateMotion></g>
+<g class="p3" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-15.1" y="-35" width="30.2" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">L2</text><animateMotion dur="20.2s" repeatCount="indefinite" keyTimes="0;0.6;0.7;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-ask" xlink:href="#p-ask"/></animateMotion></g>
+<g class="p4" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-57.8" y="-35" width="115.5" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">promoted → check</text><animateMotion dur="20.2s" repeatCount="indefinite" keyTimes="0;0.7;0.8;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-enf" xlink:href="#p-enf"/></animateMotion></g>
+<g class="p5" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-27.3" y="-35" width="54.6" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">active</text><animateMotion dur="20.2s" repeatCount="indefinite" keyTimes="0;0.8;0.9;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-keep" xlink:href="#p-keep"/></animateMotion></g>
+</g>
+<text x="429" y="569" opacity="0" class="steplabel a37">A lesson lands</text>
+<text x="429" y="569" opacity="0" class="steplabel a38">A model judges meaning</text>
+<text x="429" y="569" opacity="0" class="steplabel a39">The owner resolves at H1</text>
+<g opacity="0" class="a40"><text x="429" y="595" class="caption">The reflector adds a lesson as one row. It never rewrites the table.</text></g>
+<g opacity="0" class="a41"><text x="429" y="595" class="caption">The curator reads the active lessons, the constitution and the labeled cases. No regex compares numbers.</text></g>
+<g opacity="0" class="a42"><text x="429" y="595" class="caption">The labeled cases measure the curator on every accept. The owner sees the numbers.</text></g>
+<g opacity="0" class="a43"><text x="429" y="595" class="caption">A conflict names the clause. The lesson waits as proposed, and main stays green.</text></g>
+<g opacity="0" class="a44"><text x="429" y="595" class="caption">The next spec page lists it. The owner decides with gate H1, no extra stop.</text></g>
+<g opacity="0" class="a45"><text x="429" y="595" class="caption">A lesson a check enforces leaves the prompt. The row stays, with its lineage.</text></g>
+<g opacity="0" class="a46"><text x="429" y="595" class="caption">A false alarm goes back to active. It cost one look, not a red main.</text></g>
+</svg>
