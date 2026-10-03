@@ -25,10 +25,12 @@ module_map = "docs/modules.md"
 module_root = "src"
 
 # ponytail: cache reads (~1/10 the input price) are left out, so tokens are a raw count; weight them by price if the budget misfires.
+# Scoped Bash, never free Bash: build runs unattended on the owner's repo. git rm keeps deletions recoverable.
 [cli.claude]
 family = "claude-sonnet"
 cmd = ["claude", "-p", "--model", "sonnet", "--output-format", "json", "--json-schema", "{schema_json}",
-       "--permission-mode", "acceptEdits", "--allowedTools", "Read", "Edit", "Write", "Bash(uv run:*)"]
+       "--permission-mode", "acceptEdits", "--allowedTools", "Read", "Edit", "Write",
+       "Bash(uv run:*)", "Bash(git rm:*)", "Bash(git mv:*)", "Bash(mkdir:*)", "Bash(bash tests/run.sh)"]
 payload = "structured_output"
 tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens"]
 

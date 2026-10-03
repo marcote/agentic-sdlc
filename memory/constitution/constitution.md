@@ -9,10 +9,10 @@ here. Overriding a `base/pattern` requires explicit justification.
 
 ## Project deltas
 
-### D1 — The `amendment-gate`: instance of the narrow governance exception (Principle 4)
+### D1 — The amendment gate: instance of the narrow governance exception (Principle 4)
 
 Principle 4 (base) allows **one** exception to "nothing blocks a push": a *narrow
-governance gate on the protected integration branch*. The **`amendment-gate`**
+governance gate on the protected integration branch*. The **amendment gate**
 (CI + branch protection, feature 004) is the **concrete instance** of that exception in
 this project, and it is **narrow by design**: it blocks *only* when a commit/push changes the
 **`pillars`/`scope`** sets of the North Star's canonical JSON block without meeting the protocol
@@ -21,11 +21,11 @@ the pillars/scope sets — **is not blocked**: the gate exits `exit 0` (not-appl
 
 **Why this fits Principle 4:** its intent is **productivity first** (not blocking feature
 throughput). A North Star amendment is not feature throughput: it is a governance event
-that `base/amendment-protocol.md` already declares gated (ADR + PR).
+that the ADR rule already declares gated (ADR + PR).
 Gating it in CI enforces that protocol when a sole maintainer cannot give the approval —
 it uses exactly the exception that Principle 4 now carves out, without blocking throughput.
 
-*Branch protection note:* by making the `amendment-gate` status-check *required* on `main`,
+*Branch protection note:* by making the amendment gate status-check *required* on `main`,
 GitHub gates **all** direct pushes to `main` (they must go through PR + CI), not just
 amendments. That preserves Principle 4 — local commits and pushes to work branches remain
 free — but it is worth being explicit: `main` is a protected integration point for

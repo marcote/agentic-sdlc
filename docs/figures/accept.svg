@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1062" height="533" viewBox="0 0 1062 533" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<metadata id="figure-spec"><![CDATA[{"props":{"speed":2200,"layout":{"gap":44,"children":[{"id":"br","label":"Slice branch","sub":"tasks + build-report","shape":"store","width":190,"lines":1},{"id":"acc","label":"accept.py","sub":"clean tree, no open escalations","width":200,"lines":1},{"id":"checks","label":"Machine checks","direction":"column","gap":18,"children":[{"id":"suite","label":"Suite","sub":"example · invariant · reconciliation · e2e","width":230,"lines":1},{"id":"map","label":"Module map","sub":"every module listed","width":230,"lines":1},{"id":"judge","label":"Judge","sub":"judged requirements · another model","width":230,"lines":1}]},{"id":"dest","label":"Repo","direction":"column","gap":18,"children":[{"id":"main","label":"main","shape":"store","width":190,"lines":1},{"id":"ns","label":"North star","sub":"## Reported","shape":"store","width":190,"lines":1},{"id":"page","label":"result.html","shape":"store","width":190,"lines":3}]}]},"edges":[{"id":"in","from":"br","to":"acc","label":"run"},{"id":"c1","from":"acc","to":"suite"},{"id":"c2","from":"acc","to":"map"},{"id":"c3","from":"acc","to":"judge"},{"id":"m","from":"suite","to":"main","label":"merge"},{"id":"r","from":"map","to":"ns","label":"results"},{"id":"p","from":"judge","to":"page","label":"page"}],"steps":[{"label":"Green: merge","flow":[{"edges":[{"edge":"in","data":"030"}],"say":"Accept refuses a dirty tree or open build escalations."},{"edges":["c1","c2","c3"],"show":{"suite":[{"text":"72 passed","mark":"✓"}],"map":[{"text":"ok","mark":"✓"}],"judge":[{"text":"none judged","meta":"skipped"}]},"say":"Nobody approves by eye. The checks decide."},{"edges":["m","r","p"],"show":{"main":[{"text":"merged 02:07"}],"ns":[{"text":"results, labelled reported"}],"page":[{"tag":"lead","tone":"gray","text":"10 min"},{"tag":"H1","tone":"purple","text":"brief → H1 3 min"},{"tag":"auto","tone":"blue","text":"H1 → build 6 min"}]},"say":"Merge into local main. The page shows lead time by phase."}]},{"label":"Red: one fix, then escalate","flow":[{"edges":["in","c1"],"show":{"suite":[{"text":"e2e 497 ≠ 500","mark":"✗"}]},"say":"A check fails. Accept sends the slice back to build once, as a FIX task with frozen tests kept."},{"edges":["c1"],"show":{"suite":[{"text":"e2e 497 ≠ 500","meta":"again","mark":"✗"}]},"say":"A second failure escalates. Nothing merges on a red check, and the owner stays on the branch."}]}]}}]]></metadata>
+<style>
+svg { --accent:#0074d9; --fg:#1c1e21; --muted:#606770; --bg:#ffffff; --surface:#f5f7fa; --border:#d0d7de; --card-on:#eef5fd; }
+@media (prefers-color-scheme: dark) { svg { --accent:#3396e8; --fg:#e3e3e3; --muted:#9aa0a6; --bg:#1b1b1d; --surface:#242526; --border:#3a3b3c; --card-on:#1d2733; } }
+.label { fill: var(--fg); font-size: 14px; font-weight: 500; text-anchor: middle; }
+.sub { fill: var(--muted); font-size: 12px; text-anchor: middle; }
+.frame { fill: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+.edgelabel { fill: var(--muted); font-size: 11px; text-anchor: middle; font-family: ui-monospace, Menlo, monospace; }
+.row { fill: var(--fg); font-size: 11px; }
+.row.mono { font-size: 10.5px; font-family: ui-monospace, Menlo, monospace; }
+.muted { fill: var(--muted); }
+.tag { font-size: 9px; font-weight: 600; letter-spacing: .03em; text-anchor: middle; }
+.mark { fill: var(--accent); font-size: 11px; font-weight: 600; text-anchor: end; }
+.chip { fill: #fff; font-size: 11.5px; text-anchor: middle; }
+.steplabel { fill: var(--fg); font-size: 13px; font-weight: 600; text-anchor: middle; font-family: ui-monospace, Menlo, monospace; }
+.caption { fill: var(--muted); font-size: 13.5px; text-anchor: middle; }
+@keyframes a0 { 0%,12.5% { stroke: var(--accent) } 12.5%,25% { stroke: var(--accent) } 25%,56.2% { stroke: var(--accent) } 56.3%,68.7% { stroke: var(--accent) } 68.8%,100% { stroke: var(--accent) } }
+.a0 { animation: a0 14.1s infinite step-end; }
+@keyframes a1 { 0%,12.5% { stroke: var(--border) } 12.5%,25% { stroke: var(--accent) } 25%,56.2% { stroke: var(--accent) } 56.3%,68.7% { stroke: var(--accent) } 68.8%,100% { stroke: var(--accent) } }
+.a1 { animation: a1 14.1s infinite step-end; }
+@keyframes a2 { 0%,12.5% { stroke: var(--border); fill: var(--surface) } 12.5%,25% { stroke: var(--accent); fill: var(--card-on) } 25%,56.2% { stroke: var(--accent); fill: var(--card-on) } 56.3%,68.7% { stroke: var(--accent); fill: var(--card-on) } 68.8%,100% { stroke: var(--accent); fill: var(--card-on) } }
+.a2 { animation: a2 14.1s infinite step-end; }
+@keyframes a3 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 1 } 25%,56.2% { opacity: 1 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 0 } }
+.a3 { animation: a3 14.1s infinite step-end; }
+@keyframes a4 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 1 } 68.8%,100% { opacity: 0 } }
+.a4 { animation: a4 14.1s infinite step-end; }
+@keyframes a5 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 1 } }
+.a5 { animation: a5 14.1s infinite step-end; }
+@keyframes a6 { 0%,12.5% { opacity: 1 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 0 } }
+.a6 { animation: a6 14.1s infinite step-end; }
+@keyframes a7 { 0%,12.5% { stroke: var(--border) } 12.5%,25% { stroke: var(--accent) } 25%,56.2% { stroke: var(--accent) } 56.3%,68.7% { stroke: var(--border) } 68.8%,100% { stroke: var(--border) } }
+.a7 { animation: a7 14.1s infinite step-end; }
+@keyframes a8 { 0%,12.5% { stroke: var(--border); fill: var(--surface) } 12.5%,25% { stroke: var(--accent); fill: var(--card-on) } 25%,56.2% { stroke: var(--accent); fill: var(--card-on) } 56.3%,68.7% { stroke: var(--border); fill: var(--surface) } 68.8%,100% { stroke: var(--border); fill: var(--surface) } }
+.a8 { animation: a8 14.1s infinite step-end; }
+@keyframes a9 { 0%,12.5% { opacity: 1 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 1 } 68.8%,100% { opacity: 1 } }
+.a9 { animation: a9 14.1s infinite step-end; }
+@keyframes a10 { 0%,12.5% { stroke: var(--border) } 12.5%,25% { stroke: var(--border) } 25%,56.2% { stroke: var(--accent) } 56.3%,68.7% { stroke: var(--border) } 68.8%,100% { stroke: var(--border) } }
+.a10 { animation: a10 14.1s infinite step-end; }
+@keyframes a11 { 0%,12.5% { stroke: var(--border); fill: var(--surface) } 12.5%,25% { stroke: var(--border); fill: var(--surface) } 25%,56.2% { stroke: var(--accent); fill: var(--card-on) } 56.3%,68.7% { stroke: var(--border); fill: var(--surface) } 68.8%,100% { stroke: var(--border); fill: var(--surface) } }
+.a11 { animation: a11 14.1s infinite step-end; }
+@keyframes a12 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 1 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 0 } }
+.a12 { animation: a12 14.1s infinite step-end; }
+@keyframes a13 { 0%,12.5% { opacity: 1 } 12.5%,25% { opacity: 1 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 1 } 68.8%,100% { opacity: 1 } }
+.a13 { animation: a13 14.1s infinite step-end; }
+@keyframes a14 { 0%,12.5% { stroke: var(--accent); stroke-width: 2 } 12.5%,25% { stroke: var(--accent); stroke-width: 2 } 25%,56.2% { stroke: var(--accent); stroke-width: 2 } 56.3%,68.7% { stroke: var(--accent); stroke-width: 2 } 68.8%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a14 { animation: a14 14.1s infinite step-end; }
+@keyframes a15 { 0%,12.5% { fill: var(--accent); stroke: var(--accent) } 12.5%,25% { fill: var(--accent); stroke: var(--accent) } 25%,56.2% { fill: var(--accent); stroke: var(--accent) } 56.3%,68.7% { fill: var(--accent); stroke: var(--accent) } 68.8%,100% { fill: var(--accent); stroke: var(--accent) } }
+.a15 { animation: a15 14.1s infinite step-end; }
+@keyframes a16 { 0%,12.5% { fill: #fff } 12.5%,25% { fill: #fff } 25%,56.2% { fill: #fff } 56.3%,68.7% { fill: #fff } 68.8%,100% { fill: #fff } }
+.a16 { animation: a16 14.1s infinite step-end; }
+@keyframes a17 { 0%,12.5% { stroke: var(--muted); stroke-width: 1.25 } 12.5%,25% { stroke: var(--accent); stroke-width: 2 } 25%,56.2% { stroke: var(--accent); stroke-width: 2 } 56.3%,68.7% { stroke: var(--accent); stroke-width: 2 } 68.8%,100% { stroke: var(--accent); stroke-width: 2 } }
+.a17 { animation: a17 14.1s infinite step-end; }
+@keyframes a18 { 0%,12.5% { stroke: var(--muted); stroke-width: 1.25 } 12.5%,25% { stroke: var(--accent); stroke-width: 2 } 25%,56.2% { stroke: var(--accent); stroke-width: 2 } 56.3%,68.7% { stroke: var(--muted); stroke-width: 1.25 } 68.8%,100% { stroke: var(--muted); stroke-width: 1.25 } }
+.a18 { animation: a18 14.1s infinite step-end; }
+@keyframes a19 { 0%,12.5% { stroke: var(--muted); stroke-width: 1.25 } 12.5%,25% { stroke: var(--muted); stroke-width: 1.25 } 25%,56.2% { stroke: var(--accent); stroke-width: 2 } 56.3%,68.7% { stroke: var(--muted); stroke-width: 1.25 } 68.8%,100% { stroke: var(--muted); stroke-width: 1.25 } }
+.a19 { animation: a19 14.1s infinite step-end; }
+@keyframes a20 { 0%,12.5% { fill: var(--bg); stroke: var(--border) } 12.5%,25% { fill: var(--bg); stroke: var(--border) } 25%,56.2% { fill: var(--accent); stroke: var(--accent) } 56.3%,68.7% { fill: var(--bg); stroke: var(--border) } 68.8%,100% { fill: var(--bg); stroke: var(--border) } }
+.a20 { animation: a20 14.1s infinite step-end; }
+@keyframes a21 { 0%,12.5% { fill: var(--muted) } 12.5%,25% { fill: var(--muted) } 25%,56.2% { fill: #fff } 56.3%,68.7% { fill: var(--muted) } 68.8%,100% { fill: var(--muted) } }
+.a21 { animation: a21 14.1s infinite step-end; }
+@keyframes p0 { 0%,0% { opacity: 0 } 0%,12.5% { opacity: 1 } 12.5%,100% { opacity: 0 } }
+.p0 { animation: p0 14.1s infinite step-end; }
+@keyframes p1 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 1 } 25%,100% { opacity: 0 } }
+.p1 { animation: p1 14.1s infinite step-end; }
+@keyframes p2 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 1 } 25%,100% { opacity: 0 } }
+.p2 { animation: p2 14.1s infinite step-end; }
+@keyframes p3 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 1 } 25%,100% { opacity: 0 } }
+.p3 { animation: p3 14.1s infinite step-end; }
+@keyframes p4 { 0%,25% { opacity: 0 } 25%,37.5% { opacity: 1 } 37.5%,100% { opacity: 0 } }
+.p4 { animation: p4 14.1s infinite step-end; }
+@keyframes p5 { 0%,25% { opacity: 0 } 25%,37.5% { opacity: 1 } 37.5%,100% { opacity: 0 } }
+.p5 { animation: p5 14.1s infinite step-end; }
+@keyframes p6 { 0%,25% { opacity: 0 } 25%,37.5% { opacity: 1 } 37.5%,100% { opacity: 0 } }
+.p6 { animation: p6 14.1s infinite step-end; }
+@keyframes p7 { 0%,56.3% { opacity: 0 } 56.3%,68.7% { opacity: 1 } 68.8%,100% { opacity: 0 } }
+.p7 { animation: p7 14.1s infinite step-end; }
+@keyframes p8 { 0%,56.3% { opacity: 0 } 56.3%,68.7% { opacity: 1 } 68.8%,100% { opacity: 0 } }
+.p8 { animation: p8 14.1s infinite step-end; }
+@keyframes p9 { 0%,68.8% { opacity: 0 } 68.8%,81.2% { opacity: 1 } 81.3%,100% { opacity: 0 } }
+.p9 { animation: p9 14.1s infinite step-end; }
+@keyframes a22 { 0%,12.5% { opacity: 1 } 12.5%,25% { opacity: 1 } 25%,56.2% { opacity: 1 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 0 } }
+.a22 { animation: a22 14.1s infinite step-end; }
+@keyframes a23 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 1 } 68.8%,100% { opacity: 1 } }
+.a23 { animation: a23 14.1s infinite step-end; }
+@keyframes a24 { 0%,12.5% { opacity: 1 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 0 } }
+.a24 { animation: a24 14.1s infinite step-end; }
+@keyframes a25 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 1 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 0 } }
+.a25 { animation: a25 14.1s infinite step-end; }
+@keyframes a26 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 1 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 0 } }
+.a26 { animation: a26 14.1s infinite step-end; }
+@keyframes a27 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 1 } 68.8%,100% { opacity: 0 } }
+.a27 { animation: a27 14.1s infinite step-end; }
+@keyframes a28 { 0%,12.5% { opacity: 0 } 12.5%,25% { opacity: 0 } 25%,56.2% { opacity: 0 } 56.3%,68.7% { opacity: 0 } 68.8%,100% { opacity: 1 } }
+.a28 { animation: a28 14.1s infinite step-end; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 9 5 L 0 9 z" fill="var(--muted)"/></marker></defs>
+<rect width="100%" height="100%" fill="var(--bg)"/>
+<g transform="translate(0 0)">
+<path d="M24 220 a 95 12 0 0 1 190 0 v 43 a 95 12 0 0 1 -190 0 z" fill="var(--bg)" stroke="var(--border)" class="a0"/><path d="M24 220 a 95 12 0 0 0 190 0" fill="none" stroke="var(--border)" class="a0"/><text x="119" y="245" class="label">Slice branch</text><text x="119" y="260" class="sub">tasks + build-report</text>
+<rect x="258" y="196.5" width="200" height="90" rx="10" fill="var(--bg)" stroke="var(--border)" class="a0"/><text x="358" y="239.5" class="label">accept.py</text><text x="358" y="254.5" class="sub">clean tree, no open escalations</text>
+<rect x="502" y="64" width="266" height="355" rx="14" fill="var(--surface)" stroke="var(--border)"/><text x="520" y="84" class="frame">MACHINE CHECKS</text>
+<rect x="520" y="101" width="230" height="88" rx="10" fill="var(--bg)" stroke="var(--border)" class="a1"/><text x="635" y="124" class="label">Suite</text><text x="635" y="139" class="sub">example · invariant · reconciliation · e2e</text><rect x="530" y="152" width="210" height="27" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a2"/><g opacity="0" class="a3"><text x="732" y="169" class="mark">✓</text><text x="538" y="169" class="row">72 passed</text></g><g opacity="0" class="a4"><text x="732" y="169" class="mark">✗</text><text x="538" y="169" class="row">e2e 497 ≠ 500</text></g><g opacity="0" class="a5"><text x="732" y="169" class="mark">✗</text><text x="538" y="169" class="row">e2e 497 ≠ 500 · again</text></g><text x="538" y="169" opacity="0" class="row muted a6">—</text>
+<rect x="520" y="207" width="230" height="88" rx="10" fill="var(--bg)" stroke="var(--border)" class="a7"/><text x="635" y="230" class="label">Module map</text><text x="635" y="245" class="sub">every module listed</text><rect x="530" y="258" width="210" height="27" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a8"/><g opacity="0" class="a3"><text x="732" y="275" class="mark">✓</text><text x="538" y="275" class="row">ok</text></g><text x="538" y="275" opacity="0" class="row muted a9">—</text>
+<rect x="520" y="313" width="230" height="88" rx="10" fill="var(--bg)" stroke="var(--border)" class="a7"/><text x="635" y="336" class="label">Judge</text><text x="635" y="351" class="sub">judged requirements · another model</text><rect x="530" y="364" width="210" height="27" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a8"/><g opacity="0" class="a3"><text x="538" y="381" class="row">none judged · skipped</text></g><text x="538" y="381" opacity="0" class="row muted a9">—</text>
+<rect x="812" y="24" width="226" height="435" rx="14" fill="var(--surface)" stroke="var(--border)"/><text x="830" y="44" class="frame">REPO</text>
+<path d="M830 73 a 95 12 0 0 1 190 0 v 63 a 95 12 0 0 1 -190 0 z" fill="var(--bg)" stroke="var(--border)" class="a10"/><path d="M830 73 a 95 12 0 0 0 190 0" fill="none" stroke="var(--border)" class="a10"/><text x="925" y="98" class="label">main</text><rect x="840" y="111" width="170" height="27" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a11"/><g opacity="0" class="a12"><text x="848" y="128" class="row">merged 02:07</text></g><text x="848" y="128" opacity="0" class="row muted a13">—</text>
+<path d="M830 178 a 95 12 0 0 1 190 0 v 78 a 95 12 0 0 1 -190 0 z" fill="var(--bg)" stroke="var(--border)" class="a10"/><path d="M830 178 a 95 12 0 0 0 190 0" fill="none" stroke="var(--border)" class="a10"/><text x="925" y="203" class="label">North star</text><text x="925" y="218" class="sub">## Reported</text><rect x="840" y="231" width="170" height="27" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a11"/><g opacity="0" class="a12"><text x="848" y="248" class="row">results, labelled reported</text></g><text x="848" y="248" opacity="0" class="row muted a13">—</text>
+<path d="M830 298 a 95 12 0 0 1 190 0 v 131 a 95 12 0 0 1 -190 0 z" fill="var(--bg)" stroke="var(--border)" class="a10"/><path d="M830 298 a 95 12 0 0 0 190 0" fill="none" stroke="var(--border)" class="a10"/><text x="925" y="323" class="label">result.html</text><rect x="840" y="336" width="170" height="95" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-dasharray="3 3" class="a11"/><g opacity="0" class="a12"><rect x="848" y="343" width="27.1" height="14" rx="4" fill="#8b949e" fill-opacity="0.15"/><text x="861.5" y="353.5" class="tag" fill="#8b949e">LEAD</text><text x="848" y="368" class="row">10 min</text><rect x="848" y="377" width="17.5" height="14" rx="4" fill="#8b5cf6" fill-opacity="0.15"/><text x="856.8" y="387.5" class="tag" fill="#8b5cf6">H1</text><text x="870.5" y="387" class="row">brief → H1 3 min</text><rect x="848" y="396" width="27.1" height="14" rx="4" fill="#3b82f6" fill-opacity="0.15"/><text x="861.5" y="406.5" class="tag" fill="#3b82f6">AUTO</text><text x="848" y="421" class="row">H1 → build 6 min</text></g><text x="848" y="353" opacity="0" class="row muted a13">—</text>
+<path id="p-in" d="M 214 241.5 C 236 241.5, 236 241.5, 258 241.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a14"/><rect x="220.3" y="232.5" width="31.5" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a15"/><text x="236" y="245.5" class="edgelabel a16">run</text>
+<path id="p-c1" d="M 458 219 C 489 219, 489 145, 520 145" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a17"/>
+<path id="p-c2" d="M 458 241.5 C 489 241.5, 489 251, 520 251" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a18"/>
+<path id="p-c3" d="M 458 264 C 489 264, 489 357, 520 357" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a18"/>
+<path id="p-m" d="M 750 145 C 790 145, 790 104.5, 830 104.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a19"/><rect x="768.4" y="115.8" width="43.2" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a20"/><text x="790" y="128.8" class="edgelabel a21">merge</text>
+<path id="p-r" d="M 750 251 C 790 251, 790 217, 830 217" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a19"/><rect x="762.6" y="225" width="54.8" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a20"/><text x="790" y="238" class="edgelabel a21">results</text>
+<path id="p-p" d="M 750 357 C 790 357, 790 363.5, 830 363.5" fill="none" stroke="var(--muted)" stroke-width="1.25" marker-end="url(#arrow)" class="a19"/><rect x="771.3" y="351.3" width="37.3" height="18" rx="9" fill="var(--bg)" stroke="var(--border)" class="a20"/><text x="790" y="364.3" class="edgelabel a21">page</text>
+<g class="p0" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><rect x="-18.1" y="-35" width="36.3" height="23" rx="8" fill="var(--accent)"/><text x="0" y="-20" class="chip">030</text><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0;0.1;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-in" xlink:href="#p-in"/></animateMotion></g>
+<g class="p1" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.1;0.3;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-c1" xlink:href="#p-c1"/></animateMotion></g>
+<g class="p2" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.1;0.3;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-c2" xlink:href="#p-c2"/></animateMotion></g>
+<g class="p3" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.1;0.3;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-c3" xlink:href="#p-c3"/></animateMotion></g>
+<g class="p4" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.3;0.4;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-m" xlink:href="#p-m"/></animateMotion></g>
+<g class="p5" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.3;0.4;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-r" xlink:href="#p-r"/></animateMotion></g>
+<g class="p6" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.3;0.4;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-p" xlink:href="#p-p"/></animateMotion></g>
+<g class="p7" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.6;0.7;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-in" xlink:href="#p-in"/></animateMotion></g>
+<g class="p8" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.6;0.7;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-c1" xlink:href="#p-c1"/></animateMotion></g>
+<g class="p9" opacity="0"><circle r="10" fill="var(--accent)" opacity="0.2"/><circle r="4.5" fill="var(--accent)"/><animateMotion dur="14.1s" repeatCount="indefinite" keyTimes="0;0.7;0.8;1" keyPoints="0;0;1;1" calcMode="linear"><mpath href="#p-c1" xlink:href="#p-c1"/></animateMotion></g>
+</g>
+<text x="531" y="499" opacity="0" class="steplabel a22">Green: merge</text>
+<text x="531" y="499" opacity="0" class="steplabel a23">Red: one fix, then escalate</text>
+<g opacity="0" class="a24"><text x="531" y="525" class="caption">Accept refuses a dirty tree or open build escalations.</text></g>
+<g opacity="0" class="a25"><text x="531" y="525" class="caption">Nobody approves by eye. The checks decide.</text></g>
+<g opacity="0" class="a26"><text x="531" y="525" class="caption">Merge into local main. The page shows lead time by phase.</text></g>
+<g opacity="0" class="a27"><text x="531" y="525" class="caption">A check fails. Accept sends the slice back to build once, as a FIX task with frozen tests kept.</text></g>
+<g opacity="0" class="a28"><text x="531" y="525" class="caption">A second failure escalates. Nothing merges on a red check, and the owner stays on the branch.</text></g>
+</svg>

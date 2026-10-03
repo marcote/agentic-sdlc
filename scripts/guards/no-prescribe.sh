@@ -5,7 +5,7 @@
 # as a default *in prose*. Names inside fenced blocks and inline code spans are examples,
 # not prescriptions, and are ignored — the pin template necessarily illustrates real tools.
 #
-# Run by /verify via `scripts/stack/engine.py guards`. Exit 0 = the stance holds.
+# Run by /accept via `scripts/stack/engine.py guards`. Exit 0 = the stance holds.
 # Dependency-free: shell + coreutils only.
 set -u
 cd "$(dirname "$0")/../.."

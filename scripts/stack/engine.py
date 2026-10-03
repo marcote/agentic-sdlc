@@ -13,7 +13,7 @@ Deterministic capabilities over a project's stack charter (memory/stack/stack.md
                      overridable with repeatable --rules): one line per
                      rule, "GR<n>: pin <id>" / "n/a" / "uncovered". A SUPERSEDED pin does
                      not count -- history is not a rationale.
-  guards FILE        one Guard command per line, for /verify to execute. ANY pin kind may
+  guards FILE        one Guard command per line, for /accept to execute. ANY pin kind may
                      declare one: whether a pin injects a per-feature coverage row (stance
                      only) is orthogonal to whether it can be checked by a command (both).
                      A substrate choice such as a dependency tool is often the more
@@ -189,7 +189,7 @@ def _default_rule_paths(charter):
     """Locate the ground rule layers for a charter, resolving from the CHARTER's own directory
     upward -- the rule scripts/north-star/engine.py already uses for decisions/ (_adr_ids).
 
-    Resolving against the process cwd instead was a real defect, found at 018's /distill by
+    Resolving against the process cwd instead was a real defect, found at 018's review by
     pointing the gate at a vendored target: `ground-rules TARGET/memory/stack/stack.md` reported
     `no ground rule file found` for a file sitting right beside the charter. In this repository
     cwd and artifact always coincided, so three features never saw it.
