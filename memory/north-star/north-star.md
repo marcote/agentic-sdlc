@@ -20,7 +20,7 @@ extends: base
 
 ## Mission
 
-A reusable, stack-agnostic harness that enforces a disciplined, autonomous agentic SDLC (spec-driven, test-first, evidence-verified), where the owner defines done and agents deliver it, on any project — governs how software is built, without imposing a stack or execution runtime, and without writing product code.
+A reusable, stack-agnostic harness that enforces a disciplined, autonomous agentic SDLC (spec-driven, test-first, evidence-verified). Where the owner defines done and agents deliver it, on any project. Governs how software is built, without imposing a stack or execution runtime, and without writing product code.
 
 ## Pillars
 

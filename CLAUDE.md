@@ -8,7 +8,7 @@ Agnostic. Copied on top of any project.
 
 ## Conventions
 - One feature = one folder `specs/<NNN-feature>/` (kebab-case, NNN zero-padded).
-- Acceptance criteria are written in BDD (Given/When/Then).
+- Requirements are EARS sentences, each with examples. See `specs/_template/spec.md`.
 
 ## Hard rules
 - The owner approves once: gate H1, the spec page. Everything after it runs without the owner, except escalations.
@@ -21,9 +21,8 @@ Agnostic. Copied on top of any project.
 `/brief` → `/spec` (gate H1) → `/build` → `/accept`. See `docs/workflow.md`.
 
 ## Pointers
+- Step instructions: `harness/steps/`. Role prompts: `harness/prompts/`. Roles and CLIs: `harness.toml`.
+- Slice templates: `specs/_template/`
 - Non-negotiable principles: `memory/constitution/`
 - Load-bearing technical decisions: `memory/stack/` (charter + pin grammar)
-- Skills (dynamic context): `.claude/skills/` (distill, verify, uat)
-- Feature templates: `specs/_template/`
-- Evaluation rubric: `evals/rubric.md`
-- Verification reports (observability): `verification/reports/`
+- Why the product exists: `memory/north-star/`

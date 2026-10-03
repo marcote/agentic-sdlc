@@ -22,40 +22,32 @@ Always dry-run first — it prints exactly what each path will become before tou
 
 ### KEEP — governance, copied verbatim, **overwrites**
 The layer you do not edit; re-running refreshes it (idempotent, authoritative):
-`.claude/{commands,skills,hooks,settings.json}`, `memory/constitution/base` +
-`update-checklist.md`, `memory/north-star/base`, `specs/_template`, `evals/rubric.md`,
-the `verification/*` checklists, `docs/{factory-model,workflow}.md`, the North Star
-engine `scripts/north-star/engine.py`, `scripts/amendment-gate.sh` +
-`scripts/setup-branch-protection.sh`, and `.github/workflows/amendment-gate.yml`.
+`.claude/{commands,skills,hooks,settings.json}`, `AGENTS.md`, `harness/`,
+`memory/constitution/base` + `update-checklist.md`, `memory/north-star/base`, `memory/stack/base`,
+`specs/_template`, `docs/workflow.md`, the scripts `spec.py`, `build.py`, `accept.py`,
+`fake_agent.py`, `status.sh`, `north-star/engine.py`, `stack/engine.py` and `guards/`.
 
 ### SEED — customizable layer, stub if absent, **never clobbered**
 Yours to fill; if the file already exists, vendoring writes `<file>.harness-new` beside it
 and reports it for manual merge — it never overwrites your file:
-`CLAUDE.md`, `memory/constitution/constitution.md` (`extends: base`),
-`memory/north-star/north-star.md` (`extends: base`), and `scripts/test.sh`.
+`CLAUDE.md`, `harness.toml`, `memory/constitution/constitution.md` (`extends: base`),
+`memory/north-star/north-star.md` (`extends: base`), `memory/stack/stack.md`, `docs/modules.md`
+and `scripts/test.sh`.
 
 ### DROP — harness-self content, never copied
 The harness's own product content, which you do not want:
-`specs/0*-*` (except `_template`), `memory/north-star/decisions/*`,
-`verification/reports/*`, `verification/wow-report.md`, `docs/superpowers/*`,
-`docs/backlog.md` (the harness's own parked findings, not yours),
-`scripts/prose.sh` (a style rule for this repo's own artifacts; your prose conventions are yours),
-`scripts/nvc.sh` (it reads `tests/check_*.sh`, this repo's own test conventions — you inherit the
-*pattern* in `memory/constitution/base/patterns/non-vacuous-checks.md` and mechanise it in your stack),
-`evals/cases/*`, `README.md`, `tests/` (harness self-validation — your runtime is
-`scripts/test.sh`), and the vendoring tooling itself (`scripts/vendor.sh`, `docs/vendoring.md`).
+`specs/0*-*` (except `_template`), `memory/north-star/decisions`, `verification`,
+`docs/superpowers`, `evals`, `README.md`, `tests/` (harness self-validation — your runtime is
+`scripts/test.sh`), `docs/backlog.md` (the harness's own parked findings), and the vendoring
+tooling itself (`scripts/vendor.sh`, `docs/vendoring.md`, `bootstrap.sh`,
+`scripts/setup-branch-protection.sh`).
 
-## Stack plugs (what vendoring cannot fill for you)
+## Stack plug (what vendoring cannot fill for you)
 
-Vendoring lands the governance layer and detects what it can, but two things are your
-execution-runtime and stay yours:
-
-- **`scripts/test.sh`** — vendoring detects your stack (`package.json`→`npm test`,
-  `pyproject.toml`→`pytest`, `go.mod`→`go test ./...`, `Cargo.toml`→`cargo test`) and seeds a
-  default; **unknown stack → an explicit `TODO`**. This is the one command `/contract` and
-  `/verify` run.
-- **The eval-runner** — the non-deterministic eval cases are left to your stack
-  (`evals/README.md`); the rubric (`evals/rubric.md`) is copied as the contract.
+**`scripts/test.sh`** — vendoring detects your stack (`package.json`→`npm test`,
+`pyproject.toml`→`pytest`, `go.mod`→`go test ./...`, `Cargo.toml`→`cargo test`) and seeds a
+default; **unknown stack → an explicit `TODO`**. This is the one command `/build` and
+`/accept` run.
 
 `.harness-provenance` (written at `--apply`) records the source commit, date, and the list of
 `.harness-new` files that need merging.
@@ -67,7 +59,5 @@ Vendoring ends where the workflow begins:
 1. Merge any `*.harness-new` files into your `CLAUDE.md` / constitution / North Star.
 2. **`/constitution`** — seed your project constitution (deltas over `base`).
 3. Replace the `memory/north-star/north-star.md` placeholder with your product's North Star,
-   then it is ready for `/align`.
-4. Start your first feature: `cp -r specs/_template specs/001-my-feature`, write `brief.md`,
-   and run `/align` → `/distill` → `/plan` → `/contract` → `/tasks` → implement → `/verify` →
-   `/uat` → `/retro`.
+   then run `/stack`.
+4. Start your first slice: `/brief` → `/spec` → `/build` → `/accept`.

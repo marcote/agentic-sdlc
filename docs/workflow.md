@@ -1,6 +1,6 @@
 # Workflow
 
-    setup, once    north star (glossary, labels) · charter · module map
+    setup, once    north star (glossary, labels) · charter (/stack) · module map
     1. brief       harness/steps/brief.md
     2. spec        harness/steps/spec.md → spec.html → gate H1 (the owner approves)
     3. build       uv run scripts/build.py specs/<slice>    (no owner)

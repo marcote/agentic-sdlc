@@ -89,4 +89,4 @@ cannot govern anything.
 
 The validator only checks **shape** (presence, non-empty, type) — it has no opinion
 on whether a mission is *good*. Judging quality is the work of the semantic layer
-of the `/align` skill and the dimensions of `alignment-rubric.md`, not of this schema.
+of the alignment judge and the dimensions of `alignment-rubric.md`, not of this schema.
