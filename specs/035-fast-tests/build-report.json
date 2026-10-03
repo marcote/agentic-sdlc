@@ -1,140 +1,51 @@
 {
-  "tokens": 608980,
+  "tokens": 0,
   "tasks": {
     "T0": {
       "status": "done",
-      "attempts": 1
+      "attempts": 0
     },
     "T1": {
       "status": "done",
-      "attempts": 1
+      "attempts": 0
     },
     "T2": {
       "status": "done",
-      "attempts": 1
+      "attempts": 0
     },
     "T3": {
       "status": "done",
-      "attempts": 1
+      "attempts": 0
     },
     "T4": {
       "status": "done",
-      "attempts": 1
+      "attempts": 0
     },
     "T5": {
       "status": "done",
-      "attempts": 1
-    },
-    "FIX": {
-      "status": "blocked",
-      "attempts": 1
+      "attempts": 0
     }
   },
-  "trace": [
-    "T0:implementer",
-    "T0:checks",
-    "T0:reviewer",
-    "T1:implementer",
-    "T1:checks",
-    "T1:reviewer",
-    "T2:implementer",
-    "T2:checks",
-    "T2:reviewer",
-    "T3:implementer",
-    "T3:checks",
-    "T3:reviewer",
-    "T4:implementer",
-    "T4:checks",
-    "T4:reviewer",
-    "T5:implementer",
-    "T5:checks",
-    "T5:reviewer",
-    "FIX:implementer"
-  ],
-  "assumptions": [
-    {
-      "task": "T1",
-      "text": "Added `--with jsonschema --with markdown` to the `task` and `suite` commands, because scripts run under the test Python no longer get their inline dependencies from `uv run`."
-    },
-    {
-      "task": "T1",
-      "text": "Left the `uv run` calls in tests other than `conftest.py` (`test_build.py`, `test_lesson_curation.py`, `test_repo_memory.py`), because E3 and S3 only name `conftest.py` and the fake adapter."
-    },
-    {
-      "task": "T2",
-      "text": "Per-example results are read from pytest -rA output lines (PASSED/FAILED/ERROR ... test_eN_). The task command in harness.toml now includes -rA; other stacks must print the same line shape."
-    },
-    {
-      "task": "T2",
-      "text": "red_exit is no longer consulted in T0; an example is red if the runner prints a FAILED/ERROR line for it."
-    },
-    {
-      "task": "T3",
-      "text": "No test shares a fixed path or port: they use tmp_path and bind no ports. The parallel run showed no collisions, so I made no isolation changes."
-    },
-    {
-      "task": "T3",
-      "text": "E1 and E2 fail because the suite timing, the page and the budget check do not exist yet. They belong to a later task, not T3."
-    },
-    {
-      "task": "T4",
-      "text": "Test time is the sum of `run_raw` durations (the task check) in one build process. It is kept in a module-level `TEST_TIME` in build.py. It includes the T0 run and every retry."
-    },
-    {
-      "task": "T4",
-      "text": "If `limits.suite_seconds` is absent, accept does not check the budget. Other adopters' configs stay valid."
-    },
-    {
-      "task": "T4",
-      "text": "tests/conftest.py strips `suite_seconds = 30` from the copied slice config. The frozen E2 test inserts its own `suite_seconds` line into `[limits]`, and a duplicate key makes the TOML invalid."
-    },
-    {
-      "task": "T4",
-      "text": "Accept writes `suite_seconds` into the in-memory report, so it is also saved in build-report.json when accept escalates. It is not in the saved `runs` entries."
-    },
-    {
-      "task": "T5",
-      "text": "Cause inferred from the code (same-size rewrite within one second reusing a stale .pyc); the flake was not reproduced before the fix, so the fix is not shown to cure an observed failure."
-    },
-    {
-      "task": "T5",
-      "text": "Fixed in build.py revert() rather than only in test fixtures, because real builds hit the same stale-bytecode path."
-    }
-  ],
-  "escalations": [
-    {
-      "task": "FIX",
-      "reason": "S6 (the commit message of e044ca1) can only be fixed by amending history, which is outside what I may do, so I left it for the owner or build script."
-    },
-    {
-      "task": "accept",
-      "reason": "suite took 39.8 s, budget 30 s"
-    },
-    {
-      "task": "accept",
-      "reason": "S6: R1: the commit message does not name the root cause. Commit e044ca1 says only 'build(035-fast-tests): T5 remove the root cause of the flaky revert test', which repeats the task title and has no body. The cause appears only in a code comment in scripts/build.py revert(): a reverted source rewritten in the same second with the same size reuses its stale __pycache__ .pyc. The commit message must state that cause. (The other part of R1 is met: the diff adds no sleep, retry or skip.)"
-    }
-  ],
-  "reused": [
-    "sys.executable",
-    "existing placeholder substitution in scripts/build.py call()",
-    "run_checks",
-    "build.run_raw",
-    "accept.failures",
-    "accept.result_page rows",
-    "git clean pathspec in revert()"
-  ],
-  "new": [
-    "pytest-xdist"
-  ],
+  "trace": [],
+  "assumptions": [],
+  "escalations": [],
+  "reused": [],
+  "new": [],
   "findings": [],
-  "started": "2026-10-03T14:22:14.722164+00:00",
+  "started": "2026-10-03T14:41:38.492076+00:00",
+  "test_seconds": 0.0,
   "runs": [
     {
       "started": "2026-10-03T14:22:14.722164+00:00",
       "tokens": 473271,
-      "escalations": []
+      "escalations": [],
+      "test_seconds": null
+    },
+    {
+      "started": "2026-10-03T14:41:38.492076+00:00",
+      "tokens": 0,
+      "escalations": [],
+      "test_seconds": 0.0
     }
-  ],
-  "suite_seconds": 39.8
+  ]
 }
