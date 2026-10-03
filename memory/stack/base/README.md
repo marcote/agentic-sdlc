@@ -87,8 +87,9 @@ feature was small. If the tier could switch these off, *non-negotiable* would me
 
 `ground-rules.md` holds the **floor of the charter**: aspects that must have a recorded
 rationale before implementation begins. Each is answered by a pin declaring `Answers: GR<n>`, or
-declined with an `n/a` block carrying `Because` + `Falsifier`. `/plan` refuses to proceed while
-any ground rule lacks a verdict (`UNCOVERED`).
+declined with an `n/a` block carrying `Because` + `Falsifier`.
+`scripts/stack/engine.py ground-rules` exits 1 while any ground rule lacks a verdict (`uncovered`).
+Resolve it before gate H1.
 
 A ground rule names a **question**, never an answer — which is what lets the floor be universal
 without imposing anything. `S0` scales how deep an answer goes and how many pins exist beyond

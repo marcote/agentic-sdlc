@@ -1,0 +1,87 @@
+{
+  "tokens": 397843,
+  "tasks": {
+    "T0": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T1": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T2": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T3": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T4": {
+      "status": "done",
+      "attempts": 1
+    }
+  },
+  "trace": [
+    "T0:implementer",
+    "T0:checks",
+    "T0:reviewer",
+    "T1:implementer",
+    "T1:checks",
+    "T1:reviewer",
+    "T2:implementer",
+    "T2:checks",
+    "T2:reviewer",
+    "T3:implementer",
+    "T3:checks",
+    "T3:reviewer",
+    "T4:implementer",
+    "T4:checks",
+    "T4:reviewer"
+  ],
+  "assumptions": [
+    {
+      "task": "T1",
+      "text": "Frozen set is the union of test files across all T0 commits; the existing tests/ and test_e\\d+ filter is unchanged."
+    },
+    {
+      "task": "T2",
+      "text": "An example counts as named by a frozen test if `test_<id>_` (lower-case) appears in the frozen file's path or content. This matches the selector `run_checks` uses."
+    },
+    {
+      "task": "T2",
+      "text": "The late T0 reuses the task id `T0` and the same attempts, reviewer and vacuity checks as the first T0."
+    },
+    {
+      "task": "T3",
+      "text": "The H1 marker is the newest commit whose subject starts `spec(<slice>): approved at H1`. The build marker is the newest commit whose subject starts `build(<slice>): `, so the last build commit ends the H1 \u2192 build phase and starts Build \u2192 accept."
+    },
+    {
+      "task": "T3",
+      "text": "Every duration, including lead time, runs to the moment accept writes the page (now). All durations print as hours with one decimal."
+    },
+    {
+      "task": "T3",
+      "text": "The brief commit is the oldest commit that adds `<spec_dir>/brief.md`."
+    },
+    {
+      "task": "T3",
+      "text": "The fallback when there is no brief commit is the first commit in `main..HEAD`, then `report['started']`, then now. Only the first is exercised by the tests."
+    }
+  ],
+  "escalations": [],
+  "reused": [
+    "existing git() helper",
+    "existing frozen-file regex",
+    "done_on_branch",
+    "contract",
+    "run_checks",
+    "examples_of",
+    "prompt_for",
+    "build.git",
+    "build.done_on_branch grep style (--basic-regexp)",
+    "harness/steps/spec.md"
+  ],
+  "new": [],
+  "started": "2026-10-03T04:59:34.143963+00:00"
+}

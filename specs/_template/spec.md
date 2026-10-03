@@ -1,16 +1,51 @@
-# Spec — <feature>
+# Spec <NNN> — <name>
 
-> WHAT is built. Produced by `/distill` from `brief.md`. Frozen
-> when `coverage.md` has no orphan rows.
+Status: draft for gate H1. Labels: decided, hypothesis, open, reported.
 
-## Functional requirements
-1. _(requirement)_
+## 1. Glossary
 
-## User stories
-- As _<role>_ I want _<capability>_ so that _<benefit>_.
+| term | meaning |
+| --- | --- |
 
-## Edge cases (80% problem)
-- _(cases the brief does not cover — expanded in the distillation loop)_
+## 2. Requirements
 
-## Open questions / deferred
-- _(ambiguities resolved or deferred with justification)_
+| id | requirement | anchor | examples |
+| --- | --- | --- | --- |
+
+## 3. Examples
+
+Each example becomes a test named `test_<id>_<words>`.
+
+| id | given | when | then |
+| --- | --- | --- | --- |
+
+## 4. Tests
+
+Four kinds. Write no other kind.
+
+- example: section 3, one test per example.
+- invariant: a property every run keeps, from a north-star principle. Name the principles this slice relies on.
+- reconciliation: an output compared with a published value from outside the repo.
+- e2e run: a small run through every layer, with a fixed expected output.
+
+The e2e run writes `specs/<slice>/results.json` as `[{"id": "<hypothesis or requirement id>", "value": "<text>"}]`.
+Accept appends each entry to the north star, labelled reported.
+
+A test may use recorded real data. A test does not mock the project's own code.
+
+## 5. Plan
+
+| task | does | requirements | needs |
+| --- | --- | --- | --- |
+
+| item | justification |
+| --- | --- |
+
+## 6. Amendments
+
+Changes to the north star or the charter. Gate H1 approves each row.
+
+## 7. Assumptions and open items
+
+| item | label |
+| --- | --- |

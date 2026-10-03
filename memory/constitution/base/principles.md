@@ -5,28 +5,17 @@ verification must comply with them. They are inherited via `extends: base`.
 
 1. **Verifiability.** Every requirement is expressed as a measurable acceptance criterion
    (BDD). What cannot be verified is not built.
-2. **Test-first.** The deterministic portion of each criterion exists as a test in 🔴 RED
-   before writing implementation (gate of `/contract`). An **invariant** criterion
-   (*must-not-regress*: "X must never appear", "must stay dep-free") is **tied to an
-   observable deliverable** to have a genuine RED phase — its test must fail until what it
-   verifies exists. `green-by-construction` (green with nothing implemented) **does not count
-   as 🔴** and the `/tasks` gate rejects it; tying it to the deliverable is the correct way
-   to give it the RED→GREEN arc.
-   *Must-not-regress guard exception:* a criterion whose sole job is to assert that an
-   **already-green** behavior stays green through a change (e.g. "the existing gate behaves
-   identically after a refactor") has **no honest RED phase** — breaking the behavior to
-   redden it would be theater. Such a criterion is **annotated as a guard** (its linked test
-   is the pre-existing green suite) and **excluded from the `/contract` RED-required set**,
-   the same way `UAT (config)` rows are excluded. This is the complement of the rule above:
-   fake-green that *should* be red is rejected; a guard that *protects* real behavior is kept.
-   *Interactive-IO exception:* a criterion whose observable behavior **is** a real interactive
-   terminal exchange (e.g. a `[y/N]` prompt read from `/dev/tty`) has **no honest hermetic RED** —
-   it cannot be reddened in an automated suite without a real controlling terminal, and faking one
-   is theater. Such a criterion is **UAT-observed** (validated by hand — e.g. over a pseudo-terminal
-   — at `/uat`) and **excluded from the `/contract` RED-required set**, like `UAT (config)` rows.
-   Its **deterministic neighbors stay in** the RED set: the non-interactive paths around it (an
-   explicit `--yes`/consent flag, a no-terminal abort) must still redden and green normally; only
-   the terminal read itself is deferred to UAT.
+2. **Test-first.** Each example exists as a test in 🔴 RED before implementation: build's T0 RED gate.
+   An **invariant** ("X must never appear", "must stay dep-free") is **tied to an observable deliverable**.
+   Its test then fails until what it verifies exists.
+   A test that is green with nothing implemented **does not count as 🔴**, and T0 rejects it as vacuous.
+   *Must-not-regress guard exception:* a criterion that only asserts an **already-green** behavior stays green has **no honest RED phase**.
+   Breaking the behavior to redden it would be theater.
+   Such a criterion is **annotated as a guard**: its test is the existing green suite, and T0 does not require it red.
+   Fake green that *should* be red is rejected; a guard that *protects* real behavior is kept.
+   *Interactive-IO exception:* a real terminal exchange (a `[y/N]` prompt read from `/dev/tty`) has **no honest hermetic RED**.
+   Such a criterion is validated by hand, outside accept's machine verification, and T0 does not require it red.
+   Its **deterministic neighbors stay in** the RED set: a `--yes` flag or a no-terminal abort still reddens and greens normally.
 3. **Full traceability.** Every objective in the brief reaches a criterion; every criterion
    maps to an eval or UAT step. Orphan rows = gap that blocks the spec freeze.
 4. **Productivity first.** Verification is on-demand: no blocking per-commit hooks,

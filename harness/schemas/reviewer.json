@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "findings"],
+  "properties": {
+    "verdict": {"enum": ["pass", "fix"]},
+    "findings": {"type": "array", "items": {"type": "string"}}
+  }
+}

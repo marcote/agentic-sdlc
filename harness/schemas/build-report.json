@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": ["tokens", "tasks", "trace", "assumptions", "escalations", "reused", "new", "started"],
+  "properties": {
+    "tokens": {"type": "integer", "minimum": 0},
+    "tasks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status", "attempts"],
+        "properties": {
+          "status": {"enum": ["done", "escalated", "blocked", "skipped"]},
+          "attempts": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "trace": {"type": "array", "items": {"type": "string"}},
+    "assumptions": {"type": "array", "items": {"type": "object", "required": ["task", "text"]}},
+    "escalations": {"type": "array", "items": {"type": "object", "required": ["task", "reason"]}},
+    "reused": {"type": "array", "items": {"type": "string"}},
+    "new": {"type": "array", "items": {"type": "string"}},
+    "started": {"type": "string"}
+  }
+}

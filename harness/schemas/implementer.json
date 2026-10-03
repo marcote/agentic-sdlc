@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "summary", "assumptions", "reused", "new_deps"],
+  "properties": {
+    "status": {"enum": ["done", "blocked"]},
+    "summary": {"type": "string"},
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "severity"],
+        "properties": {"text": {"type": "string"}, "severity": {"enum": ["minor", "structural"]}}
+      }
+    },
+    "reused": {"type": "array", "items": {"type": "string"}},
+    "new_deps": {"type": "array", "items": {"type": "string"}}
+  }
+}

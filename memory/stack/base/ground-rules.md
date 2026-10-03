@@ -9,7 +9,8 @@ universal without imposing anything: *"how does anything outside reach this?"* p
 technology — it only forbids not having thought about it. A file that named answers would be a
 different thing entirely, and would not belong in a stack-agnostic harness.
 
-`/plan` refuses to proceed while any ground rule lacks a verdict (`UNCOVERED`).
+`scripts/stack/engine.py ground-rules` exits 1 while any ground rule lacks a verdict (`uncovered`).
+Resolve it before gate H1.
 
 ## The six
 

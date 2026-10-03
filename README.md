@@ -1,7 +1,7 @@
 # Agentic SDLC Harness
 
 Agnostic template (Claude Code first) for disciplined agentic development, with
-verification/UAT as north star.
+verification as north star.
 
 > **Based on Google's work.** This harness is a practical implementation of the ideas in
 > Google's whitepaper **_"The New SDLC With Vibe Coding — From ad-hoc prompting
@@ -28,143 +28,52 @@ curl -fsSL https://raw.githubusercontent.com/marcote/agentic-sdlc/main/bootstrap
 ```
 
 With no terminal and no `--yes`, it aborts rather than writing blind. After it applies, merge any
-`.harness-new` files and run `/constitution` → seed your North Star → first `/align`. Already have
+`.harness-new` files and run `/constitution` → seed your North Star → `/stack` → first `/brief`. Already have
 the harness cloned? Use `scripts/vendor.sh` directly (see `docs/vendoring.md`).
 
 ## The loop at a glance
-`/constitution → brief → /align → /distill → /plan → /contract → /tasks → implement → /verify → /uat`
+Setup, once: `/constitution` → seed your North Star → `/stack`.
 
-`/align` is the **intake gate** (Measurability Gate): it scores the brief against the
-project's North Star (`memory/north-star/`) and `/distill` refuses to start unless
-the verdict is `aligned`.
+`/brief` → `/spec` (gate H1, the owner approves) → `/build` → `/accept`
+
+The owner approves once, at the spec page. Build and accept run as scripts without the owner,
+except for escalations. Roles and CLIs live in `harness.toml`. See `docs/workflow.md`.
 
 ---
 
 ## Way of Work
 
-### Philosophy
-
 The developer's primary output **is not code: it is the system that produces code**
 (the *factory model*). You define the specs and guardrails; the agent implements; the
-verification validates. Four rules govern everything:
+machine verifies. Four rules govern everything:
 
-1. **Productivity first** — verification is run by the agent *on-demand*; the inner
-   loop (local commit, push to work branches) never stops. The only exception is a narrow
-   governance gate on `main` (the North Star amendment-gate), which does not block feature
-   throughput.
-2. **Intent > syntax** — the artifact that matters is the *spec* + the *acceptance
-   criteria*, not the code.
+1. **Productivity first** — the inner loop never stops. Verification runs on demand, in `/accept`.
+2. **Intent > syntax** — the artifact that matters is the spec: EARS requirements with examples.
 3. **The constitution is code** — versioned, reviewed, inheritable. Add a rule every
    time the agent commits a repeatable mistake.
-4. **Everything verifiable leaves a trail** — each verification emits a versioned report.
+4. **Everything verifiable leaves a trail** — build and accept each write a report.
 
-### Two layers: governance vs execution-runtime
-
-The Way of Work is split into two layers with distinct owners:
-
-| Layer | What it is | Owner | Stability |
-|---|---|---|---|
-| **Governance** (the harness) | the commands (`/align`, `/distill`, `/plan`, `/contract`, `/tasks`, `/verify`, `/uat`), deterministic gates, the **constitution** (how to build) and the **North Star** (why the product exists) | the harness — versioned, reviewed, the same for every adopter | stable |
-| **Execution-runtime** (chosen by the adopter) | the steps that are **not** commands: the intake that produces `brief.md`, the implementation work between `/tasks` and `/verify`, and the finish (merge/PR/cleanup) | each adopting repo | swappable |
-
-The harness **governs**; it does not impose an execution runtime. Any set of
-assistants can cover intake→brief, implement, and finish as long as they respect
-the governance layer's artifacts and gates. The harness **does not name any runtime
-as mandatory** — a project's brainstorming/TDD/etc. assistants are point-in-time
-helpers **subordinate** to this flow, not a parallel process.
-
-Analogously, the governance layer brings the **contract** (North Star schema,
-rubric, amendment protocol, semantics of the `/align` verdict) but **not** the
-deterministic executable engine that evaluates it: each adopting stack provides that,
-just as the eval-runner (`evals/README.md`) is left to the adopter. See `memory/north-star/base/README.md`.
-
-### Enforcement does not live in hooks
-
-Discipline is enforced at **workflow transitions** (once per phase), not in per-commit
-hooks. Three layers, from coarsest to finest:
-
-| Layer | What it does | When |
-|---|---|---|
-| **Constitution** (declarative) | non-negotiables; the agent uses it as seed and filter | always |
-| **Workflow gates** (deterministic) | `/contract` red gate, `coverage.md` state machine, strict AND close | at command transitions · **90% of enforcement** |
-| **Hooks** (fine) | only `secret-scan` advisory (warns, does not block) | opt-in |
-
-### The 7 phases
-
-Each command produces an artifact and has its verification. The backbone is
-`coverage.md`: each row travels from the objective to its report.
-
-| # | Command | Produces | Gate / verification |
-|---|---|---|---|
-| 1 | `/constitution` | `memory/constitution/` | seed + filter for the whole flow |
-| 2 | *(intake)* | `brief.md` | product objective + success metrics (not the solution) |
-| — | `/align` | `alignment.md` | **Measurability Gate**: scores the brief against the North Star; only `aligned` advances to `/distill` |
-| 3 | `/distill` | `spec.md` + `acceptance.md` + `coverage.md` | grilling loop; does not freeze with orphan rows |
-| 4 | `/plan` | `plan.md` | grounded in the constitution (cannot violate a `[given]`) |
-| 5 | `/contract` | tests 🔴 + eval cases 📋 | runs the suite and **proves it is RED** |
-| 6 | `/tasks` | `tasks.md` | **GATE test-first**: refuses to emit tasks if a red contract is missing |
-| 7 | *(implement)* | code | inner loop 🔴→🟢; escalates to human on the 20% conceptual |
-| 8 | `/verify` | `verification/reports/…` | output eval (BUILD) + trajectory eval, against `rubric.md` |
-| 9 | `/uat` | full report | validates against the **objective**; a failure = product gap → `/distill` |
-
-### The three loops
-
-- **Grilling** (inside `/distill`): closes *specification gaps* before coding.
-  The agent interrogates ambiguities one at a time and expands edge cases (the *80% problem*).
-- **Inner loop** (implementation, per task): auto-corrects 🔴→🟢. Clear cut condition
-  — DONE when the criterion's tests pass; **ESCALATES** to human after 2 identical failures
-  or 3 attempts (tuneable in the constitution), instead of burning tokens.
-- **Feedback** (`/verify` + `/uat`): a `/verify` failure is an *implementation* gap
-  → go back to implement; a `/uat` failure is a *product* gap → go back to `/distill`.
-
-### The backbone: `coverage.md`
-
-Traceability matrix + state machine. Mechanical rule: **every objective reaches a
-criterion; every criterion maps to an eval/UAT**. Orphan row = gap that blocks the spec
-freeze. States of a deterministic criterion:
-
-`no contract → 🔴 red → 🟢 green → ✅ uat` · `📋 case` (non-deterministic) · `[given]`
-(inherited from the constitution) · `deferred` (justified gap)
-
-### Test-first, BDD style
-
-Each acceptance criterion is written as a **Given/When/Then** scenario, and that scenario
-*is* the test. `/contract` materializes it in red; `/tasks` does not deliver implementation
-work until it exists. Not left to the dev's discretion.
-
-### Close condition (strict AND)
-
-```
-feature "DONE"  ⟺  BUILD ✅  AND  TRAJECTORY ✅  AND  UAT ✅  AND  coverage 100%
-```
-
-- **BUILD** — 100% of deterministic criteria in 🟢 (the contract, non-negotiable).
-- **TRAJECTORY** — weighs as much as BUILD: a green build that *skipped verification* is a fail.
-- **UAT** — the only one that validates against the brief objective and reveals product gaps.
+The harness **governs**; it does not name a mandatory agent CLI, model or product stack.
+Any CLI with a headless JSON mode can fill a role in `harness.toml`. The judge's model family
+must differ from the implementer's.
 
 ---
 
 ## Structure
-- `CLAUDE.md` — static context (stack, hard rules, workflow).
+- `CLAUDE.md` and `AGENTS.md` — static context (stack, hard rules, workflow).
+- `harness.toml` — roles and CLIs. `harness/steps/` and `harness/prompts/` — the step and role instructions.
 - `memory/constitution/` — non-negotiable principles (inheritable base + project).
-- `memory/north-star/` — product governance (why it exists): `base/` (schema,
-  rubric, amendment protocol) + `north-star.md` (the harness's North Star; the
-  adopter replaces it with their own, just like the constitution) + `decisions/` (amendment ADRs).
-- `specs/_template/` — feature template (brief/spec/acceptance/coverage/plan/tasks).
-- `evals/` — 5-dimension rubric + non-deterministic cases.
-- `verification/` — report, UAT and code-review checklists + `reports/` (observability).
-- `.claude/` — skills (distill/verify/uat), 7 commands, advisory hook, settings.
-- `docs/` — `factory-model.md` and `workflow.md` (detailed reference) + `backlog.md`
-  (findings parked with a reason, so they are neither forgotten nor started on sight).
+- `memory/stack/` — the stack charter: load-bearing technical decisions, each pinned with its price.
+- `memory/north-star/` — product governance (why it exists): `base/` + `north-star.md` +
+  `decisions/` (amendment ADRs).
+- `specs/_template/` — slice template (`brief.md`, `spec.md`).
+- `scripts/` — `spec.py`, `build.py`, `accept.py`, `status.sh`.
+- `.claude/` — the commands (`/brief`, `/spec`, `/build`, `/accept`, `/stack`, `/constitution`).
+- `docs/` — `workflow.md`, `factory-model.md`, `modules.md` and `backlog.md`.
 
-## Starting a feature
-1. `cp -r specs/_template specs/001-my-feature` and write the `brief.md`.
-2. `/distill` → `/plan` → `/contract` → `/tasks` → implement → `/verify` → `/uat`.
-3. `coverage.md` is your source of truth for state.
-
-> 📎 **Populated example:** `specs/001-example/` shows a real feature mid-way
-> — with the `coverage.md` matrix mixing states (🔴 / 🟢 / ✅ / 📋 / `[given]` /
-> `deferred`) to show the Way of Work in action.
+## Starting a slice
+1. `/brief` → `/spec` → `/build` → `/accept`.
+2. `bash scripts/status.sh <slice>` shows which step the slice has reached.
 
 ## Inheriting the constitution in another project
 `memory/constitution/base/` is a **vendored** shared asset: copy it to the new project.
@@ -172,26 +81,8 @@ The local `constitution.md` declares `extends: base` and adds its deltas. To upd
 follow `memory/constitution/update-checklist.md` and re-copy `base/`.
 
 ## Verifying the harness
-`bash tests/run.sh` — the template self-verifies (structure + hook). Also runs in CI (advisory).
-
-## Gating North Star amendments (optional but recommended)
-Changing the `pillars`/`scope` sets of the North Star is a governed event (ADR + PR, see
-`memory/north-star/base/amendment-protocol.md`). The `.github/workflows/amendment-gate.yml`
-workflow enforces it in CI: if a commit/push changes those sets without a new ADR, without
-leaving the JSON block schema-valid, or with the suite in red, the `amendment-gate` check
-fails. Normal feature development **is not blocked** (narrow block — it is the only exception
-to principle 4, recorded in the constitution's D1 delta).
-
-To make it **truly blocking** (not just advisory), the owner runs once:
-
-```sh
-scripts/setup-branch-protection.sh            # current repo, main branch
-scripts/setup-branch-protection.sh OWNER/REPO main
-```
-
-This makes `amendment-gate` a *required* status-check with `enforce_admins=true`: a PR with
-the gate in red is not mergeable and a direct push skipping it is rejected. Requires `gh` with
-admin permissions.
+`uv run --python 3.12 --with pytest --with jsonschema pytest tests -q` and `bash tests/run.sh`.
+Both run in CI on every pull request.
 
 ## Credits and references
 

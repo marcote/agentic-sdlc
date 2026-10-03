@@ -11,7 +11,7 @@ extends: base
   of how `constitution.md` declares `extends: base` and adds its deltas.
 - `base/schema.md` is the **checkable shared shape** that every project's North Star
   must satisfy. `base/alignment-rubric.md` is the **shared scoring method** that the
-  `/align` skill's judge applies. `base/amendment-protocol.md` is the **shared change
+  alignment judge applies. `base/amendment-protocol.md` is the **shared change
   control process** for editing scope/pillars. None of these three is project-specific —
   a project's delta is its mission, pillars, and scope only, never the rules for
   validating/scoring/amending them.
