@@ -13,6 +13,11 @@ Deterministic capabilities over a project's stack charter (memory/stack/stack.md
                      overridable with repeatable --rules): one line per
                      rule, "GR<n>: pin <id>" / "n/a" / "uncovered". A SUPERSEDED pin does
                      not count -- history is not a rationale.
+  guards FILE        one Guard command per line, for /verify to execute. ANY pin kind may
+                     declare one: whether a pin injects a per-feature coverage row (stance
+                     only) is orthogonal to whether it can be checked by a command (both).
+                     A substrate choice such as a dependency tool is often the more
+                     mechanically checkable of the two.
 
 This is a *reference* engine, not a requirement: the contract lives in the template
 (memory/stack/base/), and an adopting repo may reimplement it in its own stack — the
@@ -339,6 +344,17 @@ def cmd_ground_rules(args):
     return 0
 
 
+def cmd_guards(args):
+    try:
+        pins = _parse(args.file)
+    except Empty:
+        return 0  # no stance pin means nothing to run, which is not a failure
+    for p in pins:
+        if not p["superseded"] and _has(p, "Guard"):
+            print(p["fields"]["Guard"])
+    return 0
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="engine.py", description="Stack charter deterministic engine")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -355,6 +371,10 @@ def main(argv=None):
     s.add_argument("file")
     s.add_argument("--rules", action="append", default=[])
     s.set_defaults(fn=cmd_ground_rules)
+
+    s = sub.add_parser("guards")
+    s.add_argument("file")
+    s.set_defaults(fn=cmd_guards)
 
     args = p.parse_args(argv)
     try:
