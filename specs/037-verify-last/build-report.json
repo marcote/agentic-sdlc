@@ -1,5 +1,5 @@
 {
-  "tokens": 333135,
+  "tokens": 386597,
   "tasks": {
     "T0": {
       "status": "done",
@@ -86,5 +86,7 @@
       "escalations": [],
       "test_seconds": 95.1
     }
-  ]
+  ],
+  "suite_seconds": 14.8,
+  "verified": "19c149d62a1fd956bafca90813a4251845451315"
 }
