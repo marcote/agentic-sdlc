@@ -140,3 +140,27 @@ def test_accept_fix_cannot_change_frozen_test(slice_repo):
     p = slice_repo.accept()
     assert p.returncode == 1
     assert "frozen test changed" in p.stdout
+
+
+def test_accept_refuses_open_build_escalations(slice_repo):
+    ready(slice_repo)
+    rfile = slice_repo.dir / "build-report.json"
+    r = json.loads(rfile.read_text())
+    rfile.write_text(json.dumps({**r, "tasks": {"T1": {"status": "escalated", "attempts": 3}}}))
+    slice_repo.git("commit", "-qam", "escalated report")
+    p = slice_repo.accept()
+    assert p.returncode == 2 and "build has open escalations; answer them and re-run build" in p.stderr
+    assert slice_repo.calls() == []
+
+
+def test_accept_malformed_results_escalate_before_merge(slice_repo):
+    ready(slice_repo)
+    (slice_repo.dir / "results.json").write_text(json.dumps({"H-3": "0.42"}))
+    slice_repo.git("add", "-A")
+    slice_repo.git("commit", "-q", "-m", "bad results")
+    main_before, branch_before = slice_repo.git("rev-parse", "main"), slice_repo.git("rev-parse", "001-add")
+    p = slice_repo.accept()
+    assert p.returncode == 1 and "results.json" in p.stdout
+    assert slice_repo.git("rev-parse", "main") == main_before and slice_repo.git("rev-parse", "001-add") == branch_before
+    assert slice_repo.git("branch", "--show-current").strip() == "001-add"
+    assert slice_repo.git("status", "--porcelain").split() == ["M", "specs/001-add/build-report.json"]

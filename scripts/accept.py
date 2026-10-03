@@ -66,6 +66,21 @@ def failures(spec_dir, s, cfg, report, branch):
     return found + map_findings(cfg) + judge(spec_dir, s, cfg, report, branch)
 
 
+def results_problem(spec_dir, cfg):
+    """Check results.json before the merge, so a bad file cannot stop accept half-way (D4)."""
+    f = spec_dir / "results.json"
+    if not f.is_file():
+        return []
+    try:
+        rows = json.loads(f.read_text())
+    except json.JSONDecodeError:
+        rows = None
+    if not isinstance(rows, list) or not all(isinstance(r, dict) and {"id", "value"} <= r.keys() for r in rows):
+        return [f"{f}: not a list of {{id, value}}"]
+    ns = cfg["paths"]["north_star"]
+    return [] if Path(ns).is_file() else [f"{ns}: north star not found"]
+
+
 def write_back(spec_dir, cfg):
     results = spec_dir / "results.json"
     if not results.is_file():
@@ -119,6 +134,9 @@ def main():
     rfile = a.spec_dir / "build-report.json"
     report = json.loads(rfile.read_text()) if rfile.is_file() else {
         "tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [], "reused": [], "new": [], "started": ""}
+    if report["escalations"] or any(t["status"] != "done" for t in report["tasks"].values()):
+        print("accept: build has open escalations; answer them and re-run build", file=sys.stderr)
+        return 2
     try:
         bad = failures(a.spec_dir, s, cfg, report, branch)
         if bad:  # A3: return to build once, with the failures as feedback
@@ -133,6 +151,7 @@ def main():
     except build.Budget as b:
         build.revert()
         bad = [str(b)]
+    bad = bad or results_problem(a.spec_dir, cfg)
     if bad:
         report["escalations"] += [{"task": "accept", "reason": x} for x in bad]
         rfile.write_text(json.dumps(report, indent=2))
