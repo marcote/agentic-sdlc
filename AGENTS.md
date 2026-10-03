@@ -1,5 +1,7 @@
 # Agents
 
+Read `memory/north.md` first. Its rules come before every other rule in this repository. A hook adds it to every prompt.
+
 This repository uses the agentic-sdlc harness. Four steps, one owner approval (gate H1):
 
 1. brief — follow `harness/steps/brief.md`

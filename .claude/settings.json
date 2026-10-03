@@ -4,7 +4,20 @@
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": ".claude/hooks/secret-scan.sh" }
+          {
+            "type": "command",
+            "command": ".claude/hooks/secret-scan.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"$CLAUDE_PROJECT_DIR/memory/north.md\""
+          }
         ]
       }
     ]
