@@ -37,7 +37,7 @@ Each example becomes a test named `test_<id>_<words>`.
 | E3 | `harness.toml` and `tests/conftest.py` | the test reads them | the `fake` and `fake-judge` commands and the script helpers in `conftest.py` contain no `uv run` |
 | E4 | a slice with examples E1 and E2, and a task command that appends one line to `.runs` each time it starts | build runs T0 | `.runs` has 1 line after T0 |
 | E5 | `harness.toml` | the test reads `[checks] suite` | it contains `-n auto` |
-| E6 | `.github/workflows/verify.yml` | the test reads it | it has no `pytest` command of its own; it runs the `suite` value read from `harness.toml` |
+| E6 | `.github/workflows/verify.yml`, whose step `Harness tests` today runs its own `uv run … pytest tests -q` | the test reads every `run:` line | no `run:` line holds `pytest`; one `run:` line reads `suite` from `harness.toml` |
 | E7 | two failure outputs of the same test, one with `[gw0]` and one with `[gw3]`, and different durations | build compares them | it reports them as the same failure |
 
 ## 4. Tests

@@ -138,9 +138,9 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>E6</td>
-<td><code>.github/workflows/verify.yml</code></td>
-<td>the test reads it</td>
-<td>it has no <code>pytest</code> command of its own; it runs the <code>suite</code> value read from <code>harness.toml</code></td>
+<td><code>.github/workflows/verify.yml</code>, whose step <code>Harness tests</code> today runs its own <code>uv run … pytest tests -q</code></td>
+<td>the test reads every <code>run:</code> line</td>
+<td>no <code>run:</code> line holds <code>pytest</code>; one <code>run:</code> line reads <code>suite</code> from <code>harness.toml</code></td>
 </tr>
 <tr>
 <td>E7</td>
