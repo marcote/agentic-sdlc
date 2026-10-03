@@ -42,7 +42,7 @@ A reusable, stack-agnostic harness that enforces a disciplined, autonomous agent
 
 **In scope:** commands, gates, and skills of the governance workflow; product governance (constitution and North Star); feature templates, glossary, and module map; evals, verification, and UAT of the method; adoption tooling (install, vendoring, inheritance); the autonomous build loop, its metrics, and method documentation.
 
-**Out of scope** (the hard-rejection predicates that `/align` uses): application code or product features of an adopting project; the stack-specific deterministic engine (provided by the adopter — "contract in the template, engine per-stack"); imposing a mandatory agent CLI, model or product stack; blocking commit hooks; dependencies beyond `uv` and inline script dependencies.
+**Out of scope** (hard-rejection predicates for a brief): application code or product features of an adopting project; the stack-specific deterministic engine (provided by the adopter — "contract in the template, engine per-stack"); imposing a mandatory agent CLI, model or product stack; blocking commit hooks; dependencies beyond `uv` and inline script dependencies.
 
 ## Glossary
 
@@ -61,7 +61,7 @@ Accept appends results under `## Reported`.
 
 ## Alignment
 
-New briefs are scored against `base/alignment-rubric.md` by the `/align` skill.
+New briefs are scored against `base/alignment-rubric.md` by an LLM judge.
 Pass threshold: **3** out of 5 in each of the three dimensions (pillar fit, scope
 compliance, mission advancement), with any `out_of_scope` hit as a hard rejection
 regardless of score. See `base/alignment-rubric.md` for the complete aggregation rule.

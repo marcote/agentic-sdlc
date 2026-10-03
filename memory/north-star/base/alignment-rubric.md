@@ -1,9 +1,9 @@
 # Alignment Rubric (base)
 
 > "A North Star without a rubric measures nothing." Three dimensions, each scored
-> 0–5. Used by the judge (LLM) of the `/align` skill to score the objectives of a
-> brief against the project's North Star (`north-star.md`), and by the
-> `JUDGE-ALIGNMENT` eval (`evals/cases/north-star-judge.md`) to check that the judge
+> 0–5. An LLM judge uses it to score the objectives of a
+> brief against the project's North Star (`north-star.md`). The
+> `JUDGE-ALIGNMENT` eval (`evals/cases/north-star-judge.md`) checks that the judge
 > scores sensibly.
 
 ## Dimensions

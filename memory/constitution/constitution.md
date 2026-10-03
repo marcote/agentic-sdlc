@@ -39,10 +39,10 @@ the agent writes to the repo in English regardless.
 
 ### D3 — Reflexive dogfood (workflow tooling runs against its own in-flight feature)
 
-A feature that produces **workflow tooling** — a checker, tracker, gate, or report that operates on
-the SDLC's own artifacts (`coverage.md`, retros, `specs/*`, `status.sh`, `check_*`, the North Star
-engine) — must be **run against its own in-flight feature before closing**, not only against
-synthetic fixtures. The tool's first real user is the very feature that ships it.
+A feature can produce **workflow tooling**: a checker, tracker, gate, or report on the SDLC's own artifacts.
+Examples: `specs/*`, `build-report.json`, `status.sh`, `check_*`, the North Star engine.
+Such tooling **runs against its own in-flight feature before closing**, not only against synthetic fixtures.
+The tool's first real user is the very feature that ships it.
 
 **Why:** a workflow tool exercised only on hermetic fixtures hides the blind spots that appear on
 real artifacts. Feature 008 caught **two real bugs** this way (`status.sh` flagged its own

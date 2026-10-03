@@ -1,6 +1,6 @@
 ---
 name: stack
-description: Elicits the project's stack charter — the load-bearing technical decisions, each with its price and its own invalidation condition. Use after seeding the North Star and before the first brief, and whenever /plan reports UNPINNED.
+description: Elicits the project's stack charter — the load-bearing technical decisions, each with its price and its own invalidation condition. Use after seeding the North Star and before the first brief, and whenever a spec needs a decision the charter does not pin.
 ---
 
 # Stack
@@ -53,8 +53,8 @@ You perform the translation domain → non-functional requirement → pin.
 ### 3b. Walk the six ground rules — the floor
 `memory/stack/base/ground-rules.md` (plus any project layer) defines the **floor of the
 charter**: aspects that must have a recorded rationale before implementation begins. Walk them
-explicitly, by id, so the default path produces a covered charter instead of one that trips
-`/plan`'s `UNCOVERED` verdict later:
+explicitly, by id, so the default path produces a covered charter.
+Otherwise `engine.py ground-rules` reports `uncovered` later:
 
 - **`GR1` Consumption** — how does anything outside reach this, and is the core separable from
   the way it is reached?
@@ -118,15 +118,14 @@ python3 scripts/stack/engine.py pin-valid memory/stack/stack.md
 python3 scripts/stack/engine.py exposure memory/stack/stack.md
 ```
 
-## When `/plan` reports `UNPINNED`
+## When a spec needs an unpinned decision
 
 Run steps 1–5 scoped to that single decision, append the pin, and hand control back. This is
 the accretion loop: the charter grows from real features instead of from guessing what the
 future needs.
 
-If the new pin is `[stance]`, its `Injects` rows belong in a `coverage.md` that `/distill`
-already froze — so the feature **bounces back to `/distill`** to reopen coverage, take the new
-rows, and re-freeze before `/plan` resumes.
+A new pin, `[stance]` included, is an amendment to the charter.
+The spec step writes it in the spec's Amendments section, and gate H1 approves it.
 
 ## Contract in the template, engine per-stack
 

@@ -170,9 +170,9 @@ genuinely violates what the assertion asserts, and that is a question about mean
 
 This rule was written down twice before landing: proposed in 013's retro, restated as decision D10
 in 014's plan. **Occurrences 6–10 happened anyway, in the same branch as the warning.** The
-difference now is not emphasis, it is position: a `[given]` criterion becomes a row in
-`coverage.md`, and a feature does not close below 100% coverage. A retro proposal and a plan
-decision were gated by nothing.
+difference now is not emphasis, it is position.
+A `[given]` criterion becomes an invariant test in the spec, and accept does not merge while it fails.
+A retro proposal and a plan decision were gated by nothing.
 
 That is a falsifiable claim, and the next feature to ship a vacuous check while carrying these rows
 in its coverage refutes it.
