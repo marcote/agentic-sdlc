@@ -184,7 +184,7 @@ def _default_rule_paths(charter):
     """Locate the ground rule layers for a charter, resolving from the CHARTER's own directory
     upward -- the rule scripts/north-star/engine.py already uses for decisions/ (_adr_ids).
 
-    Resolving against the process cwd instead was a real defect, found at 018's /distill by
+    Resolving against the process cwd instead was a real defect, found at 018's review by
     pointing the gate at a vendored target: `ground-rules TARGET/memory/stack/stack.md` reported
     `no ground rule file found` for a file sitting right beside the charter. In this repository
     cwd and artifact always coincided, so three features never saw it.

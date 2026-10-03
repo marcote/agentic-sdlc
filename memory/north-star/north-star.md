@@ -6,8 +6,7 @@ extends: base
 
 > This file governs **why** the product exists; its counterpart
 > `memory/constitution/constitution.md` governs **how** it is built. Extends
-> `base` (see `base/schema.md`, `base/alignment-rubric.md`,
-> `base/amendment-protocol.md`).
+> `base` (see `base/schema.md`).
 >
 > **Adopters:** when vendoring the harness onto another repo, replace this file with
 > the North Star of *your* product — just as you would replace/extend `constitution.md`. The
@@ -15,7 +14,7 @@ extends: base
 > mission, pillars, and scope only.
 >
 > Changing `pillars` or `scope` is a governed event: it requires an ADR + PR (see
-> `base/amendment-protocol.md`). The initial seed is registered in
+> `base/adr-template.md`). The initial seed is registered in
 > `decisions/0001-seed-north-star.md`.
 
 ## Mission

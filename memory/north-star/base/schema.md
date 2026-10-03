@@ -76,7 +76,7 @@ having done the step*; it cannot catch *having done it badly*.
 | `scope.out_of_scope` | required, **non-empty** array of strings — used by the scope predicate (`scopeReject`, per-stack) as hard rejection predicates |
 
 A North Star that fails any of these rules **is not schema-valid**, and by
-the Measurability Gate (`specs/002-north-star-governance/acceptance.md`, criterion
+the Measurability Gate (`specs/002-north-star-governance/`, criterion
 MEAS-GATE) the flow must refuse to run against it — a non-measurable North Star
 cannot govern anything.
 
@@ -84,4 +84,4 @@ cannot govern anything.
 
 The validator only checks **shape** (presence, non-empty, type) — it has no opinion
 on whether a mission is *good*. Judging quality is the work of the semantic layer
-of the alignment judge and the dimensions of `alignment-rubric.md`, not of this schema.
+of the owner at gate H1, not of this schema.

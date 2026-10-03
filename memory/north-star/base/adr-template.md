@@ -2,7 +2,7 @@
 
 > Copy this file to `memory/north-star/decisions/NNNN-<kebab-case-slug>.md`
 > (next sequential number) each time a change to the `scope` or
-> `pillars` of `north-star.md` is proposed — see `amendment-protocol.md`. It lands together
+> `pillars` of `north-star.md` is proposed — see this template. It lands together
 > with the `north-star.md` diff in the same PR; a human reviews and approves both.
 > Any `NNNN-*.md` file here (other than `.gitkeep`) satisfies the ADR requirement —
 > fill out each section below; an empty placeholder is not a real ADR.
