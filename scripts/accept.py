@@ -95,10 +95,26 @@ def write_back(spec_dir, cfg):
 
 
 def result_page(spec_dir, report):
-    started = build.git("log", "--reverse", "--format=%cI", "main..HEAD").split() or [report.get("started", "")]
-    lead = datetime.now(timezone.utc) - datetime.fromisoformat(started[0])
+    def when(*args):
+        out = build.git("log", "--format=%cI", *args).split()
+        return datetime.fromisoformat(out[0]) if out else None
+
+    def grep(pattern):
+        return when("--basic-regexp", "-1", "--grep", pattern)
+
+    def hours(a, b):
+        return f"{(b - a).total_seconds() / 3600:.1f} h" if a and b else "unknown"
+
+    now = datetime.now(timezone.utc)
+    brief = when("--diff-filter=A", "--reverse", "--", str(spec_dir / "brief.md"))
+    start = brief or when("--reverse", "main..HEAD") or datetime.fromisoformat(report.get("started", "") or now.isoformat())
+    h1 = grep(f"^spec({spec_dir.name}): approved at H1")
+    built = grep(f"^build({spec_dir.name}): ")
     rows = [
-        ("Lead time", f"{lead.total_seconds() / 3600:.1f} h"),
+        ("Lead time", hours(start, now) + ("" if brief else " (from first commit)")),
+        ("Brief → H1", hours(brief, h1)),
+        ("H1 → build", hours(h1, built)),
+        ("Build → accept", hours(built, now)),
         ("Interventions", str(1 + len(report["escalations"]))),
         ("Reused", ", ".join(report["reused"]) or "none"),
         ("New", ", ".join(report["new"]) or "none"),
