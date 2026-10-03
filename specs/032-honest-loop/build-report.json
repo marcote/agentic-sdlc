@@ -1,0 +1,100 @@
+{
+  "tokens": 534090,
+  "tasks": {
+    "T0": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T1": {
+      "status": "done",
+      "attempts": 2
+    },
+    "T2": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T3": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T4": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T5": {
+      "status": "done",
+      "attempts": 1
+    }
+  },
+  "trace": [
+    "T0:implementer",
+    "T0:checks",
+    "T0:reviewer",
+    "T1:implementer",
+    "T1:checks",
+    "T1:reviewer",
+    "T1:implementer",
+    "T1:checks",
+    "T1:reviewer",
+    "T2:implementer",
+    "T2:checks",
+    "T2:reviewer",
+    "T3:implementer",
+    "T3:checks",
+    "T3:reviewer",
+    "T4:implementer",
+    "T4:checks",
+    "T4:reviewer",
+    "T5:implementer",
+    "T5:checks",
+    "T5:reviewer"
+  ],
+  "assumptions": [
+    {
+      "task": "T2",
+      "text": "The root for referrer scan is the current directory (lint(..., root=Path('.')) via git ls-files); main() passes nothing, so the lint must run from the repo root."
+    },
+    {
+      "task": "T2",
+      "text": "A referrer counts as named when its path appears as a substring anywhere in the spec text; the removed file itself is excluded."
+    },
+    {
+      "task": "T3",
+      "text": "A report written before `runs` existed is treated as one earlier run built from its top-level started/tokens/escalations. A missing or unreadable report is treated as no earlier runs."
+    },
+    {
+      "task": "T3",
+      "text": "Top-level tokens/escalations in the report still describe only the current run, so accept's escalation gate is unchanged. Accept (a later task) sums `runs` for the total."
+    },
+    {
+      "task": "T4",
+      "text": "A build-report.json from before `runs` existed is treated as one run (`report` itself), so it shows '(1 build run)'."
+    },
+    {
+      "task": "T4",
+      "text": "The answer-commit count searches all history reachable from HEAD, not only main..HEAD. The slice name in the subject keeps it specific."
+    },
+    {
+      "task": "T4",
+      "text": "test_e12_031_records_true_numbers fails because specs/031-clear-sdlc/spec.md lacks the '5 interventions' / '1,010,245 tokens' reported lines. No task in my scope covers it, so I left it."
+    },
+    {
+      "task": "T5",
+      "text": "Put both figures in a single table row in section 7 rather than two rows; the test accepts either."
+    }
+  ],
+  "escalations": [],
+  "reused": [
+    "late_examples matching pattern",
+    "tables() parser in scripts/spec.py",
+    "git ls-files scan pattern from tests/stale_names.py",
+    "json",
+    "datetime (already imported in scripts/build.py)",
+    "build.git",
+    "report[\"runs\"] from T3",
+    "section 7 assumptions table",
+    "build-log figures from specs/032-honest-loop/spec.md"
+  ],
+  "new": [],
+  "started": "2026-10-03T12:23:52.166879+00:00"
+}
