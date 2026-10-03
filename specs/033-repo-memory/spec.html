@@ -161,6 +161,18 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>real-enforcement</td>
 <td>E15, E16</td>
 </tr>
+<tr>
+<td>W2</td>
+<td>When the prose check reads a paragraph, it shall count each sentence across line breaks.</td>
+<td>real-enforcement</td>
+<td>E17</td>
+</tr>
+<tr>
+<td>W3</td>
+<td>The prose check shall skip the history paths of the shared list.</td>
+<td>real-enforcement</td>
+<td>E18</td>
+</tr>
 </tbody>
 </table>
 <h2 id="3-examples">3. Examples</h2>
@@ -271,6 +283,18 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>the suite runs</td>
 <td>no prose finding for <code>docs/workflow.md</code></td>
 </tr>
+<tr>
+<td>E17</td>
+<td><code>memory/owner.md</code> has one sentence of 30 words, wrapped over 3 lines of 10 words</td>
+<td>the prose check runs</td>
+<td>it names <code>memory/owner.md</code> and <code>30 words</code></td>
+</tr>
+<tr>
+<td>E18</td>
+<td><code>memory/north-star/decisions/0004-x.md</code> has a sentence of 40 words</td>
+<td>the prose check runs</td>
+<td>no finding for that file</td>
+</tr>
 </tbody>
 </table>
 <h2 id="4-tests">4. Tests</h2>
@@ -333,6 +357,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>vendoring seeds <code>AGENTS.md</code>, the <code>CLAUDE.md</code> import, an empty lessons table and an owner file stub</td>
 <td>A4</td>
 <td>T1</td>
+</tr>
+<tr>
+<td>T8</td>
+<td>the prose check joins the lines of a paragraph and skips history; rewrite every agent-facing sentence that then fails; the shell checks that read <code>CLAUDE.md</code> read <code>AGENTS.md</code>; add the lesson: a check that cannot read its input must fail, not pass, with check <code>test_e17_</code></td>
+<td>W2, W3</td>
+<td>T6, T7</td>
 </tr>
 </tbody>
 </table>
@@ -414,6 +444,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tr>
 <td>After merge, the agent's local memory becomes a pointer to <code>AGENTS.md</code>, with the owner's consent.</td>
 <td>open</td>
+</tr>
+<tr>
+<td>Pre-accept finding, approved by the owner: since spec 029 the prose check counted words per physical line, so wrapped prose passed with 43 sentences over 25 words. T8 fixes the check and the prose.</td>
+<td>decided</td>
 </tr>
 <tr>
 <td>First proposed lesson, from writing this spec: the lint must reject a requirement id that is also a task id. This spec first named a requirement <code>T1</code>.</td>

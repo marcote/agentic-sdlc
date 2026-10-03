@@ -1,0 +1,184 @@
+{
+  "tokens": 672019,
+  "tasks": {
+    "T0": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T1": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T2": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T3": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T4": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T5": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T6": {
+      "status": "done",
+      "attempts": 1
+    },
+    "T7": {
+      "status": "done",
+      "attempts": 1
+    }
+  },
+  "trace": [
+    "T0:implementer",
+    "T0:checks",
+    "T0:reviewer",
+    "T1:implementer",
+    "T1:checks",
+    "T1:reviewer",
+    "T2:implementer",
+    "T2:checks",
+    "T2:reviewer",
+    "T3:implementer",
+    "T3:checks",
+    "T3:reviewer",
+    "T4:implementer",
+    "T4:checks",
+    "T4:reviewer",
+    "T5:implementer",
+    "T5:checks",
+    "T5:reviewer",
+    "T6:implementer",
+    "T6:checks",
+    "T6:reviewer",
+    "T7:implementer",
+    "T7:checks",
+    "T7:reviewer"
+  ],
+  "assumptions": [
+    {
+      "task": "T1",
+      "text": "Lessons L1 and L8 are marked learned. Their checks are the existing tests test_e11_harness_has_no_stale_name and test_e6_workflow_prose_has_no_long_sentence. I did not run lessons.py check, because that script does not exist yet."
+    },
+    {
+      "task": "T1",
+      "text": "The lesson set is 8 rows distilled from the memory snapshot. I left out the project-history notes (features, ADRs) and kept only rules. Helpful and harmful counters start at 0."
+    },
+    {
+      "task": "T1",
+      "text": "The CLAUDE.md content is folded into AGENTS.md as a '## Harness' section plus a '## Memory' section. AGENTS.md is vendored into adopters, so they will also receive the harness-specific rules. Vendoring and the E4 seeding belong to a later task."
+    },
+    {
+      "task": "T2",
+      "text": "A check of the form `path::name` exists when the file exists and contains `def name(`. A `none: ...` check needs helpful >= 1 to count as evidence."
+    },
+    {
+      "task": "T2",
+      "text": "Only rows with status `learned` are checked. Other statuses are ignored."
+    },
+    {
+      "task": "T2",
+      "text": "The suite failure 'CLAUDE.md missing //stack/' is not caused by this task. It comes from CLAUDE.md now being only `@AGENTS.md`."
+    },
+    {
+      "task": "T3",
+      "text": "Only reviewer rejections in run_task are recorded; T0 (contract) rejections are not, since R1 and E8 concern task attempts. Failed checks and reviewer call errors are not findings."
+    },
+    {
+      "task": "T4",
+      "text": "Reflection is skipped when memory/lessons.md or the reflector role is missing, so older adopter configs keep working."
+    },
+    {
+      "task": "T4",
+      "text": "A helpful delta promotes a lesson to learned only when its status is captured."
+    },
+    {
+      "task": "T4",
+      "text": "A pipe character in lesson text is replaced with / to keep the markdown table valid."
+    },
+    {
+      "task": "T4",
+      "text": "A delta naming an unknown lesson id is ignored silently."
+    },
+    {
+      "task": "T4",
+      "text": "I edited tests/conftest.py so the slice_repo fixture maps the reflector to the fake CLI; otherwise existing accept tests would call the real claude CLI."
+    },
+    {
+      "task": "T5",
+      "text": "The lesson count is a paragraph under the result table, not a table row, so the text 'Lessons 4 learned / 6' is contiguous as E14 requires."
+    },
+    {
+      "task": "T5",
+      "text": "The Lessons prompt section lists `id: lesson` per row, and is empty (omitted) when no lesson qualifies."
+    },
+    {
+      "task": "T5",
+      "text": "spec.py now imports scripts/lessons.py, which uses only the standard library."
+    },
+    {
+      "task": "T6",
+      "text": "prose.py imports spec.prose and reuses MAX_WORDS=25, so the limit lives in one place; the inline dependency on markdown is declared because spec.py imports it."
+    },
+    {
+      "task": "T6",
+      "text": "Charter and constitution needed no rewrite because the existing prose() splits per physical line and they already pass. I did not change how it splits."
+    },
+    {
+      "task": "T6",
+      "text": "tests/test_repo_memory.py::test_e4_vendor_seeds_memory fails after my change. It concerns vendor.sh seeding memory/lessons, outside T6 scope, and I did not touch vendor.sh."
+    },
+    {
+      "task": "T7",
+      "text": "The old CLAUDE.md stub (stack, workflow and hard-rules prose) is replaced by `@AGENTS.md`, because E4 requires CLAUDE.md to equal the import. Adopters lose that prose; AGENTS.md is the copied-verbatim harness file and carries the workflow and hard rules."
+    },
+    {
+      "task": "T7",
+      "text": "The lessons header is read from the source repo's memory/lessons.md (head -5) rather than duplicated in vendor.sh, so the two cannot drift."
+    },
+    {
+      "task": "T7",
+      "text": "The new files are SEED, not KEEP: they are written if absent and never clobbered, so an existing target file gets a .harness-new copy."
+    },
+    {
+      "task": "T7",
+      "text": "docs/vendoring.md mirrors the KEEP/SEED classification and was not updated. It is outside this task, and the first bash attempt to edit it was not needed."
+    }
+  ],
+  "escalations": [],
+  "reused": [
+    "AGENTS.md",
+    "CLAUDE.md content",
+    "tests/test_clear_sdlc.py checks as lesson evidence",
+    "tests/lib.sh _pass/_fail helpers",
+    "script header style from scripts/spec.py",
+    "existing report dict and reviewer findings list",
+    "build.call",
+    "build.Budget",
+    "scripts/lessons.py rows()",
+    "scripts/fake_agent.py",
+    "harness/prompts/judge.md structure",
+    "scripts/lessons.py rows()",
+    "build.section()",
+    "spec.py page",
+    "scripts/spec.py prose()",
+    "tests/lib.sh _pass/_fail",
+    "scripts/vendor.sh seed_file()",
+    "scripts/vendor.sh SEED list",
+    "memory/lessons.md header"
+  ],
+  "new": [],
+  "started": "2026-10-03T12:49:38.452674+00:00",
+  "runs": [
+    {
+      "started": "2026-10-03T12:49:38.452674+00:00",
+      "tokens": 672019,
+      "escalations": []
+    }
+  ]
+}

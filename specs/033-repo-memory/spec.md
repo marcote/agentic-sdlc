@@ -44,6 +44,8 @@ The input for the migration is the snapshot in `specs/033-repo-memory/session-me
 | R7 | If the reflector call fails, then accept shall still merge and print the failure. | frictionless-adoption | E13 |
 | R8 | When accept writes the result page, the page shall show the count of **captured lesson** and **learned lesson** rows. | measurable-impact | E14 |
 | W1 | When the suite runs, the prose check shall cover each **agent-facing file** and skip `README.md` and `docs/`. | real-enforcement | E15, E16 |
+| W2 | When the prose check reads a paragraph, it shall count each sentence across line breaks. | real-enforcement | E17 |
+| W3 | The prose check shall skip the history paths of the shared list. | real-enforcement | E18 |
 
 ## 3. Examples
 
@@ -67,6 +69,8 @@ Each example becomes a test named `test_<id>_<words>`.
 | E14 | 6 lessons: 4 `learned`, 2 `captured` | accept writes the page | `Lessons 4 learned / 6` |
 | E15 | `memory/owner.md` has a prose sentence of 30 words | the suite runs | the prose check names `memory/owner.md` and `30 words` |
 | E16 | `docs/workflow.md` has a prose sentence of 30 words | the suite runs | no prose finding for `docs/workflow.md` |
+| E17 | `memory/owner.md` has one sentence of 30 words, wrapped over 3 lines of 10 words | the prose check runs | it names `memory/owner.md` and `30 words` |
+| E18 | `memory/north-star/decisions/0004-x.md` has a sentence of 40 words | the prose check runs | no finding for that file |
 
 ## 4. Tests
 
@@ -88,6 +92,7 @@ Four kinds. Write no other kind.
 | T5 | build adds captured and learned lessons to prompts; the spec page lists proposed lessons; the result page counts learned lessons | R5, R6, R8 | T4 |
 | T6 | the prose check covers every agent-facing file; rewrite the agent-facing prose that fails it, constitution and charter included | W1 | T1 |
 | T7 | vendoring seeds `AGENTS.md`, the `CLAUDE.md` import, an empty lessons table and an owner file stub | A4 | T1 |
+| T8 | the prose check joins the lines of a paragraph and skips history; rewrite every agent-facing sentence that then fails; the shell checks that read `CLAUDE.md` read `AGENTS.md`; add the lesson: a check that cannot read its input must fail, not pass, with check `test_e17_` | W2, W3 | T6, T7 |
 
 | item | justification |
 | --- | --- |
@@ -112,4 +117,5 @@ No new module and no new library. The reflector is a role in `harness.toml`, not
 | Build gives every captured and learned lesson to every prompt, until the table grows. | open |
 | Feature history in the snapshot (features 003–027) stays in git and specs; it does not become lessons. | decided |
 | After merge, the agent's local memory becomes a pointer to `AGENTS.md`, with the owner's consent. | open |
+| Pre-accept finding, approved by the owner: since spec 029 the prose check counted words per physical line, so wrapped prose passed with 43 sentences over 25 words. T8 fixes the check and the prose. | decided |
 | First proposed lesson, from writing this spec: the lint must reject a requirement id that is also a task id. This spec first named a requirement `T1`. | open |
