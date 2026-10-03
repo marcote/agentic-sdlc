@@ -1,0 +1,389 @@
+<title>Spec 029 Autonomous Loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a maintenance-manual page. Narrow reading column, sticky section index, data tables full width. */
+:root {
+  --paper: #f6f7f5; --sheet: #ffffff; --ink: #1c2321; --muted: #5b6662; --rule: #d7ddd9;
+  --accent: #0f5f6e; --accent-soft: #e0eef0;
+  --caution: #9a5b00; --caution-soft: #fff3dc;
+  --decided: #1f6b3a; --decided-soft: #e3f2e7;
+  --hyp: #6a4bb0; --hyp-soft: #eee8fb;
+  --open: #8a2f2f; --open-soft: #f8e6e6;
+  --rep: #5b6662; --rep-soft: #eceeed;
+  --hl: #fff7c2;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #121615; --sheet: #191e1d; --ink: #e4e9e6; --muted: #9aa6a1; --rule: #2d3533;
+  --accent: #6cc3d1; --accent-soft: #163036;
+  --caution: #f0b65a; --caution-soft: #33270f;
+  --decided: #7fd39a; --decided-soft: #16301f;
+  --hyp: #b9a2f2; --hyp-soft: #2a2340;
+  --open: #ef9a9a; --open-soft: #3a1d1d;
+  --rep: #b3bdb9; --rep-soft: #262c2a;
+  --hl: #3d3812; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #121615; --sheet: #191e1d; --ink: #e4e9e6; --muted: #9aa6a1; --rule: #2d3533;
+  --accent: #6cc3d1; --accent-soft: #163036;
+  --caution: #f0b65a; --caution-soft: #33270f;
+  --decided: #7fd39a; --decided-soft: #16301f;
+  --hyp: #b9a2f2; --hyp-soft: #2a2340;
+  --open: #ef9a9a; --open-soft: #3a1d1d;
+  --rep: #b3bdb9; --rep-soft: #262c2a;
+  --hl: #3d3812; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 15px/1.6 var(--f-body); padding-inline: 16px; padding-block: 0 64px }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px }
+@media (max-width: 820px) { .wrap { grid-template-columns: minmax(0, 1fr) } nav.index { display: none } }
+nav.index { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; padding-top: 32px; font-size: 13px }
+nav.index a { display: block; color: var(--muted); text-decoration: none; padding: 3px 0 }
+nav.index a:hover, nav.index a:focus-visible { color: var(--accent) }
+nav.index .code { font-family: var(--f-mono); color: var(--ink); font-weight: 600; margin-bottom: 12px; display: block }
+main { min-width: 0; padding-top: 32px }
+header.doc { border-bottom: 2px solid var(--ink); padding-bottom: 16px; margin-bottom: 8px }
+.dmc { font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; color: var(--muted); text-transform: uppercase }
+h1 { font-size: 34px; line-height: 1.15; margin: 6px 0 8px; font-weight: 800; text-wrap: balance }
+h2 { font-size: 20px; margin: 48px 0 12px; padding-top: 12px; border-top: 1px solid var(--rule); display: flex; gap: 12px; align-items: baseline; text-wrap: balance }
+h2 .n { font-family: var(--f-mono); font-size: 13px; color: var(--accent) }
+h3 { font-size: 15px; margin: 28px 0 8px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted) }
+p { max-width: 68ch; margin: 8px 0 }
+code, .mono { font-family: var(--f-mono); font-size: .88em }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted) }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0 }
+
+.chip { display: inline-block; font: 600 11px/1 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; padding: 4px 7px; border-radius: 3px; white-space: nowrap }
+.c-decided { color: var(--decided); background: var(--decided-soft) }
+.c-hyp { color: var(--hyp); background: var(--hyp-soft) }
+.c-open { color: var(--open); background: var(--open-soft) }
+.c-rep { color: var(--rep); background: var(--rep-soft) }
+.c-judged { color: var(--caution); background: var(--caution-soft) }
+
+.gate { background: var(--sheet); border: 1px solid var(--rule); border-left: 4px solid var(--accent); padding: 14px 18px; margin: 20px 0 }
+.gate strong { color: var(--accent) }
+.caution { border: 1px solid var(--caution); background: var(--caution-soft); padding: 12px 16px; margin: 16px 0; font-size: 14px }
+.caution .label { font: 700 12px var(--f-mono); color: var(--caution); letter-spacing: .1em; display: block; margin-bottom: 4px }
+
+.tbl { overflow-x: auto; margin: 12px 0; background: var(--sheet); border: 1px solid var(--rule) }
+table { border-collapse: collapse; width: 100%; font-size: 14px }
+th { text-align: left; font: 600 11px var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 9px 12px; border-bottom: 1px solid var(--rule); background: var(--paper); white-space: nowrap }
+td { padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top }
+tr:last-child td { border-bottom: 0 }
+td.id { font: 600 13px var(--f-mono); white-space: nowrap; color: var(--accent) }
+td.anc { font: 12px var(--f-mono); color: var(--muted); white-space: nowrap }
+td.ex a { font: 600 12px var(--f-mono); color: var(--accent); text-decoration: none; margin-right: 6px }
+td.ex a:hover { text-decoration: underline }
+tr:target td { background: var(--hl) }
+td.term { font-weight: 700; white-space: nowrap }
+.num { font-variant-numeric: tabular-nums }
+.ears { font-family: var(--f-body) }
+.ears b { color: var(--accent); font-weight: 600 }
+del { color: var(--muted) }
+ins { text-decoration: none; background: var(--decided-soft); color: var(--ink) }
+
+pre.flow { background: var(--sheet); border: 1px solid var(--rule); padding: 16px; overflow-x: auto; font: 13px/1.5 var(--f-mono); margin: 12px 0 }
+ol.ladder { padding-left: 22px; max-width: 68ch }
+ol.ladder li { padding: 2px 0 }
+ol.ladder li.lib { background: var(--accent-soft); margin-left: -8px; padding-left: 8px }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 12px 0 }
+.card { background: var(--sheet); border: 1px solid var(--rule); padding: 14px 16px }
+.card .k { font: 600 11px var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
+.card .v { font-size: 17px; font-weight: 700; margin: 4px 0 6px }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth } }
+</style>
+
+<div class="wrap">
+<nav class="index" aria-label="Sections">
+  <span class="code">SPEC-029</span>
+  <a href="#problem">1 Problem</a>
+  <a href="#success">2 Success criteria</a>
+  <a href="#glossary">3 Glossary</a>
+  <a href="#flow">4 Flow</a>
+  <a href="#req">5 Requirements</a>
+  <a href="#examples">6 Examples</a>
+  <a href="#amend">7 Amendments</a>
+  <a href="#dispo">8 Disposition</a>
+  <a href="#plan">9 Plan</a>
+  <a href="#open">10 Assumptions</a>
+</nav>
+
+<main>
+<header class="doc">
+  <div class="dmc">agentic-sdlc · specs/029-autonomous-loop · draft for gate H1 · 2026-10-02</div>
+  <h1>The autonomous loop</h1>
+  <p>The harness goes from 12 steps to 4. The owner approves once, at gate H1. A script runs the agents. A machine verifies the result.</p>
+  <div class="legend">
+    <span class="chip c-decided">decided</span>
+    <span class="chip c-hyp">hypothesis</span>
+    <span class="chip c-open">open</span>
+    <span class="chip c-rep">reported</span>
+    <span class="chip c-judged">judged</span>
+  </div>
+  <p class="meta" style="margin-top:12px">Writing rule: about 80% of ASD-STE100. One word, one meaning. 25 words per sentence, 20 for procedures. Active voice. Tables are exempt.</p>
+</header>
+
+<div class="gate"><strong>Gate H1.</strong> You approve what “done” means. Read the amendments (section 7) and the examples (section 6) first. Everything after this gate runs without you, unless build escalates.</div>
+
+<h2 id="problem"><span class="n">1</span>Problem</h2>
+<div class="tbl"><table>
+<tr><th>fact</th><th>label</th></tr>
+<tr><td>The workflow has 12 steps, and each step writes an artifact.</td><td><span class="chip c-rep">reported</span></td></tr>
+<tr><td>The implement step has no rules. <code>docs/workflow.md</code> gives it to “the adopter”.</td><td><span class="chip c-rep">reported</span></td></tr>
+<tr><td>The model does what the owner asks, but it drifts in scope, size and reuse.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td>The model skips workflow steps or does them badly.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td><code>/contract</code> writes one test per criterion. These tests cost much and prove little.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td>Features 013 to 028 changed the harness itself, not a product.</td><td><span class="chip c-rep">reported</span></td></tr>
+<tr><td>The adopter repo <code>stage-analysis-scanner</code> has 131 ADRs in four weeks and a hand-made EDGAR client. An official library exists.</td><td><span class="chip c-rep">reported</span></td></tr>
+<tr><td>The owner confirms almost every operation.</td><td><span class="chip c-decided">decided</span></td></tr>
+</table></div>
+
+<h2 id="success"><span class="n">2</span>Success criteria</h2>
+<p>The first two slices of the new trading repo measure this spec. Each threshold is a hypothesis until those slices run.</p>
+<div class="cards">
+  <div class="card"><div class="k">lead time</div><div class="v">≤ 2 sessions</div>brief to merge <span class="chip c-hyp">hypothesis</span></div>
+  <div class="card"><div class="k">interventions</div><div class="v">H1 + ≤ 1</div>escalations per slice <span class="chip c-hyp">hypothesis</span></div>
+  <div class="card"><div class="k">autonomy</div><div class="v">0 confirmations</div>between H1 and the end of accept <span class="chip c-hyp">hypothesis</span></div>
+  <div class="card"><div class="k">compounding</div><div class="v">≥ 1 module reused</div>slice 2 extends slice 1; 0 duplicates <span class="chip c-hyp">hypothesis</span></div>
+</div>
+
+<h2 id="glossary"><span class="n">3</span>Glossary</h2>
+<p>These terms have one meaning. The final glossary lives in the north star.</p>
+<div class="tbl"><table>
+<tr><th>term</th><th>meaning</th></tr>
+<tr><td class="term">north star</td><td>The document that says why the product exists. It is the only source of direction.</td></tr>
+<tr><td class="term">anchor</td><td>A reference from a requirement to one item of the north star: a pillar, a principle, or a decided item.</td></tr>
+<tr><td class="term">amendment</td><td>A proposed change to the north star or the charter. Only gate H1 approves it.</td></tr>
+<tr><td class="term">charter</td><td>The file of load-bearing technical decisions, including the libraries the project uses.</td></tr>
+<tr><td class="term">brief</td><td>The owner’s statement of the objective of one feature.</td></tr>
+<tr><td class="term">spec</td><td>The document for one feature: glossary changes, requirements, examples, amendments and plan.</td></tr>
+<tr><td class="term">requirement</td><td>One sentence in EARS form. It has an anchor and one or more examples.</td></tr>
+<tr><td class="term">EARS</td><td>Requirement syntax: <code>When &lt;trigger&gt;, the &lt;system&gt; shall &lt;response&gt;</code>, or <code>If</code>, <code>While</code>, <code>Where</code>, or <code>The &lt;system&gt; shall</code>.</td></tr>
+<tr><td class="term">example</td><td>A concrete input and its expected output, with real values. An approved example becomes a test.</td></tr>
+<tr><td class="term">judged requirement</td><td>A requirement that no example can check. It has a rubric, and a different model scores it.</td></tr>
+<tr><td class="term">invariant</td><td>A property that every run must keep. It comes from a principle of the north star.</td></tr>
+<tr><td class="term">reconciliation</td><td>A test that compares an output with a published value from outside the repo.</td></tr>
+<tr><td class="term">e2e run</td><td>A small run through every layer of the product, with a fixed expected output.</td></tr>
+<tr><td class="term">gate H1</td><td>The one approval the owner gives. The owner approves the spec page.</td></tr>
+<tr><td class="term">spec page</td><td>The HTML page that shows the spec for gate H1. This page.</td></tr>
+<tr><td class="term">build</td><td>The step that implements the plan without the owner. A script controls it.</td></tr>
+<tr><td class="term">accept</td><td>The step that verifies the result by machine and merges it.</td></tr>
+<tr><td class="term">task</td><td>One unit of the plan. It cites one or more requirements.</td></tr>
+<tr><td class="term">role</td><td>A job an agent does in build: <code>implementer</code> or <code>reviewer</code>.</td></tr>
+<tr><td class="term">adapter</td><td>The command template that runs one agent CLI for one role.</td></tr>
+<tr><td class="term">assumption</td><td>A choice the implementer makes where the spec is silent. It is <code>minor</code> or <code>structural</code>.</td></tr>
+<tr><td class="term">escalation</td><td>A stop that asks the owner for a decision.</td></tr>
+<tr><td class="term">frozen test</td><td>A test file that build locks after task 0. No later task may change it.</td></tr>
+<tr><td class="term">module map</td><td>The table of modules in <code>docs/modules.md</code>: layer, purpose, interface, anchors, status.</td></tr>
+<tr><td class="term">verified module</td><td>A module whose invariants and reconciliations pass. Other modules are <code>reported</code>.</td></tr>
+<tr><td class="term">budget</td><td>The maximum token spend for one slice.</td></tr>
+<tr><td class="term">slice</td><td>One feature, from brief to merge.</td></tr>
+</table></div>
+
+<h2 id="flow"><span class="n">4</span>Flow <span class="chip c-decided">decided</span></h2>
+<pre class="flow">setup, once    north star (with glossary and labels) · charter · module map
+   ↓
+1. brief       the owner writes it; the agent asks what is missing
+   ↓
+2. spec        the agent writes the spec → lint → spec page
+   ⛩ gate H1   the owner approves the spec page
+   ↓
+3. build       a script runs the agents; no owner
+   │  T0  examples → tests, all must fail → tests frozen
+   │  Tn  implementer → checks → reviewer → commit   (retry ≤ 3, then escalate)
+   ↓
+4. accept      examples · invariants · reconciliations · e2e run
+               pass → merge → results go back to the north star as “reported”
+               fail → build once → escalate</pre>
+
+<h2 id="req"><span class="n">5</span>Requirements</h2>
+<p>Each row gives its anchor, a pillar of the harness north star, and its examples. Click an example to jump to it.</p>
+
+<h3>5.1 Spec</h3>
+<div class="tbl"><table>
+<tr><th>id</th><th>requirement</th><th>anchor</th><th>examples</th></tr>
+<tr><td class="id">S1</td><td class="ears"><b>When</b> the lint runs, the lint <b>shall</b> reject a bold term in a requirement that the glossary does not define.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E1">E1</a></td></tr>
+<tr><td class="id">S2</td><td class="ears"><b>When</b> the lint runs, the lint <b>shall</b> reject a prose sentence of more than 25 words.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E2">E2</a></td></tr>
+<tr><td class="id">S3</td><td class="ears"><b>When</b> the lint runs, the lint <b>shall</b> reject a requirement that does not have EARS form.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E3">E3</a></td></tr>
+<tr><td class="id">S4</td><td class="ears"><b>When</b> the lint runs, the lint <b>shall</b> reject a requirement that has no anchor.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E4">E4</a></td></tr>
+<tr><td class="id">S5</td><td class="ears"><b>When</b> the lint runs, the lint <b>shall</b> reject a requirement that has no example and no <code>judged</code> label.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E5">E5</a></td></tr>
+<tr><td class="id">S6</td><td class="ears"><b>When</b> the lint runs, the lint <b>shall</b> reject a task that cites no requirement.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E6">E6</a></td></tr>
+<tr><td class="id">S7</td><td class="ears"><b>When</b> the lint runs, the lint <b>shall</b> reject a new module or dependency without a justification.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E7">E7</a></td></tr>
+<tr><td class="id">S8</td><td class="ears"><b>When</b> the lint passes, the spec step <b>shall</b> write one spec page.</td><td class="anc">frictionless-adoption</td><td class="ex"><a href="#E8">E8</a></td></tr>
+<tr><td class="id">S9</td><td class="ears"><b>If</b> the spec changes the north star or the charter, <b>then</b> the spec page <b>shall</b> show each change in an amendments section.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E9">E9</a></td></tr>
+</table></div>
+<p>The reviewer checks the 20-word limit on procedure sentences and the active voice. <span class="chip c-judged">judged</span></p>
+
+<h3>5.2 Build</h3>
+<div class="tbl"><table>
+<tr><th>id</th><th>requirement</th><th>anchor</th><th>examples</th></tr>
+<tr><td class="id">B1</td><td class="ears"><b>When</b> build starts, build <b>shall</b> turn each example into a test and <b>shall</b> require each test to fail.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E10">E10</a></td></tr>
+<tr><td class="id">B2</td><td class="ears"><b>If</b> a task after task 0 changes a frozen test, <b>then</b> build <b>shall</b> reject the task.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E11">E11</a></td></tr>
+<tr><td class="id">B3</td><td class="ears">For each task, build <b>shall</b> run the implementer, the checks and the reviewer, in this order.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E12">E12</a></td></tr>
+<tr><td class="id">B4</td><td class="ears"><b>If</b> a task fails 3 attempts, or fails 2 times with the same failure, <b>then</b> build <b>shall</b> escalate the task.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E13">E13</a></td></tr>
+<tr><td class="id">B5</td><td class="ears"><b>When</b> the implementer reports a structural assumption, build <b>shall</b> block that task and continue with the independent tasks.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E14">E14</a></td></tr>
+<tr><td class="id">B6</td><td class="ears"><b>When</b> build ends with escalations, build <b>shall</b> show all escalations to the owner once.</td><td class="anc">frictionless-adoption</td><td class="ex"><a href="#E14">E14</a></td></tr>
+<tr><td class="id">B7</td><td class="ears">The reviewer <b>shall</b> check scope, the ponytail ladder, library-first, and module reuse.</td><td class="anc">measurable-impact</td><td><span class="chip c-judged">judged · R1</span></td></tr>
+<tr><td class="id">B8</td><td class="ears"><b>If</b> the token spend exceeds the budget, <b>then</b> build <b>shall</b> stop and escalate.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E15">E15</a></td></tr>
+<tr><td class="id">B9</td><td class="ears"><b>When</b> build calls an agent, build <b>shall</b> give it only the task, its requirements, examples, glossary terms, map rows, charter and rules.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E16">E16</a></td></tr>
+<tr><td class="id">B10</td><td class="ears"><b>When</b> build ends, build <b>shall</b> write <code>build-report.json</code>.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E17">E17</a></td></tr>
+</table></div>
+
+<p><strong>Ponytail ladder with library-first.</strong> <span class="chip c-decided">decided</span> The implementer stops at the first step that works.</p>
+<ol class="ladder">
+  <li>Does the code need to exist?</li>
+  <li>Does the repo already have it? Use the module map.</li>
+  <li>Does the standard library do it?</li>
+  <li>Does the platform do it natively?</li>
+  <li class="lib">Does a library in the charter do it? An official SDK beats a hand-made client.</li>
+  <li>Can it be one line?</li>
+  <li>Only then: the minimum code that works.</li>
+</ol>
+<p>A new library is an amendment to the charter. Gate H1 approves it.</p>
+
+<p id="R1"><strong>Rubric R1</strong> (for B7). The reviewer gives <code>fix</code> when the diff does one or more of these:</p>
+<ul>
+  <li>It adds behaviour that no cited requirement asks for.</li>
+  <li>It writes code that a charter library or an official SDK already provides.</li>
+  <li>It duplicates a module in the module map.</li>
+  <li>It adds an abstraction with one implementation.</li>
+  <li>It weakens a test.</li>
+</ul>
+
+<h3>5.3 Accept</h3>
+<div class="tbl"><table>
+<tr><th>id</th><th>requirement</th><th>anchor</th><th>examples</th></tr>
+<tr><td class="id">A1</td><td class="ears"><b>When</b> build ends, accept <b>shall</b> run the examples, invariants, reconciliations and the e2e run.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E18">E18</a></td></tr>
+<tr><td class="id">A2</td><td class="ears"><b>If</b> every check passes, <b>then</b> accept <b>shall</b> merge the feature branch into <code>main</code>.</td><td class="anc">frictionless-adoption</td><td class="ex"><a href="#E18">E18</a></td></tr>
+<tr><td class="id">A3</td><td class="ears"><b>If</b> a check fails, <b>then</b> accept <b>shall</b> return the slice to build once, and escalate on a second failure.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E19">E19</a></td></tr>
+<tr><td class="id">A4</td><td class="ears"><b>When</b> accept merges, accept <b>shall</b> append each result to the north star with the label <code>reported</code>.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E20">E20</a></td></tr>
+<tr><td class="id">A5</td><td class="ears"><b>If</b> a module directory has no row in the module map, or a row has no directory, <b>then</b> accept <b>shall</b> fail.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E21">E21</a></td></tr>
+<tr><td class="id">A6</td><td class="ears"><b>When</b> accept ends, accept <b>shall</b> write a result page with lead time, interventions, reused and new modules, and assumptions.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E22">E22</a></td></tr>
+<tr><td class="id">A7</td><td class="ears"><b>When</b> a requirement is judged, accept <b>shall</b> get its score from a model that is not the implementer’s model.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E23">E23</a></td></tr>
+</table></div>
+<p>The owner can read the result page. The owner does not approve it. <span class="chip c-decided">decided</span></p>
+
+<h3>5.4 Tests pattern</h3>
+<div class="tbl"><table>
+<tr><th>id</th><th>requirement</th><th>anchor</th><th>examples</th></tr>
+<tr><td class="id">T1</td><td class="ears">The spec template <b>shall</b> define four test kinds: example, invariant, reconciliation and e2e run.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E24">E24</a></td></tr>
+<tr><td class="id">T2</td><td class="ears">The spec template <b>shall</b> not ask for one test per requirement or per function.</td><td class="anc">measurable-impact</td><td class="ex"><a href="#E24">E24</a></td></tr>
+</table></div>
+<p>A test may use recorded real data. A test shall not mock the project’s own code. <span class="chip c-decided">decided</span></p>
+
+<h3>5.5 Adapter</h3>
+<div class="tbl"><table>
+<tr><th>id</th><th>requirement</th><th>anchor</th><th>examples</th></tr>
+<tr><td class="id">D1</td><td class="ears"><b>When</b> build starts, build <b>shall</b> read the CLI of each role from <code>harness.toml</code>.</td><td class="anc">agnostic-portability</td><td class="ex"><a href="#E25">E25</a></td></tr>
+<tr><td class="id">D2</td><td class="ears"><b>If</b> an agent output fails its JSON schema, <b>then</b> build <b>shall</b> count it as a failed attempt.</td><td class="anc">real-enforcement</td><td class="ex"><a href="#E26">E26</a></td></tr>
+<tr><td class="id">D3</td><td class="ears">The adapters for <code>claude</code>, <code>codex</code> and <code>fake</code> <b>shall</b> run the same role prompts.</td><td class="anc">agnostic-portability</td><td class="ex"><a href="#E27">E27</a></td></tr>
+<tr><td class="id">D4</td><td class="ears">The instructions for the brief, spec and accept steps <b>shall</b> have one source for Claude Code and for Codex.</td><td class="anc">agnostic-portability</td><td class="ex"><a href="#E28">E28</a></td></tr>
+<tr><td class="id">D5</td><td class="ears">The harness scripts <b>shall</b> run with <code>uv run</code> and declare their dependencies inline.</td><td class="anc">frictionless-adoption</td><td class="ex"><a href="#E29">E29</a></td></tr>
+</table></div>
+
+<h2 id="examples"><span class="n">6</span>Examples</h2>
+<p>Each example becomes a test in task 0 of build. The <code>fake</code> adapter runs every build example. No example needs a real model, except E27.</p>
+<div class="tbl"><table>
+<tr><th>id</th><th>given</th><th>when</th><th>then</th></tr>
+<tr id="E1"><td class="id">E1</td><td>spec with requirement S1 that uses <b>universe</b>; the glossary has no <code>universe</code></td><td>the lint runs</td><td>exit 1; output has <code>S1: undefined term 'universe'</code></td></tr>
+<tr id="E2"><td class="id">E2</td><td>spec with a prose sentence of 26 words</td><td>the lint runs</td><td>exit 1; output names the line and <code>26 words</code></td></tr>
+<tr id="E3"><td class="id">E3</td><td>requirement <code>The data must be fresh.</code></td><td>the lint runs</td><td>exit 1; output has <code>not EARS</code></td></tr>
+<tr id="E4"><td class="id">E4</td><td>requirement row with an empty anchor cell</td><td>the lint runs</td><td>exit 1; output has <code>no anchor</code></td></tr>
+<tr id="E5"><td class="id">E5</td><td>requirement row with an empty examples cell</td><td>the lint runs</td><td>exit 1; output has <code>no example</code>. With <code>judged, rubric R1</code> in the cell: exit 0</td></tr>
+<tr id="E6"><td class="id">E6</td><td>task <code>T3</code> that cites no requirement</td><td>the lint runs</td><td>exit 1; output has <code>T3: cites no requirement</code></td></tr>
+<tr id="E7"><td class="id">E7</td><td>plan row <code>new module: edgar_client</code> with no justification</td><td>the lint runs</td><td>exit 1; output has <code>edgar_client: no justification</code></td></tr>
+<tr id="E8"><td class="id">E8</td><td>a spec that passes the lint</td><td>the spec step ends</td><td>one file <code>spec.html</code> exists; it has the glossary, requirements, examples and plan</td></tr>
+<tr id="E9"><td class="id">E9</td><td>a spec with one amendment to <code>out_of_scope</code></td><td>the spec step ends</td><td><code>spec.html</code> has an amendments section with that one change</td></tr>
+<tr id="E10"><td class="id">E10</td><td>example E1 as a test, and a lint that already rejects undefined terms</td><td>task 0 runs</td><td>the test passes before implementation; build marks it <code>vacuous</code> and escalates</td></tr>
+<tr id="E11"><td class="id">E11</td><td>task T2 diff changes <code>tests/test_e1.py</code>, which is frozen</td><td>the checks run</td><td>build rejects T2 with <code>frozen test changed: tests/test_e1.py</code></td></tr>
+<tr id="E12"><td class="id">E12</td><td><code>fake</code> adapter that logs each call</td><td>build runs one task</td><td>the log is <code>implementer, checks, reviewer</code>, in this order</td></tr>
+<tr id="E13"><td class="id">E13</td><td><code>fake</code> implementer that fails the same test 2 times</td><td>build runs</td><td>after attempt 2, build escalates with the failure text</td></tr>
+<tr id="E14"><td class="id">E14</td><td>tasks T1 and T2 independent; <code>fake</code> implementer returns a structural assumption on T1</td><td>build runs</td><td>T2 completes; T1 is blocked; the owner sees one escalation list at the end</td></tr>
+<tr id="E15"><td class="id">E15</td><td>budget <span class="num">1000</span> tokens; <code>fake</code> reports <span class="num">600</span> tokens per call</td><td>build runs</td><td>build stops after the second call with <code>budget exceeded</code></td></tr>
+<tr id="E16"><td class="id">E16</td><td>plan with tasks T1 and T2</td><td>build calls the implementer for T1</td><td>the prompt has no text from T2</td></tr>
+<tr id="E17"><td class="id">E17</td><td>a build run with one retry and one minor assumption</td><td>build ends</td><td><code>build-report.json</code> passes its schema and records 1 retry and 1 assumption</td></tr>
+<tr id="E18"><td class="id">E18</td><td>every check passes</td><td>accept runs</td><td><code>main</code> has the feature commits</td></tr>
+<tr id="E19"><td class="id">E19</td><td>the e2e run fails 2 times</td><td>accept runs</td><td>the slice goes to build once, then accept escalates</td></tr>
+<tr id="E20"><td class="id">E20</td><td>the spec tested hypothesis <code>H-3</code>, and the run returned a value</td><td>accept merges</td><td>the north star has a new <code>reported</code> line for <code>H-3</code> with the value and the date</td></tr>
+<tr id="E21"><td class="id">E21</td><td>directory <code>src/rule/</code>, and no <code>rule</code> row in <code>docs/modules.md</code></td><td>accept runs</td><td>accept fails with <code>rule: not in module map</code></td></tr>
+<tr id="E22"><td class="id">E22</td><td>a completed slice</td><td>accept ends</td><td>the result page shows lead time, interventions, reused and new modules, and assumptions</td></tr>
+<tr id="E23"><td class="id">E23</td><td>implementer <code>codex</code>; a judged requirement</td><td>accept scores it</td><td>the scoring call uses the <code>claude</code> adapter</td></tr>
+<tr id="E24"><td class="id">E24</td><td>the spec template</td><td>the owner reads it</td><td>it names the four test kinds; it has no “one test per criterion” rule</td></tr>
+<tr id="E25"><td class="id">E25</td><td><code>harness.toml</code> sets <code>implementer = "fake"</code></td><td>build runs</td><td>the fake agent receives the implementer call</td></tr>
+<tr id="E26"><td class="id">E26</td><td><code>fake</code> implementer returns <code>{"status": 5}</code></td><td>build validates it</td><td>the attempt counts as failed with <code>schema: status</code></td></tr>
+<tr id="E27"><td class="id">E27</td><td>one toy task: add a function <code>add(a, b)</code> with its test</td><td>build runs once with <code>claude</code>, and once with <code>codex</code></td><td>both runs return schema-valid JSON and a passing test</td></tr>
+<tr id="E28"><td class="id">E28</td><td>the spec step instructions</td><td>the owner opens Claude Code, then Codex</td><td>both read the same file</td></tr>
+<tr id="E29"><td class="id">E29</td><td>a clean machine with <code>uv</code></td><td>the owner runs <code>uv run scripts/build.py --help</code></td><td>the command exits 0 with no manual install</td></tr>
+</table></div>
+
+<h2 id="amend"><span class="n">7</span>Amendments</h2>
+<div class="caution"><span class="label">CAUTION</span>These rows change the north star and the constitution of the harness. Approving gate H1 approves each row. Reject a row by its number.</div>
+
+<h3>7.1 Harness north star</h3>
+<div class="tbl"><table>
+<tr><th>#</th><th>field</th><th>change</th><th>why</th></tr>
+<tr><td class="id">M1</td><td class="anc">mission</td><td>…enforces a disciplined<ins>, autonomous</ins> agentic SDLC (spec-driven, test-first, evidence-verified)<ins>, where the owner defines done and agents deliver it</ins>…</td><td>Autonomy is now a success criterion.</td></tr>
+<tr><td class="id">M2</td><td class="anc">out_of_scope</td><td><del>imposing or naming a mandatory execution runtime</del><br><ins>imposing a mandatory agent CLI, model or product stack</ins></td><td>Build is a runtime that the harness ships. It stays agnostic about the CLI.</td></tr>
+<tr><td class="id">M3</td><td class="anc">out_of_scope</td><td><del>runtime dependencies or frameworks</del><br><ins>dependencies beyond uv and inline script dependencies</ins></td><td>The owner chose uv.</td></tr>
+<tr><td class="id">M4</td><td class="anc">in_scope</td><td><del>feature templates, coverage, and criterion state machine</del><br><ins>feature templates, glossary, and module map</ins></td><td>Coverage and the state machine go away.</td></tr>
+<tr><td class="id">M5</td><td class="anc">in_scope</td><td><del>WoW self-validation (retro, wow-report) and method documentation</del><br><ins>the autonomous build loop, its metrics, and method documentation</ins></td><td>The retro and the wow-report go away. Accept writes the metrics.</td></tr>
+<tr><td class="id">M6</td><td class="anc">measurable-impact</td><td><del>gaps caught early and rework avoided, in the wow-report</del><br><ins>lead time, interventions, and reused against new modules, per slice</ins></td><td>These are the success criteria of section 2.</td></tr>
+<tr><td class="id">M7</td><td class="anc">real-enforcement</td><td><del>…dogfooding itself: retro ledger / wow-report</del><br><ins>…the lint, build and accept gates; the owner approves only at gate H1</ins></td><td>Same pillar, new evidence.</td></tr>
+<tr><td class="id">M8</td><td class="anc">new field</td><td><ins>every north-star statement carries decided, hypothesis, open or reported; the glossary lives in the north star</ins></td><td>This stops silent drift.</td></tr>
+</table></div>
+
+<h3>7.2 Constitution</h3>
+<div class="tbl"><table>
+<tr><th>#</th><th>now</th><th>proposed</th></tr>
+<tr><td class="id">C1</td><td>D5: sentences of 35 words or fewer</td><td>about 80% of ASD-STE100: 25 words, 20 for procedures</td></tr>
+<tr><td class="id">C2</td><td>D4: a gate bootstrap exemption with four conditions</td><td>delete. Build applies the gates to every slice, and git keeps the history.</td></tr>
+<tr><td class="id">C3</td><td>no rules for implementation</td><td>the ponytail ladder with library-first (section 5.2)</td></tr>
+<tr><td class="id">C4</td><td>override of <code>non-vacuous-checks</code> that depends on <code>check_96</code></td><td>delete with <code>check_96</code></td></tr>
+</table></div>
+
+<h2 id="dispo"><span class="n">8</span>Disposition of the current harness <span class="chip c-decided">decided</span></h2>
+<div class="tbl"><table>
+<tr><th>what</th><th>action</th></tr>
+<tr><td><code>scripts/north-star/engine.py</code></td><td>keep; add labels, glossary and the anchor check</td></tr>
+<tr><td><code>scripts/stack/engine.py</code></td><td>keep; library amendments go through gate H1</td></tr>
+<tr><td><code>bootstrap.sh</code>, <code>scripts/vendor.sh</code></td><td>keep; they install the harness in the new repo</td></tr>
+<tr><td><code>scripts/status.sh</code></td><td>keep; change it to the four steps</td></tr>
+<tr><td><code>scripts/prose.sh</code></td><td>merge into the spec lint</td></tr>
+<tr><td><code>tests/check_60_secret_scan.sh</code></td><td>keep</td></tr>
+<tr><td><code>scripts/mutate.sh</code>, <code>nvc.sh</code>, <code>cases.sh</code>, <code>lib/matrix.sh</code></td><td>delete</td></tr>
+<tr><td><code>tests/check_89, 91, 93, 96, 97, 99</code></td><td>delete</td></tr>
+<tr><td>commands and skills <code>align</code>, <code>distill</code>, <code>plan</code>, <code>contract</code>, <code>tasks</code>, <code>verify</code>, <code>uat</code>, <code>retro</code>, <code>wow-report</code></td><td>delete; <code>spec</code>, <code>build</code> and <code>accept</code> replace them</td></tr>
+<tr><td><code>amendment-gate.yml</code>, <code>scripts/amendment-gate.sh</code></td><td>delete; gate H1 approves amendments</td></tr>
+<tr><td><code>specs/001</code> to <code>specs/027</code>, <code>verification/reports/</code></td><td>keep as history; do not change</td></tr>
+<tr><td><code>specs/028-suite-hermeticity</code></td><td>drop; it isolated a suite that this spec deletes</td></tr>
+</table></div>
+<p>The size of <code>scripts/</code> and <code>tests/</code> goes from about 6,000 lines to about 2,000. <span class="chip c-hyp">hypothesis</span></p>
+
+<h2 id="plan"><span class="n">9</span>Plan <span class="chip c-decided">decided</span></h2>
+<p>The implementation plan is a separate document. The tasks follow this order.</p>
+<div class="tbl"><table>
+<tr><th>task</th><th>does</th><th>requirements</th></tr>
+<tr><td class="id">T1</td><td>spec lint and spec page, then run them on this spec</td><td class="anc">S1–S9</td></tr>
+<tr><td class="id">T2</td><td>adapter spike: <code>claude</code>, <code>codex</code> and <code>fake</code> return valid JSON</td><td class="anc">D1–D3, D5</td></tr>
+<tr><td class="id">T3</td><td><code>build.py</code> with the loop</td><td class="anc">B1–B10</td></tr>
+<tr><td class="id">T4</td><td>accept, the module map check and the north-star write-back</td><td class="anc">A1–A7</td></tr>
+<tr><td class="id">T5</td><td>templates, one-source instructions, constitution and north-star amendments</td><td class="anc">T1, T2, D4</td></tr>
+<tr><td class="id">T6</td><td>delete what section 8 lists</td><td class="anc">section 8</td></tr>
+</table></div>
+
+<h2 id="open"><span class="n">10</span>Assumptions and open items</h2>
+<div class="tbl"><table>
+<tr><th>item</th><th>label</th></tr>
+<tr><td><code>claude -p --output-format json</code> and <code>codex exec --output-schema</code> give schema-valid JSON. T2 tests it.</td><td><span class="chip c-hyp">hypothesis</span></td></tr>
+<tr><td>The spec page uses plain HTML. <code>interfig</code> draws scenario figures when the product has a React toolchain.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td>The thresholds of section 2.</td><td><span class="chip c-hyp">hypothesis</span></td></tr>
+<tr><td>Tasks run one at a time. Parallel tasks wait until sequential build is too slow.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td>Accept merges into the local <code>main</code>. It does not push.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td>The Claude Code Workflow tool is not used. It is not agnostic.</td><td><span class="chip c-decided">decided</span></td></tr>
+<tr><td>Which models fill which roles by default.</td><td><span class="chip c-open">open</span></td></tr>
+</table></div>
+</main>
+</div>
