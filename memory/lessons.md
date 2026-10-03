@@ -7,7 +7,7 @@ One row per lesson. `active`: every build prompt holds it. `proposed`: waits for
 | L1 | A spec that removes things lists every live reference from a full scan of tracked files. Do not list from memory. | tests/test_honest_loop.py::test_e4_lint_reports_unnamed_referrer | prune-from-inventory | 0 | 0 | promoted |
 | L2 | Merged into L9. | merged into L9 | clean-wrong-number | 0 | 0 | merged |
 | L3 | Fixtures hold your own assumptions. Run the check against the real artifact early, not only at the end. Measure its false alarms before it may block. | none: judgment | fixtures-are-my-assumptions | 0 | 0 | active |
-| L4 | A fixed-index parser of a markdown table reads the wrong column when the column count changes. Read columns by header name. | tests/test_lesson_curation.py::test_e7_requirement_columns_read_by_header | fixtures-are-my-assumptions | 0 | 0 | active |
+| L4 | A fixed-index parser of a markdown table reads the wrong column when the column count changes. Read columns by header name. | tests/test_lesson_curation.py::test_e7_requirement_columns_read_by_header | fixtures-are-my-assumptions | 1 | 0 | active |
 | L5 | A finding made during a feature goes to `docs/backlog.md`. It does not become the next feature. | none: judgment | wow-backlog-discipline | 0 | 0 | active |
 | L6 | After you move code between files, run the full suite. Do not run only the changed part. | tests/test_accept.py::test_e19_fails_twice_then_escalates | refactor-orphans-mutations | 0 | 0 | active |
 | L7 | Write a number only after a command computed it. Do not write it from memory. | none: judgment | writing-terse | 0 | 0 | active |
@@ -23,3 +23,8 @@ One row per lesson. `active`: every build prompt holds it. `proposed`: waits for
 | L17 | The vacuity check judges only the tests its task wrote. A test of other existing behavior that already passes is not vacuous, and it must not escalate. | tests/test_build.py::test_t0_ignores_same_named_tests_of_other_slices | 035-fast-tests | 0 | 0 | promoted |
 | L18 | A CI step that reads TOML with the runner's system python3 depends on Python 3.11 or later for tomllib. Pin the Python version, or run the step through uv. | none: judgment | 035-fast-tests | 0 | 0 | active |
 | L19 | A semantic question goes to a model, and the owner resolves what it flags. A parser never answers it. | memory/constitution/constitution.md::D7 | 036-memory-process | 0 | 0 | promoted |
+| L20 | When a rename forces a test update, keep the assertion as strong as before. Assert the whole row or cell, not only the renamed part. | none: judgment | 036-memory-process | 0 | 0 | active |
+| L21 | Order tasks so a lesson's check exists before the lesson is marked promoted. Otherwise the lessons check stays red until a later task lands. | none: judgment | 036-memory-process | 0 | 0 | active |
+| L22 | A promoted check that only finds its name as plain text in a file passes on any mention. It does not prove that the check runs. | none: judgment | 036-memory-process | 0 | 0 | active |
+| L23 | A check that reads repo memory by relative path makes its tests read the real repo. Run such tests with cwd set to a temporary directory. | none: judgment | 036-memory-process | 0 | 0 | active |
+| L24 | When a stricter lint rejects closed specs, scope it to open slices. Do not delete the test that lints the closed spec. | none: judgment | 036-memory-process | 0 | 0 | active |
