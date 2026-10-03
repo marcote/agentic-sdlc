@@ -12,10 +12,12 @@ Exit: 0 clean · 1 findings · 2 unusable input.
 """
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 MAX_WORDS = 25
+HISTORY = ("specs/", "verification/reports/", "docs/superpowers/", "memory/north-star/decisions/", "docs/backlog.md", "tests/")
 EARS = re.compile(r"^(When|While|If|Where|The|For each)\b.*\bshall\b", re.S)
 SEP = re.compile(r"^\|[\s:|-]+\|$")
 
@@ -84,7 +86,24 @@ def prose(text):
     return out
 
 
-def lint(spec_text, ns_text):
+def referrers(spec_text, root):
+    """Findings for live files that hold a removed path and that the spec never names."""
+    removed = [r["removes"].strip("`") for _, h, rows in tables(spec_text) if h[:2] == ["removes", "why"] for r in rows]
+    if not removed:
+        return []
+    files = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True).stdout.split("\n")
+    out = []
+    for path in removed:
+        needles = (path, Path(path).stem)
+        for f in files:
+            if not f or f.startswith(HISTORY) or f == path or f in spec_text or not (root / f).is_file():
+                continue
+            if any(n in (root / f).read_text(errors="ignore") for n in needles):
+                out.append(f"{path}: referred by {f}")
+    return out
+
+
+def lint(spec_text, ns_text, root=Path(".")):
     s, ns = parse(spec_text), parse(ns_text)
     terms = s["glossary"] | ns["glossary"]
     out = prose(spec_text)
@@ -113,7 +132,7 @@ def lint(spec_text, ns_text):
     for r in s["new"]:
         if not r["justification"]:
             out.append(f"{r['item'].split(':', 1)[-1].strip()}: no justification")
-    return out
+    return out + referrers(spec_text, root)
 
 
 PAGE = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

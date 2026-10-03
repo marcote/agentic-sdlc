@@ -103,7 +103,7 @@ def done_on_branch(slice_name):
     if not t0s:
         return None, set()
     files = [f for t0 in t0s for f in git("show", "--name-only", "--format=", t0).split()]
-    frozen = {f for f in files if re.search(r"(^|/)tests/|test_e\d+", f)}
+    frozen = {f for f in files if re.search(r"test_e\d+_", f + "\n" + (Path(f).read_text() if Path(f).is_file() else ""), re.I)}
     done = set(re.findall(rf"^build\({re.escape(slice_name)}\): (T\d+) ", git("log", "--format=%s"), re.M))
     return frozen, done
 
@@ -129,7 +129,7 @@ def section(title, body):
     return f"## {title}\n\n{body}\n\n" if body else ""
 
 
-def prompt_for(role, task, s, cfg, feedback="", diff=""):
+def prompt_for(role, task, s, cfg, feedback="", diff="", frozen=()):
     reqs = [s["reqs"][r] for r in speclib.ids_in(task["requirements"]) if r in s["reqs"]]
     exs = [s["examples"][e] for e in examples_of(task, s)]
     words = " ".join(r["requirement"] for r in reqs).lower()
@@ -142,6 +142,7 @@ def prompt_for(role, task, s, cfg, feedback="", diff=""):
         + f"## Task {task['task']}\n\n{task['does']}\n\n"
         + section("Requirements", "\n".join(f"- {r['id']}: {r['requirement']}" for r in reqs))
         + section("Examples", "\n".join(f"- {e['id']}: given {e['given']}; when {e['when']}; then {e['then']}" for e in exs))
+        + section("Frozen tests", "\n".join(f"- {f}" for f in sorted(frozen)))
         + section("Glossary", "\n".join(f"- {t}: {m}" for t, m in terms.items()))
         + section("Module map", read(paths["module_map"]))
         + section("Charter", read(paths["charter"]))
@@ -160,7 +161,7 @@ def run_task(task, s, cfg, report, frozen, done_examples):
     for attempt in range(1, cfg["limits"]["attempts"] + 1):
         entry["attempts"] = attempt
         report["trace"].append(f"{tid}:implementer")
-        res, fail = call(cfg, "implementer", prompt_for("implementer", task, s, cfg, feedback), report)
+        res, fail = call(cfg, "implementer", prompt_for("implementer", task, s, cfg, feedback, frozen=frozen), report)
         if res:
             structural = [a for a in res["assumptions"] if a["severity"] == "structural"]
             if res["status"] == "blocked" or structural:
@@ -259,6 +260,12 @@ def build(spec_dir, cfg):
     report = {"tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [],
               "reused": [], "new": [], "started": datetime.now(timezone.utc).isoformat()}
     try:
+        old = json.loads((spec_dir / "build-report.json").read_text())
+        earlier = old.get("runs") or [old]  # a report from before "runs" is one run
+        earlier = [{k: r.get(k) for k in ("started", "tokens", "escalations")} for r in earlier]
+    except (OSError, ValueError, AttributeError):
+        earlier = []
+    try:
         frozen, done = done_on_branch(s["slice"])  # a re-run keeps what an earlier run committed
         late = list(s["examples"]) if frozen is None else late_examples(s, frozen)
         if late and contract(s, cfg, report, late):
@@ -287,6 +294,7 @@ def build(spec_dir, cfg):
         report["escalations"].append({"task": "crash", "reason": f"{type(e).__name__}: {e} {getattr(e, 'stderr', '') or ''}".strip()})
         revert()
     finally:
+        report["runs"] = earlier + [{k: report[k] for k in ("started", "tokens", "escalations")}]
         (spec_dir / "build-report.json").write_text(json.dumps(report, indent=2))
     return report
 

@@ -10,9 +10,8 @@ extends: base
   adds the project's own mission, pillars, and scope — the product governance analogue
   of how `constitution.md` declares `extends: base` and adds its deltas.
 - `base/schema.md` is the **checkable shared shape** that every project's North Star
-  must satisfy. `base/alignment-rubric.md` is the **shared scoring method** that the
-  alignment judge applies. `base/amendment-protocol.md` is the **shared change
-  control process** for editing scope/pillars. None of these three is project-specific —
+  must satisfy. Editing scope/pillars is a governed change: an ADR in the same PR
+  (see `base/adr-template.md`). None of these is project-specific —
   a project's delta is its mission, pillars, and scope only, never the rules for
   validating/scoring/amending them.
 - **Contract in the template, engine per-stack.** `base/` specifies the shape, the

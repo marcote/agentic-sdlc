@@ -1,0 +1,355 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec 031 — One clear SDLC</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1c2321;--mut:#5b6662;--rule:#d7ddd9;--acc:#0f5f6e;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#121615;--fg:#e4e9e6;--mut:#9aa6a1;--rule:#2d3533;--acc:#6cc3d1;--warn:#f0b65a;color-scheme:dark}}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:24px 16px}
+h1,h2,h3{text-wrap:balance} h2{border-top:1px solid var(--rule);padding-top:12px}
+#amendments{color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%}
+</style>
+<h1 id="spec-031-one-clear-sdlc">Spec 031 — One clear SDLC</h1>
+<p>Status: draft for gate H1. Labels: decided, hypothesis, open, reported.</p>
+<p>Spec 029 pruned the old commands, but its disposition table came from a partial listing. A second layer of the 12-step flow survived in <code>evals/</code>, <code>verification/</code>, the north star and two engines. Nothing in the four-step flow uses it. This slice removes it, adds a check so it cannot come back in silence, and documents the flow with interfig.</p>
+<p><img alt="The workflow" src="../../docs/figures/workflow.svg" /></p>
+<p><img alt="The build loop" src="../../docs/figures/build-loop.svg" /></p>
+<p><img alt="Accept" src="../../docs/figures/accept.svg" /></p>
+<h2 id="1-glossary">1. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>live file</strong></td>
+<td>A tracked file outside the history paths: <code>specs/</code>, <code>verification/reports/</code>, <code>docs/superpowers/</code>, <code>memory/north-star/decisions/</code>, <code>docs/backlog.md</code> and <code>tests/</code>.</td>
+</tr>
+<tr>
+<td><strong>removed name</strong></td>
+<td>A name of the old flow: <code>/align</code>, <code>/distill</code>, <code>distill</code>, <code>/contract</code>, <code>/tasks</code>, <code>/verify</code>, <code>/uat</code>, <code>/retro</code>, <code>wow-report</code>, <code>coverage.md</code>, <code>acceptance.md</code>, <code>alignment.md</code>, <code>mutate.sh</code>, <code>nvc.sh</code>, <code>amendment-gate</code>, <code>alignment-rubric</code>, <code>amendment-protocol</code>.</td>
+</tr>
+<tr>
+<td><strong>stale-name check</strong></td>
+<td>The test that lists every live file that holds a removed name.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-requirements">2. Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>requirement</th>
+<th>anchor</th>
+<th>examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>When the slice ends, the harness shall not contain the legacy files that section 5 lists for T1.</td>
+<td>frictionless-adoption</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>N1</td>
+<td>The north-star engine shall offer only the <code>schema-valid</code> command.</td>
+<td>frictionless-adoption</td>
+<td>E2</td>
+</tr>
+<tr>
+<td>N2</td>
+<td>When the north star has no alignment block, the north-star engine shall accept it as schema-valid.</td>
+<td>frictionless-adoption</td>
+<td>E3</td>
+</tr>
+<tr>
+<td>S1</td>
+<td>The stack engine shall offer only the <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code> and <code>guards</code> commands.</td>
+<td>frictionless-adoption</td>
+<td>E4</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>The file <code>docs/workflow.md</code> shall show the workflow, the build loop and accept as interfig figures.</td>
+<td>measurable-impact</td>
+<td>E5</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>The prose of <code>docs/workflow.md</code> shall have no sentence over 25 words.</td>
+<td>measurable-impact</td>
+<td>E6</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>The README shall show the workflow figure and link <code>docs/workflow.md</code>.</td>
+<td>measurable-impact</td>
+<td>E7</td>
+</tr>
+<tr>
+<td>V1</td>
+<td>When vendoring applies, the target shall get <code>docs/workflow.md</code> and <code>docs/figures/</code>.</td>
+<td>agnostic-portability</td>
+<td>E8</td>
+</tr>
+<tr>
+<td>V2</td>
+<td>When vendoring seeds <code>harness.toml</code>, the seed shall name <code>scripts/test.sh</code> wherever the harness names <code>tests/run.sh</code>.</td>
+<td>agnostic-portability</td>
+<td>E12</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>When the suite runs, the <strong>stale-name check</strong> shall fail and name each <strong>live file</strong> that holds a <strong>removed name</strong>.</td>
+<td>real-enforcement</td>
+<td>E9, E10, E11, E13</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-examples">3. Examples</h2>
+<p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>given</th>
+<th>when</th>
+<th>then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>the harness after T1</td>
+<td>the test lists <code>evals/</code>, <code>verification/uat-checklist.md</code>, <code>memory/north-star/base/alignment-rubric.md</code>, <code>memory/north-star/base/amendment-protocol.md</code>, <code>.claude/commands/constitution.md</code>, <code>memory/constitution/base/patterns/non-vacuous-checks.md</code></td>
+<td>none of them exists</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>the north-star engine</td>
+<td>it runs <code>align-verdict</code></td>
+<td>exit 2; <code>schema-valid memory/north-star/north-star.md</code> exits 0</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>a north star whose JSON block has <code>mission</code>, <code>pillars</code> and <code>scope</code>, and no <code>alignment</code></td>
+<td><code>schema-valid</code> runs on it</td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td>E4</td>
+<td>the stack engine and <code>memory/stack/stack.md</code></td>
+<td>it runs <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code> and <code>guards</code></td>
+<td>each exits 0; the guard of pin S1, <code>scripts/guards/no-prescribe.sh</code>, runs</td>
+</tr>
+<tr>
+<td>E5</td>
+<td><code>docs/workflow.md</code></td>
+<td>the test reads it</td>
+<td>it links <code>figures/workflow.svg</code>, <code>figures/build-loop.svg</code> and <code>figures/accept.svg</code>; each file holds <code>&lt;metadata id="figure-spec"&gt;</code></td>
+</tr>
+<tr>
+<td>E6</td>
+<td><code>docs/workflow.md</code></td>
+<td><code>uv run scripts/spec.py lint docs/workflow.md</code> runs</td>
+<td>no finding has <code>words</code></td>
+</tr>
+<tr>
+<td>E7</td>
+<td><code>README.md</code></td>
+<td>the test reads it</td>
+<td>it shows <code>docs/figures/workflow.svg</code> and links <code>docs/workflow.md</code></td>
+</tr>
+<tr>
+<td>E8</td>
+<td>an empty target directory</td>
+<td><code>vendor.sh --apply</code> runs</td>
+<td>the target has <code>docs/workflow.md</code> and <code>docs/figures/workflow.svg</code></td>
+</tr>
+<tr>
+<td>E9</td>
+<td>a copy of a repo with <code>docs/notes.md</code> that says <code>run /distill first</code></td>
+<td>the stale-name check runs on it</td>
+<td>it reports <code>docs/notes.md: /distill</code></td>
+</tr>
+<tr>
+<td>E10</td>
+<td>the same text in <code>specs/015-x/brief.md</code></td>
+<td>the stale-name check runs on it</td>
+<td>no finding</td>
+</tr>
+<tr>
+<td>E11</td>
+<td>this harness repo after T1–T4</td>
+<td>the stale-name check runs</td>
+<td>no finding</td>
+</tr>
+<tr>
+<td>E12</td>
+<td>an empty target directory</td>
+<td><code>vendor.sh --apply</code> runs</td>
+<td>the seeded <code>harness.toml</code> has no <code>tests/run.sh</code> and allows <code>Bash(bash scripts/test.sh)</code></td>
+</tr>
+<tr>
+<td>E13</td>
+<td>a copy of a repo with <code>memory/stack/stack.md</code> that says <code>run /distill first</code></td>
+<td>the stale-name check runs on it</td>
+<td>it reports <code>memory/stack/stack.md: /distill</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-tests">4. Tests</h2>
+<p>Four kinds. Write no other kind.</p>
+<ul>
+<li>example: section 3, one test per example.</li>
+<li>invariant: no live file names a removed step. E11 checks it on every suite run, from now on.</li>
+<li>reconciliation: none. No published value exists here.</li>
+<li>e2e run: <code>tests/check_84_vendor.sh</code> applies vendoring to a sandbox (E8).</li>
+</ul>
+<p>The figures are approved here at gate H1 and committed with this spec. Build only links them.</p>
+<h2 id="5-plan">5. Plan</h2>
+<table>
+<thead>
+<tr>
+<th>task</th>
+<th>does</th>
+<th>requirements</th>
+<th>needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>delete <code>evals/</code>, <code>verification/</code> templates (not <code>reports/</code>), <code>alignment-rubric.md</code>, <code>amendment-protocol.md</code>, the <code>non-vacuous-checks</code> pattern, <code>/constitution</code>, <code>tests/fixtures/amendment-gate/</code>; drop them from <code>vendor.sh</code> and docs; delete the shell-check assertions on those paths (e.g. <code>evals/cases</code> in <code>check_00</code>)</td>
+<td>P1</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>north-star engine keeps <code>schema-valid</code> only; the schema no longer requires <code>alignment</code>; the north star loses its Alignment section and block; <code>check_82</code> follows: delete its assertions on the removed commands</td>
+<td>N1, N2</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>stack engine keeps <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code> and <code>guards</code>; <code>scripts/guards/</code> stays, because it is pin S1's guard</td>
+<td>S1</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>write <code>docs/workflow.md</code> around the three figures; README shows the workflow figure; vendor keeps <code>docs/figures/</code></td>
+<td>D1, D2, D3, V1</td>
+<td></td>
+</tr>
+<tr>
+<td>T5</td>
+<td>add the stale-name check to <code>tests/test_harness.py</code>; clean every live hit it still finds</td>
+<td>C1</td>
+<td>T1, T2, T3, T4</td>
+</tr>
+<tr>
+<td>T6</td>
+<td><code>vendor.sh</code> rewrites <code>tests/run.sh</code> to <code>scripts/test.sh</code> in the seeded <code>harness.toml</code>; the stale-name check covers the charter (E13); the restored guard and the engine's <code>guards</code> text stop naming <code>/verify</code> (E11)</td>
+<td>V2, C1</td>
+<td>T5</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>No new module and no new library.</p>
+<h2 id="amendments">6. Amendments</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>target</th>
+<th>change</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>north star</td>
+<td>delete the Alignment section and the <code>alignment</code> JSON block</td>
+<td><code>/align</code> is gone; the spec lint checks anchors</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>north-star base</td>
+<td>delete <code>alignment-rubric.md</code> and <code>amendment-protocol.md</code></td>
+<td>amendments go through gate H1 since spec 029</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>constitution</td>
+<td>delete the <code>non-vacuous-checks</code> pattern and the <code>/constitution</code> command</td>
+<td>the pattern rules coverage rows that no longer exist; constitution changes are amendments at gate H1</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>constitution</td>
+<td>add D7: a spec that removes a step, file or command names every live file that refers to it, from the stale-name check, not from memory</td>
+<td>spec 029 missed this layer because its list came from memory</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-assumptions-and-open-items">7. Assumptions and open items</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The figures show slice 030's real times.</td>
+<td>reported</td>
+</tr>
+<tr>
+<td><code>tests/</code> is exempt from the stale-name check, because a test may name a removed path to prove it is gone.</td>
+<td>open</td>
+</tr>
+<tr>
+<td><code>verification/reports/</code> and <code>specs/001</code>–<code>030</code> stay as history.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Escalation T1, answered by the owner: only the tests T0 froze are frozen. Shell checks under <code>tests/</code> that assert a deleted path may be edited. Spec 032 fixes the implementer rule that caused the question.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>Escalation T1 (second run), answered by the owner: the Claude implementer may run <code>git rm</code>, <code>git mv</code>, <code>mkdir</code> and <code>bash tests/run.sh</code>, scoped in <code>harness.toml</code>.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>Pre-accept finding, approved by the owner: that permission leaked <code>tests/run.sh</code> into the vendored seed, and T3 left a dead <code>Guard</code> pointer in pin S1. T6 fixes the seed.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>Escalation T6, answered by the owner: <code>scripts/guards/no-prescribe.sh</code> is pin S1's live guard, not legacy. T3's deletion is reverted, and S1 keeps its guard. E4 and E13 changed after T0, so their frozen tests were rewritten at this answer.</td>
+<td>decided</td>
+</tr>
+</tbody>
+</table>

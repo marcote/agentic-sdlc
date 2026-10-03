@@ -1,4 +1,5 @@
 from conftest import HARNESS
+from stale_names import stale_hits
 
 
 def test_e24_template_names_four_test_kinds():
@@ -38,3 +39,7 @@ DELETED = [
 def test_e30_pruned():
     present = [p for p in DELETED if (HARNESS / p).exists()]
     assert present == []
+
+
+def test_c1_no_removed_name_in_live_files():
+    assert stale_hits(HARNESS) == []

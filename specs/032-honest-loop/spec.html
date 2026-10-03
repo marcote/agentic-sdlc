@@ -1,0 +1,288 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec 032 — An honest loop</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1c2321;--mut:#5b6662;--rule:#d7ddd9;--acc:#0f5f6e;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#121615;--fg:#e4e9e6;--mut:#9aa6a1;--rule:#2d3533;--acc:#6cc3d1;--warn:#f0b65a;color-scheme:dark}}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:24px 16px}
+h1,h2,h3{text-wrap:balance} h2{border-top:1px solid var(--rule);padding-top:12px}
+#amendments{color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%}
+</style>
+<h1 id="spec-032-an-honest-loop">Spec 032 — An honest loop</h1>
+<p>Status: draft for gate H1. Labels: decided, hypothesis, open, reported.</p>
+<p>Slice 031 failed three times in ways the owner could not see at gate H1. Its delete list came from reading, so it removed pin S1's live guard. The implementer rule froze every test file, so build escalated on a legal edit. Its result page said 1 intervention and 71k tokens; the truth was 5 and about 1.01M. This slice moves each of those from the agent's memory into the machine.</p>
+<p><img alt="The impact check, on slice 031's mistake" src="impact.svg" /></p>
+<h2 id="1-glossary">1. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>removes table</strong></td>
+<td>A spec table whose two columns are <code>removes</code> and <code>why</code>. Each row is one path the slice deletes or renames.</td>
+</tr>
+<tr>
+<td><strong>referrer</strong></td>
+<td>A live file whose text holds a removed path, or the last segment of that path without its extension.</td>
+</tr>
+<tr>
+<td><strong>answer commit</strong></td>
+<td>A commit with the subject <code>spec(&lt;slice&gt;): answer escalation …</code>. It records one owner decision after gate H1.</td>
+</tr>
+<tr>
+<td><strong>build run</strong></td>
+<td>One run of <code>scripts/build.py</code> on a slice. A slice can need several.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-requirements">2. Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>requirement</th>
+<th>anchor</th>
+<th>examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>When build calls the implementer, the prompt shall list the frozen test files of the slice.</td>
+<td>real-enforcement</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>The implementer rule shall forbid edits to frozen tests only.</td>
+<td>real-enforcement</td>
+<td>E2, E3</td>
+</tr>
+<tr>
+<td>I1</td>
+<td>When the spec has a <strong>removes table</strong>, the lint shall report each <strong>referrer</strong> that the spec does not name.</td>
+<td>real-enforcement</td>
+<td>E4, E5, E6</td>
+</tr>
+<tr>
+<td>I2</td>
+<td>The lint and the stale-name check shall read the history paths from one list.</td>
+<td>real-enforcement</td>
+<td>E7</td>
+</tr>
+<tr>
+<td>M1</td>
+<td>When accept writes the result page, the page shall count interventions as the H1 marker plus each <strong>answer commit</strong>.</td>
+<td>measurable-impact</td>
+<td>E8</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>When build runs again, the report shall keep the tokens and escalations of each earlier <strong>build run</strong>.</td>
+<td>measurable-impact</td>
+<td>E9</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>When accept writes the result page, the page shall show the tokens of all build runs and their count.</td>
+<td>measurable-impact</td>
+<td>E10</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>The accept step shall tell the agent to commit each owner answer as an answer commit.</td>
+<td>measurable-impact</td>
+<td>E11</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>The spec of slice 031 shall record its true interventions and tokens, labelled reported.</td>
+<td>measurable-impact</td>
+<td>E12</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-examples">3. Examples</h2>
+<p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>given</th>
+<th>when</th>
+<th>then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>T0 froze <code>tests/test_e1_add.py</code></td>
+<td>build calls the implementer for T1</td>
+<td>the prompt has a <code>Frozen tests</code> section that lists <code>tests/test_e1_add.py</code></td>
+</tr>
+<tr>
+<td>E2</td>
+<td><code>harness/prompts/implementer.md</code></td>
+<td>the test reads it</td>
+<td>it has no <code>never edit a file under tests/ that exists already</code>; it says <code>never edit a frozen test</code></td>
+</tr>
+<tr>
+<td>E3</td>
+<td>T0 froze <code>tests/test_e1_add.py</code>; the T1 implementer edits <code>tests/check_00_skeleton.sh</code> and <code>calc.py</code></td>
+<td>build checks T1</td>
+<td>T1 is not rejected for a frozen test, and it is done</td>
+</tr>
+<tr>
+<td>E4</td>
+<td><code>memory/stack/stack.md</code> holds <code>scripts/guards/no-prescribe.sh</code>; the spec removes <code>scripts/guards/no-prescribe.sh</code> and never names <code>memory/stack/stack.md</code></td>
+<td>the lint runs</td>
+<td>exit 1; <code>scripts/guards/no-prescribe.sh: referred by memory/stack/stack.md</code></td>
+</tr>
+<tr>
+<td>E5</td>
+<td>the case of E4, and the spec names <code>memory/stack/stack.md</code></td>
+<td>the lint runs</td>
+<td>no finding for that path</td>
+</tr>
+<tr>
+<td>E6</td>
+<td>the only referrer is <code>specs/015-x/spec.md</code></td>
+<td>the lint runs</td>
+<td>no finding: <code>specs/</code> is history</td>
+</tr>
+<tr>
+<td>E7</td>
+<td><code>tests/stale_names.py</code></td>
+<td>the test reads it</td>
+<td>it defines no history list of its own; it imports the list from <code>scripts/spec.py</code></td>
+</tr>
+<tr>
+<td>E8</td>
+<td>a slice branch with the H1 marker and two answer commits</td>
+<td>accept writes the page</td>
+<td><code>Interventions 3</code></td>
+</tr>
+<tr>
+<td>E9</td>
+<td>build run 1 reports 600 tokens and one escalation; build run 2 reports 400 tokens</td>
+<td>run 2 ends</td>
+<td>the report has 2 runs, 1000 tokens in total, and run 1 keeps its escalation</td>
+</tr>
+<tr>
+<td>E10</td>
+<td>the report of E9</td>
+<td>accept writes the page</td>
+<td><code>Tokens 1000 (2 build runs)</code></td>
+</tr>
+<tr>
+<td>E11</td>
+<td><code>harness/steps/accept.md</code></td>
+<td>the test reads it</td>
+<td>it names the subject <code>spec(&lt;slice&gt;): answer escalation</code></td>
+</tr>
+<tr>
+<td>E12</td>
+<td><code>specs/031-clear-sdlc/spec.md</code></td>
+<td>the test reads it</td>
+<td>it records <code>5 interventions</code> and <code>1,010,245 tokens</code> as reported</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-tests">4. Tests</h2>
+<p>Four kinds. Write no other kind.</p>
+<ul>
+<li>example: section 3, one test per example.</li>
+<li>invariant: a deletion never reaches gate H1 with an unnamed live referrer. I1 checks it on every spec.</li>
+<li>reconciliation: E12 compares 031's numbers with the five build logs of 2026-10-03: 232,228 + 54,452 + 539,476 + 112,742 + 71,347 tokens.</li>
+<li>e2e run: the fake-agent build and accept tests.</li>
+</ul>
+<p>The e2e run writes no <code>results.json</code> here.</p>
+<h2 id="5-plan">5. Plan</h2>
+<table>
+<thead>
+<tr>
+<th>task</th>
+<th>does</th>
+<th>requirements</th>
+<th>needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>build lists the frozen tests in the implementer prompt; the implementer rule forbids edits to frozen tests only</td>
+<td>F1, F2</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>the lint reads the removes table and reports unnamed live referrers; <code>scripts/spec.py</code> owns the history list and <code>tests/stale_names.py</code> imports it</td>
+<td>I1, I2</td>
+<td></td>
+</tr>
+<tr>
+<td>T3</td>
+<td>the build report keeps a list of runs, each with its start, tokens and escalations</td>
+<td>M2</td>
+<td></td>
+</tr>
+<tr>
+<td>T4</td>
+<td>the result page counts interventions from git and shows the tokens of all runs; <code>harness/steps/accept.md</code> names the answer commit</td>
+<td>M1, M3, M4</td>
+<td>T3</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>record 031's true numbers in its section 7</td>
+<td>M5</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>No new module and no new library.</p>
+<h2 id="amendments">6. Amendments</h2>
+<p>None.</p>
+<h2 id="7-assumptions-and-open-items">7. Assumptions and open items</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A referrer match on the path's last segment can over-report, for example a common word. The spec then names the file and says why it stays.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Interventions before gate H1, during the brief and the spec, are not counted.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Slice 031 had 5 owner decisions after the brief: gate H1 and 4 answers.</td>
+<td>reported</td>
+</tr>
+</tbody>
+</table>

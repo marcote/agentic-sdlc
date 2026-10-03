@@ -24,7 +24,7 @@ Always dry-run first — it prints exactly what each path will become before tou
 The layer you do not edit; re-running refreshes it (idempotent, authoritative):
 `.claude/{commands,skills,hooks,settings.json}`, `AGENTS.md`, `harness/`,
 `memory/constitution/base` + `update-checklist.md`, `memory/north-star/base`, `memory/stack/base`,
-`specs/_template`, `docs/workflow.md`, the scripts `spec.py`, `build.py`, `accept.py`,
+`specs/_template`, `docs/workflow.md`, `docs/figures`, the scripts `spec.py`, `build.py`, `accept.py`,
 `fake_agent.py`, `status.sh`, `north-star/engine.py`, `stack/engine.py` and `guards/`.
 
 ### SEED — customizable layer, stub if absent, **never clobbered**
@@ -37,7 +37,7 @@ and `scripts/test.sh`.
 ### DROP — harness-self content, never copied
 The harness's own product content, which you do not want:
 `specs/0*-*` (except `_template`), `memory/north-star/decisions`, `verification`,
-`docs/superpowers`, `evals`, `README.md`, `tests/` (harness self-validation — your runtime is
+`docs/superpowers`, `README.md`, `tests/` (harness self-validation — your runtime is
 `scripts/test.sh`), `docs/backlog.md` (the harness's own parked findings), and the vendoring
 tooling itself (`scripts/vendor.sh`, `docs/vendoring.md` and `bootstrap.sh`).
 
@@ -56,7 +56,7 @@ default; **unknown stack → an explicit `TODO`**. This is the one command `/bui
 Vendoring ends where the workflow begins:
 
 1. Merge any `*.harness-new` files into your `CLAUDE.md` / constitution / North Star.
-2. **`/constitution`** — seed your project constitution (deltas over `base`).
+2. Edit `memory/constitution/constitution.md` — your deltas over `base`.
 3. Replace the `memory/north-star/north-star.md` placeholder with your product's North Star,
    then run `/stack`.
 4. Start your first slice: `/brief` → `/spec` → `/build` → `/accept`.
