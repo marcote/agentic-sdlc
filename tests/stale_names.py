@@ -1,7 +1,11 @@
 import re
 import subprocess
+import sys
+from pathlib import Path
 
-HISTORY = ("specs/", "verification/reports/", "docs/superpowers/", "memory/north-star/decisions/", "docs/backlog.md", "tests/")
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+from spec import HISTORY  # noqa: E402
+
 REMOVED = re.compile(
     r"(?<![\w-])(/align|/distill|distill|/contract|/tasks|/verify|/uat|/retro|wow-report"
     r"|coverage\.md|acceptance\.md|alignment\.md|mutate\.sh|nvc\.sh|amendment-gate"
