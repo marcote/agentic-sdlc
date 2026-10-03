@@ -40,11 +40,9 @@ def test_e3_no_alignment_block_is_valid(tmp_path):
     assert p.returncode == 0, p.stderr
 
 
-def test_e4_stack_engine_three_commands():
+def test_e4_stack_engine_four_commands():
     charter = str(HARNESS / "memory/stack/stack.md")
-    p = engine(STACK_ENGINE, "guards", charter)
-    assert p.returncode == 2 and "invalid choice" in p.stderr
-    for cmd in ("pin-valid", "exposure", "ground-rules"):
+    for cmd in ("pin-valid", "exposure", "ground-rules", "guards"):
         assert engine(STACK_ENGINE, cmd, charter).returncode == 0, cmd
 
 

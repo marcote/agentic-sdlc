@@ -11,10 +11,10 @@ def test_e12_seed_names_scripts_test_sh(tmp_path):
     assert "Bash(bash scripts/test.sh)" in toml
 
 
-def test_e13_stale_name_check_flags_dead_guard_pointer(tmp_path):
+def test_e13_stale_name_check_covers_the_charter(tmp_path):
     f = tmp_path / "memory/stack/stack.md"
     f.parent.mkdir(parents=True)
-    f.write_text("- Guard:      bash scripts/guards/no-prescribe.sh\n")
+    f.write_text("run /distill first\n")
     subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
     subprocess.run(["git", "-C", str(tmp_path), "add", "-A"], check=True)
-    assert "memory/stack/stack.md: scripts/guards" in stale_hits(tmp_path)
+    assert "memory/stack/stack.md: /distill" in stale_hits(tmp_path)

@@ -31,7 +31,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td><strong>removed name</strong></td>
-<td>A name of the old flow: <code>/align</code>, <code>/distill</code>, <code>distill</code>, <code>/contract</code>, <code>/tasks</code>, <code>/verify</code>, <code>/uat</code>, <code>/retro</code>, <code>wow-report</code>, <code>coverage.md</code>, <code>acceptance.md</code>, <code>alignment.md</code>, <code>mutate.sh</code>, <code>nvc.sh</code>, <code>amendment-gate</code>, <code>alignment-rubric</code>, <code>amendment-protocol</code>, <code>scripts/guards</code>, <code>no-prescribe</code>.</td>
+<td>A name of the old flow: <code>/align</code>, <code>/distill</code>, <code>distill</code>, <code>/contract</code>, <code>/tasks</code>, <code>/verify</code>, <code>/uat</code>, <code>/retro</code>, <code>wow-report</code>, <code>coverage.md</code>, <code>acceptance.md</code>, <code>alignment.md</code>, <code>mutate.sh</code>, <code>nvc.sh</code>, <code>amendment-gate</code>, <code>alignment-rubric</code>, <code>amendment-protocol</code>.</td>
 </tr>
 <tr>
 <td><strong>stale-name check</strong></td>
@@ -70,7 +70,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>S1</td>
-<td>The stack engine shall offer only the <code>pin-valid</code>, <code>exposure</code> and <code>ground-rules</code> commands.</td>
+<td>The stack engine shall offer only the <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code> and <code>guards</code> commands.</td>
 <td>frictionless-adoption</td>
 <td>E4</td>
 </tr>
@@ -144,9 +144,9 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>E4</td>
-<td>the stack engine</td>
-<td>it runs <code>guards</code></td>
-<td>exit 2; <code>pin-valid</code>, <code>exposure</code> and <code>ground-rules</code> on <code>memory/stack/stack.md</code> exit 0</td>
+<td>the stack engine and <code>memory/stack/stack.md</code></td>
+<td>it runs <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code> and <code>guards</code></td>
+<td>each exits 0; the guard of pin S1, <code>scripts/guards/no-prescribe.sh</code>, runs</td>
 </tr>
 <tr>
 <td>E5</td>
@@ -198,9 +198,9 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>E13</td>
-<td>a copy of a repo with <code>memory/stack/stack.md</code> that says <code>Guard: bash scripts/guards/no-prescribe.sh</code></td>
+<td>a copy of a repo with <code>memory/stack/stack.md</code> that says <code>run /distill first</code></td>
 <td>the stale-name check runs on it</td>
-<td>it reports <code>memory/stack/stack.md: scripts/guards</code></td>
+<td>it reports <code>memory/stack/stack.md: /distill</code></td>
 </tr>
 </tbody>
 </table>
@@ -238,7 +238,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>T3</td>
-<td>stack engine keeps <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code>; delete <code>scripts/guards/</code>; <code>check_92</code> follows: delete its assertions on <code>guards</code></td>
+<td>stack engine keeps <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code> and <code>guards</code>; <code>scripts/guards/</code> stays, because it is pin S1's guard</td>
 <td>S1</td>
 <td>T1</td>
 </tr>
@@ -256,7 +256,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>T6</td>
-<td><code>vendor.sh</code> rewrites <code>tests/run.sh</code> to <code>scripts/test.sh</code> in the seeded <code>harness.toml</code>; add <code>scripts/guards</code> and <code>no-prescribe</code> to the removed names; drop the <code>Guard</code> line of charter pin S1</td>
+<td><code>vendor.sh</code> rewrites <code>tests/run.sh</code> to <code>scripts/test.sh</code> in the seeded <code>harness.toml</code>; the stale-name check covers the charter (E13); the restored guard and the engine's <code>guards</code> text stop naming <code>/verify</code> (E11)</td>
 <td>V2, C1</td>
 <td>T5</td>
 </tr>
@@ -344,7 +344,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>decided</td>
 </tr>
 <tr>
-<td>Pre-accept finding, approved by the owner: that permission leaked <code>tests/run.sh</code> into the vendored seed, and T3 left a dead <code>Guard</code> pointer in pin S1. T6 fixes both.</td>
+<td>Pre-accept finding, approved by the owner: that permission leaked <code>tests/run.sh</code> into the vendored seed, and T3 left a dead <code>Guard</code> pointer in pin S1. T6 fixes the seed.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>Escalation T6, answered by the owner: <code>scripts/guards/no-prescribe.sh</code> is pin S1's live guard, not legacy. T3's deletion is reverted, and S1 keeps its guard. E4 and E13 changed after T0, so their frozen tests were rewritten at this answer.</td>
 <td>decided</td>
 </tr>
 </tbody>
