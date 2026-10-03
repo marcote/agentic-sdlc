@@ -93,3 +93,4 @@ No new module and no new library.
 | `tests/` is exempt from the stale-name check, because a test may name a removed path to prove it is gone. | open |
 | `verification/reports/` and `specs/001`–`030` stay as history. | open |
 | Escalation T1, answered by the owner: only the tests T0 froze are frozen. Shell checks under `tests/` that assert a deleted path may be edited. Spec 032 fixes the implementer rule that caused the question. | decided |
+| Escalation T1 (second run), answered by the owner: the Claude implementer may run `git rm`, `git mv`, `mkdir` and `bash tests/run.sh`, scoped in `harness.toml`. | decided |
