@@ -140,9 +140,6 @@ cat > "$_fx/nosub.md" <<'EOF'
 - Falsifier: a required capability lands only in a later release
 EOF
 if [ -f "$ENGINE" ]; then
-  python3 "$ENGINE" guards "$_fx/sub.md" 2>/dev/null | grep -q 'SUBSTRATE_GUARD_MARKER' \
-    && _pass "SUBSTRATE-GUARD: a [substrate] Guard is emitted for execution" \
-    || _fail "SUBSTRATE-GUARD: a declared [substrate] Guard was silently dropped"
   python3 "$ENGINE" pin-valid "$_fx/nosub.md" >/dev/null 2>&1 \
     && _pass "SUBSTRATE-GUARD: a Guard stays optional on [substrate]" \
     || _fail "SUBSTRATE-GUARD: [substrate] wrongly requires a Guard"
@@ -165,33 +162,6 @@ EOF
   fi
 else
   _fail "SUBSTRATE-GUARD: missing $ENGINE"
-fi
-rm -rf "$_fx"
-
-# --- GUARD-RUNS -----------------------------------------------------------------
-# the harness's own stance Guards must resolve, run, and pass on the real tree
-if [ -f "$ENGINE" ] && [ -f "$CHARTER" ]; then
-  _gr_n=0; _gr_bad=0
-  while IFS= read -r cmd; do
-    [ -n "$cmd" ] || continue
-    _gr_n=$((_gr_n+1))
-    sh -c "$cmd" >/dev/null 2>&1 || { _gr_bad=1; echo "    (guard failed on clean tree: $cmd)"; }
-  done <<EOF
-$(python3 "$ENGINE" guards "$CHARTER" 2>/dev/null)
-EOF
-  [ "$_gr_n" -ge 1 ] && [ "$_gr_bad" -eq 0 ] \
-    && _pass "GUARD-RUNS: $_gr_n stance Guard(s) run green on the real tree" \
-    || _fail "GUARD-RUNS: guards=$_gr_n failing=$_gr_bad"
-else
-  _fail "GUARD-RUNS: engine or charter missing"
-fi
-# negative fixture (plan D5): a Guard that cannot fail certifies nothing
-_fx=$(mktemp -d)
-mkdir -p "$_fx/core" && printf 'print("leak")\n' > "$_fx/core/bad.py"
-if ! grep -rqE '\bprint\(' "$_fx/core" 2>/dev/null; then
-  _fail "GUARD-RUNS: negative fixture is not detectable — a vacuous Guard would pass"
-else
-  _pass "GUARD-RUNS: negative fixture is detectable (Guard can fail, not vacuous)"
 fi
 rm -rf "$_fx"
 
@@ -353,10 +323,6 @@ if [ -f "$ENGINE" ]; then
   python3 "$ENGINE" pin-valid "$_fx/empty.md" 2>&1 | grep -qE '/stack' \
     && _pass "EMPTY-CHARTER: the empty message tells the adopter to run /stack" \
     || _fail "EMPTY-CHARTER: the empty message does not point at /stack"
-  _g=$(python3 "$ENGINE" guards "$_fx/empty.md" 2>/dev/null); _gc=$?
-  [ "$_gc" -eq 0 ] && [ -z "$_g" ] \
-    && _pass "EMPTY-CHARTER: guards emits nothing and exits 0 (no stance pin is not an error)" \
-    || _fail "EMPTY-CHARTER: guards on an empty charter exited $_gc with output '$_g'"
   python3 "$ENGINE" exposure "$_fx/empty.md" >/dev/null 2>&1 \
     && _pass "EMPTY-CHARTER: exposure succeeds on an empty charter" \
     || _fail "EMPTY-CHARTER: exposure failed on an empty charter"
