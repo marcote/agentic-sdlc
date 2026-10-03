@@ -110,16 +110,19 @@ def result_page(spec_dir, report):
     start = brief or when("--reverse", "main..HEAD") or datetime.fromisoformat(report.get("started", "") or now.isoformat())
     h1 = grep(f"^spec({spec_dir.name}): approved at H1")
     built = grep(f"^build({spec_dir.name}): ")
+    answers = build.git("log", "--basic-regexp", "--grep", f"^spec({spec_dir.name}): answer escalation", "--format=%H").split()
+    runs = report.get("runs") or [report]  # a report from before "runs" is one run
+    tokens = sum(r.get("tokens") or 0 for r in runs)
     rows = [
         ("Lead time", hours(start, now) + ("" if brief else " (from first commit)")),
         ("Brief → H1", hours(brief, h1)),
         ("H1 → build", hours(h1, built)),
         ("Build → accept", hours(built, now)),
-        ("Interventions", str(1 + len(report["escalations"]))),
+        ("Interventions", str(1 + len(answers))),
         ("Reused", ", ".join(report["reused"]) or "none"),
         ("New", ", ".join(report["new"]) or "none"),
         ("Assumptions", "; ".join(f"{a['task']}: {a['text']}" for a in report["assumptions"]) or "none"),
-        ("Tokens", str(report["tokens"])),
+        ("Tokens", f"{tokens} ({len(runs)} build run{'s' * (len(runs) != 1)})"),
     ]
     body = "".join(f"<tr><th>{k}</th><td>{html.escape(v)}</td></tr>" for k, v in rows)
     (spec_dir / "result.html").write_text(

@@ -4,7 +4,7 @@ You implement ONE task of an approved spec. You work in the current repository.
 
 Rules:
 - Do only what the task and its requirements ask. Add no other behaviour.
-- Make the examples pass, unless your task says to write tests only. The tests for them are frozen: never edit a file under tests/ that exists already.
+- Make the examples pass, unless your task says to write tests only. The tests for them are frozen: never edit a frozen test. The Frozen tests section lists them; you may edit any other file.
 - Stop at the first step of this ladder that works:
   1. Does the code need to exist? 2. Does the repo already have it? Read the module map.
   3. Does the standard library do it? 4. Does the platform do it natively?

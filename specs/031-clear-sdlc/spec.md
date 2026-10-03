@@ -94,6 +94,7 @@ No new module and no new library.
 | item | label |
 | --- | --- |
 | The figures show slice 030's real times. | reported |
+| Slice 031 took 5 interventions and 1,010,245 tokens, from the five build logs of 2026-10-03 (232,228 + 54,452 + 539,476 + 112,742 + 71,347). | reported |
 | `tests/` is exempt from the stale-name check, because a test may name a removed path to prove it is gone. | open |
 | `verification/reports/` and `specs/001`–`030` stay as history. | open |
 | Escalation T1, answered by the owner: only the tests T0 froze are frozen. Shell checks under `tests/` that assert a deleted path may be edited. Spec 032 fixes the implementer rule that caused the question. | decided |
