@@ -10,13 +10,13 @@ Slice 034 answered a semantic question with a parser. The regex `stated_limits` 
 
 | term | meaning |
 | --- | --- |
-| **active** | A lesson status: every build prompt holds the lesson. This is tier L1. |
+| **active** | A lesson status: every build prompt holds the lesson. This is tier L0. |
 | **proposed** | A lesson status: the lesson waits for the owner at the next gate H1. Its check cell says why. |
-| **promoted** | A lesson status: a test, a check or a constitution clause enforces the lesson. Its check cell names it. This is tier L0. |
+| **promoted** | A lesson status: a test, a check or a constitution clause enforces the lesson. Its check cell names it. This is tier L1. |
 | **merged** | A lesson status: another lesson says the same thing. Its check cell names that lesson. |
 | **curator** | The role that reads the active lessons and the constitution, and names each conflict with the clause it breaks. |
 | **labeled case** | A row of `harness/curator-cases.md`: a lesson, a rule, and the owner's label `conflict` or `clean`. |
-| **L1 cap** | The value `limits.lessons_bytes` in `harness.toml`: the most bytes of active lessons a prompt holds. |
+| **tier L0 cap** | The value `limits.lessons_bytes` in `harness.toml`: the most bytes of active lessons a prompt holds. |
 
 ## 2. Requirements
 
@@ -32,7 +32,7 @@ Slice 034 answered a semantic question with a parser. The regex `stated_limits` 
 | M8 | When accept has applied the reflector deltas, accept shall give the **curator** the constitution, the **active** lessons and each **labeled case**. | mechanical | real-enforcement | E9 |
 | M9 | If the **curator** names a conflict for an **active** lesson, then accept shall mark it **proposed** with the clause and the reason, and accept shall still merge. | mechanical | real-enforcement | E9, E10 |
 | M10 | When accept writes the result page, the page shall show the conflicts the **curator** found and missed on each **labeled case**, and its false alarms. | mechanical | measurable-impact | E11 |
-| M11 | When accept writes the result page, the page shall show the lessons per status, and the bytes of **active** lessons against the **L1 cap**. | mechanical | measurable-impact | E12 |
+| M11 | When accept writes the result page, the page shall show the lessons per status, and the bytes of **active** lessons against the **tier L0 cap**. | mechanical | measurable-impact | E12 |
 | M12 | If a requirement has no kind, or a `semantic` requirement is not judged, then the spec lint shall report it. | mechanical | real-enforcement | E13, E14 |
 | M13 | If an **active** lesson is not in the Memory applied table of a spec, then the spec lint shall report it. | mechanical | real-enforcement | E15 |
 | M14 | If a spec has no Sources table, or a Sources row names no source, then the spec lint shall report it. | mechanical | real-enforcement | E16 |
@@ -103,10 +103,10 @@ A test may use recorded real data. A test does not mock the project's own code.
 | item | label |
 | --- | --- |
 | The curator finds at least 3 of the 4 labeled conflicts, with at most 1 false alarm. | hypothesis |
-| An L1 cap of 25,000 bytes keeps prompts useful. Claude Code loads 25 KB of its memory index. | hypothesis |
-| L2 on-demand lessons wait until the active lessons cross the L1 cap. | decided |
+| A tier L0 cap of 25,000 bytes keeps prompts useful. Claude Code loads 25 KB of its memory index. | hypothesis |
+| Tier L2 on-demand lessons wait until the active lessons cross the tier L0 cap. | decided |
 | A re-run of the lessons check after the reflector, as planned before, would never fail: `apply` cannot write an invalid row. The curator covers the real failure, a lesson whose meaning conflicts. | decided |
-| `helpful` and `harmful` stay as counters. They change no status; a later L2 slice may use them to move lessons between tiers. | decided |
+| `helpful` and `harmful` stay as counters. They change no status; a later tier L2 slice may use them to move lessons between tiers. | decided |
 | A model review of the spec before H1 goes to the backlog. | decided |
 
 ## 8. Migration
@@ -175,7 +175,7 @@ The owner labels each case at H1. The curator sees the lesson and the rule, neve
 | Invalidate or version, never delete | Zep, Voyager (`research.md` §1) | `merged` and `promoted` keep every row |
 | A judge flags, a human resolves | Claude Code prompt-audit, Devin (`research.md` §3) | a conflict makes a lesson proposed for H1 |
 | Conflict detection is 87–91% F1, and models stay silent | ConInstruct (`research.md` §3) | the curator must name the clause; we measure it |
-| Always-loaded memory has a cap | Claude Code, Codex, Cursor, Chroma (`research.md` §2) | the L1 cap; promotion moves a lesson to L0 |
+| Always-loaded memory has a cap | Claude Code, Codex, Cursor, Chroma (`research.md` §2) | the tier L0 cap; promotion moves a lesson to tier L1 |
 | A must-hold rule goes to a check, not a prompt | Claude Code memory docs, OpenAI harness (`research.md` §4) | `promoted` is the end of a lesson's life |
 | Validate a check on labeled data before trust | Anthropic evals, Husain, Shankar (`research.md` §5) | the labeled cases |
 | No source tracks captured versus used | `research.md` §4 | drop `learned` and `captured` |

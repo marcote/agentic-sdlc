@@ -8,7 +8,7 @@ The owner's rules for this slice:
 - All memory is used, the good and the bad decisions. No selective memory.
 - No `retired` lessons. A lesson evolves: it is promoted into a rule or a check, or merged into another lesson. History stays.
 - "Captured" versus "used" is only a statistic. Drop it as a status.
-- Limit memory like a cache: L0 is enforced by a check, L1 is always loaded with a cap, and L2 is loaded on demand. Build L2 only when the cap is crossed.
+- Limit memory like a cache. Tier L0 is the active lessons, always loaded, with a cap. Promotion moves a lesson to tier L1, where a check enforces it. Tier L2 is loaded on demand; build it only when the cap is crossed.
 
 The review is in `research.md`, beside this brief.
 
@@ -22,7 +22,7 @@ The review is in `research.md`, beside this brief.
 - The brief step asks for the sourced review. The spec step reads the whole memory.
 
 ## Out of this slice
-- L2 on-demand lessons (build when L1 crosses its cap).
+- Tier L2 on-demand lessons (build when tier L0 crosses its cap).
 - A model review of the spec before H1.
 - Onboarding and `/status` (slice 037).
 - Pushing and the open PR #44 (the owner decides after accept).

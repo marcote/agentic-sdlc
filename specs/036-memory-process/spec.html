@@ -25,7 +25,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tbody>
 <tr>
 <td><strong>active</strong></td>
-<td>A lesson status: every build prompt holds the lesson. This is tier L1.</td>
+<td>A lesson status: every build prompt holds the lesson. This is tier L0.</td>
 </tr>
 <tr>
 <td><strong>proposed</strong></td>
@@ -33,7 +33,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td><strong>promoted</strong></td>
-<td>A lesson status: a test, a check or a constitution clause enforces the lesson. Its check cell names it. This is tier L0.</td>
+<td>A lesson status: a test, a check or a constitution clause enforces the lesson. Its check cell names it. This is tier L1.</td>
 </tr>
 <tr>
 <td><strong>merged</strong></td>
@@ -48,7 +48,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>A row of <code>harness/curator-cases.md</code>: a lesson, a rule, and the owner's label <code>conflict</code> or <code>clean</code>.</td>
 </tr>
 <tr>
-<td><strong>L1 cap</strong></td>
+<td><strong>tier L0 cap</strong></td>
 <td>The value <code>limits.lessons_bytes</code> in <code>harness.toml</code>: the most bytes of active lessons a prompt holds.</td>
 </tr>
 </tbody>
@@ -137,7 +137,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>M11</td>
-<td>When accept writes the result page, the page shall show the lessons per status, and the bytes of <strong>active</strong> lessons against the <strong>L1 cap</strong>.</td>
+<td>When accept writes the result page, the page shall show the lessons per status, and the bytes of <strong>active</strong> lessons against the <strong>tier L0 cap</strong>.</td>
 <td>mechanical</td>
 <td>measurable-impact</td>
 <td>E12</td>
@@ -405,11 +405,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>hypothesis</td>
 </tr>
 <tr>
-<td>An L1 cap of 25,000 bytes keeps prompts useful. Claude Code loads 25 KB of its memory index.</td>
+<td>A tier L0 cap of 25,000 bytes keeps prompts useful. Claude Code loads 25 KB of its memory index.</td>
 <td>hypothesis</td>
 </tr>
 <tr>
-<td>L2 on-demand lessons wait until the active lessons cross the L1 cap.</td>
+<td>Tier L2 on-demand lessons wait until the active lessons cross the tier L0 cap.</td>
 <td>decided</td>
 </tr>
 <tr>
@@ -417,7 +417,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>decided</td>
 </tr>
 <tr>
-<td><code>helpful</code> and <code>harmful</code> stay as counters. They change no status; a later L2 slice may use them to move lessons between tiers.</td>
+<td><code>helpful</code> and <code>harmful</code> stay as counters. They change no status; a later tier L2 slice may use them to move lessons between tiers.</td>
 <td>decided</td>
 </tr>
 <tr>
@@ -709,7 +709,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tr>
 <td>Always-loaded memory has a cap</td>
 <td>Claude Code, Codex, Cursor, Chroma (<code>research.md</code> §2)</td>
-<td>the L1 cap; promotion moves a lesson to L0</td>
+<td>the tier L0 cap; promotion moves a lesson to tier L1</td>
 </tr>
 <tr>
 <td>A must-hold rule goes to a check, not a prompt</td>
