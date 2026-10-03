@@ -187,6 +187,8 @@ def run_task(task, s, cfg, report, frozen, done_examples):
                 diff = git("diff", "--cached")
                 rev, why = call(cfg, "reviewer", prompt_for("reviewer", task, s, cfg, diff=diff), report)
                 fail = why or ("" if rev["verdict"] == "pass" else "reviewer:\n" + "\n".join(rev["findings"]))
+                if not why and rev["verdict"] != "pass":
+                    report["findings"] += [{"task": tid, "text": f} for f in rev["findings"]]
             if not fail:
                 report["assumptions"] += [{"task": tid, "text": a["text"]} for a in res["assumptions"]]
                 report["reused"] += res["reused"]
@@ -258,7 +260,7 @@ def build(spec_dir, cfg):
     s = speclib.parse((spec_dir / "spec.md").read_text())
     s["slice"] = spec_dir.name
     report = {"tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [],
-              "reused": [], "new": [], "started": datetime.now(timezone.utc).isoformat()}
+              "reused": [], "new": [], "findings": [], "started": datetime.now(timezone.utc).isoformat()}
     try:
         old = json.loads((spec_dir / "build-report.json").read_text())
         earlier = old.get("runs") or [old]  # a report from before "runs" is one run

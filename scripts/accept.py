@@ -152,7 +152,7 @@ def main():
     s["slice"] = a.spec_dir.name
     rfile = a.spec_dir / "build-report.json"
     report = json.loads(rfile.read_text()) if rfile.is_file() else {
-        "tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [], "reused": [], "new": [], "started": ""}
+        "tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [], "reused": [], "new": [], "findings": [], "started": ""}
     if report["escalations"] or any(t["status"] != "done" for t in report["tasks"].values()):
         print("accept: build has open escalations; answer them and re-run build", file=sys.stderr)
         return 2
