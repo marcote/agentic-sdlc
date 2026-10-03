@@ -27,9 +27,6 @@ wins**.
   "scope": {
     "in_scope": ["string"],
     "out_of_scope": ["string"]
-  },
-  "alignment": {
-    "threshold": 3
   }
 }
 ```
@@ -77,8 +74,6 @@ having done the step*; it cannot catch *having done it badly*.
 | `pillars[].signal` | required, non-empty string — a **measurable** indicator that the pillar is being served (this is what makes the North Star checkable, not just aspirational) |
 | `scope.in_scope` | required, **non-empty** array of strings |
 | `scope.out_of_scope` | required, **non-empty** array of strings — used by the scope predicate (`scopeReject`, per-stack) as hard rejection predicates |
-| `alignment.threshold` | required, number — minimum score (0–5) that each rubric dimension must exceed to count as aligned (see `alignment-rubric.md`) |
-| `alignment.rubric` | **optional** — pointer/path to the rubric file used for scoring (e.g. `alignment-rubric.md`); only `alignment.threshold` is required |
 
 A North Star that fails any of these rules **is not schema-valid**, and by
 the Measurability Gate (`specs/002-north-star-governance/acceptance.md`, criterion

@@ -59,13 +59,6 @@ Every term here has one meaning. Specs use these terms, and only gate H1 changes
 Every statement in this file carries one label: decided, hypothesis, open or reported.
 Accept appends results under `## Reported`.
 
-## Alignment
-
-New briefs are scored against `base/alignment-rubric.md` by an LLM judge.
-Pass threshold: **3** out of 5 in each of the three dimensions (pillar fit, scope
-compliance, mission advancement), with any `out_of_scope` hit as a hard rejection
-regardless of score. See `base/alignment-rubric.md` for the complete aggregation rule.
-
 ## Canonical North Star
 
 The block below is the single source of truth, read by the deterministic validator
@@ -116,10 +109,6 @@ The block below is the single source of truth, read by the deterministic validat
       "release, deployment or rollout of the software being built",
       "production monitoring, incident response or usage analytics"
     ]
-  },
-  "alignment": {
-    "threshold": 3,
-    "rubric": "memory/north-star/base/alignment-rubric.md"
   }
 }
 ```
