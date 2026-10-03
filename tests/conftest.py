@@ -116,6 +116,7 @@ def slice_repo(tmp_path):
     cfg = cfg.replace('reviewer = "claude-ro"', 'reviewer = "fake"')
     cfg = cfg.replace('reflector = "claude-ro"', 'reflector = "fake"')
     cfg = cfg.replace('judge = "claude-ro"', 'judge = "fake-judge"')
+    cfg = cfg.replace('curator = "claude-ro"', 'curator = "fake"')
     cfg = cfg.replace(" && bash tests/run.sh", "").replace("suite_seconds = 45\n", "")
     (root / "harness.toml").write_text(cfg)
     (root / ".gitignore").write_text(".fake_log\n.fake_plan\n__pycache__/\n.pytest_cache/\n")
