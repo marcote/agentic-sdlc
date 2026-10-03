@@ -54,7 +54,7 @@ def tables(text):
 def parse(text):
     out = {"reqs": {}, "examples": {}, "tasks": [], "glossary": {}, "new": []}
     for _, head, rows in tables(text):
-        if head[:4] == ["id", "requirement", "anchor", "examples"]:
+        if {"id", "requirement", "anchor", "examples"} <= set(head):
             out["reqs"].update({r["id"]: r for r in rows})
         elif head[:4] == ["id", "given", "when", "then"]:
             out["examples"].update({r["id"]: r for r in rows})
@@ -141,6 +141,8 @@ def lint(spec_text, ns_text, root=Path(".")):
             out.append(f"{rid}: no example")
         out += [f"{rid}: unknown example {e}" for e in ex if e not in s["examples"]]
     for t in s["tasks"]:
+        if t["task"] in s["reqs"]:
+            out.append(f"{t['task']}: id is both a requirement and a task")
         if not any(i in s["reqs"] for i in ids_in(t["requirements"])):
             out.append(f"{t['task']}: cites no requirement")
     for r in s["new"]:

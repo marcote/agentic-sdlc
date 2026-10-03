@@ -8,10 +8,12 @@
 
 Exit: 0 clean · 1 findings.
 """
+import re
 import sys
 from pathlib import Path
 
 LESSONS = "memory/lessons.md"
+CONSTITUTION = "memory/constitution/constitution.md"
 
 
 def rows(text):
@@ -56,10 +58,22 @@ def finding(r):
         return "learned without evidence"
 
 
+def numbers(text):
+    return re.findall(r"(?<![\w-])(\d+) ([a-z]+)", text)
+
+
+def stated_limits(lesson, constitution):
+    """findings for each `N unit` in the lesson whose unit the constitution limits with another number."""
+    law = {u: n for n, u in numbers(constitution)}
+    return [f"{n} {u}; the constitution says {law[u]} {u}" for n, u in numbers(lesson) if law.get(u, n) != n]
+
+
 def main():
     if sys.argv[1:] != ["check"] or not Path(LESSONS).is_file():
         sys.exit("usage: lessons.py check (run where memory/lessons.md exists)")
-    found = [f"{r['id']}: {m}" for r in rows(Path(LESSONS).read_text()) if (m := finding(r))]
+    law = Path(CONSTITUTION)
+    found = [f"{r['id']}: {m}" for r in rows(Path(LESSONS).read_text()) for m in
+             ([finding(r)] if finding(r) else []) + (stated_limits(r["lesson"], law.read_text()) if law.is_file() else [])]
     print("\n".join(found))
     sys.exit(1 if found else 0)
 
