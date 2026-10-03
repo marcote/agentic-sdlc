@@ -19,6 +19,7 @@
     "escalations": {"type": "array", "items": {"type": "object", "required": ["task", "reason"]}},
     "reused": {"type": "array", "items": {"type": "string"}},
     "new": {"type": "array", "items": {"type": "string"}},
-    "started": {"type": "string"}
+    "started": {"type": "string"},
+    "runs": {"type": "array", "items": {"type": "object", "required": ["started", "tokens", "escalations"]}}
   }
 }

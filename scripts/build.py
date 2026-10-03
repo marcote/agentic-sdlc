@@ -260,6 +260,12 @@ def build(spec_dir, cfg):
     report = {"tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [],
               "reused": [], "new": [], "started": datetime.now(timezone.utc).isoformat()}
     try:
+        old = json.loads((spec_dir / "build-report.json").read_text())
+        earlier = old.get("runs") or [old]  # a report from before "runs" is one run
+        earlier = [{k: r.get(k) for k in ("started", "tokens", "escalations")} for r in earlier]
+    except (OSError, ValueError, AttributeError):
+        earlier = []
+    try:
         frozen, done = done_on_branch(s["slice"])  # a re-run keeps what an earlier run committed
         late = list(s["examples"]) if frozen is None else late_examples(s, frozen)
         if late and contract(s, cfg, report, late):
@@ -288,6 +294,7 @@ def build(spec_dir, cfg):
         report["escalations"].append({"task": "crash", "reason": f"{type(e).__name__}: {e} {getattr(e, 'stderr', '') or ''}".strip()})
         revert()
     finally:
+        report["runs"] = earlier + [{k: report[k] for k in ("started", "tokens", "escalations")}]
         (spec_dir / "build-report.json").write_text(json.dumps(report, indent=2))
     return report
 
