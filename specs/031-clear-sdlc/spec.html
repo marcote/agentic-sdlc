@@ -208,19 +208,19 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tbody>
 <tr>
 <td>T1</td>
-<td>delete <code>evals/</code>, <code>verification/</code> templates (not <code>reports/</code>), <code>alignment-rubric.md</code>, <code>amendment-protocol.md</code>, the <code>non-vacuous-checks</code> pattern, <code>/constitution</code>, <code>tests/fixtures/amendment-gate/</code>; drop them from <code>vendor.sh</code> and docs</td>
+<td>delete <code>evals/</code>, <code>verification/</code> templates (not <code>reports/</code>), <code>alignment-rubric.md</code>, <code>amendment-protocol.md</code>, the <code>non-vacuous-checks</code> pattern, <code>/constitution</code>, <code>tests/fixtures/amendment-gate/</code>; drop them from <code>vendor.sh</code> and docs; delete the shell-check assertions on those paths (e.g. <code>evals/cases</code> in <code>check_00</code>)</td>
 <td>P1</td>
 <td></td>
 </tr>
 <tr>
 <td>T2</td>
-<td>north-star engine keeps <code>schema-valid</code> only; the schema no longer requires <code>alignment</code>; the north star loses its Alignment section and block; <code>check_82</code> follows</td>
+<td>north-star engine keeps <code>schema-valid</code> only; the schema no longer requires <code>alignment</code>; the north star loses its Alignment section and block; <code>check_82</code> follows: delete its assertions on the removed commands</td>
 <td>N1, N2</td>
 <td>T1</td>
 </tr>
 <tr>
 <td>T3</td>
-<td>stack engine keeps <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code>; delete <code>scripts/guards/</code>; <code>check_92</code> follows</td>
+<td>stack engine keeps <code>pin-valid</code>, <code>exposure</code>, <code>ground-rules</code>; delete <code>scripts/guards/</code>; <code>check_92</code> follows: delete its assertions on <code>guards</code></td>
 <td>S1</td>
 <td>T1</td>
 </tr>
@@ -310,6 +310,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tr>
 <td><code>verification/reports/</code> and <code>specs/001</code>–<code>030</code> stay as history.</td>
 <td>open</td>
+</tr>
+<tr>
+<td>Escalation T1, answered by the owner: only the tests T0 froze are frozen. Shell checks under <code>tests/</code> that assert a deleted path may be edited. Spec 032 fixes the implementer rule that caused the question.</td>
+<td>decided</td>
 </tr>
 </tbody>
 </table>

@@ -65,9 +65,9 @@ The figures are approved here at gate H1 and committed with this spec. Build onl
 
 | task | does | requirements | needs |
 | --- | --- | --- | --- |
-| T1 | delete `evals/`, `verification/` templates (not `reports/`), `alignment-rubric.md`, `amendment-protocol.md`, the `non-vacuous-checks` pattern, `/constitution`, `tests/fixtures/amendment-gate/`; drop them from `vendor.sh` and docs | P1 | |
-| T2 | north-star engine keeps `schema-valid` only; the schema no longer requires `alignment`; the north star loses its Alignment section and block; `check_82` follows | N1, N2 | T1 |
-| T3 | stack engine keeps `pin-valid`, `exposure`, `ground-rules`; delete `scripts/guards/`; `check_92` follows | S1 | T1 |
+| T1 | delete `evals/`, `verification/` templates (not `reports/`), `alignment-rubric.md`, `amendment-protocol.md`, the `non-vacuous-checks` pattern, `/constitution`, `tests/fixtures/amendment-gate/`; drop them from `vendor.sh` and docs; delete the shell-check assertions on those paths (e.g. `evals/cases` in `check_00`) | P1 | |
+| T2 | north-star engine keeps `schema-valid` only; the schema no longer requires `alignment`; the north star loses its Alignment section and block; `check_82` follows: delete its assertions on the removed commands | N1, N2 | T1 |
+| T3 | stack engine keeps `pin-valid`, `exposure`, `ground-rules`; delete `scripts/guards/`; `check_92` follows: delete its assertions on `guards` | S1 | T1 |
 | T4 | write `docs/workflow.md` around the three figures; README shows the workflow figure; vendor keeps `docs/figures/` | D1, D2, D3, V1 | |
 | T5 | add the stale-name check to `tests/test_harness.py`; clean every live hit it still finds | C1 | T1, T2, T3, T4 |
 
@@ -92,3 +92,4 @@ No new module and no new library.
 | The figures show slice 030's real times. | reported |
 | `tests/` is exempt from the stale-name check, because a test may name a removed path to prove it is gone. | open |
 | `verification/reports/` and `specs/001`–`030` stay as history. | open |
+| Escalation T1, answered by the owner: only the tests T0 froze are frozen. Shell checks under `tests/` that assert a deleted path may be edited. Spec 032 fixes the implementer rule that caused the question. | decided |
