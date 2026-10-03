@@ -27,7 +27,7 @@ import spec as speclib
 
 HARNESS = Path(__file__).resolve().parent.parent
 SCHEMAS = HARNESS / "harness/schemas"
-SCHEMA_OF = {"implementer": "implementer", "reviewer": "reviewer", "judge": "reviewer"}
+SCHEMA_OF = {"implementer": "implementer", "reviewer": "reviewer", "judge": "reviewer", "reflector": "reflector"}
 
 
 class Budget(Exception):

@@ -19,6 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import build  # noqa: E402
+import lessons  # noqa: E402
 import spec as speclib  # noqa: E402
 
 
@@ -79,6 +80,23 @@ def results_problem(spec_dir, cfg):
         return [f"{f}: not a list of {{id, value}}"]
     ns = cfg["paths"]["north_star"]
     return [] if Path(ns).is_file() else [f"{ns}: north star not found"]
+
+
+def reflect(report, cfg):
+    """Ask the reflector for lesson deltas and apply them (R2). A failed call is printed, never fatal (R7)."""
+    f = Path(lessons.LESSONS)
+    if "reflector" not in cfg["roles"] or not f.is_file():
+        return
+    prompt = ((build.HARNESS / "harness/prompts/reflector.md").read_text()
+              + f"\n\n## Lessons\n\n{f.read_text()}\n\n## Build report\n\n{json.dumps(report, indent=2)}")
+    try:
+        out, why = build.call(cfg, "reflector", prompt, report)
+    except build.Budget as b:
+        out, why = None, str(b)
+    if why:
+        print(f"reflector: {why}")
+    else:
+        f.write_text(lessons.apply(f.read_text(), out["deltas"]))
 
 
 def write_back(spec_dir, cfg):
@@ -177,8 +195,9 @@ def main():
         print(f"ESCALATIONS ({len(report['escalations'])})")  # includes what the return to build escalated
         print("\n".join(f"- {e['task']}: {e['reason']}" for e in report["escalations"]))
         return 1
+    reflect(report, cfg)
     result_page(a.spec_dir, report)
-    build.git("add", str(a.spec_dir / "result.html"), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
+    build.git("add", str(a.spec_dir / "result.html"), *([lessons.LESSONS] if Path(lessons.LESSONS).is_file() else []), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): verified")
     build.git("checkout", "-q", "main")
     m = subprocess.run(["git", "merge", "--no-ff", "-q", "-m", f"accept({a.spec_dir.name}): merge", branch],
