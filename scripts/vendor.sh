@@ -35,7 +35,7 @@ KEEP=(
   scripts/spec.py scripts/build.py scripts/accept.py scripts/fake_agent.py
   scripts/north-star/engine.py scripts/stack/engine.py scripts/guards scripts/status.sh
 )
-SEED=( CLAUDE.md harness.toml memory/constitution/constitution.md memory/north-star/north-star.md \
+SEED=( CLAUDE.md memory/lessons.md memory/owner.md harness.toml memory/constitution/constitution.md memory/north-star/north-star.md \
   memory/stack/stack.md docs/modules.md scripts/test.sh )
 DROP=( "specs/0*-* (except _template)" memory/north-star/decisions verification \
   docs/superpowers README.md tests scripts/vendor.sh docs/vendoring.md docs/backlog.md \
@@ -66,24 +66,14 @@ provenance_line(){
 NEWFILES=()
 
 # --- Stub contents ---
-claude_stub(){ cat <<'EOF'
-# <Your Project> — Agentic SDLC Harness (vendored)
+claude_stub(){ echo "@AGENTS.md"; }
+lessons_stub(){ head -5 "$SRC/memory/lessons.md"; }
+owner_stub(){ cat <<'EOF'
+# Owner
 
-Governance harness vendored via `scripts/vendor.sh`. Fill in your stack below,
-then seed your North Star before your first `/brief`.
+How the owner works with agents.
 
-## Stack
-Your load-bearing technical decisions live in `memory/stack/stack.md` (the **charter**),
-not here. Run `/stack` to elicit them — it asks what this harness would otherwise assume
-in silence. Your test command lives in `scripts/test.sh`.
-
-## Workflow
-seed North Star → `/stack` → `/brief` → `/spec` (gate H1) → `/build` → `/accept`.
-See `docs/workflow.md`.
-
-## Hard rules
-- The owner approves once: gate H1, the spec page. Everything after it runs without the owner, except escalations.
-- A spec passes `scripts/spec.py lint` before gate H1.
+_(none yet — add yours)_
 EOF
 }
 stack_stub(){ cat <<'EOF'
@@ -195,6 +185,8 @@ fi
 # --- apply ---
 copy_keep
 seed_file "CLAUDE.md" "$(claude_stub)"
+seed_file "memory/lessons.md" "$(lessons_stub)"
+seed_file "memory/owner.md" "$(owner_stub)"
 seed_file "memory/constitution/constitution.md" "$(constitution_stub)"
 seed_file "memory/north-star/north-star.md" "$(northstar_stub)"
 seed_file "memory/stack/stack.md" "$(stack_stub)"

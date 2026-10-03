@@ -113,6 +113,7 @@ def slice_repo(tmp_path):
     cfg = (HARNESS / "harness.toml").read_text()
     cfg = cfg.replace('implementer = "claude"', 'implementer = "fake"')
     cfg = cfg.replace('reviewer = "claude-ro"', 'reviewer = "fake"')
+    cfg = cfg.replace('reflector = "claude-ro"', 'reflector = "fake"')
     cfg = cfg.replace('judge = "claude-ro"', 'judge = "fake-judge"')
     cfg = cfg.replace(" && bash tests/run.sh", "")
     (root / "harness.toml").write_text(cfg)

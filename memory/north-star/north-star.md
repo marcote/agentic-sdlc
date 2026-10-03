@@ -31,8 +31,8 @@ A reusable, stack-agnostic harness that enforces a disciplined, autonomous agent
   every cost it does impose is justified by what that cost prevents.
   Its `signal`: steps/time to adopt (lower = better), with every mandatory step carrying a
   recorded justification proportional to what it prevents. The defect is an **unjustified**
-  step, not a step as such — a signal that merely counted steps would be maximised by shipping
-  nothing, and would put this pillar at war with the mission's word *enforces* (see
+  step, not a step as such. A signal that merely counted steps would be maximised by shipping
+  nothing. It would put this pillar at war with the mission's word *enforces* (see
   `decisions/0004-*`).
 - **`measurable-impact`** — The discipline the harness imposes must translate into better software, not gates that fire for the sake of firing.
   Its `signal`: lead time, interventions, and reused against new modules, per slice. Distinguishes *enforcing* (`real-enforcement`) from *enforcement that works* — the same anti-theater line from retro, elevated to the harness level.
