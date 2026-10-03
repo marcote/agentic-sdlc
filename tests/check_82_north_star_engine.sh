@@ -3,8 +3,7 @@
 # validation, governed-set change (requiresAdr), scope rejection, verdict aggregation
 # (alignVerdict), and ADR presence (hasAdrFor). Exercises every capability against
 # fixtures with the exit-code + minimal-stdout contract the bash caller relies on.
-# Covers 18 deterministic criteria of acceptance.md; GATE-REGRESSION is owned by
-# check_95 (the untouched amendment-gate suite).
+# Covers 18 deterministic criteria of acceptance.md.
 #
 # CLI contract the implementation must satisfy:
 #   engine.py schema-valid FILE          exit 0 valid | 1 invalid(+reason on stderr) | 2 malformed
@@ -73,14 +72,6 @@ eng_verdict "VERDICT-NEEDS-AMENDMENT: a dim below threshold" \
 # --- has-adr-for (hasAdrFor) ---
 eng_exit "ADR-PRESENT: an added decisions/NNNN-slug.md" 0 has-adr-for --added "src/x.ts memory/north-star/decisions/0004-new.md"
 eng_exit "ADR-ABSENT: README.md / no NNNN-slug is not an ADR" 1 has-adr-for --added "src/x.ts memory/north-star/decisions/README.md"
-
-# --- GATE-REUSE: amendment-gate.sh calls the engine, no embedded copy ---
-GATE=scripts/amendment-gate.sh
-if [ -f "$GATE" ] && grep -q "north-star/engine.py" "$GATE" && ! grep -qE '(_py\(\)|has_new_adr)' "$GATE"; then
-  _pass "GATE-REUSE: gate calls engine.py, no embedded heredoc / has_new_adr"
-else
-  _fail "GATE-REUSE: gate still embeds its own engine (no engine.py call, or _py()/has_new_adr present)"
-fi
 
 # --- DEP-FREE: engine exists (tied to deliverable) and imports only python3 stdlib ---
 assert_file "$ENG"

@@ -1,26 +1,21 @@
 name: verify
 on: [pull_request]
 
-# Advisory by default: this check can fail (red X) without blocking the merge.
-# To make it blocking, mark it as "required" in Branch protection (governance decision).
 jobs:
   self-verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Harness self-verification
+      - uses: astral-sh/setup-uv@v6
+      - name: Harness tests
+        run: uv run --python 3.12 --with pytest --with jsonschema pytest tests -q
+      - name: Shell checks
         run: bash tests/run.sh
-      - name: Declared mutations (check-can-fail, executed)
-        run: bash scripts/mutate.sh run --tests tests
-      # The standing debt across every closed feature, re-derived at this ref. A report, not a
-      # gate: `--all` exits 0 at 137 undeclared, because blocking on twelve closed features is
-      # what B15 says not to do. It still exits 2 on an unresolvable row, in either mode.
-      - name: Mutation coverage (the standing debt, re-derived)
-        run: bash scripts/mutate.sh coverage --tests tests --all
-      # Every 📋 case row names a case file that exists and names its criterion. Orphans reported
-      # in the same pass. A judged criterion whose case was never written renders exactly like one
-      # merely unscored — 021 shipped a dangling citation and 022 shipped a row naming nothing.
-      - name: Case resolution (a judged row names a real case)
-        run: bash scripts/cases.sh
-      # Placeholder (agent-driven /verify in CI): posting the verification-report as a PR comment
-      # is up to each project — depends on the stack and the eval runner.
+      - name: Lint every spec in the new format
+        run: |
+          rc=0
+          for s in specs/0*/spec.md; do
+            grep -q '^| id | requirement' "$s" || continue
+            uv run scripts/spec.py lint "$s" || rc=1
+          done
+          exit $rc

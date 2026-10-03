@@ -27,22 +27,19 @@ mkdir -p "$TARGET"; TARGET="$(cd "$TARGET" && pwd)"
 # --- Classification (single source of truth; docs/vendoring.md mirrors this) ---
 KEEP=(
   .claude/commands .claude/skills .claude/hooks .claude/settings.json
+  AGENTS.md harness
   memory/constitution/base memory/constitution/update-checklist.md
-  memory/north-star/base
+  memory/north-star/base memory/stack/base
   specs/_template
-  evals/rubric.md evals/README.md
-  verification/uat-checklist.md verification/code-review-checklist.md verification/verification-report.md
-  docs/factory-model.md docs/workflow.md
-  memory/stack/base
-  scripts/north-star/engine.py scripts/stack/engine.py scripts/guards
-  scripts/amendment-gate.sh scripts/setup-branch-protection.sh
-  .github/workflows/amendment-gate.yml
+  docs/workflow.md
+  scripts/spec.py scripts/build.py scripts/accept.py scripts/fake_agent.py
+  scripts/north-star/engine.py scripts/stack/engine.py scripts/guards scripts/status.sh
 )
-SEED=( CLAUDE.md memory/constitution/constitution.md memory/north-star/north-star.md \
-  memory/stack/stack.md scripts/test.sh )
-DROP=( "specs/0*-* (except _template)" memory/north-star/decisions verification/reports \
-  verification/wow-report.md docs/superpowers evals/cases README.md tests \
-  scripts/vendor.sh docs/vendoring.md docs/backlog.md scripts/nvc.sh scripts/prose.sh bootstrap.sh )
+SEED=( CLAUDE.md harness.toml memory/constitution/constitution.md memory/north-star/north-star.md \
+  memory/stack/stack.md docs/modules.md scripts/test.sh )
+DROP=( "specs/0*-* (except _template)" memory/north-star/decisions verification \
+  docs/superpowers evals README.md tests scripts/vendor.sh docs/vendoring.md docs/backlog.md \
+  bootstrap.sh )
 
 # --- Stack detection -> default test command ---
 detect_testcmd(){
@@ -73,7 +70,7 @@ claude_stub(){ cat <<'EOF'
 # <Your Project> — Agentic SDLC Harness (vendored)
 
 Governance harness vendored via `scripts/vendor.sh`. Fill in your stack below,
-then run `/constitution` and seed your North Star before your first `/align`.
+then run `/constitution` and seed your North Star before your first `/brief`.
 
 ## Stack
 Your load-bearing technical decisions live in `memory/stack/stack.md` (the **charter**),
@@ -81,12 +78,12 @@ not here. Run `/stack` to elicit them — it asks what this harness would otherw
 in silence. Your test command lives in `scripts/test.sh`.
 
 ## Workflow
-`/constitution` → seed North Star → `/stack` → brief → `/align` → `/distill` → `/plan`
-→ `/contract` → `/tasks` → implement → `/verify` → `/uat` → `/retro`. See `docs/workflow.md`.
+`/constitution` → seed North Star → `/stack` → `/brief` → `/spec` (gate H1) → `/build` → `/accept`.
+See `docs/workflow.md`.
 
-## Hard rules (details in memory/constitution/)
-- No deterministic criterion advances to implementation without a test in 🔴 RED (`/contract`).
-- A feature closes only with BUILD ✅ AND TRAJECTORY ✅ AND UAT ✅ AND coverage 100% AND retro ✅.
+## Hard rules
+- The owner approves once: gate H1, the spec page. Everything after it runs without the owner, except escalations.
+- A spec passes `scripts/spec.py lint` before gate H1.
 EOF
 }
 stack_stub(){ cat <<'EOF'
@@ -126,7 +123,7 @@ extends: base
 
 # North Star — <Your Product>
 
-> Replace this placeholder with your product's North Star, then run `/align`.
+> Replace this placeholder with your product's North Star, then run `/brief`.
 > The shared `base/` (schema, rubric, protocol) stays; your delta is mission, pillars, scope.
 
 ## Canonical North Star
@@ -149,7 +146,7 @@ EOF
 testsh_stub(){
   cat <<EOF
 #!/usr/bin/env bash
-# Seeded by vendor.sh. The one command the workflow (\`/contract\`, \`/verify\`) runs.
+# Seeded by vendor.sh. The one command the workflow (\`/build\`, \`/accept\`) runs.
 set -e
 EOF
   if [ -n "$TESTCMD" ]; then echo "$TESTCMD"; else echo "# TODO: set your test command"; fi
@@ -202,6 +199,8 @@ seed_file "memory/constitution/constitution.md" "$(constitution_stub)"
 seed_file "memory/north-star/north-star.md" "$(northstar_stub)"
 seed_file "memory/stack/stack.md" "$(stack_stub)"
 seed_file "scripts/test.sh" "$(testsh_stub)"
+seed_file "harness.toml" "$(sed 's|^suite = .*|suite = "bash scripts/test.sh"|' "$SRC/harness.toml")"
+seed_file "docs/modules.md" "$(cat "$SRC/docs/modules.md")"
 
 {
   echo "# Harness vendoring provenance"

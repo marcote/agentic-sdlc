@@ -38,7 +38,7 @@ run_boot(){ # args: extra flags (e.g. --yes)
 
 # --- FETCH: clones the harness (no manual clone) → governance appears in an empty target ---
 r=$(run_boot --yes); T=${r%|*}; S=${r#*|}
-if have && [ -f "$T/scripts/north-star/engine.py" ] && [ -f "$T/.claude/commands/align.md" ]; then
+if have && [ -f "$T/scripts/north-star/engine.py" ] && [ -f "$T/.claude/commands/spec.md" ]; then
   _pass "FETCH: bootstrap cloned the harness (engine + commands landed in a bare target)"
 else
   _fail "FETCH: harness not fetched/landed (bootstrap.sh absent or clone failed)"
@@ -57,7 +57,7 @@ rm -rf "$T" "$S"
 
 # --- APPLY-YES: --yes result == a direct vendor.sh --apply (governance + provenance) ---
 r=$(run_boot --yes); T=${r%|*}; S=${r#*|}
-if have && [ -f "$T/.claude/commands/align.md" ] && [ -f "$T/scripts/north-star/engine.py" ] \
+if have && [ -f "$T/.claude/commands/spec.md" ] && [ -f "$T/scripts/north-star/engine.py" ] \
    && [ -f "$T/.harness-provenance" ]; then
   _pass "APPLY-YES: --yes lands governance + stamps .harness-provenance (== vendor.sh --apply)"
 else

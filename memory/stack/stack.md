@@ -54,7 +54,7 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
 
 ### S2 — Reference deterministic engines written in python3         [substrate]
 - Confidence: PROVISIONAL — the hosting is a convenience, not a commitment
-- Because:    the gates need deterministic aggregation somewhere, and a stdlib-only interpreter
+- Because:    the gates need deterministic aggregation somewhere, and a Python ≥ 3.11 that uv provides
               is present on every platform the harness already targets. Feature 006 took this
               decision for the North Star engine; 013 follows it for the charter engine.
 - Buys:       gates that actually execute out of the box instead of a contract nobody has
@@ -70,17 +70,13 @@ Exposure: S2 Reference deterministic engines written in python3, S9 Portability 
               reimplementation in another stack is drop-in and no caller has to change. This
               costs nothing today — it is already how both engines are invoked.
 
-### S3 — Dependency-free baseline: shell + coreutils                [substrate]
+### S3 — Baseline: shell, coreutils and uv with inline script dependencies [substrate]
 - Confidence: PINNED
-- Because:    "runtime dependencies or frameworks" is an out-of-scope predicate in the North
-              Star, and every adoption path so far (vendoring, bootstrap, the test suite) has
-              been reachable with what a developer machine already has.
-- Buys:       adoption with nothing to install, and a suite that runs anywhere the harness can
-              be cloned.
-- Forecloses: any dependency that would need a manifest, a lockfile or an install step —
-              including ones that would make the checks considerably shorter to write.
-- Falsifier:  a gate that cannot be expressed within this baseline without becoming
-              unmaintainable, established by attempting it rather than by predicting it.
+- Because:    the build loop needs TOML, JSON Schema and Markdown, and the system python3 can be
+              3.9, which has no tomllib. Amendment M3 of spec 029 approved uv at gate H1.
+- Buys:       one command per script (`uv run`), with no manifest, no lockfile and no manual install.
+- Forecloses: running the harness where uv cannot be installed.
+- Falsifier:  an adopter who cannot install uv, or a script that needs a lockfile to stay reproducible.
 - Answers:    GR4
 
 ### S4 — Charter format: one line-oriented markdown file            [substrate]
