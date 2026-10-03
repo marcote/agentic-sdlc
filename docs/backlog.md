@@ -591,3 +591,5 @@ The final review of 029 found these. None blocks a slice. Each is one line here,
 ## Dropped
 
 _(none yet — an item dropped here keeps its reason)_
+- 035: profile which tests take the remaining ~40 s of the suite.
+- 035: build puts the implementer's summary in each task commit body, so every commit says why.

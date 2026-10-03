@@ -81,7 +81,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 </tbody>
 </table>
-<p>Rubric R1 (for S6): the fix names the root cause in its commit message. It adds no sleep, retry or skip.</p>
+<p>Rubric R1 (for S6): the fix names the root cause in a code comment at the fix. It adds no sleep, retry or skip.</p>
 <h2 id="3-examples">3. Examples</h2>
 <p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>.</p>
 <table>
@@ -230,6 +230,14 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <tr>
 <td>The flaky test fails from shared state or timing; T5 finds which.</td>
 <td>hypothesis</td>
+</tr>
+<tr>
+<td>Escalation from accept, answered by the owner: the suite took 39.8 s, down from 78 s. The 20 s hypothesis is refuted. The budget becomes 45 s; profiling the remaining time goes to the backlog.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>Escalation from accept, answered by the owner: build writes commit messages, so R1 now asks for a code comment at the fix. Putting the implementer's summary in the commit body goes to the backlog.</td>
+<td>decided</td>
 </tr>
 </tbody>
 </table>

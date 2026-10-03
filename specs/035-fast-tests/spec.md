@@ -22,7 +22,7 @@ The pytest suite takes 78 s for 116 tests. A day earlier it had 19 tests. Most o
 | S5 | The suite command shall run the pytest tests in parallel. | measurable-impact | E5 |
 | S6 | The test `test_revert_drops_staged_code_of_escalated_task` shall not depend on timing or test order. | real-enforcement | judged, rubric R1 |
 
-Rubric R1 (for S6): the fix names the root cause in its commit message. It adds no sleep, retry or skip.
+Rubric R1 (for S6): the fix names the root cause in a code comment at the fix. It adds no sleep, retry or skip.
 
 ## 3. Examples
 
@@ -72,3 +72,5 @@ Four kinds. Write no other kind.
 | The suite runs in 20 s or less after this slice. | hypothesis |
 | A budget of 30 s leaves room for growth and still fails fast. | open |
 | The flaky test fails from shared state or timing; T5 finds which. | hypothesis |
+| Escalation from accept, answered by the owner: the suite took 39.8 s, down from 78 s. The 20 s hypothesis is refuted. The budget becomes 45 s; profiling the remaining time goes to the backlog. | decided |
+| Escalation from accept, answered by the owner: build writes commit messages, so R1 now asks for a code comment at the fix. Putting the implementer's summary in the commit body goes to the backlog. | decided |
