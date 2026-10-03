@@ -61,7 +61,7 @@ def call(cfg, role, prompt, report):
     with tempfile.TemporaryDirectory() as tmp:
         out = Path(tmp) / "out.json"
         subs = {"{role}": role, "{schema}": str(schema_path), "{schema_json}": schema_path.read_text(), "{out}": str(out)}
-        argv = [subs.get(a, a).replace("{harness}", str(HARNESS)) for a in cli["cmd"]]
+        argv = [subs.get(a, a).replace("{harness}", str(HARNESS)).replace("{python}", sys.executable) for a in cli["cmd"]]
         secs = cfg["limits"]["call_seconds"]
         try:  # ponytail: kills the CLI only, not its children; use a process group if a tool outlives it
             p = subprocess.run(argv, input=prompt, capture_output=True, text=True, timeout=secs)

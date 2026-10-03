@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -25,7 +26,7 @@ def run(*args, cwd=None, env=None, check=False):
 
 
 def spec_cmd(*args, cwd=None):
-    return run("uv", "run", "-q", str(HARNESS / "scripts/spec.py"), *args, cwd=cwd)
+    return run(sys.executable, str(HARNESS / "scripts/spec.py"), *args, cwd=cwd)
 
 
 @pytest.fixture
@@ -87,10 +88,10 @@ class Slice:
         return [json.loads(l) for l in self.log.read_text().splitlines()]
 
     def build(self, *args):
-        return run("uv", "run", "-q", str(HARNESS / "scripts/build.py"), str(self.dir), *args, cwd=self.root, env=self.env())
+        return run(sys.executable, str(HARNESS / "scripts/build.py"), str(self.dir), *args, cwd=self.root, env=self.env())
 
     def accept(self, *args):
-        return run("uv", "run", "-q", str(HARNESS / "scripts/accept.py"), str(self.dir), *args, cwd=self.root, env=self.env())
+        return run(sys.executable, str(HARNESS / "scripts/accept.py"), str(self.dir), *args, cwd=self.root, env=self.env())
 
     def report(self):
         return json.loads((self.dir / "build-report.json").read_text())
