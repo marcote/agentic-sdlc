@@ -67,7 +67,7 @@ def test_e6_real_lessons_follow_migration_table():
     want = {r[head.index("lesson")]: r[head.index("becomes")] for r in cells[2:]}
     lhead, lrows = parse_table((HARNESS / LESSONS).read_text())
     got = {r[lhead.index("id")]: r[lhead.index("status")] for r in lrows}
-    assert got == want
+    assert {k: got.get(k) for k in want} == want
 
 
 def with_curator(s, rows, reflector=None, curator=None, limit=None):

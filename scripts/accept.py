@@ -220,9 +220,17 @@ def main():
     if report["escalations"] or any(t["status"] != "done" for t in report["tasks"].values()):
         print("accept: build has open escalations; answer them and re-run build", file=sys.stderr)
         return 2
+    curator = "not run"
+    early = results_problem(a.spec_dir, cfg)  # before any memory write, so a bad file stops accept early (D4)
+    if not early:  # V1: memory writes are committed before the suite runs
+        reflect(report, cfg)
+        curator = curate(report, cfg)
+        write_back(a.spec_dir, cfg)
+        build.git("add", *(p for p in (lessons.LESSONS, cfg["paths"]["north_star"]) if Path(p).is_file()))
+        build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): memory writes")
     try:
-        bad = failures(a.spec_dir, s, cfg, report, branch)
-        if bad:  # A3: return to build once, with the failures as feedback
+        bad = early or failures(a.spec_dir, s, cfg, report, branch)
+        if bad and not early:  # A3: return to build once, with the failures as feedback
             fix = {"task": "FIX", "requirements": ", ".join(s["reqs"]),
                    "does": "Make accept pass. Failures:\n" + "\n".join(bad)}
             frozen = build.done_on_branch(s["slice"])[0] or set()  # B2 holds on the return
@@ -234,16 +242,16 @@ def main():
     except build.Budget as b:
         build.revert()
         bad = [str(b)]
-    bad = bad or results_problem(a.spec_dir, cfg)
     if bad:
         report["escalations"] += [{"task": "accept", "reason": x} for x in bad]
         rfile.write_text(json.dumps(report, indent=2))
         print(f"ESCALATIONS ({len(report['escalations'])})")  # includes what the return to build escalated
         print("\n".join(f"- {e['task']}: {e['reason']}" for e in report["escalations"]))
         return 1
-    reflect(report, cfg)
-    result_page(a.spec_dir, report, cfg, curate(report, cfg))
-    build.git("add", str(a.spec_dir / "result.html"), *([lessons.LESSONS] if Path(lessons.LESSONS).is_file() else []), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
+    report["verified"] = build.git("rev-parse", "HEAD").strip()  # V2: after this, only the slice directory changes
+    rfile.write_text(json.dumps(report, indent=2))
+    result_page(a.spec_dir, report, cfg, curator)
+    build.git("add", str(a.spec_dir / "result.html"), own)
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): verified")
     build.git("checkout", "-q", "main")
     m = subprocess.run(["git", "merge", "--no-ff", "-q", "-m", f"accept({a.spec_dir.name}): merge", branch],
@@ -253,9 +261,6 @@ def main():
         build.git("checkout", "-q", branch)
         print(f"ESCALATIONS (1)\n- merge conflict: {m.stdout.strip() or m.stderr.strip()}")
         return 1
-    write_back(a.spec_dir, cfg)
-    build.git("add", cfg["paths"]["north_star"])
-    build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): results reported")
     print(f"accept: merged {branch} into main")
     return 0
 
