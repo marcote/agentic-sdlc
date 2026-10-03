@@ -79,6 +79,18 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>real-enforcement</td>
 <td>judged, rubric R1</td>
 </tr>
+<tr>
+<td>S7</td>
+<td>The CI workflow shall run the <code>[checks] suite</code> command of <code>harness.toml</code>, not a command of its own.</td>
+<td>real-enforcement</td>
+<td>E6</td>
+</tr>
+<tr>
+<td>S8</td>
+<td>When build compares two failures of a task, build shall compare their failed test names, not the raw output.</td>
+<td>measurable-impact</td>
+<td>E7</td>
+</tr>
 </tbody>
 </table>
 <p>Rubric R1 (for S6): the fix names the root cause in a code comment at the fix. It adds no sleep, retry or skip.</p>
@@ -123,6 +135,18 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td><code>harness.toml</code></td>
 <td>the test reads <code>[checks] suite</code></td>
 <td>it contains <code>-n auto</code></td>
+</tr>
+<tr>
+<td>E6</td>
+<td><code>.github/workflows/verify.yml</code></td>
+<td>the test reads it</td>
+<td>it has no <code>pytest</code> command of its own; it runs the <code>suite</code> value read from <code>harness.toml</code></td>
+</tr>
+<tr>
+<td>E7</td>
+<td>two failure outputs of the same test, one with <code>[gw0]</code> and one with <code>[gw3]</code>, and different durations</td>
+<td>build compares them</td>
+<td>it reports them as the same failure</td>
 </tr>
 </tbody>
 </table>
@@ -174,6 +198,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>remove the root cause of the flaky revert test</td>
 <td>S6</td>
 <td>T3</td>
+</tr>
+<tr>
+<td>T6</td>
+<td><code>verify.yml</code> runs the suite command from <code>harness.toml</code>; build compares failures by their <code>FAILED &lt;test&gt;</code> lines; add the lesson: CI runs the same suite command as accept</td>
+<td>S7, S8</td>
+<td>T5</td>
 </tr>
 </tbody>
 </table>
@@ -237,6 +267,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>Escalation from accept, answered by the owner: build writes commit messages, so R1 now asks for a code comment at the fix. Putting the implementer's summary in the commit body goes to the backlog.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>Escalation from CI on PR #43, answered by the owner: CI lacked <code>markdown</code> because <code>verify.yml</code> had its own command, and xdist worker ids made two equal failures look different. T6 fixes both.</td>
 <td>decided</td>
 </tr>
 </tbody>
