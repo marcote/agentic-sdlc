@@ -31,7 +31,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td><strong>removed name</strong></td>
-<td>A name of the old flow: <code>/align</code>, <code>/distill</code>, <code>distill</code>, <code>/contract</code>, <code>/tasks</code>, <code>/verify</code>, <code>/uat</code>, <code>/retro</code>, <code>wow-report</code>, <code>coverage.md</code>, <code>acceptance.md</code>, <code>alignment.md</code>, <code>mutate.sh</code>, <code>nvc.sh</code>, <code>amendment-gate</code>, <code>alignment-rubric</code>, <code>amendment-protocol</code>.</td>
+<td>A name of the old flow: <code>/align</code>, <code>/distill</code>, <code>distill</code>, <code>/contract</code>, <code>/tasks</code>, <code>/verify</code>, <code>/uat</code>, <code>/retro</code>, <code>wow-report</code>, <code>coverage.md</code>, <code>acceptance.md</code>, <code>alignment.md</code>, <code>mutate.sh</code>, <code>nvc.sh</code>, <code>amendment-gate</code>, <code>alignment-rubric</code>, <code>amendment-protocol</code>, <code>scripts/guards</code>, <code>no-prescribe</code>.</td>
 </tr>
 <tr>
 <td><strong>stale-name check</strong></td>
@@ -99,10 +99,16 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>E8</td>
 </tr>
 <tr>
+<td>V2</td>
+<td>When vendoring seeds <code>harness.toml</code>, the seed shall name <code>scripts/test.sh</code> wherever the harness names <code>tests/run.sh</code>.</td>
+<td>agnostic-portability</td>
+<td>E12</td>
+</tr>
+<tr>
 <td>C1</td>
 <td>When the suite runs, the <strong>stale-name check</strong> shall fail and name each <strong>live file</strong> that holds a <strong>removed name</strong>.</td>
 <td>real-enforcement</td>
-<td>E9, E10, E11</td>
+<td>E9, E10, E11, E13</td>
 </tr>
 </tbody>
 </table>
@@ -184,6 +190,18 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>the stale-name check runs</td>
 <td>no finding</td>
 </tr>
+<tr>
+<td>E12</td>
+<td>an empty target directory</td>
+<td><code>vendor.sh --apply</code> runs</td>
+<td>the seeded <code>harness.toml</code> has no <code>tests/run.sh</code> and allows <code>Bash(bash scripts/test.sh)</code></td>
+</tr>
+<tr>
+<td>E13</td>
+<td>a copy of a repo with <code>memory/stack/stack.md</code> that says <code>Guard: bash scripts/guards/no-prescribe.sh</code></td>
+<td>the stale-name check runs on it</td>
+<td>it reports <code>memory/stack/stack.md: scripts/guards</code></td>
+</tr>
 </tbody>
 </table>
 <h2 id="4-tests">4. Tests</h2>
@@ -235,6 +253,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 <td>add the stale-name check to <code>tests/test_harness.py</code>; clean every live hit it still finds</td>
 <td>C1</td>
 <td>T1, T2, T3, T4</td>
+</tr>
+<tr>
+<td>T6</td>
+<td><code>vendor.sh</code> rewrites <code>tests/run.sh</code> to <code>scripts/test.sh</code> in the seeded <code>harness.toml</code>; add <code>scripts/guards</code> and <code>no-prescribe</code> to the removed names; drop the <code>Guard</code> line of charter pin S1</td>
+<td>V2, C1</td>
+<td>T5</td>
 </tr>
 </tbody>
 </table>
@@ -317,6 +341,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%
 </tr>
 <tr>
 <td>Escalation T1 (second run), answered by the owner: the Claude implementer may run <code>git rm</code>, <code>git mv</code>, <code>mkdir</code> and <code>bash tests/run.sh</code>, scoped in <code>harness.toml</code>.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>Pre-accept finding, approved by the owner: that permission leaked <code>tests/run.sh</code> into the vendored seed, and T3 left a dead <code>Guard</code> pointer in pin S1. T6 fixes both.</td>
 <td>decided</td>
 </tr>
 </tbody>

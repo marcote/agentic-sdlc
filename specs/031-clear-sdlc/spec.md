@@ -15,7 +15,7 @@ Spec 029 pruned the old commands, but its disposition table came from a partial 
 | term | meaning |
 | --- | --- |
 | **live file** | A tracked file outside the history paths: `specs/`, `verification/reports/`, `docs/superpowers/`, `memory/north-star/decisions/`, `docs/backlog.md` and `tests/`. |
-| **removed name** | A name of the old flow: `/align`, `/distill`, `distill`, `/contract`, `/tasks`, `/verify`, `/uat`, `/retro`, `wow-report`, `coverage.md`, `acceptance.md`, `alignment.md`, `mutate.sh`, `nvc.sh`, `amendment-gate`, `alignment-rubric`, `amendment-protocol`. |
+| **removed name** | A name of the old flow: `/align`, `/distill`, `distill`, `/contract`, `/tasks`, `/verify`, `/uat`, `/retro`, `wow-report`, `coverage.md`, `acceptance.md`, `alignment.md`, `mutate.sh`, `nvc.sh`, `amendment-gate`, `alignment-rubric`, `amendment-protocol`, `scripts/guards`, `no-prescribe`. |
 | **stale-name check** | The test that lists every live file that holds a removed name. |
 
 ## 2. Requirements
@@ -30,7 +30,8 @@ Spec 029 pruned the old commands, but its disposition table came from a partial 
 | D2 | The prose of `docs/workflow.md` shall have no sentence over 25 words. | measurable-impact | E6 |
 | D3 | The README shall show the workflow figure and link `docs/workflow.md`. | measurable-impact | E7 |
 | V1 | When vendoring applies, the target shall get `docs/workflow.md` and `docs/figures/`. | agnostic-portability | E8 |
-| C1 | When the suite runs, the **stale-name check** shall fail and name each **live file** that holds a **removed name**. | real-enforcement | E9, E10, E11 |
+| V2 | When vendoring seeds `harness.toml`, the seed shall name `scripts/test.sh` wherever the harness names `tests/run.sh`. | agnostic-portability | E12 |
+| C1 | When the suite runs, the **stale-name check** shall fail and name each **live file** that holds a **removed name**. | real-enforcement | E9, E10, E11, E13 |
 
 ## 3. Examples
 
@@ -49,6 +50,8 @@ Each example becomes a test named `test_<id>_<words>`.
 | E9 | a copy of a repo with `docs/notes.md` that says `run /distill first` | the stale-name check runs on it | it reports `docs/notes.md: /distill` |
 | E10 | the same text in `specs/015-x/brief.md` | the stale-name check runs on it | no finding |
 | E11 | this harness repo after T1–T4 | the stale-name check runs | no finding |
+| E12 | an empty target directory | `vendor.sh --apply` runs | the seeded `harness.toml` has no `tests/run.sh` and allows `Bash(bash scripts/test.sh)` |
+| E13 | a copy of a repo with `memory/stack/stack.md` that says `Guard: bash scripts/guards/no-prescribe.sh` | the stale-name check runs on it | it reports `memory/stack/stack.md: scripts/guards` |
 
 ## 4. Tests
 
@@ -70,6 +73,7 @@ The figures are approved here at gate H1 and committed with this spec. Build onl
 | T3 | stack engine keeps `pin-valid`, `exposure`, `ground-rules`; delete `scripts/guards/`; `check_92` follows: delete its assertions on `guards` | S1 | T1 |
 | T4 | write `docs/workflow.md` around the three figures; README shows the workflow figure; vendor keeps `docs/figures/` | D1, D2, D3, V1 | |
 | T5 | add the stale-name check to `tests/test_harness.py`; clean every live hit it still finds | C1 | T1, T2, T3, T4 |
+| T6 | `vendor.sh` rewrites `tests/run.sh` to `scripts/test.sh` in the seeded `harness.toml`; add `scripts/guards` and `no-prescribe` to the removed names; drop the `Guard` line of charter pin S1 | V2, C1 | T5 |
 
 | item | justification |
 | --- | --- |
@@ -94,3 +98,4 @@ No new module and no new library.
 | `verification/reports/` and `specs/001`–`030` stay as history. | open |
 | Escalation T1, answered by the owner: only the tests T0 froze are frozen. Shell checks under `tests/` that assert a deleted path may be edited. Spec 032 fixes the implementer rule that caused the question. | decided |
 | Escalation T1 (second run), answered by the owner: the Claude implementer may run `git rm`, `git mv`, `mkdir` and `bash tests/run.sh`, scoped in `harness.toml`. | decided |
+| Pre-accept finding, approved by the owner: that permission leaked `tests/run.sh` into the vendored seed, and T3 left a dead `Guard` pointer in pin S1. T6 fixes both. | decided |
