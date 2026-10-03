@@ -28,3 +28,5 @@ One row per lesson. `active`: every build prompt holds it. `proposed`: waits for
 | L22 | A promoted check that only finds its name as plain text in a file passes on any mention. It does not prove that the check runs. | none: judgment | 036-memory-process | 0 | 0 | active |
 | L23 | A check that reads repo memory by relative path makes its tests read the real repo. Run such tests with cwd set to a temporary directory. | none: judgment | 036-memory-process | 0 | 0 | active |
 | L24 | When a stricter lint rejects closed specs, scope it to open slices. Do not delete the test that lints the closed spec. | none: judgment | 036-memory-process | 0 | 0 | active |
+| L25 | A step that writes memory must be idempotent, because accept re-runs after an escalation. Otherwise each re-run appends duplicate lines, such as Reported lines in the north star. | none: judgment | 037-verify-last | 0 | 0 | active |
+| L26 | A fixture that runs the suite in a temporary repo must call pytest through the running interpreter. A bare pytest or `-n auto` depends on what that Python has installed. | none: judgment | 037-verify-last | 0 | 0 | active |
