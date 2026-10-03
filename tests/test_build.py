@@ -1,10 +1,11 @@
 import json
 import os
+import re
 
 from conftest import HARNESS, OK, PASS, TEST_E1, run
 
 
-def call_once(slice_repo, response):
+def call_once(slice_repo, response, prompt="'hello'"):
     """Run build.call() once, in-process via a tiny uv script, and return its JSON result."""
     slice_repo.script([response])
     code = (
@@ -12,9 +13,9 @@ def call_once(slice_repo, response):
         "import build\n"
         "cfg = build.load_config(build.Path('harness.toml'))\n"
         "rep = {'tokens': 0}\n"
-        "p, why = build.call(cfg, 'implementer', 'hello', rep)\n"
+        "p, why = build.call(cfg, 'implementer', %s, rep)\n"
         "print(json.dumps({'payload': p, 'why': why, 'tokens': rep['tokens']}))\n"
-    ) % str(HARNESS / "scripts")
+    ) % (str(HARNESS / "scripts"), prompt)
     p = run("uv", "run", "-q", "--python", "3.12", "--with", "jsonschema", "python", "-c", code,
             cwd=slice_repo.root, env=slice_repo.env())
     assert p.returncode == 0, p.stderr
@@ -38,6 +39,29 @@ def test_call_non_numeric_tokens_count_zero(slice_repo):
     assert out["why"] == "" and out["tokens"] == 0
 
 
+def test_call_large_prompt_reaches_agent(slice_repo):
+    out = call_once(slice_repo, OK, prompt="'x' * 300_000")
+    assert out["why"] == ""
+    assert len(slice_repo.calls()[0]["prompt"]) == 300_000
+
+
+def test_call_timeout(slice_repo):
+    cfg = slice_repo.root / "harness.toml"
+    cfg.write_text(cfg.read_text().replace("call_seconds = 1800", "call_seconds = 1"))
+    out = call_once(slice_repo, {**OK, "_sleep": 3})
+    assert out["payload"] is None and out["why"].startswith("agent: timeout")
+
+
+def test_build_warns_when_budget_cannot_see_a_role(slice_repo):
+    cfg = slice_repo.root / "harness.toml"
+    cfg.write_text(cfg.read_text().replace('judge = "fake-judge"', 'judge = "codex-ro"'))
+    slice_repo.git("commit", "-qam", "judge without tokens")
+    slice_repo.script([T0, T1, T2])
+    p = slice_repo.build()
+    warnings = [l for l in p.stderr.splitlines() if "warning" in l]
+    assert len(warnings) == 1 and "judge" in warnings[0], p.stderr
+
+
 def test_call_agent_crash(slice_repo):
     out = call_once(slice_repo, {"_crash": True})
     assert out["payload"] is None and out["why"].startswith("agent: exit 7")
@@ -53,11 +77,10 @@ def test_e27_real_agents(slice_repo):
     clis = [c for c in os.environ.get("RUN_REAL_AGENTS", "").split(",") if c]
     if not clis:
         pytest.skip("set RUN_REAL_AGENTS=claude,codex to call real CLIs (costs tokens)")
+    base = (slice_repo.root / "harness.toml").read_text()
     for cli in clis:
-        cfg = (slice_repo.root / "harness.toml").read_text()
-        cfg = cfg.replace('implementer = "fake"', f'implementer = "{cli}"')
+        cfg = re.sub(r'^implementer = ".*"$', f'implementer = "{cli}"', base, flags=re.M)
         (slice_repo.root / "harness.toml").write_text(cfg)
-        slice_repo.script([OK])
         code = (
             "import sys, json; sys.path.insert(0, %r)\nimport build\n"
             "cfg = build.load_config(build.Path('harness.toml'))\n"

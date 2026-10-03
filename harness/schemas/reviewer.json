@@ -1,5 +1,6 @@
 {
   "type": "object",
+  "additionalProperties": false,
   "required": ["verdict", "findings"],
   "properties": {
     "verdict": {"enum": ["pass", "fix"]},

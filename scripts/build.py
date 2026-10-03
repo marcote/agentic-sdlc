@@ -59,10 +59,13 @@ def call(cfg, role, prompt, report):
     schema_path = SCHEMAS / f"{SCHEMA_OF[role]}.json"
     with tempfile.TemporaryDirectory() as tmp:
         out = Path(tmp) / "out.json"
-        subs = {"{prompt}": prompt, "{role}": role, "{schema}": str(schema_path),
-                "{schema_json}": schema_path.read_text(), "{out}": str(out)}
+        subs = {"{role}": role, "{schema}": str(schema_path), "{schema_json}": schema_path.read_text(), "{out}": str(out)}
         argv = [subs.get(a, a).replace("{harness}", str(HARNESS)) for a in cli["cmd"]]
-        p = subprocess.run(argv, capture_output=True, text=True)
+        secs = cfg["limits"]["call_seconds"]
+        try:  # ponytail: kills the CLI only, not its children; use a process group if a tool outlives it
+            p = subprocess.run(argv, input=prompt, capture_output=True, text=True, timeout=secs)
+        except subprocess.TimeoutExpired:
+            return None, f"agent: timeout after {secs}s"
         if p.returncode != 0:
             return None, f"agent: exit {p.returncode}: {(p.stderr or p.stdout).strip()[-300:]}"
         raw = out.read_text() if cli["payload"] == "@out" and out.exists() else p.stdout
@@ -143,7 +146,7 @@ def prompt_for(role, task, s, cfg, feedback="", diff=""):
         + section("Module map", read(paths["module_map"]))
         + section("Charter", read(paths["charter"]))
         + section("Feedback from the last attempt", feedback)
-        + section("Diff", diff)
+        + section("Diff", diff[-200_000:])
     )
 
 
@@ -294,7 +297,11 @@ def main():
     if changed_files() - {".fake_log", ".fake_plan", own}:  # a previous run's report may be left over
         print("build: working tree is dirty; commit or stash first", file=sys.stderr)
         return 2
-    report = build(a.spec_dir, load_config(a.config))
+    cfg = load_config(a.config)
+    blind = [r for r, c in cfg["roles"].items() if not cfg["cli"][c].get("tokens")]
+    if blind:
+        print(f"build: warning: the budget cannot see role {', '.join(blind)} (tokens = [])", file=sys.stderr)
+    report = build(a.spec_dir, cfg)
     if report["escalations"]:
         print(f"ESCALATIONS ({len(report['escalations'])})")
         for e in report["escalations"]:

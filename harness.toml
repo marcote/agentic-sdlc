@@ -1,14 +1,15 @@
 # harness.toml — which agent CLI fills each role, and how build and accept check the work.
-# Placeholders in cmd: {prompt} {role} {schema} {schema_json} {out} {harness}
+# Placeholders in cmd: {role} {schema} {schema_json} {out} {harness}. The prompt goes on stdin.
 
 [roles]
 implementer = "claude"
 reviewer = "claude-ro"
-judge = "codex"          # A7: the judge's family must differ from the implementer's
+judge = "codex-ro"       # A7: the judge's family must differ from the implementer's
 
 [limits]
 attempts = 3
 budget_tokens = 3_000_000
+call_seconds = 1800
 
 [checks]
 # {examples} expands to a pytest -k selector such as "e1_ or e2_"
@@ -22,33 +23,41 @@ charter = "memory/stack/stack.md"
 module_map = "docs/modules.md"
 module_root = "src"
 
+# ponytail: cache reads (~1/10 the input price) are left out, so tokens are a raw count; weight them by price if the budget misfires.
 [cli.claude]
 family = "anthropic"
-cmd = ["claude", "-p", "{prompt}", "--output-format", "json", "--json-schema", "{schema_json}",
+cmd = ["claude", "-p", "--output-format", "json", "--json-schema", "{schema_json}",
        "--permission-mode", "acceptEdits", "--allowedTools", "Read", "Edit", "Write", "Bash(uv run:*)"]
 payload = "structured_output"
-tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens", "usage.cache_read_input_tokens"]
+tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens"]
 
 [cli.claude-ro]
 family = "anthropic"
-cmd = ["claude", "-p", "{prompt}", "--output-format", "json", "--json-schema", "{schema_json}", "--permission-mode", "plan"]
+cmd = ["claude", "-p", "--output-format", "json", "--json-schema", "{schema_json}", "--permission-mode", "plan"]
 payload = "structured_output"
-tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens", "usage.cache_read_input_tokens"]
+tokens = ["usage.input_tokens", "usage.output_tokens", "usage.cache_creation_input_tokens"]
 
+# codex reports no token usage in its last message, so the budget cannot see it; build warns.
 [cli.codex]
 family = "openai"
-cmd = ["codex", "exec", "--full-auto", "--output-schema", "{schema}", "--output-last-message", "{out}", "{prompt}"]
+cmd = ["codex", "exec", "--full-auto", "--output-schema", "{schema}", "--output-last-message", "{out}", "-"]
+payload = "@out"
+tokens = []
+
+[cli.codex-ro]
+family = "openai"
+cmd = ["codex", "exec", "--sandbox", "read-only", "--output-schema", "{schema}", "--output-last-message", "{out}", "-"]
 payload = "@out"
 tokens = []
 
 [cli.fake]
 family = "fake"
-cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}", "{prompt}"]
-payload = ""
+cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}"]
+payload = "result"
 tokens = ["tokens"]
 
 [cli.fake-judge]
 family = "fake-2"
-cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}", "{prompt}"]
-payload = ""
+cmd = ["uv", "run", "-q", "{harness}/scripts/fake_agent.py", "{role}"]
+payload = "result"
 tokens = ["tokens"]
