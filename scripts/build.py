@@ -167,6 +167,9 @@ def prompt_for(role, task, s, cfg, feedback="", diff="", frozen=()):
 
 
 def norm(text):
+    failed = sorted(set(re.findall(r"^FAILED (\S+)", text, re.M)))  # the same tests failing is the same failure
+    if failed:
+        return failed
     return re.sub(r"\d+(\.\d+)?s\b|0x[0-9a-f]+", "", text)
 
 
