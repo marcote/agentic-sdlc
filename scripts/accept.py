@@ -88,13 +88,20 @@ def results_problem(spec_dir, cfg):
     return [] if Path(ns).is_file() else [f"{ns}: north star not found"]
 
 
+CONSTITUTION = Path("memory/constitution/constitution.md")
+
+
+def constitution():
+    return CONSTITUTION.read_text() if CONSTITUTION.is_file() else ""
+
+
 def reflect(report, cfg):
     """Ask the reflector for lesson deltas and apply them (R2). A failed call is printed, never fatal (R7)."""
     f = Path(lessons.LESSONS)
     if "reflector" not in cfg["roles"] or not f.is_file():
         return
     prompt = ((build.HARNESS / "harness/prompts/reflector.md").read_text()
-              + f"\n\n## Lessons\n\n{f.read_text()}\n\n## Build report\n\n{json.dumps(report, indent=2)}")
+              + f"\n\n## Constitution\n\n{constitution()}\n\n## Lessons\n\n{f.read_text()}\n\n## Build report\n\n{json.dumps(report, indent=2)}")
     try:
         out, why = build.call(cfg, "reflector", prompt, report)
     except build.Budget as b:
@@ -103,6 +110,32 @@ def reflect(report, cfg):
         print(f"reflector: {why}")
     else:
         f.write_text(lessons.apply(f.read_text(), out["deltas"]))
+
+
+def curate(report, cfg):
+    """Ask the curator which active lessons conflict with the constitution and mark them proposed (M8, M9).
+    Returns the page text with its counts on the labeled cases (M10). A failed call is printed, never fatal."""
+    f = Path(lessons.LESSONS)
+    if "curator" not in cfg["roles"] or not f.is_file():
+        return "not run"
+    cases = lessons.rows((build.HARNESS / "harness/curator-cases.md").read_text())
+    active = lessons.with_status("active")
+    prompt = ((build.HARNESS / "harness/prompts/curator.md").read_text()
+              + f"\n\n## Constitution\n\n{constitution()}\n\n## Active lessons\n\n" + "\n".join(f"{r['id']}: {r['lesson']}" for r in active)
+              + "\n\n## Cases\n\n" + "\n".join(f"{c['id']}: lesson: {c['lesson']} | rule: {c['rule']}" for c in cases))
+    try:
+        out, why = build.call(cfg, "curator", prompt, report)
+    except build.Budget as b:
+        out, why = None, str(b)
+    if why:
+        print(f"curator: {why}")
+        return "not run"
+    ids = {r["id"] for r in active}
+    f.write_text(lessons.apply(f.read_text(), [{"op": "propose", **c} for c in out["conflicts"] if c["id"] in ids]))
+    named = {c["id"] for c in out["conflicts"]}
+    want = {c["id"] for c in cases if c["label"] == "conflict"}
+    false = len(named & {c["id"] for c in cases} - want)
+    return f"{len(named & want)} of {len(want)} found, {len(want - named)} missed, {false} false alarm{'s' * (false != 1)}"
 
 
 def write_back(spec_dir, cfg):
@@ -118,7 +151,7 @@ def write_back(spec_dir, cfg):
     ns.write_text(text)
 
 
-def result_page(spec_dir, report, cfg):
+def result_page(spec_dir, report, cfg, curator="not run"):
     def when(*args):
         out = build.git("log", "--format=%cI", *args).split()
         return datetime.fromisoformat(out[0]) if out else None
@@ -152,6 +185,7 @@ def result_page(spec_dir, report, cfg):
         ("Test time", ", ".join(f"{r.get('test_seconds') or 0:g} s" for r in runs)),
         ("Lessons", f"{len(count['active'])} active ({used} of {cfg['limits'].get('lessons_bytes', 25_000)} bytes), "
                     + ", ".join(f"{len(count[s])} {s}" for s in ("proposed", "promoted", "merged"))),
+        ("Curator", curator),
         ("Tokens", f"{tokens} ({len(runs)} build run{'s' * (len(runs) != 1)})"),
     ]
     body = "".join(f"<tr><th>{k}</th><td>{html.escape(v)}</td></tr>" for k, v in rows)
@@ -208,7 +242,7 @@ def main():
         print("\n".join(f"- {e['task']}: {e['reason']}" for e in report["escalations"]))
         return 1
     reflect(report, cfg)
-    result_page(a.spec_dir, report, cfg)
+    result_page(a.spec_dir, report, cfg, curate(report, cfg))
     build.git("add", str(a.spec_dir / "result.html"), *([lessons.LESSONS] if Path(lessons.LESSONS).is_file() else []), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): verified")
     build.git("checkout", "-q", "main")

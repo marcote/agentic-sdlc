@@ -21,7 +21,7 @@ def rows(text):
 
 
 def apply(text, deltas):
-    """text with each lesson delta applied: an add is `proposed` for a rule and `active` otherwise; `helpful` and `harmful` change only the counter."""
+    """text with each lesson delta applied: an add is `proposed` for a rule and `active` otherwise; `helpful` and `harmful` change only the counter; `propose` marks a lesson proposed with its conflict."""
     head = next(l for l in text.splitlines() if l.startswith("|"))
     cols = [c.strip() for c in head.strip("|").split("|")]
     table = rows(text)
@@ -32,7 +32,9 @@ def apply(text, deltas):
                           "helpful": "0", "harmful": "0", "status": "proposed" if d["kind"] == "rule" else "active"})
             continue
         for r in table:
-            if r["id"] == d["id"]:
+            if r["id"] == d["id"] and d["op"] == "propose":
+                r["status"], r["check"] = "proposed", f"conflict with {d['with']}: {d['why']}".replace("|", "/")
+            elif r["id"] == d["id"]:
                 r[d["op"]] = str(int(r[d["op"]]) + 1)
     body = ["| " + " | ".join(cols) + " |", "|" + " --- |" * len(cols)] + ["| " + " | ".join(r[c] for c in cols) + " |" for r in table]
     return text[:text.index(head)] + "\n".join(body) + "\n"
