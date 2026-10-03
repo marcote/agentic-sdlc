@@ -23,11 +23,12 @@ from pathlib import Path
 import jsonschema
 
 sys.path.insert(0, str(Path(__file__).parent))
+import lessons
 import spec as speclib
 
 HARNESS = Path(__file__).resolve().parent.parent
 SCHEMAS = HARNESS / "harness/schemas"
-SCHEMA_OF = {"implementer": "implementer", "reviewer": "reviewer", "judge": "reviewer"}
+SCHEMA_OF = {"implementer": "implementer", "reviewer": "reviewer", "judge": "reviewer", "reflector": "reflector"}
 
 
 class Budget(Exception):
@@ -144,6 +145,7 @@ def prompt_for(role, task, s, cfg, feedback="", diff="", frozen=()):
         + section("Examples", "\n".join(f"- {e['id']}: given {e['given']}; when {e['when']}; then {e['then']}" for e in exs))
         + section("Frozen tests", "\n".join(f"- {f}" for f in sorted(frozen)))
         + section("Glossary", "\n".join(f"- {t}: {m}" for t, m in terms.items()))
+        + section("Lessons", "\n".join(f"- {r['id']}: {r['lesson']}" for r in lessons.with_status("captured", "learned")))
         + section("Module map", read(paths["module_map"]))
         + section("Charter", read(paths["charter"]))
         + section("Feedback from the last attempt", feedback)
@@ -187,6 +189,8 @@ def run_task(task, s, cfg, report, frozen, done_examples):
                 diff = git("diff", "--cached")
                 rev, why = call(cfg, "reviewer", prompt_for("reviewer", task, s, cfg, diff=diff), report)
                 fail = why or ("" if rev["verdict"] == "pass" else "reviewer:\n" + "\n".join(rev["findings"]))
+                if not why and rev["verdict"] != "pass":
+                    report["findings"] += [{"task": tid, "text": f} for f in rev["findings"]]
             if not fail:
                 report["assumptions"] += [{"task": tid, "text": a["text"]} for a in res["assumptions"]]
                 report["reused"] += res["reused"]
@@ -258,7 +262,7 @@ def build(spec_dir, cfg):
     s = speclib.parse((spec_dir / "spec.md").read_text())
     s["slice"] = spec_dir.name
     report = {"tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [],
-              "reused": [], "new": [], "started": datetime.now(timezone.utc).isoformat()}
+              "reused": [], "new": [], "findings": [], "started": datetime.now(timezone.utc).isoformat()}
     try:
         old = json.loads((spec_dir / "build-report.json").read_text())
         earlier = old.get("runs") or [old]  # a report from before "runs" is one run

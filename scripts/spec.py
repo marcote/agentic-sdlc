@@ -11,10 +11,14 @@
 Exit: 0 clean · 1 findings · 2 unusable input.
 """
 import argparse
+import html
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+import lessons  # noqa: E402
 
 MAX_WORDS = 25
 HISTORY = ("specs/", "verification/reports/", "docs/superpowers/", "memory/north-star/decisions/", "docs/backlog.md", "tests/")
@@ -71,18 +75,28 @@ def ids_in(cell):
 
 
 def prose(text):
-    out, fenced = [], False
-    for n, line in enumerate(text.splitlines(), 1):
-        if line.lstrip().startswith("```"):
-            fenced = not fenced
-            continue
-        if fenced or line.startswith(("|", ">", "#")):
-            continue
-        s = re.sub(r"`[^`]*`", "X", line)
+    out, fenced, para, start = [], False, [], 0
+
+    def flush():
+        s = re.sub(r"`[^`]*`", "X", " ".join(para))
         for part in re.split(r"(?<=[.:;!?])\s+", s):
             k = len(part.split())
             if k > MAX_WORDS:
-                out.append(f"line {n}: {k} words: {part.strip()[:50]}…")
+                out.append(f"line {start}: {k} words: {part.strip()[:50]}…")
+        para.clear()
+
+    for n, line in enumerate(text.splitlines() + [""], 1):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            flush()
+        elif fenced or not line.strip() or line.startswith(("|", ">", "#")):
+            flush()
+        else:
+            if re.match(r"\s*([-*+]|\d+[.)])\s", line):
+                flush()
+            if not para:
+                start = n
+            para.append(line.strip())
     return out
 
 
@@ -160,6 +174,8 @@ def page(spec_path, out_path):
     body = md.convert(text)
     # the toc extension slugs "7. Amendments" as "7-amendments"; give the section a stable id
     body = re.sub(r'<h2 id="[^"]*amendments[^"]*">', '<h2 id="amendments">', body)
+    if proposed := lessons.with_status("proposed"):
+        body += "<h2>Proposed lessons</h2><ul>" + "".join(f"<li>{r['id']}: {html.escape(r['lesson'])}</li>" for r in proposed) + "</ul>"
     out_path.write_text(PAGE.format(title=title, body=body))
 
 

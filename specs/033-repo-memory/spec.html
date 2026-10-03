@@ -1,0 +1,457 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec 033 — Memory in the repo, and lessons that are learned</title>
+<style>
+:root{--bg:#f6f7f5;--fg:#1c2321;--mut:#5b6662;--rule:#d7ddd9;--acc:#0f5f6e;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root{--bg:#121615;--fg:#e4e9e6;--mut:#9aa6a1;--rule:#2d3533;--acc:#6cc3d1;--warn:#f0b65a;color-scheme:dark}}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:0 auto;padding:24px 16px}
+h1,h2,h3{text-wrap:balance} h2{border-top:1px solid var(--rule);padding-top:12px}
+#amendments{color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:6px 10px;text-align:left;vertical-align:top}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.9em} img{max-width:100%}
+</style>
+<h1 id="spec-033-memory-in-the-repo-and-lessons-that-are-learned">Spec 033 — Memory in the repo, and lessons that are learned</h1>
+<p>Status: draft for gate H1. Labels: decided, hypothesis, open, reported.</p>
+<p>The lessons of this harness and the owner's way of working live today in one agent's local store. They are lost when the harness moves to another repo or another agent runs it. This slice moves them into the repo.</p>
+<p>A lesson that is only written down is captured, not learned. A lesson is learned when it changes what the agents do, and there is evidence of it. This slice makes that difference visible and measured.</p>
+<p>Agents read the constitution, the memory, the prompts and the steps. Ambiguity in that text becomes drift. So that text follows ASD-STE100 at about 80%, and a check enforces it. Documents for humans stay free.</p>
+<p><img alt="The memory loop" src="memory-loop.svg" /></p>
+<p>The input for the migration is the snapshot in <code>specs/033-repo-memory/session-memory/</code>, taken on 2026-10-03.</p>
+<h2 id="1-glossary">1. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>term</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>lesson</strong></td>
+<td>One row of <code>memory/lessons.md</code>: what to do, its check, its source slice, two counters and a status.</td>
+</tr>
+<tr>
+<td><strong>captured lesson</strong></td>
+<td>A lesson with status <code>captured</code>: written, with no evidence that it changes what agents do.</td>
+</tr>
+<tr>
+<td><strong>learned lesson</strong></td>
+<td>A lesson with status <code>learned</code>: its check exists and runs, or a later slice applied it (<code>helpful</code> is 1 or more).</td>
+</tr>
+<tr>
+<td><strong>rule lesson</strong></td>
+<td>A lesson that changes what is allowed. It has status <code>proposed</code> until the owner approves it at gate H1.</td>
+</tr>
+<tr>
+<td><strong>reflector</strong></td>
+<td>The role that reads a slice's build report and returns each lesson delta.</td>
+</tr>
+<tr>
+<td><strong>lesson delta</strong></td>
+<td>One change to the lessons: add a lesson, or add one to its <code>helpful</code> or <code>harmful</code> counter.</td>
+</tr>
+<tr>
+<td><strong>owner file</strong></td>
+<td><code>memory/owner.md</code>: how the owner works with agents.</td>
+</tr>
+<tr>
+<td><strong>agent-facing file</strong></td>
+<td>A file that agents read as instructions: <code>AGENTS.md</code>, <code>memory/</code>, <code>harness/prompts/</code>, <code>harness/steps/</code> and each <code>specs/*/spec.md</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-requirements">2. Requirements</h2>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>requirement</th>
+<th>anchor</th>
+<th>examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>The file <code>AGENTS.md</code> shall be the one index of the harness memory, and <code>CLAUDE.md</code> shall only import it.</td>
+<td>agnostic-portability</td>
+<td>E1</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>The file <code>memory/lessons.md</code> shall hold every <strong>lesson</strong> in one table.</td>
+<td>measurable-impact</td>
+<td>E2</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>The <strong>owner file</strong> shall hold the owner's working preferences from the snapshot.</td>
+<td>agnostic-portability</td>
+<td>E3</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>When vendoring applies, the target shall get <code>AGENTS.md</code>, the <code>CLAUDE.md</code> import, an empty lessons table and an owner file stub.</td>
+<td>agnostic-portability</td>
+<td>E4</td>
+</tr>
+<tr>
+<td>K1</td>
+<td>When the suite runs, each <strong>learned lesson</strong> shall name a check that exists, or have <code>helpful</code> of 1 or more.</td>
+<td>real-enforcement</td>
+<td>E5, E6, E7</td>
+</tr>
+<tr>
+<td>K2</td>
+<td>When a lesson's check names a test that exists, the lessons check shall accept the status <code>learned</code> for it.</td>
+<td>real-enforcement</td>
+<td>E5</td>
+</tr>
+<tr>
+<td>R1</td>
+<td>When build rejects an attempt, the report shall record the reason as a finding of that task.</td>
+<td>measurable-impact</td>
+<td>E8</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>When the checks of accept pass, accept shall apply each <strong>lesson delta</strong> that the <strong>reflector</strong> returns, before the merge.</td>
+<td>measurable-impact</td>
+<td>E9</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>If a lesson delta adds a <strong>rule lesson</strong>, then accept shall add it with status <code>proposed</code>.</td>
+<td>real-enforcement</td>
+<td>E10</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>When a lesson delta adds one to <code>helpful</code>, accept shall set that lesson to <code>learned</code>.</td>
+<td>measurable-impact</td>
+<td>E9</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>When the spec step writes the spec page, the page shall list every proposed lesson for the owner.</td>
+<td>real-enforcement</td>
+<td>E11</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>When build calls the implementer or the reviewer, the prompt shall include every lesson that is <code>captured</code> or <code>learned</code>.</td>
+<td>measurable-impact</td>
+<td>E12</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>If the reflector call fails, then accept shall still merge and print the failure.</td>
+<td>frictionless-adoption</td>
+<td>E13</td>
+</tr>
+<tr>
+<td>R8</td>
+<td>When accept writes the result page, the page shall show the count of <strong>captured lesson</strong> and <strong>learned lesson</strong> rows.</td>
+<td>measurable-impact</td>
+<td>E14</td>
+</tr>
+<tr>
+<td>W1</td>
+<td>When the suite runs, the prose check shall cover each <strong>agent-facing file</strong> and skip <code>README.md</code> and <code>docs/</code>.</td>
+<td>real-enforcement</td>
+<td>E15, E16</td>
+</tr>
+<tr>
+<td>W2</td>
+<td>When the prose check reads a paragraph, it shall count each sentence across line breaks.</td>
+<td>real-enforcement</td>
+<td>E17</td>
+</tr>
+<tr>
+<td>W3</td>
+<td>The prose check shall skip the history paths of the shared list.</td>
+<td>real-enforcement</td>
+<td>E18</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-examples">3. Examples</h2>
+<p>Each example becomes a test named <code>test_&lt;id&gt;_&lt;words&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>given</th>
+<th>when</th>
+<th>then</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>the harness repo</td>
+<td>the test reads <code>AGENTS.md</code> and <code>CLAUDE.md</code></td>
+<td><code>CLAUDE.md</code> is exactly <code>@AGENTS.md</code>; <code>AGENTS.md</code> links <code>memory/lessons.md</code> and <code>memory/owner.md</code></td>
+</tr>
+<tr>
+<td>E2</td>
+<td><code>memory/lessons.md</code></td>
+<td>the test parses its table</td>
+<td>the header is <code>id, lesson, check, source, helpful, harmful, status</code>; rows exist whose source names <code>prune-from-inventory</code>, <code>clean-wrong-number</code> and <code>fixtures-are-my-assumptions</code></td>
+</tr>
+<tr>
+<td>E3</td>
+<td><code>memory/owner.md</code></td>
+<td>the test reads it</td>
+<td>it says the owner chats in Spanish and artifacts are in English; it names gate H1 as the one approval; it names interfig for spec pages</td>
+</tr>
+<tr>
+<td>E4</td>
+<td>an empty target directory</td>
+<td><code>vendor.sh --apply</code> runs</td>
+<td>the target has <code>AGENTS.md</code>, <code>CLAUDE.md</code> equal to <code>@AGENTS.md</code>, <code>memory/lessons.md</code> with the header and no rows, and <code>memory/owner.md</code></td>
+</tr>
+<tr>
+<td>E5</td>
+<td>lesson <code>L1</code>, status <code>learned</code>, check <code>tests/test_spec.py::test_e1_undefined_bold_term</code></td>
+<td>the lessons check runs</td>
+<td>no finding</td>
+</tr>
+<tr>
+<td>E6</td>
+<td>lesson <code>L3</code>, status <code>learned</code>, check <code>tests/test_x.py::test_missing</code></td>
+<td>the lessons check runs</td>
+<td>the finding <code>L3: check not found: tests/test_x.py::test_missing</code></td>
+</tr>
+<tr>
+<td>E7</td>
+<td>lesson <code>L5</code>, status <code>learned</code>, check <code>none: judgment</code>, helpful 0</td>
+<td>the lessons check runs</td>
+<td>the finding <code>L5: learned without evidence</code></td>
+</tr>
+<tr>
+<td>E8</td>
+<td>a fake reviewer returns <code>fix</code> with the finding <code>R1 scope: calc.py adds mul</code></td>
+<td>build ends</td>
+<td>the report has the finding <code>{"task": "T1", "text": "R1 scope: calc.py adds mul"}</code></td>
+</tr>
+<tr>
+<td>E9</td>
+<td>lesson <code>L2</code> is <code>captured</code> with helpful 0; a fake reflector returns one soft add and a <code>helpful</code> delta for <code>L2</code></td>
+<td>accept passes its checks</td>
+<td>the new row has status <code>captured</code>; <code>L2</code> has helpful 1 and status <code>learned</code>; both reach <code>main</code></td>
+</tr>
+<tr>
+<td>E10</td>
+<td>a fake reflector returns an add of kind <code>rule</code></td>
+<td>accept passes its checks</td>
+<td>the new row has status <code>proposed</code></td>
+</tr>
+<tr>
+<td>E11</td>
+<td><code>memory/lessons.md</code> has one <code>proposed</code> row</td>
+<td><code>scripts/spec.py page</code> runs on a spec</td>
+<td>the page has a <code>Proposed lessons</code> section with that row's text</td>
+</tr>
+<tr>
+<td>E12</td>
+<td>rows <code>L1</code> learned, <code>L2</code> captured, <code>L3</code> proposed, <code>L4</code> retired</td>
+<td>build calls the implementer</td>
+<td>the prompt has a <code>Lessons</code> section with <code>L1</code> and <code>L2</code>, and without <code>L3</code> or <code>L4</code></td>
+</tr>
+<tr>
+<td>E13</td>
+<td>the fake reflector exits 7</td>
+<td>accept passes its checks</td>
+<td>exit 0; the slice is on <code>main</code>; the output names <code>reflector: agent: exit 7</code></td>
+</tr>
+<tr>
+<td>E14</td>
+<td>6 lessons: 4 <code>learned</code>, 2 <code>captured</code></td>
+<td>accept writes the page</td>
+<td><code>Lessons 4 learned / 6</code></td>
+</tr>
+<tr>
+<td>E15</td>
+<td><code>memory/owner.md</code> has a prose sentence of 30 words</td>
+<td>the suite runs</td>
+<td>the prose check names <code>memory/owner.md</code> and <code>30 words</code></td>
+</tr>
+<tr>
+<td>E16</td>
+<td><code>docs/workflow.md</code> has a prose sentence of 30 words</td>
+<td>the suite runs</td>
+<td>no prose finding for <code>docs/workflow.md</code></td>
+</tr>
+<tr>
+<td>E17</td>
+<td><code>memory/owner.md</code> has one sentence of 30 words, wrapped over 3 lines of 10 words</td>
+<td>the prose check runs</td>
+<td>it names <code>memory/owner.md</code> and <code>30 words</code></td>
+</tr>
+<tr>
+<td>E18</td>
+<td><code>memory/north-star/decisions/0004-x.md</code> has a sentence of 40 words</td>
+<td>the prose check runs</td>
+<td>no finding for that file</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-tests">4. Tests</h2>
+<p>Four kinds. Write no other kind.</p>
+<ul>
+<li>example: section 3, one test per example.</li>
+<li>invariant: no learned lesson lacks evidence (K1), and no agent-facing sentence runs over 25 words (W1). Both run on every suite run.</li>
+<li>reconciliation: none.</li>
+<li>e2e run: the fake-agent accept tests run the reflector role through <code>scripts/fake_agent.py</code>.</li>
+</ul>
+<h2 id="5-plan">5. Plan</h2>
+<table>
+<thead>
+<tr>
+<th>task</th>
+<th>does</th>
+<th>requirements</th>
+<th>needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>write <code>memory/lessons.md</code> and <code>memory/owner.md</code> from the snapshot, in English at about 80% ASD-STE100; a lesson whose test exists is <code>learned</code>, the rest <code>captured</code>; fold <code>CLAUDE.md</code> into <code>AGENTS.md</code>; <code>CLAUDE.md</code> becomes <code>@AGENTS.md</code></td>
+<td>A1, A2, A3</td>
+<td></td>
+</tr>
+<tr>
+<td>T2</td>
+<td>add the lessons check to the suite</td>
+<td>K1, K2</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>build records each rejected attempt's reason as a finding</td>
+<td>R1</td>
+<td></td>
+</tr>
+<tr>
+<td>T4</td>
+<td>add the reflector role, prompt and schema; accept runs it after its checks, applies each delta, and sets <code>learned</code> on a helpful delta</td>
+<td>R2, R3, R4, R7</td>
+<td>T3</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>build adds captured and learned lessons to prompts; the spec page lists proposed lessons; the result page counts learned lessons</td>
+<td>R5, R6, R8</td>
+<td>T4</td>
+</tr>
+<tr>
+<td>T6</td>
+<td>the prose check covers every agent-facing file; rewrite the agent-facing prose that fails it, constitution and charter included</td>
+<td>W1</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T7</td>
+<td>vendoring seeds <code>AGENTS.md</code>, the <code>CLAUDE.md</code> import, an empty lessons table and an owner file stub</td>
+<td>A4</td>
+<td>T1</td>
+</tr>
+<tr>
+<td>T8</td>
+<td>the prose check joins the lines of a paragraph and skips history; rewrite every agent-facing sentence that then fails; the shell checks that read <code>CLAUDE.md</code> read <code>AGENTS.md</code>; add the lesson: a check that cannot read its input must fail, not pass, with check <code>test_e17_</code></td>
+<td>W2, W3</td>
+<td>T6, T7</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>No new module and no new library. The reflector is a role in <code>harness.toml</code>, not a module.</p>
+<h2 id="amendments">6. Amendments</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>target</th>
+<th>change</th>
+<th>why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C5</td>
+<td>constitution</td>
+<td>add D8: the harness memory lives in the repo, and <code>AGENTS.md</code> is its index. A lesson is captured when written and learned only with evidence: a running check, or a later slice that applied it.</td>
+<td>the owner: memory in one agent's store is lost; a written lesson is not yet learned</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>constitution</td>
+<td><code>CLAUDE.md</code> becomes a one-line import of <code>AGENTS.md</code>; its rules move into <code>AGENTS.md</code></td>
+<td>one source for every agent</td>
+</tr>
+<tr>
+<td>C7</td>
+<td>constitution</td>
+<td>D5 (ASD-STE100) covers every agent-facing file, not only specs; documents for humans stay free</td>
+<td>ambiguity in what agents read becomes drift</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-assumptions-and-open-items">7. Assumptions and open items</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The reflector runs on Claude Opus, like the judge.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Soft lessons land as <code>captured</code> without the owner. Only rule lessons wait for gate H1.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>A lesson with no helpful delta in its next 5 slices becomes <code>retired</code>. Retiring is left for a later slice.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Build gives every captured and learned lesson to every prompt, until the table grows.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Feature history in the snapshot (features 003–027) stays in git and specs; it does not become lessons.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>After merge, the agent's local memory becomes a pointer to <code>AGENTS.md</code>, with the owner's consent.</td>
+<td>open</td>
+</tr>
+<tr>
+<td>Pre-accept finding, approved by the owner: since spec 029 the prose check counted words per physical line, so wrapped prose passed with 43 sentences over 25 words. T8 fixes the check and the prose.</td>
+<td>decided</td>
+</tr>
+<tr>
+<td>First proposed lesson, from writing this spec: the lint must reject a requirement id that is also a task id. This spec first named a requirement <code>T1</code>.</td>
+<td>open</td>
+</tr>
+</tbody>
+</table>

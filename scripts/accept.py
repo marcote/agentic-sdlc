@@ -19,6 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import build  # noqa: E402
+import lessons  # noqa: E402
 import spec as speclib  # noqa: E402
 
 
@@ -81,6 +82,23 @@ def results_problem(spec_dir, cfg):
     return [] if Path(ns).is_file() else [f"{ns}: north star not found"]
 
 
+def reflect(report, cfg):
+    """Ask the reflector for lesson deltas and apply them (R2). A failed call is printed, never fatal (R7)."""
+    f = Path(lessons.LESSONS)
+    if "reflector" not in cfg["roles"] or not f.is_file():
+        return
+    prompt = ((build.HARNESS / "harness/prompts/reflector.md").read_text()
+              + f"\n\n## Lessons\n\n{f.read_text()}\n\n## Build report\n\n{json.dumps(report, indent=2)}")
+    try:
+        out, why = build.call(cfg, "reflector", prompt, report)
+    except build.Budget as b:
+        out, why = None, str(b)
+    if why:
+        print(f"reflector: {why}")
+    else:
+        f.write_text(lessons.apply(f.read_text(), out["deltas"]))
+
+
 def write_back(spec_dir, cfg):
     results = spec_dir / "results.json"
     if not results.is_file():
@@ -113,13 +131,14 @@ def result_page(spec_dir, report):
     answers = build.git("log", "--basic-regexp", "--grep", f"^spec({spec_dir.name}): answer escalation", "--format=%H").split()
     runs = report.get("runs") or [report]  # a report from before "runs" is one run
     tokens = sum(r.get("tokens") or 0 for r in runs)
+    kept = lessons.with_status("captured", "learned")
     rows = [
         ("Lead time", hours(start, now) + ("" if brief else " (from first commit)")),
         ("Brief → H1", hours(brief, h1)),
         ("H1 → build", hours(h1, built)),
         ("Build → accept", hours(built, now)),
         ("Interventions", str(1 + len(answers))),
-        ("Reused", ", ".join(report["reused"]) or "none"),
+        ("Reused",", ".join(report["reused"]) or "none"),
         ("New", ", ".join(report["new"]) or "none"),
         ("Assumptions", "; ".join(f"{a['task']}: {a['text']}" for a in report["assumptions"]) or "none"),
         ("Tokens", f"{tokens} ({len(runs)} build run{'s' * (len(runs) != 1)})"),
@@ -128,7 +147,7 @@ def result_page(spec_dir, report):
     (spec_dir / "result.html").write_text(
         f"<!doctype html><meta charset='utf-8'><title>Result {spec_dir.name}</title>"
         f"<style>body{{font:15px system-ui;max-width:720px;margin:2em auto;padding:0 16px}}"
-        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table>")
+        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table><p>Lessons {sum(r['status'] == 'learned' for r in kept)} learned / {len(kept)}</p>")
 
 
 def main():
@@ -152,7 +171,7 @@ def main():
     s["slice"] = a.spec_dir.name
     rfile = a.spec_dir / "build-report.json"
     report = json.loads(rfile.read_text()) if rfile.is_file() else {
-        "tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [], "reused": [], "new": [], "started": ""}
+        "tokens": 0, "tasks": {}, "trace": [], "assumptions": [], "escalations": [], "reused": [], "new": [], "findings": [], "started": ""}
     if report["escalations"] or any(t["status"] != "done" for t in report["tasks"].values()):
         print("accept: build has open escalations; answer them and re-run build", file=sys.stderr)
         return 2
@@ -177,8 +196,9 @@ def main():
         print(f"ESCALATIONS ({len(report['escalations'])})")  # includes what the return to build escalated
         print("\n".join(f"- {e['task']}: {e['reason']}" for e in report["escalations"]))
         return 1
+    reflect(report, cfg)
     result_page(a.spec_dir, report)
-    build.git("add", str(a.spec_dir / "result.html"), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
+    build.git("add", str(a.spec_dir / "result.html"), *([lessons.LESSONS] if Path(lessons.LESSONS).is_file() else []), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): verified")
     build.git("checkout", "-q", "main")
     m = subprocess.run(["git", "merge", "--no-ff", "-q", "-m", f"accept({a.spec_dir.name}): merge", branch],

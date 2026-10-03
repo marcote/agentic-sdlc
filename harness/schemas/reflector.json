@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["deltas"],
+  "properties": {
+    "deltas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["op"],
+        "properties": {
+          "op": {"enum": ["add", "helpful", "harmful"]},
+          "kind": {"enum": ["soft", "rule"]},
+          "lesson": {"type": "string"},
+          "source": {"type": "string"},
+          "id": {"type": "string"}
+        }
+      }
+    }
+  }
+}

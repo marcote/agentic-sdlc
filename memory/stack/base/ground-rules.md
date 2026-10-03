@@ -41,8 +41,8 @@ and the first thing anyone does with a thirty-question form is stop reading it.
 ### GR4 — Language, runtime and execution
 - Question: What is this written in, which version, how are dependencies declared, and how is it
   run?
-- Prevents: an implicit toolchain — one that works on the author's machine, is never written
-  down, and has to be reconstructed by whoever arrives next or by the automation that builds it.
+- Prevents: an implicit toolchain. It works on the author's machine and is never written
+  down. Whoever arrives next, or the automation that builds it, has to reconstruct it.
 
 ### GR5 — What "verified" means
 - Question: What does the verification command actually exercise, and what does a passing run
@@ -59,8 +59,8 @@ and the first thing anyone does with a thirty-question form is stop reading it.
 ## Answering, and declining
 
 **Answer** a ground rule with a pin that declares `Answers: GR<n>`. One pin may answer several
-rules; a rule is covered if any live pin claims it. A `SUPERSEDED` pin does **not** count —
-history is not a rationale, and if it counted, amending a pin would silently drop the project
+rules; a rule is covered if any live pin claims it. A `SUPERSEDED` pin does **not** count.
+History is not a rationale. If it counted, amending a pin would silently drop the project
 below the floor.
 
 **Decline** a ground rule that genuinely does not apply:
@@ -72,13 +72,13 @@ below the floor.
 ```
 
 A declination is **not a pin**: no decision was taken, so there is nothing to price and no
-`Buys` or `Forecloses` to state. Its `Falsifier` is what makes it **expire** — a decline written
-in week one stops being valid the moment the project crosses the stated line, instead of
-silently outliving the conditions that justified it.
+`Buys` or `Forecloses` to state. Its `Falsifier` is what makes it **expire**. A decline written
+in week one stops being valid the moment the project crosses the stated line. It does not
+silently outlive the conditions that justified it.
 
 Declining is the escape hatch that keeps this floor cheap for small work: a disposable project
 may honestly decline several rules at one line each. It is also the easiest way to defeat the
-floor without appearing to, so a decline that is convenient rather than true is a defect, not a
+floor without appearing to. So a decline that is convenient rather than true is a defect, not a
 shortcut.
 
 ## The floor does not scale

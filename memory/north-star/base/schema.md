@@ -34,8 +34,8 @@ wins**.
 ## `since` — per-pillar provenance
 
 `since` is the **4-digit number of the ADR that last changed that pillar's `statement` or
-`signal`**. Required. It answers a question the file could not answer before: reading a North Star,
-you could not tell that a signal means something different than it did last month, because the only
+`signal`**. Required. It answers a question the file could not answer before. Reading a North Star,
+you could not tell that a signal means something different than it did last month. The only
 record was the ADR list and a sentence of prose.
 
 - **Not a path.** Paths break on rename; the ADR number is the stable identity the amendment
@@ -54,9 +54,9 @@ record was the ADR list and a sentence of prose.
 ## Unfilled is not valid
 
 A North Star still carrying the values a vendoring stub seeds is **unfilled**, and unfilled is not
-valid. The validator reports it with an exit code **distinct from malformed**, because an adopter's
-day-one state is a well-formed file with nothing in it, not a broken one — the message must say
-*seed it*, not send someone hunting a bug that is not there.
+valid. The validator reports it with an exit code **distinct from malformed**. An adopter's
+day-one state is a well-formed file with nothing in it, not a broken one. The message must say
+*seed it*. It must not send someone hunting a bug that is not there.
 
 The discriminator is **byte identity with the seeded values**, never the presence of a word like
 `TODO`. A product whose domain is to-do lists writes `TODO` legitimately in its own scope, and
@@ -75,9 +75,9 @@ having done the step*; it cannot catch *having done it badly*.
 | `scope.in_scope` | required, **non-empty** array of strings |
 | `scope.out_of_scope` | required, **non-empty** array of strings — used by the scope predicate (`scopeReject`, per-stack) as hard rejection predicates |
 
-A North Star that fails any of these rules **is not schema-valid**, and by
+A North Star that fails any of these rules **is not schema-valid**. By
 the Measurability Gate (`specs/002-north-star-governance/`, criterion
-MEAS-GATE) the flow must refuse to run against it — a non-measurable North Star
+MEAS-GATE) the flow must refuse to run against it. A non-measurable North Star
 cannot govern anything.
 
 ## Validity, not truth
