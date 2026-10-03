@@ -9,8 +9,10 @@ Status: draft for gate H1. Labels: decided, hypothesis, open, reported.
 
 ## 2. Requirements
 
-| id | requirement | anchor | examples |
-| --- | --- | --- | --- |
+| id | requirement | kind | anchor | examples |
+| --- | --- | --- | --- | --- |
+
+Kind is `mechanical` or `semantic`. A `semantic` requirement lists `judged` in examples.
 
 ## 3. Examples
 
@@ -40,6 +42,18 @@ A test may use recorded real data. A test does not mock the project's own code.
 
 | item | justification |
 | --- | --- |
+
+## Memory applied
+
+One row per active lesson in `memory/lessons.md`.
+
+| lesson | applies |
+| --- | --- |
+
+## Sources
+
+| practice | source | implies |
+| --- | --- | --- |
 
 ## 6. Amendments
 

@@ -296,3 +296,14 @@ def test_crash_still_writes_report(slice_repo):
     assert p.returncode == 3, p.stdout + p.stderr
     assert any(e["task"] == "crash" for e in slice_repo.report()["escalations"])
     assert only_report(slice_repo)
+
+
+def test_t0_ignores_same_named_tests_of_other_slices(slice_repo):
+    # Another slice already has a passing test_e1_…; T0 must judge only the tests it wrote.
+    (slice_repo.root / "tests/test_older_slice.py").write_text("def test_e1_older():\n    pass\n")
+    slice_repo.git("add", "-A")
+    slice_repo.git("commit", "-q", "-m", "older slice")
+    slice_repo.script([T0, T1, T2])
+    assert slice_repo.build().returncode == 0
+    assert slice_repo.report()["tasks"]["T0"]["status"] == "done"
+

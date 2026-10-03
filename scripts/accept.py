@@ -14,6 +14,7 @@ import html
 import json
 import subprocess
 import sys
+import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -23,8 +24,10 @@ import lessons  # noqa: E402
 import spec as speclib  # noqa: E402
 
 
-def suite(cfg):
+def suite(cfg, report):
+    t0 = time.monotonic()
     p = subprocess.run(cfg["checks"]["suite"], shell=True, capture_output=True, text=True)
+    report["suite_seconds"] = round(time.monotonic() - t0, 1)
     return p.returncode, (p.stdout + p.stderr)[-1500:]
 
 
@@ -62,8 +65,11 @@ def judge(spec_dir, s, cfg, report, branch):
 
 
 def failures(spec_dir, s, cfg, report, branch):
-    code, out = suite(cfg)
+    code, out = suite(cfg, report)
     found = [] if code == 0 else [f"suite failed:\n{out}"]
+    budget = cfg["limits"].get("suite_seconds")
+    if budget is not None and report["suite_seconds"] > budget:
+        found.append(f"suite took {report['suite_seconds']:g} s, budget {budget:g} s")
     return found + map_findings(cfg) + judge(spec_dir, s, cfg, report, branch)
 
 
@@ -82,13 +88,20 @@ def results_problem(spec_dir, cfg):
     return [] if Path(ns).is_file() else [f"{ns}: north star not found"]
 
 
+CONSTITUTION = Path("memory/constitution/constitution.md")
+
+
+def constitution():
+    return CONSTITUTION.read_text() if CONSTITUTION.is_file() else ""
+
+
 def reflect(report, cfg):
     """Ask the reflector for lesson deltas and apply them (R2). A failed call is printed, never fatal (R7)."""
     f = Path(lessons.LESSONS)
     if "reflector" not in cfg["roles"] or not f.is_file():
         return
     prompt = ((build.HARNESS / "harness/prompts/reflector.md").read_text()
-              + f"\n\n## Lessons\n\n{f.read_text()}\n\n## Build report\n\n{json.dumps(report, indent=2)}")
+              + f"\n\n## Constitution\n\n{constitution()}\n\n## Lessons\n\n{f.read_text()}\n\n## Build report\n\n{json.dumps(report, indent=2)}")
     try:
         out, why = build.call(cfg, "reflector", prompt, report)
     except build.Budget as b:
@@ -97,6 +110,32 @@ def reflect(report, cfg):
         print(f"reflector: {why}")
     else:
         f.write_text(lessons.apply(f.read_text(), out["deltas"]))
+
+
+def curate(report, cfg):
+    """Ask the curator which active lessons conflict with the constitution and mark them proposed (M8, M9).
+    Returns the page text with its counts on the labeled cases (M10). A failed call is printed, never fatal."""
+    f = Path(lessons.LESSONS)
+    if "curator" not in cfg["roles"] or not f.is_file():
+        return "not run"
+    cases = lessons.rows((build.HARNESS / "harness/curator-cases.md").read_text())
+    active = lessons.with_status("active")
+    prompt = ((build.HARNESS / "harness/prompts/curator.md").read_text()
+              + f"\n\n## Constitution\n\n{constitution()}\n\n## Active lessons\n\n" + "\n".join(f"{r['id']}: {r['lesson']}" for r in active)
+              + "\n\n## Cases\n\n" + "\n".join(f"{c['id']}: lesson: {c['lesson']} | rule: {c['rule']}" for c in cases))
+    try:
+        out, why = build.call(cfg, "curator", prompt, report)
+    except build.Budget as b:
+        out, why = None, str(b)
+    if why:
+        print(f"curator: {why}")
+        return "not run"
+    ids = {r["id"] for r in active}
+    f.write_text(lessons.apply(f.read_text(), [{"op": "propose", **c} for c in out["conflicts"] if c["id"] in ids]))
+    named = {c["id"] for c in out["conflicts"]}
+    want = {c["id"] for c in cases if c["label"] == "conflict"}
+    false = len(named & {c["id"] for c in cases} - want)
+    return f"{len(named & want)} of {len(want)} found, {len(want - named)} missed, {false} false alarm{'s' * (false != 1)}"
 
 
 def write_back(spec_dir, cfg):
@@ -112,7 +151,7 @@ def write_back(spec_dir, cfg):
     ns.write_text(text)
 
 
-def result_page(spec_dir, report):
+def result_page(spec_dir, report, cfg, curator="not run"):
     def when(*args):
         out = build.git("log", "--format=%cI", *args).split()
         return datetime.fromisoformat(out[0]) if out else None
@@ -131,7 +170,8 @@ def result_page(spec_dir, report):
     answers = build.git("log", "--basic-regexp", "--grep", f"^spec({spec_dir.name}): answer escalation", "--format=%H").split()
     runs = report.get("runs") or [report]  # a report from before "runs" is one run
     tokens = sum(r.get("tokens") or 0 for r in runs)
-    kept = lessons.with_status("captured", "learned")
+    count = {s: lessons.with_status(s) for s in ("active", "proposed", "promoted", "merged")}
+    used = sum(len(r["lesson"].encode()) for r in count["active"])
     rows = [
         ("Lead time", hours(start, now) + ("" if brief else " (from first commit)")),
         ("Brief → H1", hours(brief, h1)),
@@ -141,13 +181,18 @@ def result_page(spec_dir, report):
         ("Reused",", ".join(report["reused"]) or "none"),
         ("New", ", ".join(report["new"]) or "none"),
         ("Assumptions", "; ".join(f"{a['task']}: {a['text']}" for a in report["assumptions"]) or "none"),
+        ("Suite", f"{report.get('suite_seconds', 0):g} s"),
+        ("Test time", ", ".join(f"{r.get('test_seconds') or 0:g} s" for r in runs)),
+        ("Lessons", f"{len(count['active'])} active ({used} of {cfg['limits'].get('lessons_bytes', 25_000)} bytes), "
+                    + ", ".join(f"{len(count[s])} {s}" for s in ("proposed", "promoted", "merged"))),
+        ("Curator", curator),
         ("Tokens", f"{tokens} ({len(runs)} build run{'s' * (len(runs) != 1)})"),
     ]
     body = "".join(f"<tr><th>{k}</th><td>{html.escape(v)}</td></tr>" for k, v in rows)
     (spec_dir / "result.html").write_text(
         f"<!doctype html><meta charset='utf-8'><title>Result {spec_dir.name}</title>"
         f"<style>body{{font:15px system-ui;max-width:720px;margin:2em auto;padding:0 16px}}"
-        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table><p>Lessons {sum(r['status'] == 'learned' for r in kept)} learned / {len(kept)}</p>")
+        f"th{{text-align:left;padding:6px 16px 6px 0}}</style><h1>Result {spec_dir.name}</h1><table>{body}</table>")
 
 
 def main():
@@ -175,9 +220,17 @@ def main():
     if report["escalations"] or any(t["status"] != "done" for t in report["tasks"].values()):
         print("accept: build has open escalations; answer them and re-run build", file=sys.stderr)
         return 2
+    curator = "not run"
+    early = results_problem(a.spec_dir, cfg)  # before any memory write, so a bad file stops accept early (D4)
+    if not early:  # V1: memory writes are committed before the suite runs
+        reflect(report, cfg)
+        curator = curate(report, cfg)
+        write_back(a.spec_dir, cfg)
+        build.git("add", *(p for p in (lessons.LESSONS, cfg["paths"]["north_star"]) if Path(p).is_file()))
+        build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): memory writes")
     try:
-        bad = failures(a.spec_dir, s, cfg, report, branch)
-        if bad:  # A3: return to build once, with the failures as feedback
+        bad = early or failures(a.spec_dir, s, cfg, report, branch)
+        if bad and not early:  # A3: return to build once, with the failures as feedback
             fix = {"task": "FIX", "requirements": ", ".join(s["reqs"]),
                    "does": "Make accept pass. Failures:\n" + "\n".join(bad)}
             frozen = build.done_on_branch(s["slice"])[0] or set()  # B2 holds on the return
@@ -189,16 +242,16 @@ def main():
     except build.Budget as b:
         build.revert()
         bad = [str(b)]
-    bad = bad or results_problem(a.spec_dir, cfg)
     if bad:
         report["escalations"] += [{"task": "accept", "reason": x} for x in bad]
         rfile.write_text(json.dumps(report, indent=2))
         print(f"ESCALATIONS ({len(report['escalations'])})")  # includes what the return to build escalated
         print("\n".join(f"- {e['task']}: {e['reason']}" for e in report["escalations"]))
         return 1
-    reflect(report, cfg)
-    result_page(a.spec_dir, report)
-    build.git("add", str(a.spec_dir / "result.html"), *([lessons.LESSONS] if Path(lessons.LESSONS).is_file() else []), *([own] if (a.spec_dir / "build-report.json").is_file() else []))
+    report["verified"] = build.git("rev-parse", "HEAD").strip()  # V2: after this, only the slice directory changes
+    rfile.write_text(json.dumps(report, indent=2))
+    result_page(a.spec_dir, report, cfg, curator)
+    build.git("add", str(a.spec_dir / "result.html"), own)
     build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): verified")
     build.git("checkout", "-q", "main")
     m = subprocess.run(["git", "merge", "--no-ff", "-q", "-m", f"accept({a.spec_dir.name}): merge", branch],
@@ -208,9 +261,6 @@ def main():
         build.git("checkout", "-q", branch)
         print(f"ESCALATIONS (1)\n- merge conflict: {m.stdout.strip() or m.stderr.strip()}")
         return 1
-    write_back(a.spec_dir, cfg)
-    build.git("add", cfg["paths"]["north_star"])
-    build.git("commit", "-q", "--allow-empty", "-m", f"accept({a.spec_dir.name}): results reported")
     print(f"accept: merged {branch} into main")
     return 0
 

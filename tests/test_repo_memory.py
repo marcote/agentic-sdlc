@@ -82,21 +82,16 @@ def test_e4_vendor_seeds_memory(tmp_path):
     assert head == HEADER and rows == []
 
 
-def test_e5_learned_with_existing_check(tmp_path):
-    p = lessons_check(tmp_path, [row("L1", "learned", check="tests/test_spec.py::test_e1_undefined_bold_term")])
+def test_e5_promoted_with_existing_check(tmp_path):
+    p = lessons_check(tmp_path, [row("L1", "promoted", check="tests/test_spec.py::test_e1_undefined_bold_term")])
     assert p.returncode == 0 and "L1" not in p.stdout, p.stdout + p.stderr
 
 
-def test_e6_learned_with_missing_check(tmp_path):
-    p = lessons_check(tmp_path, [row("L3", "learned", check="tests/test_x.py::test_missing")])
+def test_e6_promoted_with_missing_check(tmp_path):
+    p = lessons_check(tmp_path, [row("L3", "promoted", check="tests/test_x.py::test_missing")])
     assert p.returncode == 1
     assert "L3: check not found: tests/test_x.py::test_missing" in p.stdout
 
-
-def test_e7_learned_without_evidence(tmp_path):
-    p = lessons_check(tmp_path, [row("L5", "learned")])
-    assert p.returncode == 1
-    assert "L5: learned without evidence" in p.stdout
 
 
 def test_e8_rejected_attempt_is_a_finding(slice_repo):
@@ -109,13 +104,13 @@ def test_e8_rejected_attempt_is_a_finding(slice_repo):
 def test_e9_reflector_adds_and_credits(slice_repo):
     deltas = {"deltas": [{"op": "add", "kind": "soft", "lesson": "UNIQUE_NEW_TEXT", "source": "001-add"},
                          {"op": "helpful", "id": "L2"}]}
-    with_reflector(slice_repo, [row("L2", "captured")], reflector=deltas)
+    with_reflector(slice_repo, [row("L2", "active")], reflector=deltas)
     p = slice_repo.accept()
     assert p.returncode == 0, p.stdout + p.stderr
     rows = {r[0]: r for r in main_lessons(slice_repo)}
     new = next(r for r in rows.values() if "UNIQUE_NEW_TEXT" in r[1])
-    assert new[6] == "captured"
-    assert rows["L2"][4] == "1" and rows["L2"][6] == "learned"
+    assert new[6] == "active"
+    assert rows["L2"][4] == "1" and rows["L2"][6] == "active"
 
 
 def test_e10_rule_lesson_is_proposed(slice_repo):
@@ -128,7 +123,7 @@ def test_e10_rule_lesson_is_proposed(slice_repo):
 
 def test_e11_page_lists_proposed_lessons(tmp_path):
     put(tmp_path, "north-star.md", NS)
-    put(tmp_path, "specs/099-x/spec.md", SLICE_SPEC)
+    put(tmp_path, "specs/099-x/spec.md", "# Spec\n\n## Sources\n\n| practice | source | implies |\n| --- | --- | --- |\n| p | s | i |\n")
     put(tmp_path, LESSONS, table([row("L1", "proposed", text="UNIQUE_PROPOSED_TEXT")]))
     p = spec_cmd("page", "specs/099-x/spec.md", "--north-star", "north-star.md", cwd=tmp_path)
     assert p.returncode == 0, p.stdout + p.stderr
@@ -136,8 +131,8 @@ def test_e11_page_lists_proposed_lessons(tmp_path):
     assert "Proposed lessons" in html and "UNIQUE_PROPOSED_TEXT" in html
 
 
-def test_e12_prompt_has_captured_and_learned(slice_repo):
-    rows = [row("L1", "learned", 1), row("L2", "captured"), row("L3", "proposed"), row("L4", "retired")]
+def test_e12_prompt_has_active_only(slice_repo):
+    rows = [row("L1", "active", 1), row("L2", "active"), row("L3", "proposed"), row("L4", "merged")]
     put(slice_repo.root, LESSONS, table(rows))
     slice_repo.git("add", "-A")
     slice_repo.git("commit", "-q", "-m", "lessons")
@@ -157,10 +152,12 @@ def test_e13_reflector_failure_still_merges(slice_repo):
 
 
 def test_e14_page_counts_lessons(slice_repo):
-    rows = [row(f"L{i}", "learned", 1) for i in range(1, 5)] + [row(f"L{i}", "captured") for i in (5, 6)]
+    rows = [row(f"L{i}", "active", 1) for i in range(1, 5)] + [row(f"L{i}", "proposed") for i in (5, 6)]
     with_reflector(slice_repo, rows)
     assert slice_repo.accept().returncode == 0
-    assert "Lessons 4 learned / 6" in (slice_repo.dir / "result.html").read_text()
+    html = (slice_repo.dir / "result.html").read_text()
+    assert "<th>Lessons</th><td>4 active (" in html
+    assert "bytes), 2 proposed, 0 promoted, 0 merged</td>" in html
 
 
 def prose_check(tmp_path):
